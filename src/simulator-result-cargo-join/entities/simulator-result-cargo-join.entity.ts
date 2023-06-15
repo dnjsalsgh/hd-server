@@ -22,15 +22,6 @@ export class SimulatorResultCargoJoin {
   @Column({ type: 'date', nullable: true })
   deletedAt: Date;
 
-  // @ManyToOne(
-  //   () => SimulatorResult,
-  //   (simulatorResult) => simulatorResult.simulatorResultCargoJoin,
-  // )
-  // simulatorResult: SimulatorResult;
-
-  // @ManyToOne(() => Cargo, (cargo) => cargo.simulatorResultCargoJoin)
-  // cargo: Cargo;
-
   @ManyToOne(
     () => SimulatorResult,
     (simulatorResult) => simulatorResult.simulatorResultCargoJoin,
