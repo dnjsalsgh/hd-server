@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AmrModule } from './amr/amr.module';
@@ -46,6 +46,7 @@ import { TempStorage } from './temp-storage/entities/temp-storage.entity';
 import { TempStorageHistory } from './temp-storage-history/entities/temp-storage-history.entity';
 import { SimulatorResultCargoJoinModule } from './simulator-result-cargo-join/simulator-result-cargo-join.module';
 import { SimulatorResultCargoJoin } from './simulator-result-cargo-join/entities/simulator-result-cargo-join.entity';
+import { LoggerMiddleware } from './middlewares/logger.middleware';
 
 @Module({
   imports: [
@@ -117,4 +118,8 @@ import { SimulatorResultCargoJoin } from './simulator-result-cargo-join/entities
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): any {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

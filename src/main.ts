@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { defaultOutDir } from '@nestjs/cli/lib/configuration/defaults';
 
 declare const module: any;
 
