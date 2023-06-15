@@ -103,12 +103,12 @@ export class Cargo {
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.inspectWorkOrder)
   uldHistories: UldHistory[];
 
+  @OneToMany(() => CargoSccJoin, (cargoSccJoin) => cargoSccJoin.cargo)
+  cargoSccJoin: CargoSccJoin[];
+
   @OneToMany(
     () => SimulatorResultCargoJoin,
     (simulatorResultCargoJoin) => simulatorResultCargoJoin.cargo,
   )
-  simulatorResultCargoJoin: SimulatorResultCargoJoin[];
-
-  @OneToMany(() => CargoSccJoin, (cargoSccJoin) => cargoSccJoin.cargo)
-  cargoSccJoin: CargoSccJoin[];
+  srJoin: SimulatorResultCargoJoin[];
 }

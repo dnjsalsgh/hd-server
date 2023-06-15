@@ -1,7 +1,14 @@
-import { Column, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Uld } from '../../uld/entities/uld.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Cargo } from '../../cargo/entities/cargo.entity';
+import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 
+@Entity()
 export class SimulatorResultCargoJoin {
   @PrimaryGeneratedColumn()
   id: number;
@@ -15,9 +22,21 @@ export class SimulatorResultCargoJoin {
   @Column({ type: 'date', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => Uld, (uld) => uld.simulatorResultCargoJoin)
-  uld: Uld;
+  // @ManyToOne(
+  //   () => SimulatorResult,
+  //   (simulatorResult) => simulatorResult.simulatorResultCargoJoin,
+  // )
+  // simulatorResult: SimulatorResult;
 
-  @ManyToOne(() => Cargo, (cargo) => cargo.simulatorResultCargoJoin)
+  // @ManyToOne(() => Cargo, (cargo) => cargo.simulatorResultCargoJoin)
+  // cargo: Cargo;
+
+  @ManyToOne(
+    () => SimulatorResult,
+    (simulatorResult) => simulatorResult.simulatorResultCargoJoin,
+  )
+  simulatorResult: SimulatorResult;
+
+  @ManyToOne(() => Cargo, (cargo) => cargo.srJoin)
   cargo: Cargo;
 }

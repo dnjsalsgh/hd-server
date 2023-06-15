@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
+import { SimulatorResultCargoJoin } from '../../simulator-result-cargo-join/entities/simulator-result-cargo-join.entity';
 
 @Entity()
 export class SimulatorResult {
@@ -32,7 +33,13 @@ export class SimulatorResult {
   deletedAt: Date;
 
   @ManyToOne(() => Uld, (uld) => uld.simulatorResult)
-  ulds: Uld[];
+  uld: Uld;
+
+  @OneToMany(
+    () => SimulatorResultCargoJoin,
+    (simulatorResultCargoJoin) => simulatorResultCargoJoin.simulatorResult,
+  )
+  simulatorResultCargoJoin: SimulatorResultCargoJoin[];
 
   @OneToMany(
     () => SimulatorHistory,

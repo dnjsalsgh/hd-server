@@ -51,7 +51,7 @@ export class Uld {
   @OneToMany(() => InspectWorkOrder, (inspectWorkOrder) => inspectWorkOrder.uld)
   inspectWorkOrders: InspectWorkOrder[];
 
-  @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.ulds)
+  @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.uld)
   simulatorResult: SimulatorResult[];
 
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.uld)
@@ -62,12 +62,6 @@ export class Uld {
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.inspectWorkOrder)
   uldHistories: UldHistory[];
-
-  @OneToMany(
-    () => SimulatorResultCargoJoin,
-    (simulatorResultCargoJoin) => simulatorResultCargoJoin.uld,
-  )
-  simulatorResultCargoJoin: SimulatorResultCargoJoin[];
 
   @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
   uldSccJoin: UldSccJoin[];

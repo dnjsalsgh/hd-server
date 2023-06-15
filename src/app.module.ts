@@ -45,6 +45,7 @@ import { InspectWorkOrder } from './inspect-work-order/entities/inspect-work-ord
 import { TempStorage } from './temp-storage/entities/temp-storage.entity';
 import { TempStorageHistory } from './temp-storage-history/entities/temp-storage-history.entity';
 import { SimulatorResultCargoJoinModule } from './simulator-result-cargo-join/simulator-result-cargo-join.module';
+import { SimulatorResultCargoJoin } from './simulator-result-cargo-join/entities/simulator-result-cargo-join.entity';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { SimulatorResultCargoJoinModule } from './simulator-result-cargo-join/si
         StorageHistory,
         SimulatorResult,
         SimulatorHistory,
+        SimulatorResultCargoJoin,
       ],
       // autoLoadEntities: true,
       logging: true,
