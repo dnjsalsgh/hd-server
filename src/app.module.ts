@@ -87,7 +87,7 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
         SimulatorResultCargoJoin,
       ],
       // autoLoadEntities: true,
-      logging: true,
+      logging: true, // 쿼리 보여주는 옵션
       synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
     }),
 
