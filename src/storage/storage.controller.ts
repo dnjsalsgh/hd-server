@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  UseFilters,
 } from '@nestjs/common';
 import { StorageService } from './storage.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
@@ -17,13 +18,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Storage } from './entities/storage.entity';
-import {
-  ApiJsonResponse,
-  makeResponseTemplate,
-  responseType,
-} from '../lib/resUtil';
+import { AllExceptionFilter } from '../lib/filter/allException.filter';
 
+// @UseFilters(new AllExceptionFilter())
 @Controller('storage')
+// @UseInterceptors(ResponseInterceptor)
+// @UseFilters(NotFoundExceptionFilter)
 @ApiTags('storage')
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
@@ -35,11 +35,8 @@ export class StorageController {
   })
   @ApiBody({ type: CreateStorageDto })
   @ApiCreatedResponse({ description: '유저를 생성한다.', type: Storage })
-  @ApiJsonResponse(responseType.REG)
-  async create(
-    @Body() createStorageDto: CreateStorageDto,
-    // @Res() res: Response,
-  ) {
+  // @ApiJsonResponse(responseType.REG)
+  async create(@Body() createStorageDto: CreateStorageDto) {
     const storage = await this.storageService.create(createStorageDto);
     // const resJson = makeResponseTemplate(storage, responseType.REG);
     return storage;
@@ -48,16 +45,12 @@ export class StorageController {
   @Get()
   async findAll() {
     const storage = await this.storageService.findAll();
-    const resJson = {
-      data: storage,
-      message: 'Inserted Data succesfully',
-    };
-    return resJson;
+    return storage;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.storageService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.storageService.findOne(+id);
   }
 
   @Put(':id')
