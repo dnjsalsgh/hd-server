@@ -43,6 +43,16 @@ import { TempStorageHistory } from './temp-storage-history/entities/temp-storage
 import { SimulatorResultCargoJoinModule } from './simulator-result-cargo-join/simulator-result-cargo-join.module';
 import { SimulatorResultCargoJoin } from './simulator-result-cargo-join/entities/simulator-result-cargo-join.entity';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
+import { TimeTableModule } from './time-table/time-table.module';
+import { AircraftModule } from './aircraft/aircraft.module';
+import { AircraftScheduleModule } from './aircraft-schedule/aircraft-schedule.module';
+import { CommonCodeModule } from './common-code/common-code.module';
+import { CargoGroupModule } from './cargo-group/cargo-group.module';
+import { TimeTable } from './time-table/entities/time-table.entity';
+import { Aircraft } from './aircraft/entities/aircraft.entity';
+import { AircraftSchedule } from './aircraft-schedule/entities/aircraft-schedule.entity';
+import { CommonCode } from './common-code/entities/common-code.entity';
+import { CargoGroup } from './cargo-group/entities/cargo-group.entity';
 
 @Module({
   imports: [
@@ -79,6 +89,11 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
         SimulatorResult,
         SimulatorHistory,
         SimulatorResultCargoJoin,
+        TimeTable,
+        Aircraft,
+        AircraftSchedule,
+        CommonCode,
+        CargoGroup,
       ],
       // autoLoadEntities: true,
       logging: true, // 쿼리 보여주는 옵션
@@ -106,6 +121,11 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
     SimulatorResultModule,
     SimulatorHistoryModule,
     SimulatorResultCargoJoinModule,
+    TimeTableModule,
+    AircraftModule,
+    AircraftScheduleModule,
+    CommonCodeModule,
+    CargoGroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

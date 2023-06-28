@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { AmrChargeHistory } from '../../amr-charge-history/entities/amr-charge-history.entity';
+import { TimeTable } from '../../time-table/entities/time-table.entity';
 
 @Entity()
 export class Amr {
@@ -63,4 +64,7 @@ export class Amr {
 
   @OneToMany(() => AmrChargeHistory, (amrChargeHistory) => amrChargeHistory.amr)
   amrChargeHistories: AmrChargeHistory[];
+
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.timeTable)
+  timeTables: TimeTable[];
 }

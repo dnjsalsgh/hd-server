@@ -11,6 +11,7 @@ import { SimulatorHistory } from '../../simulator-history/entities/simulator-his
 import { UldType } from '../../uld-type/entities/uld-type.entity';
 import { UldHistory } from '../../uld-history/entities/uld-history.entity';
 import { UldSccJoin } from '../../uld-scc-join/entities/uld-scc-join.entity';
+import { TimeTable } from '../../time-table/entities/time-table.entity';
 
 @Entity()
 export class Uld {
@@ -55,4 +56,7 @@ export class Uld {
 
   @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
   uldSccJoin: UldSccJoin[];
+
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.timeTable)
+  timeTables: TimeTable[];
 }

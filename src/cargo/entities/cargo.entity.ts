@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { InspectWorkOrder } from '../../inspect-work-order/entities/inspect-work-order.entity';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
 import { StorageHistory } from '../../storage-history/entities/storage-history.entity';
@@ -7,6 +13,9 @@ import { TempStorageHistory } from '../../temp-storage-history/entities/temp-sto
 import { UldHistory } from '../../uld-history/entities/uld-history.entity';
 import { SimulatorResultCargoJoin } from '../../simulator-result-cargo-join/entities/simulator-result-cargo-join.entity';
 import { CargoSccJoin } from '../../cargo-scc-join/entities/cargo-scc-join.entity';
+import { CargoGroup } from '../../cargo-group/entities/cargo-group.entity';
+import { CargoGroupModule } from '../../cargo-group/cargo-group.module';
+import { TimeTable } from '../../time-table/entities/time-table.entity';
 
 @Entity()
 export class Cargo {
@@ -73,6 +82,9 @@ export class Cargo {
   @Column({ type: 'date', nullable: true })
   deletedAt: Date;
 
+  @ManyToOne(() => CargoGroup, (cargoGroup) => cargoGroup.cargos)
+  cargoGroup: CargoGroup;
+
   @OneToMany(
     () => InspectWorkOrder,
     (inspectWorkOrder) => inspectWorkOrder.cargo,
@@ -111,4 +123,7 @@ export class Cargo {
     (simulatorResultCargoJoin) => simulatorResultCargoJoin.cargo,
   )
   srJoin: SimulatorResultCargoJoin[];
+
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.timeTable)
+  timeTables: TimeTable[];
 }
