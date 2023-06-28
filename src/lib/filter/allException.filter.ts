@@ -32,7 +32,8 @@ export class AllExceptionFilter implements ExceptionFilter {
       message: exception.message,
     };
 
-    if (status === 404) {
+    // 404 에러
+    if (status === HttpStatus.NOT_FOUND) {
       json.message = 'Page not found';
     }
     response.status(status).json(json);

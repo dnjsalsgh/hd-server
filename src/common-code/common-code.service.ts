@@ -1,15 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCommonCodeDto } from './dto/create-common-code.dto';
 import { UpdateCommonCodeDto } from './dto/update-common-code.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CommonCode } from './entities/common-code.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CommonCodeService {
-  create(createCommonCodeDto: CreateCommonCodeDto) {
-    return 'This action adds a new commonCode';
+  constructor(
+    @InjectRepository(CommonCode)
+    private readonly commonCodeRepository: Repository<CommonCode>,
+  ) {}
+  async create(createCommonCodeDto: CreateCommonCodeDto) {
+    const result = await this.commonCodeRepository.save(createCommonCodeDto);
+    return result;
   }
 
-  findAll() {
-    return `This action returns all commonCode`;
+  async findAll() {
+    return await this.commonCodeRepository.find();
   }
 
   findOne(id: number) {

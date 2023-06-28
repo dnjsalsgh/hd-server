@@ -53,7 +53,7 @@ import { Aircraft } from './aircraft/entities/aircraft.entity';
 import { AircraftSchedule } from './aircraft-schedule/entities/aircraft-schedule.entity';
 import { CommonCode } from './common-code/entities/common-code.entity';
 import { CargoGroup } from './cargo-group/entities/cargo-group.entity';
-
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 @Module({
   imports: [
     //env 파일 사용
@@ -98,6 +98,7 @@ import { CargoGroup } from './cargo-group/entities/cargo-group.entity';
       // autoLoadEntities: true,
       logging: true, // 쿼리 보여주는 옵션
       synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
+      namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
     }),
 
     // TypeOrmModule.forRoot(typeormConfig),

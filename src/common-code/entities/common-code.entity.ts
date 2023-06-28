@@ -3,11 +3,9 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Entity()
 export class CommonCode {
@@ -17,7 +15,7 @@ export class CommonCode {
   @Column({ type: 'varchar', length: 50, nullable: true })
   name: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   code: string;
 
   @Column({ type: 'varchar', length: 50, nullable: false })

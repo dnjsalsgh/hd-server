@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AircraftSchedule } from './entities/aircraft-schedule.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AircraftScheduleService {
+  constructor(
+    @InjectRepository(AircraftSchedule)
+    private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
+  ) {}
   create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
-    return 'This action adds a new aircraftSchedule';
+    createAircraftScheduleDto.code = new Date().getTime().toString();
+    return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
   }
 
   findAll() {

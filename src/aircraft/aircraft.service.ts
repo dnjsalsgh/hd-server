@@ -1,19 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAircraftDto } from './dto/create-aircraft.dto';
 import { UpdateAircraftDto } from './dto/update-aircraft.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Aircraft } from './entities/aircraft.entity';
+import { Repository } from 'typeorm';
+import { Storage } from '../storage/entities/storage.entity';
 
 @Injectable()
 export class AircraftService {
-  create(createAircraftDto: CreateAircraftDto) {
-    return 'This action adds a new aircraft';
+  constructor(
+    @InjectRepository(Aircraft)
+    private readonly aircraftRepository: Repository<Aircraft>,
+  ) {}
+  async create(createAircraftDto: CreateAircraftDto) {
+    createAircraftDto.code = new Date().getTime().toString();
+    const result = await this.aircraftRepository.save(createAircraftDto);
+    return result;
   }
 
-  findAll() {
-    return `This action returns all aircraft`;
+  async findAll() {
+    const result = await this.aircraftRepository.find();
+    return result;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} aircraft`;
+  async findOne(id: number) {
+    const result = await this.aircraftRepository.findOne({ where: { id: id } });
+    return result;
   }
 
   update(id: number, updateAircraftDto: UpdateAircraftDto) {
