@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AmrModule } from './amr/amr.module';
-import { AmrDataModule } from './amr-data/amr-data.module';
 import { AmrChargerModule } from './amr-charger/amr-charger.module';
 import { AmrChargeHistoryModule } from './amr-charge-history/amr-charge-history.module';
 import { StorageModule } from './storage/storage.module';
@@ -13,7 +12,6 @@ import { UldModule } from './uld/uld.module';
 import { UldHistoryModule } from './uld-history/uld-history.module';
 import { UldSccJoinModule } from './uld-scc-join/uld-scc-join.module';
 import { UldTypeModule } from './uld-type/uld-type.module';
-import { StackerDataModule } from './stacker-data/stacker-data.module';
 import { StorageWorkOrderModule } from './storage-work-order/storage-work-order.module';
 import { InspectWorkOrderModule } from './inspect-work-order/inspect-work-order.module';
 import { TempStorageModule } from './temp-storage/temp-storage.module';
@@ -25,7 +23,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as process from 'process';
 import { Amr } from './amr/entities/amr.entity';
-import { AmrData } from './amr-data/entities/amr-data.entity';
 import { AmrCharger } from './amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from './amr-charge-history/entities/amr-charge-history.entity';
 import { Cargo } from './cargo/entities/cargo.entity';
@@ -39,7 +36,6 @@ import { StorageHistory } from './storage-history/entities/storage-history.entit
 import { UldSccJoin } from './uld-scc-join/entities/uld-scc-join.entity';
 import { UldHistory } from './uld-history/entities/uld-history.entity';
 import { UldType } from './uld-type/entities/uld-type.entity';
-import { StackerData } from './stacker-data/entities/stacker-data.entity';
 import { StorageWorkOrder } from './storage-work-order/entities/storage-work-order.entity';
 import { InspectWorkOrder } from './inspect-work-order/entities/inspect-work-order.entity';
 import { TempStorage } from './temp-storage/entities/temp-storage.entity';
@@ -65,7 +61,6 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
       database: process.env.DATABASE_NAME,
       entities: [
         Amr,
-        AmrData,
         AmrCharger,
         AmrChargeHistory,
         Storage,
@@ -76,7 +71,6 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
         UldHistory,
         UldSccJoin,
         UldType,
-        StackerData,
         StorageWorkOrder,
         InspectWorkOrder,
         TempStorage,
@@ -94,7 +88,6 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
     // TypeOrmModule.forRoot(typeormConfig),
 
     AmrModule,
-    AmrDataModule,
     AmrChargerModule,
     AmrChargeHistoryModule,
     StorageModule,
@@ -105,7 +98,6 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
     UldHistoryModule,
     UldSccJoinModule,
     UldTypeModule,
-    StackerDataModule,
     StorageWorkOrderModule,
     InspectWorkOrderModule,
     TempStorageModule,

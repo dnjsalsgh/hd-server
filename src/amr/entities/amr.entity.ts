@@ -1,7 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { AmrChargeHistory } from '../../amr-charge-history/entities/amr-charge-history.entity';
-import { AmrData } from '../../amr-data/entities/amr-data.entity';
-import { StackerData } from '../../stacker-data/entities/stacker-data.entity';
 
 @Entity()
 export class Amr {
@@ -65,10 +63,4 @@ export class Amr {
 
   @OneToMany(() => AmrChargeHistory, (amrChargeHistory) => amrChargeHistory.amr)
   amrChargeHistories: AmrChargeHistory[];
-
-  @OneToMany(() => AmrData, (amrData) => amrData.amr)
-  amrDatas: AmrData[];
-
-  @OneToMany(() => StackerData, (stackerData) => stackerData.amr)
-  stackerDatas: StackerData[];
 }

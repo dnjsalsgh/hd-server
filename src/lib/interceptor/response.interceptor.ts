@@ -4,9 +4,9 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { map, Observable, throwError } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ServerResponse } from 'http';
-import { catchError } from 'rxjs/operators';
+
 export interface Response<T> {
   data: T;
 }
@@ -20,11 +20,13 @@ export class ResponseInterceptor implements NestInterceptor<ServerResponse> {
     const httpResponseObject = context
       .switchToHttp()
       .getResponse<ServerResponse>();
+    const ctx = context.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
 
     const { url, method } = httpResponseObject.req;
     const statusCode = httpResponseObject.statusCode;
     const splitUrl = url.split('/')[1];
-    const req = context.switchToHttp().getRequest();
 
     let message = '';
 
