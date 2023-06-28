@@ -3,7 +3,7 @@ import { BaseExceptionFilter } from '@nestjs/core';
 import { QueryFailedError, TypeORMError } from 'typeorm';
 
 @Catch(TypeORMError)
-export class TypeORMExceptionFilter extends BaseExceptionFilter {
+export class TypeOrmExceptionFilter extends BaseExceptionFilter {
   catch(exception: QueryFailedError | TypeORMError, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse();
     let status = HttpStatus.INTERNAL_SERVER_ERROR; // 기본적으로 내부 서버 오류 상태 코드로 설정
@@ -15,10 +15,9 @@ export class TypeORMExceptionFilter extends BaseExceptionFilter {
       status = HttpStatus.BAD_REQUEST; // 예를 들어, 잘못된 요청 상태 코드로 설정
       remark = exception.driverError;
     } else if (exception instanceof TypeORMError) {
-      console.log('Typeorm Error 발생');
       remark = exception.toString();
-      console.log('exception = ', exception);
     }
+
     errorMessage = 'TypeORM Error: ' + exception.message;
     response
       .status(status)
