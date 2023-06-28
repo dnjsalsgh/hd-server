@@ -28,13 +28,17 @@ export class AircraftSchedule {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @ManyToOne(() => Aircraft, (aircraft) => aircraft.aircraftSchedules)
+  @ManyToOne(() => Aircraft, (aircraft) => aircraft.aircraftSchedules, {
+    nullable: false,
+  })
   aircraft: Aircraft;
 
   // commonCode의 일방향 관계설정
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.aircraftSchedules)
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.id)
-  @ManyToOne(() => CommonCode)
+  @ManyToOne(() => CommonCode, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'cc_id_destination' }) // 원하는 컬럼 이름을 지정합니다.
   ccIdDestination: CommonCode;
 }

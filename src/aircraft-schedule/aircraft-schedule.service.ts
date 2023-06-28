@@ -17,7 +17,11 @@ export class AircraftScheduleService {
   }
 
   findAll() {
-    return `This action returns all aircraftSchedule`;
+    console.log('서비스 들어옴');
+    const result = this.aircraftScheduleRepository.find({
+      relations: ['aircraftId'],
+    });
+    return result;
   }
 
   findOne(id: number) {

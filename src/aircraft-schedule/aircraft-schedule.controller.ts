@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
 import { AircraftScheduleService } from './aircraft-schedule.service';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
@@ -24,6 +24,7 @@ export class AircraftScheduleController {
 
   @Get()
   findAll() {
+    console.log('컨트롤러 들어옴');
     return this.aircraftScheduleService.findAll();
   }
 
