@@ -47,11 +47,15 @@ export class ResponseInterceptor implements NestInterceptor<ServerResponse> {
     }
 
     return next.handle().pipe(
-      map((data) => ({
-        statusCode,
-        message,
-        data,
-      })),
+      map((data) => {
+        // const length = data?.length;
+        // data.unshift(length);
+        return {
+          statusCode: statusCode,
+          message: message,
+          data: data,
+        };
+      }),
     );
   }
 }

@@ -4,6 +4,7 @@ import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AircraftSchedule } from './entities/aircraft-schedule.entity';
 import { Repository } from 'typeorm';
+import { AircraftAttribute } from '../aircraft/entities/aircraft.entity';
 
 @Injectable()
 export class AircraftScheduleService {
@@ -11,28 +12,47 @@ export class AircraftScheduleService {
     @InjectRepository(AircraftSchedule)
     private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
   ) {}
+
   create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
-    createAircraftScheduleDto.code = new Date().getTime().toString();
+    // createAircraftScheduleDto.code = new Date().getTime().toString();
     return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
   }
 
-  findAll() {
-    console.log('서비스 들어옴');
-    const result = this.aircraftScheduleRepository.find({
-      relations: ['aircraftId'],
-    });
+  async findAll(source: string) {
+    const queryBuilder = await this.aircraftScheduleRepository
+      .createQueryBuilder('aircraftSchedule')
+      .leftJoinAndSelect('aircraftSchedule.Aircraft', 'aircraft')
+      .select(['aircraftSchedule', ...AircraftAttribute])
+      .where('aircraftSchedule.source = :source', { source: source });
+
+    const result = await queryBuilder.getMany();
+
     return result;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} aircraftSchedule`;
+  async findOne(id: number) {
+    return await this.aircraftScheduleRepository.find({
+      where: { id: id },
+      relations: {
+        Aircraft: true,
+      },
+    });
   }
 
-  update(id: number, updateAircraftScheduleDto: UpdateAircraftScheduleDto) {
-    return `This action updates a #${id} aircraftSchedule`;
+  async update(
+    id: number,
+    updateAircraftScheduleDto: UpdateAircraftScheduleDto,
+  ) {
+    const { source, Aircraft, CcIdDestination } = updateAircraftScheduleDto;
+    await this.aircraftScheduleRepository.update(id, {
+      source,
+      Aircraft,
+      CcIdDestination,
+    });
+    return;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} aircraftSchedule`;
+  async remove(id: number) {
+    return await this.aircraftScheduleRepository.delete(id);
   }
 }

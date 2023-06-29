@@ -34,7 +34,9 @@ export class Aircraft {
 
   @OneToMany(
     () => AircraftSchedule,
-    (aircraftSchedule) => aircraftSchedule.aircraft,
+    (aircraftSchedule) => aircraftSchedule.Aircraft,
   )
-  aircraftSchedules: AircraftSchedule[];
+  AircraftSchedules: AircraftSchedule[];
 }
+
+export const AircraftAttribute: string[] = ['aircraft.code', 'aircraft.name'];
