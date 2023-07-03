@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { AmrChargerService } from './amr-charger.service';
 import { CreateAmrChargerDto } from './dto/create-amr-charger.dto';
@@ -32,7 +32,7 @@ export class AmrChargerController {
     return this.amrChargerService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateAmrChargerDto: UpdateAmrChargerDto,
