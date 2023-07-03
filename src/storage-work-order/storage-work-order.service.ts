@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStorageWorkOrderDto } from './dto/create-storage-work-order.dto';
 import { UpdateStorageWorkOrderDto } from './dto/update-storage-work-order.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { StorageWorkOrder } from './entities/storage-work-order.entity';
 
 @Injectable()
 export class StorageWorkOrderService {
-  create(createStorageWorkOrderDto: CreateStorageWorkOrderDto) {
-    return 'This action adds a new storageWorkOrder';
+  constructor(
+    @InjectRepository(StorageWorkOrder)
+    private readonly storageWorkOrderRepository: Repository<StorageWorkOrder>,
+  ) {}
+  async create(
+    createStorageWorkOrderDto: CreateStorageWorkOrderDto,
+  ): Promise<StorageWorkOrder> {
+    const storage = await this.storageWorkOrderRepository.create(
+      createStorageWorkOrderDto,
+    );
+
+    await this.storageWorkOrderRepository.save(storage);
+    return storage;
   }
 
-  findAll() {
-    return `This action returns all storageWorkOrder`;
+  async findAll() {
+    return await this.storageWorkOrderRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} storageWorkOrder`;
+  async findOne(id: number) {
+    const result = await this.storageWorkOrderRepository.findOne({
+      where: { id: id },
+    });
+    return result;
   }
 
   update(id: number, updateStorageWorkOrderDto: UpdateStorageWorkOrderDto) {
-    return `This action updates a #${id} storageWorkOrder`;
+    return this.storageWorkOrderRepository.update(
+      id,
+      updateStorageWorkOrderDto,
+    );
   }
 
   remove(id: number) {
-    return `This action removes a #${id} storageWorkOrder`;
+    return this.storageWorkOrderRepository.delete(id);
   }
 }

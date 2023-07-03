@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { StorageWorkOrderService } from './storage-work-order.service';
 import { CreateStorageWorkOrderDto } from './dto/create-storage-work-order.dto';
@@ -34,7 +35,7 @@ export class StorageWorkOrderController {
     return this.storageWorkOrderService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateStorageWorkOrderDto: UpdateStorageWorkOrderDto,
