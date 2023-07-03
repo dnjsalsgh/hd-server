@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { StorageHistoryService } from './storage-history.service';
 import { CreateStorageHistoryDto } from './dto/create-storage-history.dto';
@@ -32,7 +33,7 @@ export class StorageHistoryController {
     return this.storageHistoryService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateStorageHistoryDto: UpdateStorageHistoryDto,

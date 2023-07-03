@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStorageHistoryDto } from './dto/create-storage-history.dto';
 import { UpdateStorageHistoryDto } from './dto/update-storage-history.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Storage } from '../storage/entities/storage.entity';
+import { Repository } from 'typeorm';
+import { CreateStorageDto } from '../storage/dto/create-storage.dto';
+import { UpdateStorageDto } from '../storage/dto/update-storage.dto';
+import { StorageHistory } from './entities/storage-history.entity';
 
 @Injectable()
 export class StorageHistoryService {
-  create(createStorageHistoryDto: CreateStorageHistoryDto) {
-    return 'This action adds a new storageHistory';
+  constructor(
+    @InjectRepository(StorageHistory)
+    private readonly storageHistoryRepository: Repository<StorageHistory>,
+  ) {}
+  async create(
+    createStorageHistoryDto: CreateStorageHistoryDto,
+  ): Promise<StorageHistory> {
+    const storage = await this.storageHistoryRepository.create(
+      createStorageHistoryDto,
+    );
+
+    await this.storageHistoryRepository.save(storage);
+    return storage;
   }
 
-  findAll() {
-    return `This action returns all storageHistory`;
+  async findAll() {
+    return await this.storageHistoryRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} storageHistory`;
+  async findOne(id: number) {
+    const result = await this.storageHistoryRepository.findOne({
+      where: { id: id },
+    });
+    return result;
   }
 
   update(id: number, updateStorageHistoryDto: UpdateStorageHistoryDto) {
-    return `This action updates a #${id} storageHistory`;
+    return this.storageHistoryRepository.update(id, updateStorageHistoryDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} storageHistory`;
+    return this.storageHistoryRepository.delete(id);
   }
 }
