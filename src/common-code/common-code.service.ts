@@ -20,15 +20,15 @@ export class CommonCodeService {
     return await this.commonCodeRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} commonCode`;
+  async findOne(id: number) {
+    return await this.commonCodeRepository.find({ where: { id: id } });
   }
 
   update(id: number, updateCommonCodeDto: UpdateCommonCodeDto) {
-    return `This action updates a #${id} commonCode`;
+    return this.commonCodeRepository.update(id, updateCommonCodeDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} commonCode`;
+    return this.commonCodeRepository.delete(id);
   }
 }

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { CommonCodeService } from './common-code.service';
 import { CreateCommonCodeDto } from './dto/create-common-code.dto';
@@ -32,7 +33,7 @@ export class CommonCodeController {
     return this.commonCodeService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateCommonCodeDto: UpdateCommonCodeDto,
