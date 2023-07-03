@@ -1,26 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUldTypeDto } from './dto/create-uld-type.dto';
 import { UpdateUldTypeDto } from './dto/update-uld-type.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UldType } from './entities/uld-type.entity';
 
 @Injectable()
 export class UldTypeService {
-  create(createUldTypeDto: CreateUldTypeDto) {
-    return 'This action adds a new uldType';
+  constructor(
+    @InjectRepository(UldType)
+    private readonly uldTypeRepository: Repository<UldType>,
+  ) {}
+  async create(createUldTypeDto: CreateUldTypeDto) {
+    const result = await this.uldTypeRepository.create(createUldTypeDto);
+
+    await this.uldTypeRepository.save(result);
+    return result;
   }
 
-  findAll() {
-    return `This action returns all uldType`;
+  async findAll() {
+    return await this.uldTypeRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} uldType`;
+  async findOne(id: number) {
+    const result = await this.uldTypeRepository.findOne({
+      where: { id: id },
+    });
+    return result;
   }
 
   update(id: number, updateUldTypeDto: UpdateUldTypeDto) {
-    return `This action updates a #${id} uldType`;
+    return this.uldTypeRepository.update(id, updateUldTypeDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} uldType`;
+    return this.uldTypeRepository.delete(id);
   }
 }

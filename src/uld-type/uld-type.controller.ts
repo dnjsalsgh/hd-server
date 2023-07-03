@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { UldTypeService } from './uld-type.service';
 import { CreateUldTypeDto } from './dto/create-uld-type.dto';
@@ -32,7 +33,7 @@ export class UldTypeController {
     return this.uldTypeService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateUldTypeDto: UpdateUldTypeDto) {
     return this.uldTypeService.update(+id, updateUldTypeDto);
   }
