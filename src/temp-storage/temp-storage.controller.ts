@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { TempStorageService } from './temp-storage.service';
 import { CreateTempStorageDto } from './dto/create-temp-storage.dto';
@@ -32,7 +32,7 @@ export class TempStorageController {
     return this.tempStorageService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateTempStorageDto: UpdateTempStorageDto,
