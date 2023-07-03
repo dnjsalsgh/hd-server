@@ -1,26 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUldDto } from './dto/create-uld.dto';
 import { UpdateUldDto } from './dto/update-uld.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TimeTable } from '../time-table/entities/time-table.entity';
+import { Repository } from 'typeorm';
+import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
+import { UpdateTimeTableDto } from '../time-table/dto/update-time-table.dto';
+import { Uld } from './entities/uld.entity';
 
 @Injectable()
 export class UldService {
-  create(createUldDto: CreateUldDto) {
-    return 'This action adds a new uld';
+  constructor(
+    @InjectRepository(Uld)
+    private readonly uldRepository: Repository<Uld>,
+  ) {}
+  async create(createUldDto: CreateUldDto) {
+    const result = await this.uldRepository.create(createUldDto);
+
+    await this.uldRepository.save(result);
+    return result;
   }
 
-  findAll() {
-    return `This action returns all uld`;
+  async findAll() {
+    return await this.uldRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} uld`;
+  async findOne(id: number) {
+    const result = await this.uldRepository.findOne({
+      where: { id: id },
+    });
+    return result;
   }
 
   update(id: number, updateUldDto: UpdateUldDto) {
-    return `This action updates a #${id} uld`;
+    return this.uldRepository.update(id, updateUldDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} uld`;
+    return this.uldRepository.delete(id);
   }
 }

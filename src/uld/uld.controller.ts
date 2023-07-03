@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { UldService } from './uld.service';
 import { CreateUldDto } from './dto/create-uld.dto';
@@ -32,7 +33,7 @@ export class UldController {
     return this.uldService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateUldDto: UpdateUldDto) {
     return this.uldService.update(+id, updateUldDto);
   }

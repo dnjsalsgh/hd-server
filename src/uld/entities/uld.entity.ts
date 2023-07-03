@@ -1,9 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { InspectWorkOrder } from '../../inspect-work-order/entities/inspect-work-order.entity';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
@@ -12,33 +15,54 @@ import { UldType } from '../../uld-type/entities/uld-type.entity';
 import { UldHistory } from '../../uld-history/entities/uld-history.entity';
 import { UldSccJoin } from '../../uld-scc-join/entities/uld-scc-join.entity';
 import { TimeTable } from '../../time-table/entities/time-table.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Uld {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty({
+    example: 'uld-001',
+    description: 'uld 코드',
+  })
   @Column({ type: 'varchar', length: 50, nullable: true })
   code: string;
 
+  @ApiProperty({
+    example: '프리맵명',
+    description: '프리맵명',
+  })
   @Column({ type: 'varchar', length: 50, nullable: true })
   prefab: string;
 
+  @ApiProperty({
+    example: '보잉070',
+    description: '항공기종류',
+  })
   @Column({ type: 'varchar', length: 50, nullable: true })
   airplaneType: string;
 
+  @ApiProperty({
+    example: true,
+    description: '시뮬레이션모드',
+  })
   @Column({ type: 'boolean', nullable: true })
   simulation: boolean;
 
-  @Column({ type: 'date', nullable: false })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'date', nullable: false })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'date', nullable: true })
-  deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 
+  @ApiProperty({
+    example: 1,
+    description: 'uld유형 FK',
+  })
   @ManyToOne(() => UldType, (uldType) => uldType.ulds)
   uldType: UldType;
 
@@ -57,6 +81,6 @@ export class Uld {
   @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
   uldSccJoin: UldSccJoin[];
 
-  @OneToMany(() => TimeTable, (timeTable) => timeTable.timeTable)
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.uld)
   timeTables: TimeTable[];
 }
