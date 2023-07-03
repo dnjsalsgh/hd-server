@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { SimulatorResultService } from './simulator-result.service';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
@@ -34,7 +35,7 @@ export class SimulatorResultController {
     return this.simulatorResultService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateSimulatorResultDto: UpdateSimulatorResultDto,

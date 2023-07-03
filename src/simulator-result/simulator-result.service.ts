@@ -1,26 +1,37 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { SimulatorResult } from './entities/simulator-result.entity';
+import { Repository } from 'typeorm';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
 
 @Injectable()
 export class SimulatorResultService {
-  create(createSimulatorResultDto: CreateSimulatorResultDto) {
-    return 'This action adds a new simulatorResult';
+  constructor(
+    @InjectRepository(SimulatorResult)
+    private readonly simulatorResultRepository: Repository<SimulatorResult>,
+  ) {}
+
+  async create(createSimulatorResultDto: CreateSimulatorResultDto) {
+    const result = await this.simulatorResultRepository.save(
+      createSimulatorResultDto,
+    );
+    return result;
   }
 
-  findAll() {
-    return `This action returns all simulatorResult`;
+  async findAll() {
+    return await this.simulatorResultRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} simulatorResult`;
+  async findOne(id: number) {
+    return await this.simulatorResultRepository.find({ where: { id: id } });
   }
 
   update(id: number, updateSimulatorResultDto: UpdateSimulatorResultDto) {
-    return `This action updates a #${id} simulatorResult`;
+    return this.simulatorResultRepository.update(id, updateSimulatorResultDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} simulatorResult`;
+    return this.simulatorResultRepository.delete(id);
   }
 }
