@@ -1,4 +1,12 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Amr } from '../../amr/entities/amr.entity';
 import { Uld } from '../../uld/entities/uld.entity';
 import { StorageWorkOrder } from '../../storage-work-order/entities/storage-work-order.entity';
@@ -11,14 +19,14 @@ export class TempStorageHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'date', nullable: false })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'date', nullable: false })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'date', nullable: true })
-  deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 
   @ManyToOne(
     () => StorageWorkOrder,

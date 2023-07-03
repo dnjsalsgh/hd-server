@@ -1,26 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTempStorageHistoryDto } from './dto/create-temp-storage-history.dto';
 import { UpdateTempStorageHistoryDto } from './dto/update-temp-storage-history.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TempStorageHistory } from './entities/temp-storage-history.entity';
 
 @Injectable()
 export class TempStorageHistoryService {
-  create(createTempStorageHistoryDto: CreateTempStorageHistoryDto) {
-    return 'This action adds a new tempStorageHistory';
+  constructor(
+    @InjectRepository(TempStorageHistory)
+    private readonly tempStorageHistoryRepository: Repository<TempStorageHistory>,
+  ) {}
+  async create(createTempStorageHistoryDto: CreateTempStorageHistoryDto) {
+    const storage = await this.tempStorageHistoryRepository.create(
+      createTempStorageHistoryDto,
+    );
+
+    await this.tempStorageHistoryRepository.save(storage);
+    return storage;
   }
 
-  findAll() {
-    return `This action returns all tempStorageHistory`;
+  async findAll() {
+    return await this.tempStorageHistoryRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tempStorageHistory`;
+  async findOne(id: number) {
+    const result = await this.tempStorageHistoryRepository.findOne({
+      where: { id: id },
+    });
+    return result;
   }
 
   update(id: number, updateTempStorageHistoryDto: UpdateTempStorageHistoryDto) {
-    return `This action updates a #${id} tempStorageHistory`;
+    return this.tempStorageHistoryRepository.update(
+      id,
+      updateTempStorageHistoryDto,
+    );
   }
 
   remove(id: number) {
-    return `This action removes a #${id} tempStorageHistory`;
+    return this.tempStorageHistoryRepository.delete(id);
   }
 }

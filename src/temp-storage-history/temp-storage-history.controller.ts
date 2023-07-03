@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { TempStorageHistoryService } from './temp-storage-history.service';
 import { CreateTempStorageHistoryDto } from './dto/create-temp-storage-history.dto';
@@ -34,7 +35,7 @@ export class TempStorageHistoryController {
     return this.tempStorageHistoryService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateTempStorageHistoryDto: UpdateTempStorageHistoryDto,
