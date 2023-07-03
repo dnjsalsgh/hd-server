@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { CargoSccJoinService } from './cargo-scc-join.service';
 import { CreateCargoSccJoinDto } from './dto/create-cargo-scc-join.dto';
@@ -32,7 +33,7 @@ export class CargoSccJoinController {
     return this.cargoSccJoinService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateCargoSccJoinDto: UpdateCargoSccJoinDto,
