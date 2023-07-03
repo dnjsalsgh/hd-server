@@ -29,10 +29,10 @@ export class StorageService {
   }
 
   update(id: number, updateStorageDto: UpdateStorageDto) {
-    return `This action updates a #${id} storage`;
+    return this.storageRepository.update(id, updateStorageDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} storage`;
+    return this.storageRepository.delete(id);
   }
 }

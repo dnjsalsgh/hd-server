@@ -10,12 +10,17 @@ import {
 import { StorageHistory } from '../../storage-history/entities/storage-history.entity';
 import { StorageWorkOrder } from '../../storage-work-order/entities/storage-work-order.entity';
 import { TempStorageHistory } from '../../temp-storage-history/entities/temp-storage-history.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Storage {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty({
+    example: 'test',
+    description: '창고 위치 이름',
+  })
   @Column({ type: 'varchar', length: 50, nullable: true })
   name: string;
 
@@ -25,21 +30,45 @@ export class Storage {
   @Column({ type: 'int', nullable: false, default: 0 })
   level: number;
 
+  @ApiProperty({
+    example: 'fullPath',
+    description: '창고의 위치',
+  })
   @Column({ type: 'varchar', length: 500, nullable: true })
   fullPath: string;
 
+  @ApiProperty({
+    example: 0,
+    description: '넣은 순서',
+  })
   @Column({ type: 'int', nullable: true })
   orderby: number;
 
+  @ApiProperty({
+    example: 0,
+    description: 'x좌표',
+  })
   @Column({ type: 'double precision', nullable: true })
   x: number;
 
+  @ApiProperty({
+    example: 0,
+    description: 'y좌표',
+  })
   @Column({ type: 'double precision', nullable: true })
   y: number;
 
+  @ApiProperty({
+    example: 0,
+    description: 'z좌표',
+  })
   @Column({ type: 'double precision', nullable: true })
   z: number;
 
+  @ApiProperty({
+    example: true,
+    description: '시뮬레이션 모드 확인',
+  })
   @Column({ type: 'boolean', nullable: true })
   simulation: boolean;
 
