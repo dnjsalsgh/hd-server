@@ -22,7 +22,6 @@ export class AircraftScheduleService {
   ) {}
 
   create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
-    // createAircraftScheduleDto.code = new Date().getTime().toString();
     return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
   }
 

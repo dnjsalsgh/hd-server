@@ -16,31 +16,31 @@ export class Aircraft {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @IsString()
-  @MaxLength(50)
-  @IsNotEmpty()
-  @Column({ type: 'varchar', length: 50, nullable: true })
   @ApiProperty({
     example: 'test',
     description: '항공기 이름',
   })
-  name: string;
-
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  name: string;
+
   @ApiProperty({
     example: 'test',
     description: '고유코드',
   })
+  @IsString()
+  @MaxLength(50)
+  @IsNotEmpty()
+  @Column({ type: 'varchar', length: 50, nullable: false })
   code: string;
 
-  @Column({ type: 'jsonb', nullable: false })
   @ApiProperty({
     example: '{ test: test }',
     description: '항공기 정보',
   })
+  @Column({ type: 'jsonb', nullable: false })
   info: unknown;
 
   @CreateDateColumn()
@@ -52,7 +52,10 @@ export class Aircraft {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => AircraftSchedule, (aircraftSchedule) => aircraftSchedule.Aircraft)
+  @OneToMany(
+    () => AircraftSchedule,
+    (aircraftSchedule) => aircraftSchedule.Aircraft,
+  )
   AircraftSchedules: AircraftSchedule[];
 }
 

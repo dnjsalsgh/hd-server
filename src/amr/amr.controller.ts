@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { AmrService } from './amr.service';
 import { CreateAmrDto } from './dto/create-amr.dto';
@@ -32,7 +33,7 @@ export class AmrController {
     return this.amrService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateAmrDto: UpdateAmrDto) {
     return this.amrService.update(+id, updateAmrDto);
   }

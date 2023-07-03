@@ -1,26 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAmrDto } from './dto/create-amr.dto';
 import { UpdateAmrDto } from './dto/update-amr.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Amr } from './entities/amr.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AmrService {
+  constructor(
+    @InjectRepository(Amr) private readonly amrRepository: Repository<Amr>,
+  ) {}
   create(createAmrDto: CreateAmrDto) {
-    return 'This action adds a new amr';
+    return this.amrRepository.save(createAmrDto);
   }
 
   findAll() {
-    return `This action returns all amr`;
+    return this.amrRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} amr`;
+    return this.amrRepository.find({ where: { id: id } });
   }
 
   update(id: number, updateAmrDto: UpdateAmrDto) {
-    return `This action updates a #${id} amr`;
+    return this.amrRepository.update(id, updateAmrDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} amr`;
+    return this.amrRepository.delete(id);
   }
 }
