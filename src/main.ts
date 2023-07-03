@@ -20,10 +20,9 @@ async function bootstrap() {
 
   // swagger 생성
   const config = new DocumentBuilder()
-    .setTitle('현대물류')
-    .setDescription('현대물류 api 문서')
+    .setTitle('test')
+    .setDescription('test api 문서')
     .setVersion('1.0.0')
-    // .addTag('minho')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -39,4 +38,5 @@ async function bootstrap() {
     module.hot.dispose(() => app.close());
   }
 }
+
 bootstrap();
