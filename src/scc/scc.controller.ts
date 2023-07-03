@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { SccService } from './scc.service';
 import { CreateSccDto } from './dto/create-scc.dto';
@@ -32,7 +32,7 @@ export class SccController {
     return this.sccService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateSccDto: UpdateSccDto) {
     return this.sccService.update(+id, updateSccDto);
   }
