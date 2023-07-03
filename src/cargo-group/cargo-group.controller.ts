@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { CargoGroupService } from './cargo-group.service';
 import { CreateCargoGroupDto } from './dto/create-cargo-group.dto';
@@ -32,7 +32,7 @@ export class CargoGroupController {
     return this.cargoGroupService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateCargoGroupDto: UpdateCargoGroupDto,
