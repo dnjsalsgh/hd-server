@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { UldSccJoinService } from './uld-scc-join.service';
 import { CreateUldSccJoinDto } from './dto/create-uld-scc-join.dto';
@@ -32,7 +33,7 @@ export class UldSccJoinController {
     return this.uldSccJoinService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateUldSccJoinDto: UpdateUldSccJoinDto,
