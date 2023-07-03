@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { UldHistoryService } from './uld-history.service';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
@@ -32,7 +33,7 @@ export class UldHistoryController {
     return this.uldHistoryService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateUldHistoryDto: UpdateUldHistoryDto,

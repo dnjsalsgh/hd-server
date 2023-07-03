@@ -1,26 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
 import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UldHistory } from './entities/uld-history.entity';
 
 @Injectable()
 export class UldHistoryService {
-  create(createUldHistoryDto: CreateUldHistoryDto) {
-    return 'This action adds a new uldHistory';
+  constructor(
+    @InjectRepository(UldHistory)
+    private readonly uldHistoryRepository: Repository<UldHistory>,
+  ) {}
+  async create(createUldHistoryDto: CreateUldHistoryDto) {
+    const result = await this.uldHistoryRepository.create(createUldHistoryDto);
+
+    await this.uldHistoryRepository.save(result);
+    return result;
   }
 
-  findAll() {
-    return `This action returns all uldHistory`;
+  async findAll() {
+    return await this.uldHistoryRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} uldHistory`;
+  async findOne(id: number) {
+    const result = await this.uldHistoryRepository.findOne({
+      where: { id: id },
+    });
+    return result;
   }
 
   update(id: number, updateUldHistoryDto: UpdateUldHistoryDto) {
-    return `This action updates a #${id} uldHistory`;
+    return this.uldHistoryRepository.update(id, updateUldHistoryDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} uldHistory`;
+    return this.uldHistoryRepository.delete(id);
   }
 }
