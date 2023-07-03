@@ -1,26 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAmrChargeHistoryDto } from './dto/create-amr-charge-history.dto';
 import { UpdateAmrChargeHistoryDto } from './dto/update-amr-charge-history.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Amr } from '../amr/entities/amr.entity';
+import { Repository } from 'typeorm';
+import { CreateAmrDto } from '../amr/dto/create-amr.dto';
+import { UpdateAmrDto } from '../amr/dto/update-amr.dto';
+import { AmrChargeHistory } from './entities/amr-charge-history.entity';
 
 @Injectable()
 export class AmrChargeHistoryService {
+  constructor(
+    @InjectRepository(AmrChargeHistory)
+    private readonly amrChargeHistoryRepository: Repository<AmrChargeHistory>,
+  ) {}
   create(createAmrChargeHistoryDto: CreateAmrChargeHistoryDto) {
-    return 'This action adds a new amrChargeHistory';
+    return this.amrChargeHistoryRepository.save(createAmrChargeHistoryDto);
   }
 
   findAll() {
-    return `This action returns all amrChargeHistory`;
+    return this.amrChargeHistoryRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} amrChargeHistory`;
+    return this.amrChargeHistoryRepository.find({ where: { id: id } });
   }
 
   update(id: number, updateAmrChargeHistoryDto: UpdateAmrChargeHistoryDto) {
-    return `This action updates a #${id} amrChargeHistory`;
+    return this.amrChargeHistoryRepository.update(
+      id,
+      updateAmrChargeHistoryDto,
+    );
   }
 
   remove(id: number) {
-    return `This action removes a #${id} amrChargeHistory`;
+    return this.amrChargeHistoryRepository.delete(id);
   }
 }
