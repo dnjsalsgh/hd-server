@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { InspectWorkOrderService } from './inspect-work-order.service';
 import { CreateInspectWorkOrderDto } from './dto/create-inspect-work-order.dto';
@@ -34,7 +35,7 @@ export class InspectWorkOrderController {
     return this.inspectWorkOrderService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateInspectWorkOrderDto: UpdateInspectWorkOrderDto,

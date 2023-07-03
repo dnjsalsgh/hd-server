@@ -1,26 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { CreateInspectWorkOrderDto } from './dto/create-inspect-work-order.dto';
 import { UpdateInspectWorkOrderDto } from './dto/update-inspect-work-order.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { InspectWorkOrder } from './entities/inspect-work-order.entity';
 
 @Injectable()
 export class InspectWorkOrderService {
-  create(createInspectWorkOrderDto: CreateInspectWorkOrderDto) {
-    return 'This action adds a new inspectWorkOrder';
+  constructor(
+    @InjectRepository(InspectWorkOrder)
+    private readonly inspectWorkOrderRepository: Repository<InspectWorkOrder>,
+  ) {}
+  async create(createInspectWorkOrderDto: CreateInspectWorkOrderDto) {
+    const result = await this.inspectWorkOrderRepository.save(
+      createInspectWorkOrderDto,
+    );
+    return result;
   }
 
-  findAll() {
-    return `This action returns all inspectWorkOrder`;
+  async findAll() {
+    return await this.inspectWorkOrderRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} inspectWorkOrder`;
+  async findOne(id: number) {
+    return await this.inspectWorkOrderRepository.find({ where: { id: id } });
   }
 
   update(id: number, updateInspectWorkOrderDto: UpdateInspectWorkOrderDto) {
-    return `This action updates a #${id} inspectWorkOrder`;
+    return this.inspectWorkOrderRepository.update(
+      id,
+      updateInspectWorkOrderDto,
+    );
   }
 
   remove(id: number) {
-    return `This action removes a #${id} inspectWorkOrder`;
+    return this.inspectWorkOrderRepository.delete(id);
   }
 }
