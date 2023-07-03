@@ -12,8 +12,10 @@ import {
 import { AircraftScheduleService } from './aircraft-schedule.service';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('aircraft-schedule')
+@ApiTags('aircraft-schedule')
 export class AircraftScheduleController {
   constructor(
     private readonly aircraftScheduleService: AircraftScheduleService,

@@ -10,8 +10,10 @@ import {
 import { AircraftService } from './aircraft.service';
 import { CreateAircraftDto } from './dto/create-aircraft.dto';
 import { UpdateAircraftDto } from './dto/update-aircraft.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('aircraft')
+@ApiTags('aircraft')
 export class AircraftController {
   constructor(private readonly aircraftService: AircraftService) {}
 

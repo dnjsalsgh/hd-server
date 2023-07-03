@@ -6,7 +6,7 @@ import { AircraftSchedule } from './entities/aircraft-schedule.entity';
 import {
   Between,
   FindOperator,
-  FindOptionsWhere,
+  ILike,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
@@ -34,95 +34,39 @@ export class AircraftScheduleService {
     limit: number,
     offset: number,
   ) {
-    const conditions: {
-      where?: FindOperator<AircraftSchedule>;
-      // limit?: number;
-      // offset?: number;
-      // order?: string;
-    } = {};
-    const whereCondition: any = {};
+    let findDate: FindOperator<Date>;
     if (createdAtFrom && createdAtTo) {
-      whereCondition.createdAt = MoreThanOrEqual(createdAtFrom);
+      findDate = Between(createdAtFrom, createdAtTo);
     } else if (createdAtFrom) {
-      whereCondition.createdAt = LessThanOrEqual(createdAtTo);
+      findDate = MoreThanOrEqual(createdAtFrom);
     } else if (createdAtTo) {
-      whereCondition.createdAt = Between(createdAtFrom, createdAtTo);
+      findDate = LessThanOrEqual(createdAtTo);
     }
 
-    // if (createdAtFrom) {
-    //   conditions.where = {
-    //     ...conditions.where,
-    //     ...MoreThanOrEqual(createdAtFrom),
-    //   };
-    // }
-    // if (createdAtTo) {
-    //   conditions.where = {
-    //     ...conditions.where,
-    //     ...LessThanOrEqual(createdAtTo),
-    //   };
-    // }
-    //
-    // if (createdAtFrom && createdAtTo) {
-    //   conditions.where = {
-    //     ...conditions.where,
-    //     ...Between(createdAtFrom, createdAtTo),
-    //   };
-    // }
-
-    // const mainEntity = 'aircraftSchedule';
-    // const queryBuilder = await this.aircraftScheduleRepository
-    //   .createQueryBuilder(`${mainEntity}`)
-    //   .leftJoinAndSelect(`${mainEntity}.Aircraft`, 'aircraft')
-    //   .select([`${mainEntity}`, ...AircraftAttribute]);
     const result = await this.aircraftScheduleRepository.find({
       relations: {
         Aircraft: true,
         CcIdDestination: true,
       },
       select: {
-        // ...makeAttribute(),
         Aircraft: {
-          // ...makeAttribute(new Aircraft()),
           ...AircraftAttribute,
         },
         CcIdDestination: {
-          // ...makeAttribute(new CommonCode()),
           ...CcIdDestinationAttribute,
         },
       },
       where: {
-        createdAt: whereCondition,
+        source: source ? ILike(`%${source}%`) : null,
+        createdAt: findDate,
       },
-      // ...conditions,
+      order: {
+        id: 'desc',
+      },
+      take: limit, // limit
+      skip: offset, // offset
+      cache: 60000, // 1 minute caching
     });
-    // if (source) {
-    //   // queryBuilder.andWhere('aircraftSchedule.source = :source', {
-    //   queryBuilder.andWhere(`${mainEntity}.source like :source`, {
-    //     source: `%${source}%`,
-    //   });
-    // }
-
-    // 기간 검색
-    // if (createdAtFrom && createdAtTo) {
-    //   queryBuilder.andWhere(
-    //     `${mainEntity}.createdAt BETWEEN :createdAtFrom AND :createdAtTo`,
-    //     { createdAtFrom, createdAtEnd: createdAtTo },
-    //   );
-    // } else if (createdAtFrom) {
-    //   queryBuilder.andWhere(`${mainEntity}.createdAt >= :createdAtFrom`, {
-    //     createdAtFrom,
-    //   });
-    // } else if (createdAtTo) {
-    //   queryBuilder.andWhere(`${mainEntity}.createdAt <= :createdAtTo`, {
-    //     createdAtEnd: createdAtTo,
-    //   });
-    // }
-    //
-    // // -id, -code
-    // if (order) queryBuilder.orderBy(`${mainEntity}.${order}`, 'DESC');
-    // if (limit) queryBuilder.limit(limit);
-    // if (offset) queryBuilder.offset(offset);
-    // const result = await queryBuilder.getMany();
 
     return result;
   }

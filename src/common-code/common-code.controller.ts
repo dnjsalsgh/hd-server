@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CommonCodeService } from './common-code.service';
 import { CreateCommonCodeDto } from './dto/create-common-code.dto';
 import { UpdateCommonCodeDto } from './dto/update-common-code.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('common-code')
+@ApiTags('common-code')
 export class CommonCodeController {
   constructor(private readonly commonCodeService: CommonCodeService) {}
 
@@ -23,7 +33,10 @@ export class CommonCodeController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommonCodeDto: UpdateCommonCodeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCommonCodeDto: UpdateCommonCodeDto,
+  ) {
     return this.commonCodeService.update(+id, updateCommonCodeDto);
   }
 

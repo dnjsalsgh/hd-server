@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CargoGroupService } from './cargo-group.service';
 import { CreateCargoGroupDto } from './dto/create-cargo-group.dto';
 import { UpdateCargoGroupDto } from './dto/update-cargo-group.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('cargo-group')
+@ApiTags('cargo-group')
 export class CargoGroupController {
   constructor(private readonly cargoGroupService: CargoGroupService) {}
 
@@ -23,7 +33,10 @@ export class CargoGroupController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCargoGroupDto: UpdateCargoGroupDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCargoGroupDto: UpdateCargoGroupDto,
+  ) {
     return this.cargoGroupService.update(+id, updateCargoGroupDto);
   }
 
