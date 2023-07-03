@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
   Post,
   Put,
   Query,
@@ -13,7 +12,6 @@ import {
 import { AircraftScheduleService } from './aircraft-schedule.service';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
-import { Scope } from 'eslint';
 
 @Controller('aircraft-schedule')
 export class AircraftScheduleController {
@@ -22,13 +20,27 @@ export class AircraftScheduleController {
   ) {}
 
   @Post()
-  create(@Body() createAircraftScheduleDto: CreateAircraftScheduleDto) {
-    return this.aircraftScheduleService.create(createAircraftScheduleDto);
+  async create(@Body() createAircraftScheduleDto: CreateAircraftScheduleDto) {
+    return await this.aircraftScheduleService.create(createAircraftScheduleDto);
   }
 
   @Get()
-  findAll(@Query('source') source: string) {
-    return this.aircraftScheduleService.findAll(source);
+  findAll(
+    @Query('source') source: string,
+    @Query('createdAtFrom') createdAtFrom: Date,
+    @Query('createdAtTo') createdAtTo: Date,
+    @Query('order') order: string,
+    @Query('limit') limit: number,
+    @Query('offset') offset: number,
+  ) {
+    return this.aircraftScheduleService.findAll(
+      source,
+      createdAtFrom,
+      createdAtTo,
+      order,
+      limit,
+      offset,
+    );
   }
 
   @Get(':id')

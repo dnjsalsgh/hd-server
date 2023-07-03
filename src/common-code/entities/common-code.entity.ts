@@ -48,3 +48,17 @@ export class CommonCode {
   // )
   // aircraftSchedules: AircraftSchedule[];
 }
+
+export const CcIdDestinationAttribute = {
+  id: true,
+  name: true,
+  code: true,
+  masterCode: true,
+  level: true,
+  orderdy: true,
+  type: true,
+  description: true,
+  createdAt: true,
+  updatedAt: false,
+  deletedAt: false,
+};

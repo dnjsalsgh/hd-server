@@ -97,11 +97,9 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
       ],
       // autoLoadEntities: true,
       logging: true, // 쿼리 보여주는 옵션
-      synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
+      // synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
       namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
     }),
-
-    // TypeOrmModule.forRoot(typeormConfig),
 
     AmrModule,
     AmrChargerModule,

@@ -6,7 +6,6 @@ import {
   Param,
   Post,
   Put,
-  UseFilters,
 } from '@nestjs/common';
 import { StorageService } from './storage.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
@@ -18,12 +17,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Storage } from './entities/storage.entity';
-import { AllExceptionFilter } from '../lib/filter/allException.filter';
 
-// @UseFilters(new AllExceptionFilter())
 @Controller('storage')
-// @UseInterceptors(ResponseInterceptor)
-// @UseFilters(NotFoundExceptionFilter)
 @ApiTags('storage')
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
@@ -35,10 +30,8 @@ export class StorageController {
   })
   @ApiBody({ type: CreateStorageDto })
   @ApiCreatedResponse({ description: '유저를 생성한다.', type: Storage })
-  // @ApiJsonResponse(responseType.REG)
   async create(@Body() createStorageDto: CreateStorageDto) {
     const storage = await this.storageService.create(createStorageDto);
-    // const resJson = makeResponseTemplate(storage, responseType.REG);
     return storage;
   }
 

@@ -1,10 +1,14 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Aircraft } from '../../aircraft/entities/aircraft.entity';
 import { CommonCode } from '../../common-code/entities/common-code.entity';
 import { AircraftSchedule } from '../entities/aircraft-schedule.entity';
 import { DeepPartial } from 'typeorm/common/DeepPartial';
 
-export class CreateAircraftScheduleDto extends AircraftSchedule {
+export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
+  'source',
+  'Aircraft',
+  'CcIdDestination',
+]) {
   @ApiProperty({
     example: 'GEN',
     description: '출처',

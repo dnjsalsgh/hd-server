@@ -21,7 +21,7 @@ export class Aircraft {
   code: string;
 
   @Column({ type: 'jsonb', nullable: false })
-  info: JSON;
+  info: unknown;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -39,4 +39,12 @@ export class Aircraft {
   AircraftSchedules: AircraftSchedule[];
 }
 
-export const AircraftAttribute: string[] = ['aircraft.code', 'aircraft.name'];
+export const AircraftAttribute = {
+  id: true,
+  name: true,
+  code: true,
+  info: true,
+  createdAt: true,
+  updatedAt: false,
+  deletedAt: false,
+};

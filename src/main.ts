@@ -2,14 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ResponseInterceptor } from './lib/interceptor/response.interceptor';
-import { AllExceptionFilter } from './lib/filter/allException.filter';
+import { HttpExceptionFilter } from './lib/filter/httpExceptionFilter';
 import { TypeOrmExceptionFilter } from './lib/filter/typeOrmException.filter';
+import { ValidationPipe } from '@nestjs/common';
 
 declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalFilters(new AllExceptionFilter()); // Http 에러 처리
+
+  app.useGlobalPipes(new ValidationPipe()); // class validator 처리
+  app.useGlobalFilters(new HttpExceptionFilter()); // Http 에러 처리
   app.useGlobalFilters(new TypeOrmExceptionFilter()); // Typeorm 에러 처리
   app.useGlobalInterceptors(new ResponseInterceptor()); // 반환값 객체화 처리
   const port = process.env.PORT || 3000;

@@ -60,6 +60,8 @@ export class ResponseInterceptor implements NestInterceptor<ServerResponse> {
   }
 }
 
+// [express style]
+
 // import {
 //   Injectable,
 //   NestInterceptor,
