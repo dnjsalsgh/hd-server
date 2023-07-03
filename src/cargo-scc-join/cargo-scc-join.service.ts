@@ -1,26 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCargoSccJoinDto } from './dto/create-cargo-scc-join.dto';
 import { UpdateCargoSccJoinDto } from './dto/update-cargo-scc-join.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CargoSccJoin } from './entities/cargo-scc-join.entity';
 
 @Injectable()
 export class CargoSccJoinService {
+  constructor(
+    @InjectRepository(CargoSccJoin)
+    private readonly cargoGroupRepository: Repository<CargoSccJoin>,
+  ) {}
   create(createCargoSccJoinDto: CreateCargoSccJoinDto) {
-    return 'This action adds a new cargoSccJoin';
+    return this.cargoGroupRepository.save(createCargoSccJoinDto);
   }
 
   findAll() {
-    return `This action returns all cargoSccJoin`;
+    return this.cargoGroupRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} cargoSccJoin`;
+    return this.cargoGroupRepository.find({ where: { id: id } });
   }
 
   update(id: number, updateCargoSccJoinDto: UpdateCargoSccJoinDto) {
-    return `This action updates a #${id} cargoSccJoin`;
+    return this.cargoGroupRepository.update(id, updateCargoSccJoinDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} cargoSccJoin`;
+    return this.cargoGroupRepository.delete(id);
   }
 }
