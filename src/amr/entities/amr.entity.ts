@@ -140,6 +140,6 @@ export class Amr {
   @OneToMany(() => AmrChargeHistory, (amrChargeHistory) => amrChargeHistory.amr)
   amrChargeHistories: AmrChargeHistory[];
 
-  @OneToMany(() => TimeTable, (timeTable) => timeTable.timeTable)
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.amr)
   timeTables: TimeTable[];
 }

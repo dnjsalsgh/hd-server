@@ -20,8 +20,8 @@ async function bootstrap() {
 
   // swagger 생성
   const config = new DocumentBuilder()
-    .setTitle('test')
-    .setDescription('test api 문서')
+    .setTitle('현대물류')
+    .setDescription('현대물류 api 문서')
     .setVersion('1.0.0')
     .build();
 
