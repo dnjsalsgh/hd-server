@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { SimulatorResultCargoJoinService } from './simulator-result-cargo-join.service';
 import { CreateSimulatorResultCargoJoinDto } from './dto/create-simulator-result-cargo-join.dto';
@@ -39,7 +39,7 @@ export class SimulatorResultCargoJoinController {
     return this.simulatorResultCargoJoinService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body()

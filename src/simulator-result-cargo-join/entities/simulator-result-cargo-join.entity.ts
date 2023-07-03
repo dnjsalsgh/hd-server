@@ -1,9 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Cargo } from '../../cargo/entities/cargo.entity';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
@@ -13,14 +16,14 @@ export class SimulatorResultCargoJoin {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'date', nullable: false })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'date', nullable: false })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'date', nullable: true })
-  deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 
   @ManyToOne(
     () => SimulatorResult,

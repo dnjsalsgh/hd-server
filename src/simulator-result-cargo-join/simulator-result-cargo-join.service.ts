@@ -1,26 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSimulatorResultCargoJoinDto } from './dto/create-simulator-result-cargo-join.dto';
 import { UpdateSimulatorResultCargoJoinDto } from './dto/update-simulator-result-cargo-join.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { SimulatorResultCargoJoin } from './entities/simulator-result-cargo-join.entity';
 
 @Injectable()
 export class SimulatorResultCargoJoinService {
-  create(createSimulatorResultCargoJoinDto: CreateSimulatorResultCargoJoinDto) {
-    return 'This action adds a new simulatorResultCargoJoin';
+  constructor(
+    @InjectRepository(SimulatorResultCargoJoin)
+    private readonly simulatorResultCargoJoinRepository: Repository<SimulatorResultCargoJoin>,
+  ) {}
+
+  async create(
+    createSimulatorResultCargoJoinDto: CreateSimulatorResultCargoJoinDto,
+  ) {
+    const result = await this.simulatorResultCargoJoinRepository.save(
+      createSimulatorResultCargoJoinDto,
+    );
+    return result;
   }
 
-  findAll() {
-    return `This action returns all simulatorResultCargoJoin`;
+  async findAll() {
+    return await this.simulatorResultCargoJoinRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} simulatorResultCargoJoin`;
+  async findOne(id: number) {
+    return await this.simulatorResultCargoJoinRepository.find({
+      where: { id: id },
+    });
   }
 
-  update(id: number, updateSimulatorResultCargoJoinDto: UpdateSimulatorResultCargoJoinDto) {
-    return `This action updates a #${id} simulatorResultCargoJoin`;
+  update(
+    id: number,
+    updateSimulatorResultCargoJoinDto: UpdateSimulatorResultCargoJoinDto,
+  ) {
+    return this.simulatorResultCargoJoinRepository.update(
+      id,
+      updateSimulatorResultCargoJoinDto,
+    );
   }
 
   remove(id: number) {
-    return `This action removes a #${id} simulatorResultCargoJoin`;
+    return this.simulatorResultCargoJoinRepository.delete(id);
   }
 }
