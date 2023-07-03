@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { SimulatorHistoryService } from './simulator-history.service';
 import { CreateSimulatorHistoryDto } from './dto/create-simulator-history.dto';
@@ -34,7 +35,7 @@ export class SimulatorHistoryController {
     return this.simulatorHistoryService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateSimulatorHistoryDto: UpdateSimulatorHistoryDto,

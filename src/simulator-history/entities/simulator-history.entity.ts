@@ -1,30 +1,51 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 import { Uld } from '../../uld/entities/uld.entity';
 import { Cargo } from '../../cargo/entities/cargo.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class SimulatorHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty({
+    example: 1.0,
+    description: 'x좌표',
+  })
   @Column({ type: 'double precision', nullable: true })
   x: number;
 
+  @ApiProperty({
+    example: 1.0,
+    description: 'y좌표',
+  })
   @Column({ type: 'double precision', nullable: true })
   y: number;
 
+  @ApiProperty({
+    example: 1.0,
+    description: 'z좌표',
+  })
   @Column({ type: 'double precision', nullable: true })
   z: number;
 
-  @Column({ type: 'date', nullable: false })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'date', nullable: false })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'date', nullable: true })
-  deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 
   @ManyToOne(
     () => SimulatorResult,
