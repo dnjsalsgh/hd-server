@@ -1,23 +1,41 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Cargo } from '../../cargo/entities/cargo.entity';
 import { Scc } from '../../scc/entities/scc.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class CargoSccJoin {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'date', nullable: false })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'date', nullable: false })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'date', nullable: true })
-  deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 
+  @ApiProperty({
+    example: 1,
+    description: '화물FK',
+  })
   @ManyToOne(() => Cargo, (cargo) => cargo.cargoSccJoin)
   cargo: Cargo;
+
+  @ApiProperty({
+    example: 1,
+    description: 'sccFK',
+  })
   @ManyToOne(() => Scc, (scc) => scc.cargoSccJoin)
   scc: Scc;
 }
