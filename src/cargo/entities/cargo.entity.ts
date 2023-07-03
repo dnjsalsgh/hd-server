@@ -193,6 +193,6 @@ export class Cargo {
   )
   srJoin: SimulatorResultCargoJoin[];
 
-  @OneToMany(() => TimeTable, (timeTable) => timeTable.timeTable)
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.cargo)
   timeTables: TimeTable[];
 }

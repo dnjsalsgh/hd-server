@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { TimeTableService } from './time-table.service';
 import { CreateTimeTableDto } from './dto/create-time-table.dto';
@@ -32,7 +33,7 @@ export class TimeTableController {
     return this.timeTableService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateTimeTableDto: UpdateTimeTableDto,

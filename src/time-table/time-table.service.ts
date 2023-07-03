@@ -1,26 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTimeTableDto } from './dto/create-time-table.dto';
 import { UpdateTimeTableDto } from './dto/update-time-table.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TimeTable } from './entities/time-table.entity';
 
 @Injectable()
 export class TimeTableService {
-  create(createTimeTableDto: CreateTimeTableDto) {
-    return 'This action adds a new timeTable';
+  constructor(
+    @InjectRepository(TimeTable)
+    private readonly timeTableRepository: Repository<TimeTable>,
+  ) {}
+  async create(createTimeTableDto: CreateTimeTableDto) {
+    const storage = await this.timeTableRepository.create(createTimeTableDto);
+
+    await this.timeTableRepository.save(storage);
+    return storage;
   }
 
-  findAll() {
-    return `This action returns all timeTable`;
+  async findAll() {
+    return await this.timeTableRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} timeTable`;
+  async findOne(id: number) {
+    const result = await this.timeTableRepository.findOne({
+      where: { id: id },
+    });
+    return result;
   }
 
   update(id: number, updateTimeTableDto: UpdateTimeTableDto) {
-    return `This action updates a #${id} timeTable`;
+    return this.timeTableRepository.update(id, updateTimeTableDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} timeTable`;
+    return this.timeTableRepository.delete(id);
   }
 }
