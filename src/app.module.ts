@@ -19,8 +19,8 @@ import { TempStorageHistoryModule } from './temp-storage-history/temp-storage-hi
 import { StorageHistoryModule } from './storage-history/storage-history.module';
 import { SimulatorResultModule } from './simulator-result/simulator-result.module';
 import { SimulatorHistoryModule } from './simulator-history/simulator-history.module';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as process from 'process';
 import { Amr } from './amr/entities/amr.entity';
 import { AmrCharger } from './amr-charger/entities/amr-charger.entity';
@@ -54,6 +54,8 @@ import { AircraftSchedule } from './aircraft-schedule/entities/aircraft-schedule
 import { CommonCode } from './common-code/entities/common-code.entity';
 import { CargoGroup } from './cargo-group/entities/cargo-group.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { MqttModule } from './mqtt.module';
+
 @Module({
   imports: [
     //env 파일 사용
@@ -62,43 +64,51 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
     }),
 
     // DB 연결
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DATABASE_HOST,
-      port: +process.env.DATABASE_PORT,
-      username: process.env.DATABASE_USER,
-      password: process.env.DATABASE_PASS,
-      database: process.env.DATABASE_NAME,
-      entities: [
-        Amr,
-        AmrCharger,
-        AmrChargeHistory,
-        Storage,
-        Cargo,
-        CargoSccJoin,
-        Scc,
-        Uld,
-        UldHistory,
-        UldSccJoin,
-        UldType,
-        StorageWorkOrder,
-        InspectWorkOrder,
-        TempStorage,
-        TempStorageHistory,
-        StorageHistory,
-        SimulatorResult,
-        SimulatorHistory,
-        SimulatorResultCargoJoin,
-        TimeTable,
-        Aircraft,
-        AircraftSchedule,
-        CommonCode,
-        CargoGroup,
-      ],
-      // autoLoadEntities: true,
-      logging: true, // 쿼리 보여주는 옵션
-      synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
-      namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<TypeOrmModuleOptions> => {
+        return {
+          type: 'postgres',
+          host: configService.getOrThrow('DATABASE_HOST'),
+          port: configService.getOrThrow('DATABASE_PORT'),
+          username: configService.getOrThrow('DATABASE_USER'),
+          password: configService.getOrThrow('DATABASE_PASS'),
+          database: configService.getOrThrow('DATABASE_NAME'),
+          entities: [
+            Amr,
+            AmrCharger,
+            AmrChargeHistory,
+            Storage,
+            Cargo,
+            CargoSccJoin,
+            Scc,
+            Uld,
+            UldHistory,
+            UldSccJoin,
+            UldType,
+            StorageWorkOrder,
+            InspectWorkOrder,
+            TempStorage,
+            TempStorageHistory,
+            StorageHistory,
+            SimulatorResult,
+            SimulatorHistory,
+            SimulatorResultCargoJoin,
+            TimeTable,
+            Aircraft,
+            AircraftSchedule,
+            CommonCode,
+            CargoGroup,
+          ],
+          // autoLoadEntities: true,
+          logging: true, // 쿼리 보여주는 옵션
+          synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
+          namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
+        };
+      },
+      inject: [ConfigService],
     }),
 
     AmrModule,
@@ -125,9 +135,26 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
     AircraftScheduleModule,
     CommonCodeModule,
     CargoGroupModule,
+    // mqtt 모듈설정
+    MqttModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // {
+    //   provide: 'TEST',
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => {
+    //     ClientProxyFactory.create({
+    //       transport: Transport.MQTT,
+    //       options: {
+    //         host: configService.get('TEST_HOST'),
+    //         port: configService.get('TEST_PORT'),
+    //       },
+    //     });
+    //   },
+    // },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
