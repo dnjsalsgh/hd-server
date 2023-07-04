@@ -72,6 +72,7 @@ export class UldHistory {
   @ApiProperty({
     example: 1,
     description: '작업자 작업지시FK',
+    type: () => InspectWorkOrder,
   })
   @ManyToOne(
     () => InspectWorkOrder,

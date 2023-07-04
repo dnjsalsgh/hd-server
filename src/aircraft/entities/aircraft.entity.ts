@@ -37,7 +37,7 @@ export class Aircraft {
   code: string;
 
   @ApiProperty({
-    example: '{ test: test }',
+    example: '{ "test": "test" }',
     description: '항공기 정보',
   })
   @Column({ type: 'jsonb', nullable: false })

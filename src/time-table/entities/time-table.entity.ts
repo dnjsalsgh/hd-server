@@ -36,6 +36,7 @@ export class TimeTable {
   @ApiProperty({
     example: 1,
     description: 'ULD FK',
+    type: () => Uld,
   })
   @ManyToOne(() => Uld, (uld) => uld.timeTables)
   uld: Uld;
@@ -43,6 +44,7 @@ export class TimeTable {
   @ApiProperty({
     example: 1,
     description: 'AMR FK',
+    type: () => Amr,
   })
   @ManyToOne(() => Amr, (amr) => amr.timeTables)
   amr: Amr;

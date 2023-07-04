@@ -21,12 +21,15 @@ export class UldSccJoin {
   @ApiProperty({
     example: 1,
     description: 'ULD FK',
+    type: () => Uld,
   })
   @ManyToOne(() => Uld, (uld) => uld.uldSccJoin)
   uld: Uld;
+
   @ApiProperty({
     example: 1,
     description: 'scc FK',
+    type: () => Scc,
   })
   @ManyToOne(() => Scc, (scc) => scc.uldSccJoin)
   scc: Scc;

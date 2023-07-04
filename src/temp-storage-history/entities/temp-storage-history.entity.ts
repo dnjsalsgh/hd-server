@@ -42,6 +42,7 @@ export class TempStorageHistory {
   @ApiProperty({
     example: 1,
     description: '자동창고 FK',
+    type: () => Storage,
   })
   @ManyToOne(() => Storage, (storage) => storage.tempStorageHistories)
   storage: Storage;
@@ -49,6 +50,7 @@ export class TempStorageHistory {
   @ApiProperty({
     example: 1,
     description: '안착대 FK',
+    type: () => TempStorage,
   })
   @ManyToOne(
     () => TempStorage,

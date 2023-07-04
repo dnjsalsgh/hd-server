@@ -27,6 +27,7 @@ export class StorageHistory {
   @ApiProperty({
     example: 1,
     description: '자동창고FK',
+    type: () => Storage,
   })
   @ManyToOne(() => Storage, (storage) => storage.storageHistories)
   storage: Storage;

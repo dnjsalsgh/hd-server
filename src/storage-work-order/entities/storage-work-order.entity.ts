@@ -45,6 +45,7 @@ export class StorageWorkOrder {
   @ApiProperty({
     example: 1,
     description: '안착대FK',
+    type: () => TempStorage,
   })
   @ManyToOne(() => TempStorage, (tempStorage) => tempStorage.storageWorkOrders)
   tempStorage: TempStorage;
