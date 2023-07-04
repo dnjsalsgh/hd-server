@@ -5,7 +5,6 @@ import { ResponseInterceptor } from './lib/interceptor/response.interceptor';
 import { HttpExceptionFilter } from './lib/filter/httpExceptionFilter';
 import { TypeOrmExceptionFilter } from './lib/filter/typeOrmException.filter';
 import { ValidationPipe } from '@nestjs/common';
-import { NestMicroserviceOptions } from '@nestjs/common/interfaces/microservices/nest-microservice-options.interface';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 declare const module: any;

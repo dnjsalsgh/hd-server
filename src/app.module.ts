@@ -102,7 +102,7 @@ import { MqttModule } from './mqtt.module';
             CommonCode,
             CargoGroup,
           ],
-          // autoLoadEntities: true,
+          // autoLoadEntities: true,  [버그있어서 사용 지양]
           logging: true, // 쿼리 보여주는 옵션
           synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
           namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
@@ -139,22 +139,7 @@ import { MqttModule } from './mqtt.module';
     MqttModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    // {
-    //   provide: 'TEST',
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => {
-    //     ClientProxyFactory.create({
-    //       transport: Transport.MQTT,
-    //       options: {
-    //         host: configService.get('TEST_HOST'),
-    //         port: configService.get('TEST_PORT'),
-    //       },
-    //     });
-    //   },
-    // },
-  ],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
