@@ -26,6 +26,13 @@ export class Cargo {
   id: number;
 
   @ApiProperty({
+    example: '화물-001',
+    description: '화물의 이름',
+  })
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  name: string;
+
+  @ApiProperty({
     example: '3d Model Name',
     description: '생성된 3D 모델링명',
   })

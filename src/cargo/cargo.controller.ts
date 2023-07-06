@@ -1,17 +1,16 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
 } from '@nestjs/common';
 import { CargoService } from './cargo.service';
 import { CreateCargoDto } from './dto/create-cargo.dto';
 import { UpdateCargoDto } from './dto/update-cargo.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('cargo')
 @ApiTags('cargo')
@@ -21,6 +20,15 @@ export class CargoController {
   @Post()
   create(@Body() createCargoDto: CreateCargoDto) {
     return this.cargoService.create(createCargoDto);
+  }
+
+  @ApiOperation({ summary: '해포 실행' })
+  @Post('/break-down/:parent')
+  breakDown(
+    @Param('parent') parent: string,
+    @Body() createCargoDtoArray: CreateCargoDto[],
+  ) {
+    return this.cargoService.breakDown(parent, createCargoDtoArray);
   }
 
   @Get()
