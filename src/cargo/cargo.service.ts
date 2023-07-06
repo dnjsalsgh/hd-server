@@ -109,6 +109,7 @@ export class CargoService {
       await queryRunner.release();
     }
   }
+
   remove(id: number) {
     return this.cargoRepository.delete(id);
   }
