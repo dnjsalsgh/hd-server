@@ -55,6 +55,7 @@ import { CommonCode } from './common-code/entities/common-code.entity';
 import { CargoGroup } from './cargo-group/entities/cargo-group.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { MqttModule } from './mqtt.module';
+import { CargoListModule } from './cargo-list/cargo-list.module';
 
 @Module({
   imports: [
@@ -137,6 +138,7 @@ import { MqttModule } from './mqtt.module';
     CargoGroupModule,
     // mqtt 모듈설정
     MqttModule,
+    CargoListModule,
   ],
   controllers: [AppController],
   providers: [AppService],

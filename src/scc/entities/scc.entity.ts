@@ -44,6 +44,13 @@ export class Scc {
   @Column({ type: 'varchar', length: 500, nullable: true })
   description: string;
 
+  @ApiProperty({
+    example: '/c/xx',
+    description: '이미지 파일경로',
+  })
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  path: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

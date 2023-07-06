@@ -1,5 +1,6 @@
-import { PickType } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Cargo } from '../entities/cargo.entity';
+import { Scc } from '../../scc/entities/scc.entity';
 
 export class CreateCargoDto extends PickType(Cargo, [
   'prefab',
@@ -19,4 +20,10 @@ export class CreateCargoDto extends PickType(Cargo, [
   'parent',
   'modelPath',
   'simulation',
-]) {}
+]) {
+  @ApiProperty({
+    example: 1,
+    description: 'SCCFK',
+  })
+  scc: Scc;
+}

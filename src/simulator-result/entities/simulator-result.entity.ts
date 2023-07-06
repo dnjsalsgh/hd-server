@@ -39,6 +39,13 @@ export class SimulatorResult {
   @Column({ type: 'double precision', nullable: true })
   loadRate: number;
 
+  @ApiProperty({
+    example: '0.1',
+    description: '알고리즘 버전',
+  })
+  @Column({ type: 'varchar', length: 5, nullable: true })
+  version: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

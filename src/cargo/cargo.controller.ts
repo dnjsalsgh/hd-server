@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { CargoService } from './cargo.service';
 import { CreateCargoDto } from './dto/create-cargo.dto';
@@ -32,7 +33,7 @@ export class CargoController {
     return this.cargoService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateCargoDto: UpdateCargoDto) {
     return this.cargoService.update(+id, updateCargoDto);
   }

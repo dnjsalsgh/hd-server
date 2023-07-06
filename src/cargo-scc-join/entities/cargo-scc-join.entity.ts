@@ -28,6 +28,7 @@ export class CargoSccJoin {
   @ApiProperty({
     example: 1,
     description: '화물FK',
+    type: () => Cargo,
   })
   @ManyToOne(() => Cargo, (cargo) => cargo.cargoSccJoin)
   cargo: Cargo;

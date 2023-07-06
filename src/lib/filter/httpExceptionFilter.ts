@@ -27,15 +27,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
     console.log(status, err.message, exception.message);
 
     // class-validator가 발생시킨 에러 배열 해체
-    if (typeof err.message !== 'string') {
-      err.message = err.message.join(',');
+    if (err.message && typeof err.message !== 'string') {
+      err.message = err?.message?.join(',');
     }
 
     const json = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      message: typeof err.message, // class-validator가 발생시킨 에러, 내가 발생시킨 error
+      message: err.message, // class-validator가 발생시킨 에러, 내가 발생시킨 error
     };
 
     response.status(status).json(json);
