@@ -22,9 +22,7 @@ export class CargoService {
     const { scc, ...cargoDto } = createCargoDto;
 
     const queryRunner = await this.dataSource.createQueryRunner();
-
     await queryRunner.connect();
-
     await queryRunner.startTransaction();
 
     try {
@@ -51,6 +49,10 @@ export class CargoService {
     return this.cargoRepository.find();
   }
 
+  findFamily(id: number) {
+    return this.cargoRepository.find({ where: [{ id: id }, { parent: id }] });
+  }
+
   findOne(id: number) {
     return this.cargoRepository.find({ where: { id: id } });
   }
@@ -63,7 +65,7 @@ export class CargoService {
     const parentCargo = await this.cargoRepository.findOne({
       where: { name: parentName },
     });
-    // 1. 부모의 존재, 부모의 parent 칼럼이 0인지 확인
+    // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
     if (
       !parentCargo &&
       parentCargo.parent !== 0 &&

@@ -26,7 +26,7 @@ export class CargoController {
   @Post('/break-down/:parent')
   breakDown(
     @Param('parent') parent: string,
-    @Body() createCargoDtoArray: CreateCargoDto[],
+    @Body() createCargoDtoArray: Array<CreateCargoDto>,
   ) {
     return this.cargoService.breakDown(parent, createCargoDtoArray);
   }
@@ -34,6 +34,12 @@ export class CargoController {
   @Get()
   findAll() {
     return this.cargoService.findAll();
+  }
+
+  @ApiOperation({ summary: '해포화물 검색' })
+  @Get('/family/:id')
+  getFamily(@Param('id') id: string) {
+    return this.cargoService.findFamily(+id);
   }
 
   @Get(':id')
