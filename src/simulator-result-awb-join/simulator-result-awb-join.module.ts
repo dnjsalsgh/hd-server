@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { SimulatorResultCargoJoinService } from './simulator-result-cargo-join.service';
-import { SimulatorResultCargoJoinController } from './simulator-result-cargo-join.controller';
+import { SimulatorResultAwbJoinService } from './simulator-result-awb-join.service';
+import { SimulatorResultAwbJoinController } from './simulator-result-awb-join.controller';
 import { SimulatorResultAwbJoin } from './entities/simulator-result-awb-join.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [TypeOrmModule.forFeature([SimulatorResultAwbJoin])],
-  controllers: [SimulatorResultCargoJoinController],
-  providers: [SimulatorResultCargoJoinService],
+  controllers: [SimulatorResultAwbJoinController],
+  providers: [SimulatorResultAwbJoinService],
 })
 export class SimulatorResultAwbJoinModule {}

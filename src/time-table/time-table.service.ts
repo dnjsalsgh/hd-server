@@ -12,10 +12,10 @@ export class TimeTableService {
     private readonly timeTableRepository: Repository<TimeTable>,
   ) {}
   async create(createTimeTableDto: CreateTimeTableDto) {
-    const storage = await this.timeTableRepository.create(createTimeTableDto);
+    const asrs = await this.timeTableRepository.create(createTimeTableDto);
 
-    await this.timeTableRepository.save(storage);
-    return storage;
+    await this.timeTableRepository.save(asrs);
+    return asrs;
   }
 
   async findAll() {

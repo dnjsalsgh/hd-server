@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { AmrModule } from './amr/amr.module';
 import { AmrChargerModule } from './amr-charger/amr-charger.module';
 import { AmrChargeHistoryModule } from './amr-charge-history/amr-charge-history.module';
-import { StorageModule } from './storage/storage.module';
+import { AsrsModule } from './asrs/asrs.module';
 import { AwbModule } from './awb/awb.module';
 import { AwbSccJoinModule } from './awb-scc-join/awb-scc-join.module';
 import { SccModule } from './scc/scc.module';
@@ -12,11 +12,11 @@ import { UldModule } from './uld/uld.module';
 import { UldHistoryModule } from './uld-history/uld-history.module';
 import { UldSccJoinModule } from './uld-scc-join/uld-scc-join.module';
 import { UldTypeModule } from './uld-type/uld-type.module';
-import { StorageWorkOrderModule } from './storage-work-order/storage-work-order.module';
-import { InspectWorkOrderModule } from './inspect-work-order/inspect-work-order.module';
-import { TempStorageModule } from './temp-storage/temp-storage.module';
-import { TempStorageHistoryModule } from './temp-storage-history/temp-storage-history.module';
-import { StorageHistoryModule } from './storage-history/storage-history.module';
+import { AsrsOutOrderModule } from './asrs-out-order/asrs-out-order.module';
+import { BuildUpOrderModule } from './build-up-order/build-up-order.module';
+import { SkidPlatformModule } from './skid-platform/skid-platform.module';
+import { SkidPlatformHistoryModule } from './skid-platform-history/skid-platform-history.module';
+import { AsrsHistoryModule } from './asrs-history/asrs-history.module';
 import { SimulatorResultModule } from './simulator-result/simulator-result.module';
 import { SimulatorHistoryModule } from './simulator-history/simulator-history.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -26,22 +26,19 @@ import { Amr } from './amr/entities/amr.entity';
 import { AmrCharger } from './amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from './amr-charge-history/entities/amr-charge-history.entity';
 import { Awb } from './awb/entities/awb.entity';
-import { Storage } from './storage/entities/storage.entity';
+import { Asrs } from './asrs/entities/asrs.entity';
 import { AwbSccJoin } from './awb-scc-join/entities/awb-scc-join.entity';
 import { Scc } from './scc/entities/scc.entity';
 import { Uld } from './uld/entities/uld.entity';
 import { SimulatorHistory } from './simulator-history/entities/simulator-history.entity';
 import { SimulatorResult } from './simulator-result/entities/simulator-result.entity';
-import { StorageHistory } from './storage-history/entities/storage-history.entity';
+import { AsrsHistory } from './asrs-history/entities/asrs-history.entity';
 import { UldSccJoin } from './uld-scc-join/entities/uld-scc-join.entity';
 import { UldHistory } from './uld-history/entities/uld-history.entity';
 import { UldType } from './uld-type/entities/uld-type.entity';
-import { StorageWorkOrder } from './storage-work-order/entities/storage-work-order.entity';
-import { InspectWorkOrder } from './inspect-work-order/entities/inspect-work-order.entity';
-import { TempStorage } from './temp-storage/entities/temp-storage.entity';
-import { TempStorageHistory } from './temp-storage-history/entities/temp-storage-history.entity';
-import { SimulatorResultAwbJoinModule } from './simulator-result-cargo-join/simulator-result-awb-join.module';
-import { SimulatorResultAwbJoin } from './simulator-result-cargo-join/entities/simulator-result-awb-join.entity';
+import { AsrsOutOrder } from './asrs-out-order/entities/asrs-out-order.entity';
+import { SimulatorResultAwbJoinModule } from './simulator-result-awb-join/simulator-result-awb-join.module';
+import { SimulatorResultAwbJoin } from './simulator-result-awb-join/entities/simulator-result-awb-join.entity';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { TimeTableModule } from './time-table/time-table.module';
 import { AircraftModule } from './aircraft/aircraft.module';
@@ -55,6 +52,9 @@ import { CommonCode } from './common-code/entities/common-code.entity';
 import { AwbGroup } from './awb-group/entities/awb-group.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { MqttModule } from './mqtt.module';
+import { BuildUpOrder } from './build-up-order/entities/build-up-order.entity';
+import { SkidPlatform } from './skid-platform/entities/skid-platform.entity';
+import { SkidPlatformHistory } from './skid-platform-history/entities/skid-platform-history.entity';
 
 @Module({
   imports: [
@@ -80,7 +80,7 @@ import { MqttModule } from './mqtt.module';
             Amr,
             AmrCharger,
             AmrChargeHistory,
-            Storage,
+            Asrs,
             Awb,
             AwbSccJoin,
             Scc,
@@ -88,11 +88,11 @@ import { MqttModule } from './mqtt.module';
             UldHistory,
             UldSccJoin,
             UldType,
-            StorageWorkOrder,
-            InspectWorkOrder,
-            TempStorage,
-            TempStorageHistory,
-            StorageHistory,
+            AsrsOutOrder,
+            BuildUpOrder,
+            SkidPlatform,
+            SkidPlatformHistory,
+            AsrsHistory,
             SimulatorResult,
             SimulatorHistory,
             SimulatorResultAwbJoin,
@@ -114,7 +114,7 @@ import { MqttModule } from './mqtt.module';
     AmrModule,
     AmrChargerModule,
     AmrChargeHistoryModule,
-    StorageModule,
+    AsrsModule,
     AwbModule,
     AwbSccJoinModule,
     SccModule,
@@ -122,11 +122,11 @@ import { MqttModule } from './mqtt.module';
     UldHistoryModule,
     UldSccJoinModule,
     UldTypeModule,
-    StorageWorkOrderModule,
-    InspectWorkOrderModule,
-    TempStorageModule,
-    TempStorageHistoryModule,
-    StorageHistoryModule,
+    AsrsOutOrderModule,
+    BuildUpOrderModule,
+    SkidPlatformModule,
+    SkidPlatformHistoryModule,
+    AsrsHistoryModule,
     SimulatorResultModule,
     SimulatorHistoryModule,
     SimulatorResultAwbJoinModule,

@@ -8,18 +8,18 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { InspectWorkOrder } from '../../inspect-work-order/entities/inspect-work-order.entity';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
-import { StorageHistory } from '../../storage-history/entities/storage-history.entity';
-import { StorageWorkOrder } from '../../storage-work-order/entities/storage-work-order.entity';
-import { TempStorageHistory } from '../../temp-storage-history/entities/temp-storage-history.entity';
+import { AsrsHistory } from '../../asrs-history/entities/asrs-history.entity';
+import { SkidPlatformHistory } from '../../skid-platform-history/entities/skid-platform-history.entity';
 import { UldHistory } from '../../uld-history/entities/uld-history.entity';
 
 import { AwbSccJoin } from '../../awb-scc-join/entities/awb-scc-join.entity';
 import { AwbGroup } from '../../awb-group/entities/awb-group.entity';
 import { TimeTable } from '../../time-table/entities/time-table.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { SimulatorResultAwbJoin } from '../../simulator-result-cargo-join/entities/simulator-result-awb-join.entity';
+import { SimulatorResultAwbJoin } from '../../simulator-result-awb-join/entities/simulator-result-awb-join.entity';
+import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
+import { AsrsOutOrder } from '../../asrs-out-order/entities/asrs-out-order.entity';
 
 @Entity()
 export class Awb {
@@ -164,25 +164,25 @@ export class Awb {
   @ManyToOne(() => AwbGroup, (awbGroup) => awbGroup.awbs)
   awbGroup: AwbGroup;
 
-  @OneToMany(() => InspectWorkOrder, (inspectWorkOrder) => inspectWorkOrder.awb)
-  inspectWorkOrders: InspectWorkOrder[];
+  @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.awb)
+  inspectWorkOrders: BuildUpOrder[];
 
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.awb)
   simulatorHistories: SimulatorHistory[];
 
-  @OneToMany(() => StorageHistory, (storageHistory) => storageHistory.awb)
-  storageHistories: StorageHistory[];
+  @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.awb)
+  asrsHistories: AsrsHistory[];
 
-  @OneToMany(() => StorageWorkOrder, (storageWorkOrder) => storageWorkOrder.awb)
-  storageWorkOrders: StorageWorkOrder[];
+  @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.awb)
+  asrsOutOrders: AsrsOutOrder[];
 
   @OneToMany(
-    () => TempStorageHistory,
-    (tempStorageHistory) => tempStorageHistory.awb,
+    () => SkidPlatformHistory,
+    (skidPlatformHistory) => skidPlatformHistory.awb,
   )
-  tempStorageHistories: TempStorageHistory[];
+  skidPlatformHistories: SkidPlatformHistory[];
 
-  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.inspectWorkOrder)
+  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
   uldHistories: UldHistory[];
 
   @OneToMany(() => AwbSccJoin, (awbSccJoin) => awbSccJoin.awb)

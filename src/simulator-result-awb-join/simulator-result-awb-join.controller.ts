@@ -7,22 +7,22 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { SimulatorResultCargoJoinService } from './simulator-result-cargo-join.service';
-import { CreateSimulatorResultCargoJoinDto } from './dto/create-simulator-result-cargo-join.dto';
-import { UpdateSimulatorResultCargoJoinDto } from './dto/update-simulator-result-cargo-join.dto';
+import { SimulatorResultAwbJoinService } from './simulator-result-awb-join.service';
+import { CreateSimulatorResultAwbJoinDto } from './dto/create-simulator-result-awb-join.dto';
+import { UpdateSimulatorResultAwbJoinDto } from './dto/update-simulator-result-awb-join.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('simulator-result-awb-join')
 @ApiTags('simulator-result-awb-join')
-export class SimulatorResultCargoJoinController {
+export class SimulatorResultAwbJoinController {
   constructor(
-    private readonly simulatorResultCargoJoinService: SimulatorResultCargoJoinService,
+    private readonly simulatorResultCargoJoinService: SimulatorResultAwbJoinService,
   ) {}
 
   @Post()
   create(
     @Body()
-    createSimulatorResultCargoJoinDto: CreateSimulatorResultCargoJoinDto,
+    createSimulatorResultCargoJoinDto: CreateSimulatorResultAwbJoinDto,
   ) {
     return this.simulatorResultCargoJoinService.create(
       createSimulatorResultCargoJoinDto,
@@ -43,7 +43,7 @@ export class SimulatorResultCargoJoinController {
   update(
     @Param('id') id: string,
     @Body()
-    updateSimulatorResultCargoJoinDto: UpdateSimulatorResultCargoJoinDto,
+    updateSimulatorResultCargoJoinDto: UpdateSimulatorResultAwbJoinDto,
   ) {
     return this.simulatorResultCargoJoinService.update(
       +id,

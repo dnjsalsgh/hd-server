@@ -1,15 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SimulatorResultCargoJoinService } from './simulator-result-cargo-join.service';
+import { SimulatorResultAwbJoinService } from './simulator-result-awb-join.service';
 
 describe('SimulatorResultCargoJoinService', () => {
-  let service: SimulatorResultCargoJoinService;
+  let service: SimulatorResultAwbJoinService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SimulatorResultCargoJoinService],
+      providers: [SimulatorResultAwbJoinService],
     }).compile();
 
-    service = module.get<SimulatorResultCargoJoinService>(SimulatorResultCargoJoinService);
+    service = module.get<SimulatorResultAwbJoinService>(
+      SimulatorResultAwbJoinService,
+    );
   });
 
   it('should be defined', () => {

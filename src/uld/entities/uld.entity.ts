@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { InspectWorkOrder } from '../../inspect-work-order/entities/inspect-work-order.entity';
+
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
 import { UldType } from '../../uld-type/entities/uld-type.entity';
@@ -16,6 +16,7 @@ import { UldHistory } from '../../uld-history/entities/uld-history.entity';
 import { UldSccJoin } from '../../uld-scc-join/entities/uld-scc-join.entity';
 import { TimeTable } from '../../time-table/entities/time-table.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
 
 @Entity()
 export class Uld {
@@ -66,8 +67,8 @@ export class Uld {
   @ManyToOne(() => UldType, (uldType) => uldType.ulds)
   uldType: UldType;
 
-  @OneToMany(() => InspectWorkOrder, (inspectWorkOrder) => inspectWorkOrder.uld)
-  inspectWorkOrders: InspectWorkOrder[];
+  @OneToMany(() => BuildUpOrder, (inspectWorkOrder) => inspectWorkOrder.uld)
+  inspectWorkOrders: BuildUpOrder[];
 
   @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.uld)
   simulatorResult: SimulatorResult[];
@@ -75,7 +76,7 @@ export class Uld {
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.uld)
   simulatorHistories: SimulatorHistory[];
 
-  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.inspectWorkOrder)
+  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
   uldHistories: UldHistory[];
 
   @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)

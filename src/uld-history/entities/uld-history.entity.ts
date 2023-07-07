@@ -8,10 +8,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
-import { InspectWorkOrder } from '../../inspect-work-order/entities/inspect-work-order.entity';
-import { TempStorage } from '../../temp-storage/entities/temp-storage.entity';
 import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
+import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity';
 
 @Entity()
 export class UldHistory {
@@ -72,16 +72,18 @@ export class UldHistory {
   @ApiProperty({
     example: 1,
     description: '작업자 작업지시FK',
-    type: () => InspectWorkOrder,
+    type: () => BuildUpOrder,
   })
-  @ManyToOne(
-    () => InspectWorkOrder,
-    (inspectWorkOrder) => inspectWorkOrder.uldHistories,
-  )
-  inspectWorkOrder: InspectWorkOrder;
+  @ManyToOne(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.uldHistories)
+  buildUpOrder: BuildUpOrder;
 
-  @ManyToOne(() => TempStorage, (tempStorage) => tempStorage.uldHistories)
-  tempStorage: TempStorage;
+  @ApiProperty({
+    example: 1,
+    description: '안착대FK',
+    type: () => SkidPlatform,
+  })
+  @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.uldHistories)
+  skidPlatform: SkidPlatform;
 
   @ManyToOne(() => Uld, (uld) => uld.uldHistories)
   uld: Uld;
