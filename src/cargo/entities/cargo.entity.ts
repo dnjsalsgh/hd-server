@@ -62,17 +62,17 @@ export class Cargo {
 
   @ApiProperty({
     example: 1.0,
-    description: '너비',
-  })
-  @Column({ type: 'double precision', nullable: true })
-  length: number;
-
-  @ApiProperty({
-    example: 1.0,
     description: '높이',
   })
   @Column({ type: 'double precision', nullable: true })
   height: number;
+
+  @ApiProperty({
+    example: 1.0,
+    description: '깊이',
+  })
+  @Column({ type: 'double precision', nullable: true })
+  depth: number;
 
   @ApiProperty({
     example: 1.0,
@@ -86,7 +86,7 @@ export class Cargo {
     description: '정형성',
   })
   @Column({ type: 'boolean', nullable: true })
-  orthopedic: boolean;
+  isStructure: boolean;
 
   @ApiProperty({
     example: '010101',

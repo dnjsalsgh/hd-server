@@ -56,6 +56,10 @@ export class InspectWorkOrder {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
+  @ApiProperty({
+    example: 1,
+    description: '안착대',
+  })
   @ManyToOne(() => TempStorage, (tempStorage) => tempStorage.inspectWorkOrders)
   tempStorage: TempStorage;
 

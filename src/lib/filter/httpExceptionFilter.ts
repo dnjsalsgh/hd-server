@@ -35,7 +35,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      message: err.message, // class-validator가 발생시킨 에러, 내가 발생시킨 error
+      message: err.message ?? exception.message, // class-validator가 발생시킨 에러, 내가 발생시킨 error
     };
 
     response.status(status).json(json);

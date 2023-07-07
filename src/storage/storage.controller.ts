@@ -3,7 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -30,8 +32,15 @@ export class StorageController {
   })
   @ApiBody({ type: CreateStorageDto })
   @ApiCreatedResponse({ description: '유저를 생성한다.', type: Storage })
-  async create(@Body() createStorageDto: CreateStorageDto) {
-    const storage = await this.storageService.create(createStorageDto);
+  async create(@Body() body: CreateStorageDto) {
+    // parent 정보 확인
+    if (typeof body.parent === 'number' && body.parent < 0) {
+      throw new HttpException('parent 정보를 정확히 입력해주세요', 400);
+    }
+
+    body.parent = typeof body.parent === 'number' ? body.parent : 0;
+    body.fullPath = body.name;
+    const storage = await this.storageService.create(body);
     return storage;
   }
 
@@ -47,8 +56,11 @@ export class StorageController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateStorageDto: UpdateStorageDto) {
-    return this.storageService.update(+id, updateStorageDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateStorageDto: UpdateStorageDto,
+  ) {
+    return this.storageService.update(id, updateStorageDto);
   }
 
   @Delete(':id')
