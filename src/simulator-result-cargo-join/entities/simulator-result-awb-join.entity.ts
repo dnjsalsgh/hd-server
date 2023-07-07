@@ -8,11 +8,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 
 @Entity()
-export class SimulatorResultCargoJoin {
+export class SimulatorResultAwbJoin {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -31,6 +31,6 @@ export class SimulatorResultCargoJoin {
   )
   simulatorResult: SimulatorResult;
 
-  @ManyToOne(() => Cargo, (cargo) => cargo.srJoin)
-  cargo: Cargo;
+  @ManyToOne(() => Awb, (awb) => awb.srJoin)
+  awb: Awb;
 }

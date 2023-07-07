@@ -3,13 +3,13 @@ import { CreateSimulatorResultCargoJoinDto } from './dto/create-simulator-result
 import { UpdateSimulatorResultCargoJoinDto } from './dto/update-simulator-result-cargo-join.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SimulatorResultCargoJoin } from './entities/simulator-result-cargo-join.entity';
+import { SimulatorResultAwbJoin } from './entities/simulator-result-awb-join.entity';
 
 @Injectable()
 export class SimulatorResultCargoJoinService {
   constructor(
-    @InjectRepository(SimulatorResultCargoJoin)
-    private readonly simulatorResultCargoJoinRepository: Repository<SimulatorResultCargoJoin>,
+    @InjectRepository(SimulatorResultAwbJoin)
+    private readonly simulatorResultCargoJoinRepository: Repository<SimulatorResultAwbJoin>,
   ) {}
 
   async create(

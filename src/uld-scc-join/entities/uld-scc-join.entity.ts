@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { Scc } from '../../scc/entities/scc.entity';
 import { ApiProperty } from '@nestjs/swagger';
 

@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Storage } from '../../storage/entities/storage.entity';
 import { TempStorage } from '../../temp-storage/entities/temp-storage.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { TempStorageHistory } from '../../temp-storage-history/entities/temp-storage-history.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -54,8 +54,8 @@ export class StorageWorkOrder {
     example: 1,
     description: '화물FK',
   })
-  @ManyToOne(() => Cargo, (cargo) => cargo.storageWorkOrders)
-  cargo: Cargo;
+  @ManyToOne(() => Awb, (awb) => awb.storageWorkOrders)
+  awb: Awb;
 
   @OneToMany(
     () => TempStorageHistory,

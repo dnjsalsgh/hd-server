@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
 import { Amr } from '../../amr/entities/amr.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -53,6 +53,6 @@ export class TimeTable {
     example: 1,
     description: '화물 FK',
   })
-  @ManyToOne(() => Cargo, (cargo) => cargo.timeTables)
-  cargo: Cargo;
+  @ManyToOne(() => Awb, (awb) => awb.timeTables)
+  awb: Awb;
 }

@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CargoSccJoin } from '../../cargo-scc-join/entities/cargo-scc-join.entity';
+import { AwbSccJoin } from '../../awb-scc-join/entities/awb-scc-join.entity';
 import { UldSccJoin } from '../../uld-scc-join/entities/uld-scc-join.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -60,8 +60,8 @@ export class Scc {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => CargoSccJoin, (cargoSccJoin) => cargoSccJoin.scc)
-  cargoSccJoin: CargoSccJoin[];
+  @OneToMany(() => AwbSccJoin, (cargoSccJoin) => cargoSccJoin.scc)
+  awbSccJoin: AwbSccJoin[];
 
   @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.scc)
   uldSccJoin: UldSccJoin[];

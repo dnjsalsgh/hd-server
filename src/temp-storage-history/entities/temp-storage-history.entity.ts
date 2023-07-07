@@ -12,7 +12,7 @@ import { Uld } from '../../uld/entities/uld.entity';
 import { StorageWorkOrder } from '../../storage-work-order/entities/storage-work-order.entity';
 import { Storage } from '../../storage/entities/storage.entity';
 import { TempStorage } from '../../temp-storage/entities/temp-storage.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -62,6 +62,6 @@ export class TempStorageHistory {
     example: 1,
     description: '화물 FK',
   })
-  @ManyToOne(() => Cargo, (cargo) => cargo.tempStorageHistories)
-  cargo: Cargo;
+  @ManyToOne(() => Awb, (awb) => awb.tempStorageHistories)
+  awb: Awb;
 }

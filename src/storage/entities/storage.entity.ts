@@ -11,7 +11,7 @@ import { StorageHistory } from '../../storage-history/entities/storage-history.e
 import { StorageWorkOrder } from '../../storage-work-order/entities/storage-work-order.entity';
 import { TempStorageHistory } from '../../temp-storage-history/entities/temp-storage-history.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator';
 
 @Entity()
 export class Storage {
@@ -31,7 +31,8 @@ export class Storage {
     description: '부모 창고의 id',
   })
   @IsNumber()
-  @Min(0, { message: 'Value must be greater than -1' })
+  @IsOptional()
+  @Min(-1, { message: 'Value must be greater than -1' })
   @Column({ type: 'int', nullable: false, default: 0 })
   parent: number;
 

@@ -5,5 +5,5 @@ export class CreateStorageWorkOrderDto extends PickType(StorageWorkOrder, [
   'order',
   'storage',
   'tempStorage',
-  'cargo',
+  'awb',
 ]) {}

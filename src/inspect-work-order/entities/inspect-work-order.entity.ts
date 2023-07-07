@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { TempStorage } from '../../temp-storage/entities/temp-storage.entity';
 import { Uld } from '../../uld/entities/uld.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { UldHistory } from '../../uld-history/entities/uld-history.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -66,8 +66,8 @@ export class InspectWorkOrder {
   @ManyToOne(() => Uld, (uld) => uld.inspectWorkOrders)
   uld: Uld;
 
-  @ManyToOne(() => Cargo, (cargo) => cargo.inspectWorkOrders)
-  cargo: Cargo;
+  @ManyToOne(() => Awb, (awb) => awb.inspectWorkOrders)
+  awb: Awb;
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.inspectWorkOrder)
   uldHistories: UldHistory[];

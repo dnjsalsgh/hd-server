@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
-import { SimulatorResultCargoJoin } from '../../simulator-result-cargo-join/entities/simulator-result-cargo-join.entity';
+import { SimulatorResultAwbJoin } from '../../simulator-result-cargo-join/entities/simulator-result-awb-join.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -59,10 +59,10 @@ export class SimulatorResult {
   uld: Uld;
 
   @OneToMany(
-    () => SimulatorResultCargoJoin,
+    () => SimulatorResultAwbJoin,
     (simulatorResultCargoJoin) => simulatorResultCargoJoin.simulatorResult,
   )
-  simulatorResultCargoJoin: SimulatorResultCargoJoin[];
+  simulatorResultCargoJoin: SimulatorResultAwbJoin[];
 
   @OneToMany(
     () => SimulatorHistory,

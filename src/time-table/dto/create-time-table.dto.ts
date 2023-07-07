@@ -5,5 +5,5 @@ export class CreateTimeTableDto extends PickType(TimeTable, [
   'data',
   'uld',
   'amr',
-  'cargo',
+  'awb',
 ]) {}

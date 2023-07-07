@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 import { Uld } from '../../uld/entities/uld.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -56,6 +56,6 @@ export class SimulatorHistory {
   @ManyToOne(() => Uld, (uld) => uld.simulatorHistories)
   uld: Uld;
 
-  @ManyToOne(() => Cargo, (cargo) => cargo.simulatorHistories)
-  cargo: Cargo;
+  @ManyToOne(() => Awb, (awb) => awb.simulatorHistories)
+  awb: Awb;
 }

@@ -10,7 +10,7 @@ import {
 import { Uld } from '../../uld/entities/uld.entity';
 import { InspectWorkOrder } from '../../inspect-work-order/entities/inspect-work-order.entity';
 import { TempStorage } from '../../temp-storage/entities/temp-storage.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -86,6 +86,6 @@ export class UldHistory {
   @ManyToOne(() => Uld, (uld) => uld.uldHistories)
   uld: Uld;
 
-  @ManyToOne(() => Cargo, (cargo) => cargo.uldHistories)
-  cargo: Cargo;
+  @ManyToOne(() => Awb, (cargo) => cargo.uldHistories)
+  cargo: Awb;
 }

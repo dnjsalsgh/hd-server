@@ -5,5 +5,5 @@ export class CreateTempStorageHistoryDto extends PickType(TempStorageHistory, [
   'storageWorkOrder',
   'storage',
   'tempStorage',
-  'cargo',
+  'awb',
 ]) {}

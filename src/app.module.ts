@@ -5,8 +5,8 @@ import { AmrModule } from './amr/amr.module';
 import { AmrChargerModule } from './amr-charger/amr-charger.module';
 import { AmrChargeHistoryModule } from './amr-charge-history/amr-charge-history.module';
 import { StorageModule } from './storage/storage.module';
-import { CargoModule } from './cargo/cargo.module';
-import { CargoSccJoinModule } from './cargo-scc-join/cargo-scc-join.module';
+import { AwbModule } from './awb/awb.module';
+import { AwbSccJoinModule } from './awb-scc-join/awb-scc-join.module';
 import { SccModule } from './scc/scc.module';
 import { UldModule } from './uld/uld.module';
 import { UldHistoryModule } from './uld-history/uld-history.module';
@@ -25,9 +25,9 @@ import * as process from 'process';
 import { Amr } from './amr/entities/amr.entity';
 import { AmrCharger } from './amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from './amr-charge-history/entities/amr-charge-history.entity';
-import { Cargo } from './cargo/entities/cargo.entity';
+import { Awb } from './awb/entities/awb.entity';
 import { Storage } from './storage/entities/storage.entity';
-import { CargoSccJoin } from './cargo-scc-join/entities/cargo-scc-join.entity';
+import { AwbSccJoin } from './awb-scc-join/entities/awb-scc-join.entity';
 import { Scc } from './scc/entities/scc.entity';
 import { Uld } from './uld/entities/uld.entity';
 import { SimulatorHistory } from './simulator-history/entities/simulator-history.entity';
@@ -40,22 +40,21 @@ import { StorageWorkOrder } from './storage-work-order/entities/storage-work-ord
 import { InspectWorkOrder } from './inspect-work-order/entities/inspect-work-order.entity';
 import { TempStorage } from './temp-storage/entities/temp-storage.entity';
 import { TempStorageHistory } from './temp-storage-history/entities/temp-storage-history.entity';
-import { SimulatorResultCargoJoinModule } from './simulator-result-cargo-join/simulator-result-cargo-join.module';
-import { SimulatorResultCargoJoin } from './simulator-result-cargo-join/entities/simulator-result-cargo-join.entity';
+import { SimulatorResultAwbJoinModule } from './simulator-result-cargo-join/simulator-result-awb-join.module';
+import { SimulatorResultAwbJoin } from './simulator-result-cargo-join/entities/simulator-result-awb-join.entity';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { TimeTableModule } from './time-table/time-table.module';
 import { AircraftModule } from './aircraft/aircraft.module';
 import { AircraftScheduleModule } from './aircraft-schedule/aircraft-schedule.module';
 import { CommonCodeModule } from './common-code/common-code.module';
-import { CargoGroupModule } from './cargo-group/cargo-group.module';
+import { AwbGroupModule } from './awb-group/awb-group.module';
 import { TimeTable } from './time-table/entities/time-table.entity';
 import { Aircraft } from './aircraft/entities/aircraft.entity';
 import { AircraftSchedule } from './aircraft-schedule/entities/aircraft-schedule.entity';
 import { CommonCode } from './common-code/entities/common-code.entity';
-import { CargoGroup } from './cargo-group/entities/cargo-group.entity';
+import { AwbGroup } from './awb-group/entities/awb-group.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { MqttModule } from './mqtt.module';
-import { CargoListModule } from './cargo-list/cargo-list.module';
 
 @Module({
   imports: [
@@ -82,8 +81,8 @@ import { CargoListModule } from './cargo-list/cargo-list.module';
             AmrCharger,
             AmrChargeHistory,
             Storage,
-            Cargo,
-            CargoSccJoin,
+            Awb,
+            AwbSccJoin,
             Scc,
             Uld,
             UldHistory,
@@ -96,12 +95,12 @@ import { CargoListModule } from './cargo-list/cargo-list.module';
             StorageHistory,
             SimulatorResult,
             SimulatorHistory,
-            SimulatorResultCargoJoin,
+            SimulatorResultAwbJoin,
             TimeTable,
             Aircraft,
             AircraftSchedule,
             CommonCode,
-            CargoGroup,
+            AwbGroup,
           ],
           // autoLoadEntities: true,  [버그있어서 사용 지양]
           logging: true, // 쿼리 보여주는 옵션
@@ -116,8 +115,8 @@ import { CargoListModule } from './cargo-list/cargo-list.module';
     AmrChargerModule,
     AmrChargeHistoryModule,
     StorageModule,
-    CargoModule,
-    CargoSccJoinModule,
+    AwbModule,
+    AwbSccJoinModule,
     SccModule,
     UldModule,
     UldHistoryModule,
@@ -130,15 +129,14 @@ import { CargoListModule } from './cargo-list/cargo-list.module';
     StorageHistoryModule,
     SimulatorResultModule,
     SimulatorHistoryModule,
-    SimulatorResultCargoJoinModule,
+    SimulatorResultAwbJoinModule,
     TimeTableModule,
     AircraftModule,
     AircraftScheduleModule,
     CommonCodeModule,
-    CargoGroupModule,
+    AwbGroupModule,
     // mqtt 모듈설정
     MqttModule,
-    CargoListModule,
   ],
   controllers: [AppController],
   providers: [AppService],

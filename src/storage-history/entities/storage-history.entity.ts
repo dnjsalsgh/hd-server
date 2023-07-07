@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Storage } from '../../storage/entities/storage.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -36,6 +36,6 @@ export class StorageHistory {
     example: 1,
     description: '화물FK',
   })
-  @ManyToOne(() => Cargo, (cargo) => cargo.storageHistories)
-  cargo: Cargo;
+  @ManyToOne(() => Awb, (awb) => awb.storageHistories)
+  awb: Awb;
 }
