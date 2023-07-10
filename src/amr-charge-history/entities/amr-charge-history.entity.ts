@@ -52,13 +52,23 @@ export class AmrChargeHistory {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
+  @ApiProperty({
+    example: 1,
+    description: 'AMR FK',
+    type: () => Amr,
+  })
   @ManyToOne(() => Amr, (amr) => amr.amrChargeHistories, {
     onDelete: 'SET NULL',
   })
-  amr: Relation<Amr>;
+  amr: Relation<Amr> | number;
 
+  @ApiProperty({
+    example: 1,
+    description: 'AMR Charger FK',
+    type: () => AmrCharger,
+  })
   @ManyToOne(() => AmrCharger, (amrCharger) => amrCharger.amrChargeHistories, {
     onDelete: 'SET NULL',
   })
-  amrCharger: Relation<AmrCharger>;
+  amrCharger: Relation<AmrCharger> | number;
 }

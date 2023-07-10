@@ -1,17 +1,17 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
 } from '@nestjs/common';
 import { AmrService } from './amr.service';
 import { CreateAmrDto } from './dto/create-amr.dto';
 import { UpdateAmrDto } from './dto/update-amr.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AmrRawDto } from './dto/amr-raw.dto';
 
 @Controller('amr')
 @ApiTags('amr')
@@ -21,6 +21,11 @@ export class AmrController {
   @Post()
   create(@Body() createAmrDto: CreateAmrDto) {
     return this.amrService.create(createAmrDto);
+  }
+  @ApiOperation({ summary: 'plc의 데이터 입력' })
+  @Post('/plc')
+  createByPlc(@Body() body: AmrRawDto) {
+    return this.amrService.createAmrByPlcData(body);
   }
 
   @Get()

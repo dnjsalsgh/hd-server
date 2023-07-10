@@ -6,5 +6,5 @@ export class CreateAmrChargerDto extends PickType(AmrCharger, [
   'working',
   'x',
   'y',
-  'z',
+  // 'z',
 ]) {}

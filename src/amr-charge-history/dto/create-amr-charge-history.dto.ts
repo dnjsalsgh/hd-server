@@ -6,4 +6,6 @@ export class CreateAmrChargeHistoryDto extends PickType(AmrChargeHistory, [
   'chargeEnd',
   'soc',
   'soh',
+  'amr',
+  'amrCharger',
 ]) {}

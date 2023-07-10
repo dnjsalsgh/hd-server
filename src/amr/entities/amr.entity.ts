@@ -37,8 +37,8 @@ export class Amr {
     example: 1,
     description: '공정 코드',
   })
-  @Column({ nullable: false })
-  prcsCD: number;
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  prcsCD: string;
 
   @ApiProperty({
     example: false,
@@ -128,7 +128,7 @@ export class Amr {
     example: new Date(),
     description: '데이터 업데이트 일자',
   })
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   logDT: Date;
 
   @CreateDateColumn()

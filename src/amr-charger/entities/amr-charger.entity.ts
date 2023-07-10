@@ -45,7 +45,7 @@ export class AmrCharger {
 
   @ApiProperty({
     example: 1,
-    description: 'z좌표',
+    description: '로봇헤더',
   })
   @Column({ type: 'double precision', nullable: true })
   z: number;
