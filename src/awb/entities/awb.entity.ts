@@ -153,6 +153,56 @@ export class Awb {
   @Column({ type: 'boolean', nullable: true })
   simulation: boolean;
 
+  // 피드백 반영 후 새로생긴 칼럼
+  @ApiProperty({
+    example: 1.0,
+    description: '데이터 용량',
+  })
+  @Column({ type: 'double precision', nullable: true })
+  dataCapacity: number;
+
+  @ApiProperty({
+    example: 'fly',
+    description: '항공편',
+  })
+  @Column({ type: 'string', nullable: true })
+  flight: string;
+
+  @ApiProperty({
+    example: '출발지',
+    description: '출발지',
+  })
+  @Column({ type: 'string', nullable: true })
+  from: string;
+
+  @ApiProperty({
+    example: '공항도착',
+    description: '공항도착',
+  })
+  @Column({ type: 'string', nullable: true })
+  airportArrival: string;
+
+  @ApiProperty({
+    example: '배송설명',
+    description: '배송설명',
+  })
+  @Column({ type: 'string', nullable: true })
+  description: string;
+
+  @ApiProperty({
+    example: 'rm코멘트',
+    description: 'rm코멘트',
+  })
+  @Column({ type: 'string', nullable: true })
+  rmComment: string;
+
+  @ApiProperty({
+    example: '로컬타임',
+    description: '로컬타임',
+  })
+  @Column({ type: 'datetime', nullable: true })
+  localTime: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -166,7 +216,7 @@ export class Awb {
   awbGroup: Relation<AwbGroup>;
 
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.awb)
-  inspectWorkOrders: Relation<BuildUpOrder[]>;
+  BuildUpOrders: Relation<BuildUpOrder[]>;
 
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.awb)
   simulatorHistories: Relation<SimulatorHistory[]>;

@@ -68,7 +68,7 @@ export class BuildUpOrder {
   @ManyToOne(() => Uld, (uld) => uld.inspectWorkOrders)
   uld: Relation<Uld>;
 
-  @ManyToOne(() => Awb, (awb) => awb.inspectWorkOrders)
+  @ManyToOne(() => Awb, (awb) => awb.BuildUpOrders)
   awb: Relation<Awb>;
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)

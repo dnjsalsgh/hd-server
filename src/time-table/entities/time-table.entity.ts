@@ -19,7 +19,7 @@ export class TimeTable {
   id: number;
 
   @ApiProperty({
-    example: '{ test: 1}',
+    example: '{ test: 1 }',
     description: '이력데이터',
   })
   @Column({ type: 'jsonb' })
