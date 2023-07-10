@@ -44,6 +44,7 @@ export class Scc {
   @Column({ type: 'varchar', length: 500, nullable: true })
   description: string;
 
+  // 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({
     example: '/c/xx',
     description: '이미지 파일경로',

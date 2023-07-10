@@ -44,6 +44,21 @@ export class Aircraft {
   @Column({ type: 'jsonb', nullable: false })
   info: unknown;
 
+  // 피드백 반영 후 새로생긴 칼럼
+  @ApiProperty({
+    example: '허용가능',
+    description: '허용가능',
+  })
+  @Column({ type: 'boolean', nullable: true })
+  allow: boolean;
+
+  @ApiProperty({
+    example: '허용가능 드라이아이스',
+    description: '허용가능 드라이아이스',
+  })
+  @Column({ type: 'int', nullable: true })
+  allowDryIce: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
