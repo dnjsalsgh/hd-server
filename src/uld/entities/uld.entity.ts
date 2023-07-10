@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -65,23 +66,23 @@ export class Uld {
     description: 'uld유형 FK',
   })
   @ManyToOne(() => UldType, (uldType) => uldType.ulds)
-  uldType: UldType;
+  uldType: Relation<UldType>;
 
   @OneToMany(() => BuildUpOrder, (inspectWorkOrder) => inspectWorkOrder.uld)
-  inspectWorkOrders: BuildUpOrder[];
+  inspectWorkOrders: Relation<BuildUpOrder[]>;
 
   @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.uld)
-  simulatorResult: SimulatorResult[];
+  simulatorResult: Relation<SimulatorResult[]>;
 
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.uld)
-  simulatorHistories: SimulatorHistory[];
+  simulatorHistories: Relation<SimulatorHistory[]>;
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
-  uldHistories: UldHistory[];
+  uldHistories: Relation<UldHistory[]>;
 
   @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
-  uldSccJoin: UldSccJoin[];
+  uldSccJoin: Relation<UldSccJoin[]>;
 
   @OneToMany(() => TimeTable, (timeTable) => timeTable.uld)
-  timeTables: TimeTable[];
+  timeTables: Relation<TimeTable[]>;
 }

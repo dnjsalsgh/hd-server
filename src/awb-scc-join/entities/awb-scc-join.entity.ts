@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -31,7 +32,7 @@ export class AwbSccJoin {
     type: () => Awb,
   })
   @ManyToOne(() => Awb, (awb) => awb.awbSccJoin)
-  awb: Awb;
+  awb: Relation<Awb>;
 
   @ApiProperty({
     example: 1,
@@ -39,5 +40,5 @@ export class AwbSccJoin {
     type: () => Scc,
   })
   @ManyToOne(() => Scc, (scc) => scc.awbSccJoin)
-  scc: Scc;
+  scc: Relation<Scc>;
 }

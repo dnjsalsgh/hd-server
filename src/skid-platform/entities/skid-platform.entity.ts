@@ -5,6 +5,7 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { UldHistory } from '../../uld-history/entities/uld-history.entity';
@@ -91,17 +92,17 @@ export class SkidPlatform {
   deletedAt: Date | null;
 
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.skidPlatform)
-  buildUpOrders: BuildUpOrder[];
+  buildUpOrders: Relation<BuildUpOrder[]>;
 
   @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.skidPlatform)
-  asrsOutOrders: AsrsOutOrder[];
+  asrsOutOrders: Relation<AsrsOutOrder[]>;
 
   @OneToMany(
     () => SkidPlatformHistory,
     (skidPlatformHistory) => skidPlatformHistory.skidPlatform,
   )
-  skidPlatformHistories: SkidPlatformHistory[];
+  skidPlatformHistories: Relation<SkidPlatformHistory[]>;
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
-  uldHistories: UldHistory[];
+  uldHistories: Relation<UldHistory[]>;
 }

@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Relation,
 } from 'typeorm';
 import { Amr } from '../../amr/entities/amr.entity';
 import { AmrCharger } from '../../amr-charger/entities/amr-charger.entity';
@@ -54,10 +55,10 @@ export class AmrChargeHistory {
   @ManyToOne(() => Amr, (amr) => amr.amrChargeHistories, {
     onDelete: 'SET NULL',
   })
-  amr: Amr;
+  amr: Relation<Amr>;
 
   @ManyToOne(() => AmrCharger, (amrCharger) => amrCharger.amrChargeHistories, {
     onDelete: 'SET NULL',
   })
-  amrCharger: AmrCharger;
+  amrCharger: Relation<AmrCharger>;
 }

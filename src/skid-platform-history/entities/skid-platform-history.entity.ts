@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Awb } from '../../awb/entities/awb.entity';
@@ -35,7 +36,7 @@ export class SkidPlatformHistory {
     () => AsrsOutOrder,
     (asrsOutOrder) => asrsOutOrder.skidPlatformHistories,
   )
-  asrsOutOrder: AsrsOutOrder;
+  asrsOutOrder: Relation<AsrsOutOrder>;
 
   @ApiProperty({
     example: 1,
@@ -43,7 +44,7 @@ export class SkidPlatformHistory {
     type: () => Asrs,
   })
   @ManyToOne(() => Asrs, (asrs) => asrs.skidPlatformHistories)
-  asrs: Asrs;
+  asrs: Relation<Asrs>;
 
   @ApiProperty({
     example: 1,
@@ -54,7 +55,7 @@ export class SkidPlatformHistory {
     () => SkidPlatform,
     (skidPlatform) => skidPlatform.skidPlatformHistories,
   )
-  skidPlatform: SkidPlatform;
+  skidPlatform: Relation<SkidPlatform>;
 
   @ApiProperty({
     example: 1,
@@ -62,5 +63,5 @@ export class SkidPlatformHistory {
     type: () => Awb,
   })
   @ManyToOne(() => Awb, (awb) => awb.skidPlatformHistories)
-  awb: Awb;
+  awb: Relation<Awb>;
 }

@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
@@ -56,17 +57,17 @@ export class SimulatorResult {
   deletedAt: Date | null;
 
   @ManyToOne(() => Uld, (uld) => uld.simulatorResult)
-  uld: Uld;
+  uld: Relation<Uld>;
 
   @OneToMany(
     () => SimulatorResultAwbJoin,
     (simulatorResultCargoJoin) => simulatorResultCargoJoin.simulatorResult,
   )
-  simulatorResultCargoJoin: SimulatorResultAwbJoin[];
+  simulatorResultCargoJoin: Relation<SimulatorResultAwbJoin[]>;
 
   @OneToMany(
     () => SimulatorHistory,
     (simulatorHistory) => simulatorHistory.simulatorResult,
   )
-  simulatorHistories: SimulatorHistory[];
+  simulatorHistories: Relation<SimulatorHistory[]>;
 }

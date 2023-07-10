@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Aircraft } from '../../aircraft/entities/aircraft.entity';
@@ -35,7 +36,7 @@ export class AircraftSchedule {
   @ManyToOne(() => Aircraft, (aircraft) => aircraft.AircraftSchedules, {
     nullable: false,
   })
-  Aircraft: Aircraft;
+  Aircraft: Relation<Aircraft>;
 
   // commonCode의 일방향 관계설정
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.aircraftSchedules)
@@ -45,7 +46,7 @@ export class AircraftSchedule {
     nullable: false,
   })
   @JoinColumn({ name: 'cc_id_destination' }) // 원하는 컬럼 이름을 지정합니다.
-  CcIdDestination: CommonCode;
+  CcIdDestination: Relation<CommonCode>;
 }
 
 export const AircraftScheduleAttributes = {

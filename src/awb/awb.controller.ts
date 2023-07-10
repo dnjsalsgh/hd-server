@@ -13,7 +13,7 @@ import { UpdateAwbDto } from './dto/update-awb.dto';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('awb')
-@ApiTags('awb')
+@ApiTags('awb(화물,vms)')
 export class AwbController {
   constructor(private readonly awbService: AwbService) {}
 

@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Asrs } from '../../asrs/entities/asrs.entity';
@@ -30,7 +31,7 @@ export class AsrsHistory {
     type: () => Asrs,
   })
   @ManyToOne(() => Asrs, (asrs) => asrs.asrsHistories)
-  asrs: Asrs;
+  asrs: Relation<Asrs>;
 
   @ApiProperty({
     example: 1,
@@ -38,5 +39,5 @@ export class AsrsHistory {
     type: () => Awb,
   })
   @ManyToOne(() => Awb, (awb) => awb.asrsHistories)
-  awb: Awb;
+  awb: Relation<Awb>;
 }

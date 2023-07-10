@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
@@ -62,14 +63,14 @@ export class BuildUpOrder {
     type: () => SkidPlatform,
   })
   @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.buildUpOrders)
-  skidPlatform: SkidPlatform;
+  skidPlatform: Relation<SkidPlatform>;
 
   @ManyToOne(() => Uld, (uld) => uld.inspectWorkOrders)
-  uld: Uld;
+  uld: Relation<Uld>;
 
   @ManyToOne(() => Awb, (awb) => awb.inspectWorkOrders)
-  awb: Awb;
+  awb: Relation<Awb>;
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
-  uldHistories: UldHistory[];
+  uldHistories: Relation<UldHistory[]>;
 }

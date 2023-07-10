@@ -5,6 +5,7 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
@@ -56,7 +57,7 @@ export class Aircraft {
     () => AircraftSchedule,
     (aircraftSchedule) => aircraftSchedule.Aircraft,
   )
-  AircraftSchedules: AircraftSchedule[];
+  AircraftSchedules: Relation<AircraftSchedule[]>;
 }
 
 export const AircraftAttribute = {

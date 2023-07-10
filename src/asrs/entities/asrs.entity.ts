@@ -27,7 +27,7 @@ export class Asrs {
   name: string;
 
   @ApiProperty({
-    example: 1,
+    example: 0,
     description: '부모 창고의 id',
   })
   @IsNumber()

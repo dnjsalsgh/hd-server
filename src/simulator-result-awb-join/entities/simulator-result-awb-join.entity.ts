@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Awb } from '../../awb/entities/awb.entity';
@@ -29,8 +30,8 @@ export class SimulatorResultAwbJoin {
     () => SimulatorResult,
     (simulatorResult) => simulatorResult.simulatorResultCargoJoin,
   )
-  simulatorResult: SimulatorResult;
+  simulatorResult: Relation<SimulatorResult>;
 
   @ManyToOne(() => Awb, (awb) => awb.srJoin)
-  awb: Awb;
+  awb: Relation<Awb>;
 }

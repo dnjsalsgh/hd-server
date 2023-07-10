@@ -5,6 +5,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
@@ -75,7 +76,7 @@ export class UldHistory {
     type: () => BuildUpOrder,
   })
   @ManyToOne(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.uldHistories)
-  buildUpOrder: BuildUpOrder;
+  buildUpOrder: Relation<BuildUpOrder>;
 
   @ApiProperty({
     example: 1,
@@ -83,11 +84,11 @@ export class UldHistory {
     type: () => SkidPlatform,
   })
   @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.uldHistories)
-  skidPlatform: SkidPlatform;
+  skidPlatform: Relation<SkidPlatform>;
 
   @ManyToOne(() => Uld, (uld) => uld.uldHistories)
-  uld: Uld;
+  uld: Relation<Uld>;
 
   @ManyToOne(() => Awb, (cargo) => cargo.uldHistories)
-  cargo: Awb;
+  cargo: Relation<Awb>;
 }

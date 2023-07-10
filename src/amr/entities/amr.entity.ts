@@ -5,6 +5,7 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { AmrChargeHistory } from '../../amr-charge-history/entities/amr-charge-history.entity';
@@ -138,8 +139,8 @@ export class Amr {
   deletedAt: Date | null;
 
   @OneToMany(() => AmrChargeHistory, (amrChargeHistory) => amrChargeHistory.amr)
-  amrChargeHistories: AmrChargeHistory[];
+  amrChargeHistories: Relation<AmrChargeHistory[]>;
 
   @OneToMany(() => TimeTable, (timeTable) => timeTable.amr)
-  timeTables: TimeTable[];
+  timeTables: Relation<TimeTable[]>;
 }

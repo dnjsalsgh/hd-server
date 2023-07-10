@@ -5,6 +5,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
@@ -51,11 +52,11 @@ export class SimulatorHistory {
     () => SimulatorResult,
     (simulatorResult) => simulatorResult.simulatorHistories,
   )
-  simulatorResult: SimulatorResult;
+  simulatorResult: Relation<SimulatorResult>;
 
   @ManyToOne(() => Uld, (uld) => uld.simulatorHistories)
-  uld: Uld;
+  uld: Relation<Uld>;
 
   @ManyToOne(() => Awb, (awb) => awb.simulatorHistories)
-  awb: Awb;
+  awb: Relation<Awb>;
 }

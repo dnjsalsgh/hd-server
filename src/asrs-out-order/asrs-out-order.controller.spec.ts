@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AsrsOutOrderController } from './asrs-work-order.controller';
-import { AsrsOutOrderService } from './asrs-work-order.service';
+import { AsrsOutOrderController } from './asrs-out-order.controller';
+import { AsrsOutOrderService } from './asrs-out-order.service';
 
 describe('AsrsOutOrderController', () => {
   let controller: AsrsOutOrderController;

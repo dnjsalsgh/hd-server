@@ -1,6 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Relation,
+} from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
-import { Awb } from '../../awb/entities/awb.entity';
 import { Scc } from '../../scc/entities/scc.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -24,7 +29,7 @@ export class UldSccJoin {
     type: () => Uld,
   })
   @ManyToOne(() => Uld, (uld) => uld.uldSccJoin)
-  uld: Uld;
+  uld: Relation<Uld>;
 
   @ApiProperty({
     example: 1,
@@ -32,5 +37,5 @@ export class UldSccJoin {
     type: () => Scc,
   })
   @ManyToOne(() => Scc, (scc) => scc.uldSccJoin)
-  scc: Scc;
+  scc: Relation<Scc>;
 }

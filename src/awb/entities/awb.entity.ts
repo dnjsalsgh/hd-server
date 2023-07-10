@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
@@ -162,38 +163,38 @@ export class Awb {
   deletedAt: Date | null;
 
   @ManyToOne(() => AwbGroup, (awbGroup) => awbGroup.awbs)
-  awbGroup: AwbGroup;
+  awbGroup: Relation<AwbGroup>;
 
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.awb)
-  inspectWorkOrders: BuildUpOrder[];
+  inspectWorkOrders: Relation<BuildUpOrder[]>;
 
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.awb)
-  simulatorHistories: SimulatorHistory[];
+  simulatorHistories: Relation<SimulatorHistory[]>;
 
   @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.awb)
-  asrsHistories: AsrsHistory[];
+  asrsHistories: Relation<AsrsHistory[]>;
 
   @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.awb)
-  asrsOutOrders: AsrsOutOrder[];
+  asrsOutOrders: Relation<AsrsOutOrder[]>;
 
   @OneToMany(
     () => SkidPlatformHistory,
     (skidPlatformHistory) => skidPlatformHistory.awb,
   )
-  skidPlatformHistories: SkidPlatformHistory[];
+  skidPlatformHistories: Relation<SkidPlatformHistory[]>;
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
-  uldHistories: UldHistory[];
+  uldHistories: Relation<UldHistory[]>;
 
   @OneToMany(() => AwbSccJoin, (awbSccJoin) => awbSccJoin.awb)
-  awbSccJoin: AwbSccJoin[];
+  awbSccJoin: Relation<AwbSccJoin[]>;
 
   @OneToMany(
     () => SimulatorResultAwbJoin,
     (simulatorResultAwbJoin) => simulatorResultAwbJoin.awb,
   )
-  srJoin: SimulatorResultAwbJoin[];
+  srJoin: Relation<SimulatorResultAwbJoin[]>;
 
   @OneToMany(() => TimeTable, (timeTable) => timeTable.awb)
-  timeTables: TimeTable[];
+  timeTables: Relation<TimeTable[]>;
 }
