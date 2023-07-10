@@ -33,49 +33,49 @@ export class AircraftSchedule {
     example: '2023-07-10',
     description: '현지출발시간',
   })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   localDepartureTime: string;
 
   @ApiProperty({
     example: '2023-07-14',
     description: '한국도착시간',
   })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   koreaArrivalTime: string;
 
   @ApiProperty({
     example: '2023-07-14:13:00:00',
     description: '작업시작시간',
   })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   workStartTime: string;
 
   @ApiProperty({
     example: '2023-07-15:13:00:00',
     description: '작업완료목표시간',
   })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   workCompleteTargetTime: string;
 
   @ApiProperty({
     example: '2023-07-15:13:00:00',
     description: '한국출항시간',
   })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   koreaDepartureTime: string;
 
   @ApiProperty({
     example: '2023-07-15:13:00:00',
     description: '현지도착시간',
   })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   localArrivalTime: string;
 
   @ApiProperty({
     example: '[GEN,TEL,QRL]',
     description: '경유지',
   })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   waypoint: string[];
 
   @CreateDateColumn()

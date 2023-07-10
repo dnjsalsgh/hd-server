@@ -165,42 +165,42 @@ export class Awb {
     example: 'fly',
     description: '항공편',
   })
-  @Column({ type: 'string', nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   flight: string;
 
   @ApiProperty({
     example: '출발지',
     description: '출발지',
   })
-  @Column({ type: 'string', nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   from: string;
 
   @ApiProperty({
     example: '공항도착',
     description: '공항도착',
   })
-  @Column({ type: 'string', nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   airportArrival: string;
 
   @ApiProperty({
     example: '배송설명',
     description: '배송설명',
   })
-  @Column({ type: 'string', nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   description: string;
 
   @ApiProperty({
     example: 'rm코멘트',
     description: 'rm코멘트',
   })
-  @Column({ type: 'string', nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   rmComment: string;
 
   @ApiProperty({
     example: '로컬타임',
     description: '로컬타임',
   })
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   localTime: Date;
 
   @CreateDateColumn()
