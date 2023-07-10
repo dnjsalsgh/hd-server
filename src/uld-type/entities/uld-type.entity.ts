@@ -85,6 +85,14 @@ export class UldType {
   @Column({ type: 'json', nullable: true })
   vertexCord: JSON;
 
+  // 피드백 반영 후 새로생긴 칼럼
+  @ApiProperty({
+    example: 1.0,
+    description: '스키드 무게',
+  })
+  @Column({ type: 'double precision', nullable: true })
+  squareWeight: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
