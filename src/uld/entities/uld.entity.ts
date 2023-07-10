@@ -52,6 +52,14 @@ export class Uld {
   @Column({ type: 'boolean', nullable: true })
   simulation: boolean;
 
+  // 피드백 반영 후 새로생긴 칼럼
+  @ApiProperty({
+    example: '경계 프리맵',
+    description: '경계 프리맵',
+  })
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  boundaryPrefab: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
