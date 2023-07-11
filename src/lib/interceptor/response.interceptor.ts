@@ -45,7 +45,6 @@ export class ResponseInterceptor implements NestInterceptor<ServerResponse> {
         message = `Delete ${splitUrl} successfully`;
         break;
     }
-
     return next.handle().pipe(
       map((data) => {
         // const length = data?.length;

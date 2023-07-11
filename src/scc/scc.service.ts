@@ -24,8 +24,16 @@ export class SccService {
     return await this.sccRepository.find({ where: { id: id } });
   }
 
-  update(id: number, updateSccDto: UpdateSccDto) {
-    return this.sccRepository.update(id, updateSccDto);
+  async update(id: number, updateSccDto: UpdateSccDto) {
+    const updateResult = await this.sccRepository.update(id, updateSccDto);
+    // const updateResult1 = await this.sccRepository
+    //   .createQueryBuilder()
+    //   .update(Scc)
+    //   .set(updateSccDto)
+    //   .where('id = :id', { id: id })
+    //   .execute();
+
+    return updateResult;
   }
 
   remove(id: number) {

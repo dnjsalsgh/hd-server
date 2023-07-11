@@ -10,6 +10,7 @@ import {
 import { Asrs } from '../../asrs/entities/asrs.entity';
 import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
 @Entity()
 export class AsrsHistory {
@@ -30,7 +31,8 @@ export class AsrsHistory {
     description: '자동창고FK',
     type: () => Asrs,
   })
-  @ManyToOne(() => Asrs, (asrs) => asrs.asrsHistories)
+  @IsNotEmpty()
+  @ManyToOne(() => Asrs, (asrs) => asrs.asrsHistories, { nullable: false })
   asrs: Relation<Asrs>;
 
   @ApiProperty({
@@ -38,6 +40,7 @@ export class AsrsHistory {
     description: '화물FK',
     type: () => Awb,
   })
-  @ManyToOne(() => Awb, (awb) => awb.asrsHistories)
+  @IsNotEmpty()
+  @ManyToOne(() => Awb, (awb) => awb.asrsHistories, { nullable: false })
   awb: Relation<Awb>;
 }

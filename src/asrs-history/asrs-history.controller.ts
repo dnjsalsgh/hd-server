@@ -23,6 +23,11 @@ export class AsrsHistoryController {
     return this.asrsHistoryService.create(createAsrsHistoryDto);
   }
 
+  @Post('/with')
+  createWithObject(@Body() createAsrsHistoryDto: CreateAsrsHistoryDto) {
+    return this.asrsHistoryService.createWithObject(createAsrsHistoryDto);
+  }
+
   @Get()
   findAll() {
     return this.asrsHistoryService.findAll();

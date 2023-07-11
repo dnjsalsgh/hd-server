@@ -1,11 +1,10 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
 } from '@nestjs/common';
 import { UldTypeService } from './uld-type.service';

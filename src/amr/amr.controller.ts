@@ -22,6 +22,7 @@ export class AmrController {
   create(@Body() createAmrDto: CreateAmrDto) {
     return this.amrService.create(createAmrDto);
   }
+
   @ApiOperation({ summary: 'plc의 데이터 입력' })
   @Post('/plc')
   createByPlc(@Body() body: AmrRawDto) {

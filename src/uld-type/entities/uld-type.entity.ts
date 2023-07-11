@@ -19,7 +19,7 @@ export class UldType {
     example: 'uldType-001',
     description: '고유code',
   })
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'varchar', length: 50, nullable: false })
   code: number;
 
   @ApiProperty({
@@ -52,17 +52,17 @@ export class UldType {
 
   @ApiProperty({
     example: 1.0,
-    description: '길이',
-  })
-  @Column({ type: 'double precision', nullable: true })
-  length: number;
-
-  @ApiProperty({
-    example: 1.0,
     description: '높이',
   })
   @Column({ type: 'double precision', nullable: true })
   height: number;
+
+  @ApiProperty({
+    example: 1.0,
+    description: '길이',
+  })
+  @Column({ type: 'double precision', nullable: true })
+  length: number;
 
   @ApiProperty({
     example: 1.0,

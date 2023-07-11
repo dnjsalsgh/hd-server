@@ -7,6 +7,7 @@ import { Awb } from './entities/awb.entity';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { CreateAwbSccJoinDto } from '../awb-scc-join/dto/create-awb-scc-join.dto';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { Scc } from '../scc/entities/scc.entity';
 
 @Injectable()
 export class AwbService {
@@ -30,8 +31,10 @@ export class AwbService {
         .getRepository(Awb)
         .save(cargoDto);
 
+      const sccResult = await queryRunner.manager.getRepository(Scc).save(scc);
+
       const joinParams: CreateAwbSccJoinDto = {
-        scc: scc,
+        scc: sccResult.id,
         cargo: result,
       };
       await queryRunner.manager.getRepository(AwbSccJoin).save(joinParams);
