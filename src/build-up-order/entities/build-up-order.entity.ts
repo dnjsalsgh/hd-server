@@ -65,9 +65,19 @@ export class BuildUpOrder {
   @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.buildUpOrders)
   skidPlatform: Relation<SkidPlatform>;
 
+  @ApiProperty({
+    example: 1,
+    description: 'ULD FK',
+    type: () => Uld,
+  })
   @ManyToOne(() => Uld, (uld) => uld.inspectWorkOrders)
   uld: Relation<Uld>;
 
+  @ApiProperty({
+    example: 1,
+    description: 'Awb FK',
+    type: () => Awb,
+  })
   @ManyToOne(() => Awb, (awb) => awb.BuildUpOrders)
   awb: Relation<Awb>;
 

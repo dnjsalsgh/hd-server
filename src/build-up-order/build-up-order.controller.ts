@@ -11,13 +11,14 @@ import {
 import { BuildUpOrderService } from './build-up-order.service';
 import { CreateBuildUpOrderDto } from './dto/create-build-up-order.dto';
 import { UpdateBuildUpOrderDto } from './dto/update-build-up-order.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@Controller('inspect-work-order')
-@ApiTags('inspect-work-order')
+@Controller('build-up-order')
+@ApiTags('build-up-order(작업자 작업지시)')
 export class BuildUpOrderController {
   constructor(private readonly inspectWorkOrderService: BuildUpOrderService) {}
 
+  @ApiOperation({ summary: '작업자 작업지시' })
   @Post()
   create(@Body() createBuildUpOrderDto: CreateBuildUpOrderDto) {
     return this.inspectWorkOrderService.create(createBuildUpOrderDto);

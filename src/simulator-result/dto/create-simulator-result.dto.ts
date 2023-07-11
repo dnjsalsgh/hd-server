@@ -5,4 +5,6 @@ export class CreateSimulatorResultDto extends PickType(SimulatorResult, [
   'startDate',
   'endDate',
   'loadRate',
+  'version',
+  'uld',
 ]) {}

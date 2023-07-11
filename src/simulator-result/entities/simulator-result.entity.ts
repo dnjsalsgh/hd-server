@@ -56,6 +56,10 @@ export class SimulatorResult {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
+  @ApiProperty({
+    example: 1,
+    description: 'ULD FK',
+  })
   @ManyToOne(() => Uld, (uld) => uld.simulatorResult)
   uld: Relation<Uld>;
 

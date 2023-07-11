@@ -3,11 +3,20 @@ import { Aircraft } from '../../aircraft/entities/aircraft.entity';
 import { CommonCode } from '../../common-code/entities/common-code.entity';
 import { AircraftSchedule } from '../entities/aircraft-schedule.entity';
 import { DeepPartial } from 'typeorm/common/DeepPartial';
+import { Column } from 'typeorm';
 
 export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
   'source',
   'Aircraft',
   'CcIdDestination',
+  'CcIdDeparture',
+  'localDepartureTime',
+  'koreaArrivalTime',
+  'workStartTime',
+  'workCompleteTargetTime',
+  'koreaDepartureTime',
+  'localArrivalTime',
+  'waypoint',
 ]) {
   @ApiProperty({
     example: 'GEN',
@@ -21,21 +30,15 @@ export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
   })
   Aircraft: Aircraft;
 
-  @ApiProperty({
-    example: '31',
-    description: '공통코드 FK',
-  })
-  CcIdDestination: CommonCode;
+  // @ApiProperty({
+  //   example: '31',
+  //   description: '공통코드 FK',
+  // })
+  // CcIdDestination: CommonCode;
 
-  // @ApiProperty({
-  //   example: '1',
-  //   description: '항공기Id',
-  // })
-  // aircraft: number;
-  //
-  // @ApiProperty({
-  //   example: '1',
-  //   description: '목적지Id',
-  // })
-  // ccIdDestination: number;
+  @ApiProperty({
+    example: '1',
+    description: '항공기Id',
+  })
+  aircraft: number;
 }

@@ -48,15 +48,27 @@ export class SimulatorHistory {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
+  @ApiProperty({
+    example: 1,
+    description: '시뮬레이션 FK',
+  })
   @ManyToOne(
     () => SimulatorResult,
     (simulatorResult) => simulatorResult.simulatorHistories,
   )
   simulatorResult: Relation<SimulatorResult>;
 
+  @ApiProperty({
+    example: 1,
+    description: 'ULD FK',
+  })
   @ManyToOne(() => Uld, (uld) => uld.simulatorHistories)
   uld: Relation<Uld>;
 
+  @ApiProperty({
+    example: 1,
+    description: 'awb FK',
+  })
   @ManyToOne(() => Awb, (awb) => awb.simulatorHistories)
   awb: Relation<Awb>;
 }

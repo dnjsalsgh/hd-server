@@ -33,49 +33,49 @@ export class AircraftSchedule {
     example: '2023-07-10',
     description: '현지출발시간',
   })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'time', nullable: true })
   localDepartureTime: string;
 
   @ApiProperty({
     example: '2023-07-14',
     description: '한국도착시간',
   })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'time', nullable: true })
   koreaArrivalTime: string;
 
   @ApiProperty({
     example: '2023-07-14:13:00:00',
     description: '작업시작시간',
   })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'time', nullable: true })
   workStartTime: string;
 
   @ApiProperty({
     example: '2023-07-15:13:00:00',
     description: '작업완료목표시간',
   })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'time', nullable: true })
   workCompleteTargetTime: string;
 
   @ApiProperty({
     example: '2023-07-15:13:00:00',
     description: '한국출항시간',
   })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'time', nullable: true })
   koreaDepartureTime: string;
 
   @ApiProperty({
     example: '2023-07-15:13:00:00',
     description: '현지도착시간',
   })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'time', nullable: true })
   localArrivalTime: string;
 
   @ApiProperty({
     example: '[GEN,TEL,QRL]',
     description: '경유지',
   })
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'text', array: true, nullable: true })
   waypoint: string[];
 
   @CreateDateColumn()
@@ -101,14 +101,14 @@ export class AircraftSchedule {
     nullable: false,
   })
   @JoinColumn({ name: 'cc_id_destination' }) // 원하는 컬럼 이름을 지정합니다.
-  CcIdDestination: Relation<CommonCode>;
+  CcIdDestination: Relation<CommonCode> | number;
 
   @IsNotEmpty()
   @ManyToOne(() => CommonCode, {
     nullable: false,
   })
   @JoinColumn({ name: 'cc_id_departure' }) // 원하는 컬럼 이름을 지정합니다.
-  CcIdDeparture: Relation<CommonCode>;
+  CcIdDeparture: Relation<CommonCode> | number;
 }
 
 export const AircraftScheduleAttributes = {
