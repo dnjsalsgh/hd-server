@@ -57,19 +57,19 @@ export class SimulatorHistory {
     (simulatorResult) => simulatorResult.simulatorHistories,
     { nullable: false },
   )
-  SimulatorResult: Relation<SimulatorResult>;
+  SimulatorResult: Relation<SimulatorResult> | number;
 
   @ApiProperty({
     example: 1,
     description: 'ULD FK',
   })
   @ManyToOne(() => Uld, (uld) => uld.simulatorHistories)
-  Uld: Relation<Uld>;
+  Uld: Relation<Uld> | number;
 
   @ApiProperty({
     example: 1,
     description: 'Awb FK',
   })
   @ManyToOne(() => Awb, (awb) => awb.simulatorHistories)
-  Awb: Relation<Awb>;
+  Awb: Relation<Awb> | number;
 }

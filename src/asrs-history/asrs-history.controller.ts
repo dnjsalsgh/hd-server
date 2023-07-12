@@ -23,12 +23,6 @@ export class AsrsHistoryController {
     return this.asrsHistoryService.create(createAsrsHistoryDto);
   }
 
-  @ApiOperation({ summary: 'Awb, Asrs 객체 생성하면서 이력등록' })
-  @Post('/with')
-  createWithObject(@Body() createAsrsHistoryDto: CreateAsrsHistoryDto) {
-    return this.asrsHistoryService.createWithObject(createAsrsHistoryDto);
-  }
-
   @Get()
   findAll() {
     return this.asrsHistoryService.findAll();

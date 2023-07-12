@@ -67,7 +67,7 @@ export class SimulatorResult {
 
   @OneToMany(
     () => SimulatorResultAwbJoin,
-    (simulatorResultAwbJoin) => simulatorResultAwbJoin.simulatorResult,
+    (simulatorResultAwbJoin) => simulatorResultAwbJoin.SimulatorResult,
   )
   simulatorResultAwbJoin: Relation<SimulatorResultAwbJoin[]>;
 

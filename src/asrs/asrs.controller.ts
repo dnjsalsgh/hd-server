@@ -19,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Asrs } from './entities/asrs.entity';
+import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 
 @Controller('asrs')
 @ApiTags('Asrs(자동창고)')
@@ -42,6 +43,12 @@ export class AsrsController {
     body.fullPath = body.name;
     const asrs = await this.asrsService.create(body);
     return asrs;
+  }
+
+  @ApiOperation({ summary: 'Awb, Asrs 객체 생성하면서 이력등록' })
+  @Post('/with')
+  createWithObject(@Body() createAsrsHistoryDto: CreateAsrsHistoryDto) {
+    return this.asrsService.createWithAwb(createAsrsHistoryDto);
   }
 
   @Get()

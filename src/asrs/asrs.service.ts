@@ -3,14 +3,18 @@ import { CreateAsrsDto } from './dto/create-asrs.dto';
 import { UpdateAsrsDto } from './dto/update-asrs.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Asrs } from './entities/asrs.entity';
-import { Like, Repository } from 'typeorm';
+import { DataSource, Like, Repository, TypeORMError } from 'typeorm';
 import { ResponseDto } from '../lib/dto/response.dto';
+import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
+import { Awb } from '../awb/entities/awb.entity';
+import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 
 @Injectable()
 export class AsrsService {
   constructor(
     @InjectRepository(Asrs)
     private readonly asrsRepository: Repository<Asrs>,
+    private dataSource: DataSource,
   ) {}
   async create(createAsrsDto: CreateAsrsDto): Promise<Asrs> {
     let parentAsrs;
@@ -42,6 +46,37 @@ export class AsrsService {
 
     await this.asrsRepository.save(asrs);
     return asrs;
+  }
+
+  async createWithAwb(createAsrsHistoryDto: CreateAsrsHistoryDto) {
+    const queryRunner = await this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const asrsResult = await this.dataSource.manager
+        .getRepository(Asrs)
+        .save(createAsrsHistoryDto.Asrs);
+
+      const awbResult = await this.dataSource.manager
+        .getRepository(Awb)
+        .save(createAsrsHistoryDto.Awb);
+
+      const resultParam = {
+        Asrs: asrsResult,
+        awb: awbResult,
+      };
+      await this.dataSource.manager
+        .getRepository(AsrsHistory)
+        .save(resultParam);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findAll() {

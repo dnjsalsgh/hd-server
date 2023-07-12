@@ -24,37 +24,6 @@ export class AsrsHistoryService {
     }
   }
 
-  async createWithObject(createAsrsHistoryDto: CreateAsrsHistoryDto) {
-    const queryRunner = await this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      const asrsResult = await this.dataSource.manager
-        .getRepository(Asrs)
-        .save(createAsrsHistoryDto.Asrs);
-
-      const awbResult = await this.dataSource.manager
-        .getRepository(Awb)
-        .save(createAsrsHistoryDto.Awb);
-
-      const resultParam = {
-        Asrs: asrsResult,
-        awb: awbResult,
-      };
-      await this.dataSource.manager
-        .getRepository(AsrsHistory)
-        .save(resultParam);
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
   async findAll() {
     return await this.asrsHistoryRepository.find({
       select: {
