@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
 import { UldAttribute } from '../uld/entities/uld.entity';
+import { CreateSimulatorResultWithAwbDto } from './dto/create-simulator-result-with-awb';
 
 @Injectable()
 export class SimulatorResultService {
@@ -17,6 +18,11 @@ export class SimulatorResultService {
     const result = await this.simulatorResultRepository.save(
       createSimulatorResultDto,
     );
+    return result;
+  }
+
+  async createWithAwb(body: CreateSimulatorResultWithAwbDto) {
+    const result = await this.simulatorResultRepository.save(body);
     return result;
   }
 

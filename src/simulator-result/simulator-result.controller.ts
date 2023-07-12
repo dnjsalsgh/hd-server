@@ -11,6 +11,7 @@ import { SimulatorResultService } from './simulator-result.service';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateSimulatorResultWithAwbDto } from './dto/create-simulator-result-with-awb';
 
 @Controller('simulator-result')
 @ApiTags('simulator-result')
@@ -25,6 +26,10 @@ export class SimulatorResultController {
   }
 
   @Post('/')
+  createWithAwb(@Body() body: CreateSimulatorResultWithAwbDto) {
+    return this.simulatorResultService.createWithAwb(body);
+  }
+
   @Get()
   findAll() {
     return this.simulatorResultService.findAll();

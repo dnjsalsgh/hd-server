@@ -57,21 +57,21 @@ export class Awb {
 
   @ApiProperty({
     example: 1.0,
-    description: '폭',
+    description: '폭(x)',
   })
   @Column({ type: 'double precision', nullable: true })
   width: number;
 
   @ApiProperty({
     example: 1.0,
-    description: '높이',
+    description: '높이(y)',
   })
   @Column({ type: 'double precision', nullable: true })
-  height: number;
+  length: number;
 
   @ApiProperty({
     example: 1.0,
-    description: '깊이',
+    description: '깊이(z)',
   })
   @Column({ type: 'double precision', nullable: true })
   depth: number;

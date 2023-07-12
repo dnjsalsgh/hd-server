@@ -45,24 +45,24 @@ export class UldType {
 
   @ApiProperty({
     example: 1.0,
-    description: '폭',
+    description: '폭(x)',
   })
   @Column({ type: 'double precision', nullable: true })
   width: number;
 
   @ApiProperty({
     example: 1.0,
-    description: '높이',
-  })
-  @Column({ type: 'double precision', nullable: true })
-  height: number;
-
-  @ApiProperty({
-    example: 1.0,
-    description: '길이',
+    description: '길이(y)',
   })
   @Column({ type: 'double precision', nullable: true })
   length: number;
+
+  @ApiProperty({
+    example: 1.0,
+    description: '높이(z)',
+  })
+  @Column({ type: 'double precision', nullable: true })
+  depth: number;
 
   @ApiProperty({
     example: 1.0,

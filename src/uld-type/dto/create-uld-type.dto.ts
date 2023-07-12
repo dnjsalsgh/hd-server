@@ -8,7 +8,7 @@ export class CreateUldTypeDto extends PickType(UldType, [
   'squareVolume',
   'width',
   'length',
-  'height',
+  'depth',
   'capacity',
   'modelPath',
   'vertexCord',

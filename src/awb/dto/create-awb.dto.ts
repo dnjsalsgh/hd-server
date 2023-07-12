@@ -8,7 +8,7 @@ export class CreateAwbDto extends PickType(Awb, [
   'waterVolume',
   'squareVolume',
   'width',
-  'height',
+  'length',
   'depth',
   'weight',
   'isStructure',
