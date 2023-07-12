@@ -12,7 +12,7 @@ export class AmrRawDto {
   })
   public LogDT: string;
   @ApiProperty({
-    example: 'amr-001',
+    example: 'Amr-001',
     description: '공정코드',
   })
   public PrcsCD: string;

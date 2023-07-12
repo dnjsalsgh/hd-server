@@ -4,6 +4,9 @@ import { UpdateTimeTableDto } from './dto/update-time-table.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TimeTable } from './entities/time-table.entity';
+import { UldAttribute } from '../uld/entities/uld.entity';
+import { AmrAttribute } from '../amr/entities/amr.entity';
+import { AwbAttribute } from '../awb/entities/awb.entity';
 
 @Injectable()
 export class TimeTableService {
@@ -19,7 +22,18 @@ export class TimeTableService {
   }
 
   async findAll() {
-    return await this.timeTableRepository.find();
+    return await this.timeTableRepository.find({
+      relations: {
+        Uld: true,
+        Amr: true,
+        Awb: true,
+      },
+      select: {
+        Uld: UldAttribute,
+        Amr: AmrAttribute,
+        Awb: AwbAttribute,
+      },
+    });
   }
 
   async findOne(id: number) {

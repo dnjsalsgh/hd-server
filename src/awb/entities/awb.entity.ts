@@ -269,7 +269,7 @@ export class Awb {
   )
   srJoin: Relation<SimulatorResultAwbJoin[]>;
 
-  @OneToMany(() => TimeTable, (timeTable) => timeTable.awb)
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.Awb)
   timeTables: Relation<TimeTable[]>;
 }
 

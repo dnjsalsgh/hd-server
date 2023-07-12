@@ -77,7 +77,7 @@ export class AmrService {
         .getRepository(AmrCharger)
         .save(amrChargerBody);
 
-      // amr 생성, amr충전 생성 될 시에만 이력 저장
+      // Amr 생성, amr충전 생성 될 시에만 이력 저장
       if (amrResult.id && amrChargerResult.id) {
         amrChargeHistoryBody.amr = amrResult.id;
         amrChargeHistoryBody.amrCharger = amrChargerResult.id;

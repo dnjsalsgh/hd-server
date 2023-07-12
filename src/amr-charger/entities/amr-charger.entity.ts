@@ -16,7 +16,7 @@ export class AmrCharger {
   id: number;
 
   @ApiProperty({
-    example: 'amr-001',
+    example: 'Amr-001',
     description: '충전이름',
   })
   @Column({ type: 'varchar', length: 50, nullable: true })

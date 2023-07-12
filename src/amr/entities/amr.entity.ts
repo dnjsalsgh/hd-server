@@ -19,8 +19,8 @@ export class Amr {
   id: number;
 
   @ApiProperty({
-    example: 'amr-001',
-    description: 'amr 이름',
+    example: 'Amr-001',
+    description: 'Amr 이름',
   })
   @IsNotEmpty()
   @Column({ length: 100, nullable: false })
@@ -148,6 +148,28 @@ export class Amr {
   @OneToMany(() => AmrChargeHistory, (amrChargeHistory) => amrChargeHistory.amr)
   amrChargeHistories: Relation<AmrChargeHistory[]>;
 
-  @OneToMany(() => TimeTable, (timeTable) => timeTable.amr)
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.Amr)
   timeTables: Relation<TimeTable[]>;
 }
+
+export const AmrAttribute = {
+  id: true,
+  name: true,
+  charging: true,
+  prcsCD: true,
+  ACSMode: true,
+  mode: true,
+  errorLevel: true,
+  errorCode: true,
+  startTime: true,
+  endTime: true,
+  travelDist: true,
+  oprTime: true,
+  stopTime: true,
+  startBatteryLevel: true,
+  lastBatteryLevel: true,
+  simulation: true,
+  logDT: true,
+  distinguish: true,
+  createdAt: true,
+};

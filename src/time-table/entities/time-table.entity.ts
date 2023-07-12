@@ -40,7 +40,7 @@ export class TimeTable {
     type: () => Uld,
   })
   @ManyToOne(() => Uld, (uld) => uld.timeTables)
-  uld: Relation<Uld>;
+  Uld: Relation<Uld>;
 
   @ApiProperty({
     example: 1,
@@ -48,12 +48,12 @@ export class TimeTable {
     type: () => Amr,
   })
   @ManyToOne(() => Amr, (amr) => amr.timeTables)
-  amr: Relation<Amr>;
+  Amr: Relation<Amr>;
 
   @ApiProperty({
     example: 1,
     description: '화물 FK',
   })
   @ManyToOne(() => Awb, (awb) => awb.timeTables)
-  awb: Relation<Awb>;
+  Awb: Relation<Awb>;
 }

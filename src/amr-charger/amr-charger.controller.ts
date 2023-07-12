@@ -12,8 +12,8 @@ import { CreateAmrChargerDto } from './dto/create-amr-charger.dto';
 import { UpdateAmrChargerDto } from './dto/update-amr-charger.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('amr-charger')
-@ApiTags('amr-charge')
+@Controller('Amr-charger')
+@ApiTags('Amr-charge')
 export class AmrChargerController {
   constructor(private readonly amrChargerService: AmrChargerService) {}
 

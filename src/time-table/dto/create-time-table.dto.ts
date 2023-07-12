@@ -3,7 +3,7 @@ import { TimeTable } from '../entities/time-table.entity';
 
 export class CreateTimeTableDto extends PickType(TimeTable, [
   'data',
-  'uld',
-  'amr',
-  'awb',
+  'Uld',
+  'Amr',
+  'Awb',
 ]) {}

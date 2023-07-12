@@ -91,7 +91,7 @@ export class Uld {
   @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
   uldSccJoin: Relation<UldSccJoin[]>;
 
-  @OneToMany(() => TimeTable, (timeTable) => timeTable.uld)
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.Uld)
   timeTables: Relation<TimeTable[]>;
 }
 
