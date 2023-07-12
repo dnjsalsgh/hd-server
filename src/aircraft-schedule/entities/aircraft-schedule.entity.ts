@@ -30,14 +30,14 @@ export class AircraftSchedule {
 
   // 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({
-    example: '2023-07-10',
+    example: '2023-07-10:15:00:00',
     description: '현지출발시간',
   })
   @Column({ type: 'time', nullable: true })
   localDepartureTime: string;
 
   @ApiProperty({
-    example: '2023-07-14',
+    example: '2023-07-14:15:00:00',
     description: '한국도착시간',
   })
   @Column({ type: 'time', nullable: true })
@@ -72,7 +72,7 @@ export class AircraftSchedule {
   localArrivalTime: string;
 
   @ApiProperty({
-    example: '[GEN,TEL,QRL]',
+    example: ['GEN', 'TEL', 'QRL'],
     description: '경유지',
   })
   @Column({ type: 'text', array: true, nullable: true })
@@ -87,6 +87,11 @@ export class AircraftSchedule {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
+  @ApiProperty({
+    example: 1,
+    description: '항공기FK',
+    type: () => Aircraft,
+  })
   @IsNotEmpty()
   @ManyToOne(() => Aircraft, (aircraft) => aircraft.AircraftSchedules, {
     nullable: false,
@@ -96,6 +101,11 @@ export class AircraftSchedule {
   // commonCode의 일방향 관계설정
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.aircraftSchedules)
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.id)
+  @ApiProperty({
+    example: 1,
+    description: '목적지FK',
+    type: () => CommonCode,
+  })
   @IsNotEmpty()
   @ManyToOne(() => CommonCode, {
     nullable: false,
@@ -103,6 +113,11 @@ export class AircraftSchedule {
   @JoinColumn({ name: 'cc_id_destination' }) // 원하는 컬럼 이름을 지정합니다.
   CcIdDestination: Relation<CommonCode> | number;
 
+  @ApiProperty({
+    example: 1,
+    description: '출발지FK',
+    type: () => CommonCode,
+  })
   @IsNotEmpty()
   @ManyToOne(() => CommonCode, {
     nullable: false,
@@ -115,6 +130,4 @@ export const AircraftScheduleAttributes = {
   id: true,
   source: true,
   createdAt: true,
-  updatedAt: false,
-  deletedAt: false,
 };

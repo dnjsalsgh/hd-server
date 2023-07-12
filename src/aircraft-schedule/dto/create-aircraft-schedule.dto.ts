@@ -7,9 +7,6 @@ import { Column } from 'typeorm';
 
 export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
   'source',
-  'Aircraft',
-  'CcIdDestination',
-  'CcIdDeparture',
   'localDepartureTime',
   'koreaArrivalTime',
   'workStartTime',
@@ -17,28 +14,28 @@ export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
   'koreaDepartureTime',
   'localArrivalTime',
   'waypoint',
+  'Aircraft',
+  'CcIdDestination',
+  'CcIdDeparture',
 ]) {
-  @ApiProperty({
-    example: 'GEN',
-    description: '출처',
-  })
-  source: string;
-
-  @ApiProperty({
-    example: '4',
-    description: '항공기 FK',
-  })
-  Aircraft: Aircraft;
-
+  // @ApiProperty({
+  //   example: 'GEN',
+  //   description: '출처',
+  // })
+  // source: string;
+  // @ApiProperty({
+  //   example: '4',
+  //   description: '항공기 FK',
+  // })
+  // Aircraft: Aircraft;
   // @ApiProperty({
   //   example: '31',
   //   description: '공통코드 FK',
   // })
   // CcIdDestination: CommonCode;
-
-  @ApiProperty({
-    example: '1',
-    description: '항공기Id',
-  })
-  aircraft: number;
+  // @ApiProperty({
+  //   example: '1',
+  //   description: '항공기Id',
+  // })
+  // aircraft: number;
 }

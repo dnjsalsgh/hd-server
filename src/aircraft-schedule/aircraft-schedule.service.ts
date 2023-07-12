@@ -22,7 +22,6 @@ export class AircraftScheduleService {
   ) {}
 
   create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
-    console.log('createAircraftScheduleDto = ', createAircraftScheduleDto);
     return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
   }
 
