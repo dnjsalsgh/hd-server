@@ -6,7 +6,7 @@ export class CreateBuildUpOrderDto extends PickType(BuildUpOrder, [
   'x',
   'y',
   'z',
-  'skidPlatform',
-  'uld',
-  'awb',
+  'SkidPlatform',
+  'Uld',
+  'Awb',
 ]) {}

@@ -63,15 +63,15 @@ export class BuildUpOrder {
     type: () => SkidPlatform,
   })
   @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.buildUpOrders)
-  skidPlatform: Relation<SkidPlatform>;
+  SkidPlatform: Relation<SkidPlatform>;
 
   @ApiProperty({
     example: 1,
     description: 'ULD FK',
     type: () => Uld,
   })
-  @ManyToOne(() => Uld, (uld) => uld.inspectWorkOrders)
-  uld: Relation<Uld>;
+  @ManyToOne(() => Uld, (uld) => uld.buildUpOrders)
+  Uld: Relation<Uld>;
 
   @ApiProperty({
     example: 1,
@@ -79,7 +79,7 @@ export class BuildUpOrder {
     type: () => Awb,
   })
   @ManyToOne(() => Awb, (awb) => awb.BuildUpOrders)
-  awb: Relation<Awb>;
+  Awb: Relation<Awb>;
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
   uldHistories: Relation<UldHistory[]>;

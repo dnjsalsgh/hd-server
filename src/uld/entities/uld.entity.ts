@@ -74,10 +74,10 @@ export class Uld {
     description: 'uld유형 FK',
   })
   @ManyToOne(() => UldType, (uldType) => uldType.ulds)
-  uldType: Relation<UldType>;
+  UldType: Relation<UldType>;
 
-  @OneToMany(() => BuildUpOrder, (inspectWorkOrder) => inspectWorkOrder.uld)
-  inspectWorkOrders: Relation<BuildUpOrder[]>;
+  @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Uld)
+  buildUpOrders: Relation<BuildUpOrder[]>;
 
   @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.uld)
   simulatorResult: Relation<SimulatorResult[]>;
@@ -94,3 +94,13 @@ export class Uld {
   @OneToMany(() => TimeTable, (timeTable) => timeTable.uld)
   timeTables: Relation<TimeTable[]>;
 }
+
+export const UldAttribute = {
+  id: true,
+  code: true,
+  prefab: true,
+  airplaneType: true,
+  simulation: true,
+  boundaryPrefab: true,
+  createdAt: true,
+};

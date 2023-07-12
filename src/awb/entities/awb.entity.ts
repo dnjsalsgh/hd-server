@@ -236,9 +236,9 @@ export class Awb {
   deletedAt: Date | null;
 
   @ManyToOne(() => AwbGroup, (awbGroup) => awbGroup.awbs)
-  awbGroup: Relation<AwbGroup>;
+  AwbGroup: Relation<AwbGroup>;
 
-  @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.awb)
+  @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Awb)
   BuildUpOrders: Relation<BuildUpOrder[]>;
 
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.awb)

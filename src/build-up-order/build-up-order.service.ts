@@ -4,6 +4,9 @@ import { UpdateBuildUpOrderDto } from './dto/update-build-up-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BuildUpOrder } from './entities/build-up-order.entity';
+import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
+import { UldAttribute } from '../uld/entities/uld.entity';
+import { AwbAttribute } from '../awb/entities/awb.entity';
 
 @Injectable()
 export class BuildUpOrderService {
@@ -19,7 +22,18 @@ export class BuildUpOrderService {
   }
 
   async findAll() {
-    return await this.buildUpOrderRepository.find();
+    return await this.buildUpOrderRepository.find({
+      relations: {
+        SkidPlatform: true,
+        Uld: true,
+        Awb: true,
+      },
+      select: {
+        SkidPlatform: SkidPlatformAttribute,
+        Uld: UldAttribute,
+        Awb: AwbAttribute,
+      },
+    });
   }
 
   async findOne(id: number) {

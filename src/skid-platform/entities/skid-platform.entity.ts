@@ -91,7 +91,7 @@ export class SkidPlatform {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.skidPlatform)
+  @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.SkidPlatform)
   buildUpOrders: Relation<BuildUpOrder[]>;
 
   @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.SkidPlatform)

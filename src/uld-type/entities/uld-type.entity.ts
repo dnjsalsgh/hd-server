@@ -102,6 +102,6 @@ export class UldType {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => Uld, (uld) => uld.uldType)
+  @OneToMany(() => Uld, (uld) => uld.UldType)
   ulds: Uld[];
 }

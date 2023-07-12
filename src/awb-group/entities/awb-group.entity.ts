@@ -38,6 +38,6 @@ export class AwbGroup {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => Awb, (awb) => awb.awbGroup)
+  @OneToMany(() => Awb, (awb) => awb.AwbGroup)
   awbs: Awb[];
 }
