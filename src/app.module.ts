@@ -39,7 +39,7 @@ import { UldType } from './uld-type/entities/uld-type.entity';
 import { AsrsOutOrder } from './asrs-out-order/entities/asrs-out-order.entity';
 import { SimulatorResultAwbJoinModule } from './simulator-result-awb-join/simulator-result-awb-join.module';
 import { SimulatorResultAwbJoin } from './simulator-result-awb-join/entities/simulator-result-awb-join.entity';
-import { LoggerMiddleware } from './middlewares/logger.middleware';
+import { LoggerMiddleware } from './lib/logger/logger.middleware';
 import { TimeTableModule } from './time-table/time-table.module';
 import { AircraftModule } from './aircraft/aircraft.module';
 import { AircraftScheduleModule } from './aircraft-schedule/aircraft-schedule.module';
