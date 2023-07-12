@@ -252,7 +252,7 @@ export class Awb {
 
   @OneToMany(
     () => SkidPlatformHistory,
-    (skidPlatformHistory) => skidPlatformHistory.awb,
+    (skidPlatformHistory) => skidPlatformHistory.Awb,
   )
   skidPlatformHistories: Relation<SkidPlatformHistory[]>;
 

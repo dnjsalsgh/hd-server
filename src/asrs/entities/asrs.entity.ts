@@ -102,7 +102,7 @@ export class Asrs {
 
   @OneToMany(
     () => SkidPlatformHistory,
-    (skidPlatformHistory) => skidPlatformHistory.asrs,
+    (skidPlatformHistory) => skidPlatformHistory.Asrs,
   )
   skidPlatformHistories: SkidPlatformHistory[];
 }

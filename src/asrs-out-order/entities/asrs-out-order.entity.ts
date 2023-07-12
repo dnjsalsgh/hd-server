@@ -62,7 +62,16 @@ export class AsrsOutOrder {
 
   @OneToMany(
     () => SkidPlatformHistory,
-    (skidPlatformHistory) => skidPlatformHistory.asrsOutOrder,
+    (skidPlatformHistory) => skidPlatformHistory.AsrsOutOrder,
   )
   skidPlatformHistories: Relation<SkidPlatformHistory[]>;
 }
+
+export const AsrsOutOrderAttribute = {
+  id: true,
+  order: true,
+  createdAt: true,
+  // Asrs: true,
+  // SkidPlatform: true,
+  // Awb: true,
+};

@@ -99,7 +99,7 @@ export class SkidPlatform {
 
   @OneToMany(
     () => SkidPlatformHistory,
-    (skidPlatformHistory) => skidPlatformHistory.skidPlatform,
+    (skidPlatformHistory) => skidPlatformHistory.SkidPlatform,
   )
   skidPlatformHistories: Relation<SkidPlatformHistory[]>;
 
