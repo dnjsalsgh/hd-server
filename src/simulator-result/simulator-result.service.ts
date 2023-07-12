@@ -20,7 +20,11 @@ export class SimulatorResultService {
   }
 
   async findAll() {
-    return await this.simulatorResultRepository.find();
+    return await this.simulatorResultRepository.find({
+      relations: {
+        Uld: true,
+      },
+    });
   }
 
   async findOne(id: number) {

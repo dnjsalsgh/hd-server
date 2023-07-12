@@ -79,7 +79,7 @@ export class Uld {
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Uld)
   buildUpOrders: Relation<BuildUpOrder[]>;
 
-  @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.uld)
+  @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.Uld)
   simulatorResult: Relation<SimulatorResult[]>;
 
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.uld)

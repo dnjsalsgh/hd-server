@@ -61,7 +61,7 @@ export class SimulatorResult {
     description: 'ULD FK',
   })
   @ManyToOne(() => Uld, (uld) => uld.simulatorResult)
-  uld: Relation<Uld>;
+  Uld: Relation<Uld>;
 
   @OneToMany(
     () => SimulatorResultAwbJoin,
