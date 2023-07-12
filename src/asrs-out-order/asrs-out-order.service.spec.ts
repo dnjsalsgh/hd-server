@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AsrsOutOrderService } from './asrs-work-order.service';
+import { AsrsOutOrderService } from './Asrs-work-order.service';
 
 describe('AsrsOutOrderService', () => {
   let service: AsrsOutOrderService;

@@ -13,8 +13,8 @@ import { AsrsOutOrderService } from './asrs-out-order.service';
 import { CreateAsrsOutOrderDto } from './dto/create-asrs-out-order.dto';
 import { UpdateAsrsOutOrderDto } from './dto/update-asrs-out-order.dto';
 
-@Controller('asrs-work-order')
-@ApiTags('asrs-work-order(자동창고 작업지시)')
+@Controller('Asrs-out-order')
+@ApiTags('Asrs-out-order(자동창고 작업지시)')
 export class AsrsOutOrderController {
   constructor(private readonly asrsOutOrderService: AsrsOutOrderService) {}
 

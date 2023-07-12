@@ -12,8 +12,8 @@ import { CreateAwbGroupDto } from './dto/create-awb-group.dto';
 import { UpdateAwbGroupDto } from './dto/update-awb-group.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('awb-group')
-@ApiTags('awb-group')
+@Controller('Awb-group')
+@ApiTags('Awb-group')
 export class AwbGroupController {
   constructor(private readonly cargoGroupService: AwbGroupService) {}
 

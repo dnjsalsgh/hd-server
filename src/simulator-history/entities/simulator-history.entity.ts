@@ -67,7 +67,7 @@ export class SimulatorHistory {
 
   @ApiProperty({
     example: 1,
-    description: 'awb FK',
+    description: 'Awb FK',
   })
   @ManyToOne(() => Awb, (awb) => awb.simulatorHistories)
   awb: Relation<Awb>;

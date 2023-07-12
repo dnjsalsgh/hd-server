@@ -224,7 +224,7 @@ export class Awb {
   @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.awb)
   asrsHistories: Relation<AsrsHistory[]>;
 
-  @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.awb)
+  @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.Awb)
   asrsOutOrders: Relation<AsrsOutOrder[]>;
 
   @OneToMany(
@@ -248,3 +248,33 @@ export class Awb {
   @OneToMany(() => TimeTable, (timeTable) => timeTable.awb)
   timeTables: Relation<TimeTable[]>;
 }
+
+export const AwbAttribute = {
+  id: true,
+  name: true,
+  prefab: true,
+  waterVolume: true,
+  squareVolume: true,
+  width: true,
+  height: true,
+  depth: true,
+  weight: true,
+  isStructure: true,
+  barcode: true,
+  destination: true,
+  source: true,
+  breakDown: true,
+  piece: true,
+  state: true,
+  parent: true,
+  modelPath: true,
+  simulation: true,
+  dataCapacity: true,
+  flight: true,
+  from: true,
+  airportArrival: true,
+  description: true,
+  rmComment: true,
+  localTime: true,
+  createdAt: true,
+};

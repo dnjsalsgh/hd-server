@@ -94,7 +94,7 @@ export class SkidPlatform {
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.skidPlatform)
   buildUpOrders: Relation<BuildUpOrder[]>;
 
-  @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.skidPlatform)
+  @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.SkidPlatform)
   asrsOutOrders: Relation<AsrsOutOrder[]>;
 
   @OneToMany(
@@ -106,3 +106,17 @@ export class SkidPlatform {
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
   uldHistories: Relation<UldHistory[]>;
 }
+
+export const SkidPlatformAttribute = {
+  id: true,
+  name: true,
+  parent: true,
+  level: true,
+  fullPath: true,
+  orderby: true,
+  x: true,
+  y: true,
+  z: true,
+  simulation: true,
+  createdAt: true,
+};

@@ -97,7 +97,7 @@ export class Asrs {
   @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.asrs)
   asrsHistories: AsrsHistory[];
 
-  @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.asrs)
+  @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.Asrs)
   asrsOutOrders: AsrsOutOrder[];
 
   @OneToMany(
@@ -106,3 +106,17 @@ export class Asrs {
   )
   skidPlatformHistories: SkidPlatformHistory[];
 }
+
+export const AsrsAttribute = {
+  id: true,
+  name: true,
+  parent: true,
+  level: true,
+  fullPath: true,
+  orderby: true,
+  x: true,
+  y: true,
+  z: true,
+  simulation: true,
+  createdAt: true,
+};

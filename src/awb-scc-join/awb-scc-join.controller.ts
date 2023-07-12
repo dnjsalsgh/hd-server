@@ -13,8 +13,8 @@ import { CreateAwbSccJoinDto } from './dto/create-awb-scc-join.dto';
 import { UpdateAwbSccJoinDto } from './dto/update-awb-scc-join.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('awb-scc-join')
-@ApiTags('awb-scc-join')
+@Controller('Awb-scc-join')
+@ApiTags('Awb-scc-join')
 export class AwbSccJoinController {
   constructor(private readonly cargoSccJoinService: AwbSccJoinService) {}
 

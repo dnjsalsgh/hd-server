@@ -21,7 +21,7 @@ import {
 import { Asrs } from './entities/asrs.entity';
 
 @Controller('asrs')
-@ApiTags('asrs(자동창고)')
+@ApiTags('Asrs(자동창고)')
 export class AsrsController {
   constructor(private readonly asrsService: AsrsService) {}
 

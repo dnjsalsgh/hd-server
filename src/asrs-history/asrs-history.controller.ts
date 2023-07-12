@@ -13,8 +13,8 @@ import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@Controller('asrs-history')
-@ApiTags('asrs-history')
+@Controller('Asrs-history')
+@ApiTags('Asrs-history')
 export class AsrsHistoryController {
   constructor(private readonly asrsHistoryService: AsrsHistoryService) {}
 
@@ -23,7 +23,7 @@ export class AsrsHistoryController {
     return this.asrsHistoryService.create(createAsrsHistoryDto);
   }
 
-  @ApiOperation({ summary: 'awb, asrs 객체 생성하면서 이력등록' })
+  @ApiOperation({ summary: 'Awb, Asrs 객체 생성하면서 이력등록' })
   @Post('/with')
   createWithObject(@Body() createAsrsHistoryDto: CreateAsrsHistoryDto) {
     return this.asrsHistoryService.createWithObject(createAsrsHistoryDto);
