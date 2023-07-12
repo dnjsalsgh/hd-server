@@ -26,7 +26,7 @@ export class SimulatorResultController {
   }
 
   @ApiOperation({ summary: 'history까지 함께 입력' })
-  @Post('/with-Awb-history')
+  @Post('/with-awb-history')
   createWithAwb(@Body() body: CreateSimulatorResultWithAwbAndHistoryDto) {
     return this.simulatorResultService.createWithAwb(body);
   }

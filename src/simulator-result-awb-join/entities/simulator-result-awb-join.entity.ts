@@ -29,9 +29,10 @@ export class SimulatorResultAwbJoin {
   @ManyToOne(
     () => SimulatorResult,
     (simulatorResult) => simulatorResult.simulatorResultAwbJoin,
+    { nullable: false },
   )
   SimulatorResult: Relation<SimulatorResult> | number;
 
-  @ManyToOne(() => Awb, (awb) => awb.srJoin)
+  @ManyToOne(() => Awb, (awb) => awb.srJoin, { nullable: false })
   Awb: Relation<Awb> | number;
 }

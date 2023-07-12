@@ -42,7 +42,7 @@ export class SimulatorResultService {
       }
 
       // 1. simulatorResult 입력
-      const simulatorResultResult = await this.dataSource.manager
+      const simulatorResultResult = await queryRunner.manager
         .getRepository(SimulatorResult)
         .save(body);
 
@@ -70,10 +70,10 @@ export class SimulatorResultService {
         historyParamArray.push(historyParam);
       }
 
-      const joinResult = this.dataSource.manager
+      const joinResult = queryRunner.manager
         .getRepository(SimulatorResultAwbJoin)
         .save(joinParamArray);
-      const historyResult = this.dataSource.manager
+      const historyResult = queryRunner.manager
         .getRepository(SimulatorHistory)
         .save(historyParamArray);
 
