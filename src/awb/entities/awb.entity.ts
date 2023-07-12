@@ -242,7 +242,7 @@ export class Awb {
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Awb)
   BuildUpOrders: Relation<BuildUpOrder[]>;
 
-  @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.awb)
+  @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.Awb)
   simulatorHistories: Relation<SimulatorHistory[]>;
 
   @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.Awb)

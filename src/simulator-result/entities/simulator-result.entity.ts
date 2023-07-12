@@ -73,7 +73,7 @@ export class SimulatorResult {
 
   @OneToMany(
     () => SimulatorHistory,
-    (simulatorHistory) => simulatorHistory.simulatorResult,
+    (simulatorHistory) => simulatorHistory.SimulatorResult,
   )
   simulatorHistories: Relation<SimulatorHistory[]>;
 }

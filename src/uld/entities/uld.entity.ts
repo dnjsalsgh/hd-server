@@ -25,8 +25,8 @@ export class Uld {
   id: number;
 
   @ApiProperty({
-    example: 'uld-001',
-    description: 'uld 코드',
+    example: 'Uld-001',
+    description: 'Uld 코드',
   })
   @Column({ type: 'varchar', length: 50, nullable: true })
   code: string;
@@ -82,7 +82,7 @@ export class Uld {
   @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.Uld)
   simulatorResult: Relation<SimulatorResult[]>;
 
-  @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.uld)
+  @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.Uld)
   simulatorHistories: Relation<SimulatorHistory[]>;
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)

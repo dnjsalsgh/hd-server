@@ -12,8 +12,8 @@ import { CreateUldTypeDto } from './dto/create-uld-type.dto';
 import { UpdateUldTypeDto } from './dto/update-uld-type.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('uld-type')
-@ApiTags('uld-type')
+@Controller('Uld-type')
+@ApiTags('Uld-type')
 export class UldTypeController {
   constructor(private readonly uldTypeService: UldTypeService) {}
 

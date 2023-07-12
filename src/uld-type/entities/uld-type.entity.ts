@@ -23,8 +23,8 @@ export class UldType {
   code: number;
 
   @ApiProperty({
-    example: 'uld-A',
-    description: 'uld 이름',
+    example: 'Uld-A',
+    description: 'Uld 이름',
   })
   @Column({ type: 'varchar', length: 50, nullable: true })
   name: string;
