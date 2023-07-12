@@ -28,7 +28,7 @@ export class SimulatorResultAwbJoin {
 
   @ManyToOne(
     () => SimulatorResult,
-    (simulatorResult) => simulatorResult.simulatorResultCargoJoin,
+    (simulatorResult) => simulatorResult.simulatorResultAwbJoin,
   )
   simulatorResult: Relation<SimulatorResult>;
 

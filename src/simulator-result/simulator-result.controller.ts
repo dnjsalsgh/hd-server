@@ -24,6 +24,7 @@ export class SimulatorResultController {
     return this.simulatorResultService.create(createSimulatorResultDto);
   }
 
+  @Post('/')
   @Get()
   findAll() {
     return this.simulatorResultService.findAll();
