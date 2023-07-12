@@ -3,6 +3,7 @@ import { Awb } from '../entities/awb.entity';
 import { Scc } from '../../scc/entities/scc.entity';
 
 export class CreateAwbDto extends PickType(Awb, [
+  'name',
   'prefab',
   'waterVolume',
   'squareVolume',
@@ -20,6 +21,17 @@ export class CreateAwbDto extends PickType(Awb, [
   'parent',
   'modelPath',
   'simulation',
+  'dataCapacity',
+  'flight',
+  'from',
+  'airportArrival',
+  'path',
+  'spawnRatio',
+  'description',
+  'rmComment',
+  'localTime',
+  'localInTerminal',
+  'createdAt',
 ]) {
   @ApiProperty({
     example:

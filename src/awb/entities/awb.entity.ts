@@ -182,26 +182,49 @@ export class Awb {
   @Column({ type: 'varchar', length: 50, nullable: true })
   airportArrival: string;
 
+  // ============v0.2 추가=================
+  @ApiProperty({
+    example: '/c/file/xxx',
+    description: '이미지 경로',
+  })
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  path: string;
+
+  @ApiProperty({
+    example: 1,
+    description: '화물의 등장 빈도',
+  })
+  @Column({ type: 'int', nullable: true })
+  spawnRatio: number;
+
   @ApiProperty({
     example: '배송설명',
     description: '배송설명',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   description: string;
 
   @ApiProperty({
-    example: 'rm코멘트',
-    description: 'rm코멘트',
+    example: 'RM 코멘트',
+    description: 'RM 코멘트',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   rmComment: string;
 
   @ApiProperty({
-    example: '로컬타임',
+    example: '2023-07-12',
     description: '로컬타임',
   })
   @Column({ type: 'timestamp', nullable: true })
   localTime: Date;
+
+  @ApiProperty({
+    example: 'AIR-001',
+    description: '터미널 내에 화물이 현재 위치하고 있는 사항',
+  })
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  localInTerminal: string;
+  // ============v0.2 추가 끝=================
 
   @CreateDateColumn()
   createdAt: Date;
@@ -277,4 +300,7 @@ export const AwbAttribute = {
   rmComment: true,
   localTime: true,
   createdAt: true,
+  path: true,
+  spawnRatio: true,
+  localInTerminal: true,
 };

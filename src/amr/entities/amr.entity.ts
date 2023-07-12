@@ -131,6 +131,13 @@ export class Amr {
   @Column({ nullable: true })
   logDT: Date;
 
+  @ApiProperty({
+    example: '인입용',
+    description: '인입용, 인출용 구분',
+  })
+  @Column({ nullable: true })
+  distinguish: Date;
+
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

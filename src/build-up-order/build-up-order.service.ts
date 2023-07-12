@@ -9,28 +9,28 @@ import { BuildUpOrder } from './entities/build-up-order.entity';
 export class BuildUpOrderService {
   constructor(
     @InjectRepository(BuildUpOrder)
-    private readonly inspectWorkOrderRepository: Repository<BuildUpOrder>,
+    private readonly buildUpOrderRepository: Repository<BuildUpOrder>,
   ) {}
   async create(createBuildUpOrderDto: CreateBuildUpOrderDto) {
-    const result = await this.inspectWorkOrderRepository.save(
+    const result = await this.buildUpOrderRepository.save(
       createBuildUpOrderDto,
     );
     return result;
   }
 
   async findAll() {
-    return await this.inspectWorkOrderRepository.find();
+    return await this.buildUpOrderRepository.find();
   }
 
   async findOne(id: number) {
-    return await this.inspectWorkOrderRepository.find({ where: { id: id } });
+    return await this.buildUpOrderRepository.find({ where: { id: id } });
   }
 
   update(id: number, updateBuildUpOrderDto: UpdateBuildUpOrderDto) {
-    return this.inspectWorkOrderRepository.update(id, updateBuildUpOrderDto);
+    return this.buildUpOrderRepository.update(id, updateBuildUpOrderDto);
   }
 
   remove(id: number) {
-    return this.inspectWorkOrderRepository.delete(id);
+    return this.buildUpOrderRepository.delete(id);
   }
 }
