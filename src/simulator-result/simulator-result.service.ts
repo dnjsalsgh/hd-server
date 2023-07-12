@@ -4,6 +4,7 @@ import { SimulatorResult } from './entities/simulator-result.entity';
 import { Repository } from 'typeorm';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
+import { UldAttribute } from '../uld/entities/uld.entity';
 
 @Injectable()
 export class SimulatorResultService {
@@ -23,6 +24,9 @@ export class SimulatorResultService {
     return await this.simulatorResultRepository.find({
       relations: {
         Uld: true,
+      },
+      select: {
+        Uld: UldAttribute,
       },
     });
   }

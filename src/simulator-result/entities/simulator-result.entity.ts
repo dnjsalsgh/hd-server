@@ -13,6 +13,7 @@ import { Uld } from '../../uld/entities/uld.entity';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
 import { SimulatorResultAwbJoin } from '../../simulator-result-awb-join/entities/simulator-result-awb-join.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
 @Entity()
 export class SimulatorResult {
@@ -60,7 +61,8 @@ export class SimulatorResult {
     example: 1,
     description: 'ULD FK',
   })
-  @ManyToOne(() => Uld, (uld) => uld.simulatorResult)
+  @IsNotEmpty()
+  @ManyToOne(() => Uld, (uld) => uld.simulatorResult, { nullable: false })
   Uld: Relation<Uld>;
 
   @OneToMany(
