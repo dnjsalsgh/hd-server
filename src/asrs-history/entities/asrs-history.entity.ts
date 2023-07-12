@@ -33,7 +33,7 @@ export class AsrsHistory {
   })
   @IsNotEmpty()
   @ManyToOne(() => Asrs, (asrs) => asrs.asrsHistories, { nullable: false })
-  asrs: Relation<Asrs>;
+  Asrs: Relation<Asrs>;
 
   @ApiProperty({
     example: 1,
@@ -42,5 +42,5 @@ export class AsrsHistory {
   })
   @IsNotEmpty()
   @ManyToOne(() => Awb, (awb) => awb.asrsHistories, { nullable: false })
-  awb: Relation<Awb>;
+  Awb: Relation<Awb>;
 }

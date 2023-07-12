@@ -2,13 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Asrs } from '../asrs/entities/asrs.entity';
+import { Asrs, AsrsAttribute } from '../asrs/entities/asrs.entity';
 import { DataSource, Repository, TypeORMError } from 'typeorm';
-import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
-import { UpdateAsrsDto } from '../asrs/dto/update-asrs.dto';
 import { AsrsHistory } from './entities/asrs-history.entity';
-import { Amr } from '../amr/entities/amr.entity';
-import { Awb } from '../awb/entities/awb.entity';
+import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 
 @Injectable()
 export class AsrsHistoryService {
@@ -20,8 +17,8 @@ export class AsrsHistoryService {
 
   async create(createAsrsHistoryDto: CreateAsrsHistoryDto) {
     if (
-      typeof createAsrsHistoryDto.asrs === 'number' &&
-      typeof createAsrsHistoryDto.awb === 'number'
+      typeof createAsrsHistoryDto.Asrs === 'number' &&
+      typeof createAsrsHistoryDto.Awb === 'number'
     ) {
       return await this.asrsHistoryRepository.save(createAsrsHistoryDto);
     }
@@ -35,14 +32,14 @@ export class AsrsHistoryService {
     try {
       const asrsResult = await this.dataSource.manager
         .getRepository(Asrs)
-        .save(createAsrsHistoryDto.asrs);
+        .save(createAsrsHistoryDto.Asrs);
 
       const awbResult = await this.dataSource.manager
         .getRepository(Awb)
-        .save(createAsrsHistoryDto.awb);
+        .save(createAsrsHistoryDto.Awb);
 
       const resultParam = {
-        asrs: asrsResult,
+        Asrs: asrsResult,
         awb: awbResult,
       };
       await this.dataSource.manager
@@ -59,7 +56,16 @@ export class AsrsHistoryService {
   }
 
   async findAll() {
-    return await this.asrsHistoryRepository.find();
+    return await this.asrsHistoryRepository.find({
+      select: {
+        Asrs: AsrsAttribute,
+        Awb: AwbAttribute,
+      },
+      relations: {
+        Asrs: true,
+        Awb: true,
+      },
+    });
   }
 
   async findOne(id: number) {

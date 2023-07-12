@@ -153,7 +153,7 @@ export class Awb {
   @Column({ type: 'boolean', nullable: true })
   simulation: boolean;
 
-  // 피드백 반영 후 새로생긴 칼럼
+  // v1 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({
     example: 1.0,
     description: '데이터 용량',
@@ -181,6 +181,7 @@ export class Awb {
   })
   @Column({ type: 'varchar', length: 50, nullable: true })
   airportArrival: string;
+  // ========= v1 피드백 반영 후 새로생긴 칼럼 끝 =========
 
   // ============v0.2 추가=================
   @ApiProperty({
@@ -244,7 +245,7 @@ export class Awb {
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.awb)
   simulatorHistories: Relation<SimulatorHistory[]>;
 
-  @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.awb)
+  @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.Awb)
   asrsHistories: Relation<AsrsHistory[]>;
 
   @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.Awb)

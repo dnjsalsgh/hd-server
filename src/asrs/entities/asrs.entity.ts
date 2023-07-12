@@ -94,7 +94,7 @@ export class Asrs {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.asrs)
+  @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.Asrs)
   asrsHistories: AsrsHistory[];
 
   @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.Asrs)
