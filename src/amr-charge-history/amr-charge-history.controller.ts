@@ -12,8 +12,8 @@ import { CreateAmrChargeHistoryDto } from './dto/create-amr-charge-history.dto';
 import { UpdateAmrChargeHistoryDto } from './dto/update-amr-charge-history.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('Amr-charge-history')
-@ApiTags('Amr-charge-history')
+@Controller('amr-charge-history')
+@ApiTags('amr-charge-history')
 export class AmrChargeHistoryController {
   constructor(
     private readonly amrChargeHistoryService: AmrChargeHistoryService,

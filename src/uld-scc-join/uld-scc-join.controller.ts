@@ -13,8 +13,8 @@ import { CreateUldSccJoinDto } from './dto/create-uld-scc-join.dto';
 import { UpdateUldSccJoinDto } from './dto/update-uld-scc-join.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('Uld-scc-join')
-@ApiTags('Uld-scc-join')
+@Controller('uld-scc-join')
+@ApiTags('uld-scc-join')
 export class UldSccJoinController {
   constructor(private readonly uldSccJoinService: UldSccJoinService) {}
 

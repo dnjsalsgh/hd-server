@@ -13,8 +13,8 @@ import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
 import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('Uld-history')
-@ApiTags('Uld-history')
+@Controller('uld-history')
+@ApiTags('uld-history')
 export class UldHistoryController {
   constructor(private readonly uldHistoryService: UldHistoryService) {}
 

@@ -13,8 +13,8 @@ import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@Controller('Asrs-history')
-@ApiTags('Asrs-history')
+@Controller('asrs-history')
+@ApiTags('asrs-history')
 export class AsrsHistoryController {
   constructor(private readonly asrsHistoryService: AsrsHistoryService) {}
 
