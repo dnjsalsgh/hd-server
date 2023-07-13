@@ -8,4 +8,5 @@ export class CreateAmrChargerDto extends PickType(AmrCharger, [
 ]) {
   x?: number;
   y?: number;
+  z?: number;
 }

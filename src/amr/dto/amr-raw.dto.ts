@@ -268,4 +268,22 @@ export class AmrRawDto {
     description: '마지막 볼륨 레벨',
   })
   public AccuBattery: number;
+
+  @ApiProperty({
+    example: 10.3,
+    description: '충전기의 X좌표',
+  })
+  public ChargeX: number;
+
+  @ApiProperty({
+    example: 11.3,
+    description: '충전기의 X좌표',
+  })
+  public ChargeY: number;
+
+  @ApiProperty({
+    example: 9.3,
+    description: '충전기의 X좌표',
+  })
+  public ChargeZ: number;
 }

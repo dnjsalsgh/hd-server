@@ -53,9 +53,9 @@ export class AmrService {
     const amrChargerBody: CreateAmrChargerDto = {
       name: body.Amrld.toString(),
       working: body.PauseState > 0,
-      // x: body.X,
-      // y: body.Y,
-      // z: body.Z,
+      x: body.ChargeX,
+      y: body.ChargeY,
+      z: body.ChargeZ,
     };
 
     const amrChargeHistoryBody: CreateAmrChargeHistoryDto = {
