@@ -23,7 +23,7 @@ export class TimeTable {
     description: '이력데이터',
   })
   @Column({ type: 'jsonb' })
-  data: JSON;
+  data: unknown;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -40,7 +40,7 @@ export class TimeTable {
     type: () => Uld,
   })
   @ManyToOne(() => Uld, (uld) => uld.timeTables)
-  Uld: Relation<Uld>;
+  Uld: Relation<Uld> | number;
 
   @ApiProperty({
     example: 1,
@@ -48,12 +48,12 @@ export class TimeTable {
     type: () => Amr,
   })
   @ManyToOne(() => Amr, (amr) => amr.timeTables)
-  Amr: Relation<Amr>;
+  Amr: Relation<Amr> | number;
 
   @ApiProperty({
     example: 1,
     description: '화물 FK',
   })
   @ManyToOne(() => Awb, (awb) => awb.timeTables)
-  Awb: Relation<Awb>;
+  Awb: Relation<Awb> | number;
 }

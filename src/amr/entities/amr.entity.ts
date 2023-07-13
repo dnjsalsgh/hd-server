@@ -23,7 +23,7 @@ export class Amr {
     description: 'Amr 이름',
   })
   @IsNotEmpty()
-  @Column({ length: 100, nullable: false })
+  @Column({ length: 100, nullable: false, unique: true })
   name: string;
 
   @ApiProperty({

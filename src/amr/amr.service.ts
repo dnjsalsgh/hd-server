@@ -12,6 +12,8 @@ import { CreateAwbSccJoinDto } from '../awb-scc-join/dto/create-awb-scc-join.dto
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { CreateAmrChargerDto } from '../amr-charger/dto/create-amr-charger.dto';
 import { CreateAmrChargeHistoryDto } from '../amr-charge-history/dto/create-amr-charge-history.dto';
+import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
+import { TimeTable } from '../time-table/entities/time-table.entity';
 
 @Injectable()
 export class AmrService {
@@ -30,7 +32,7 @@ export class AmrService {
   async createAmrByPlcData(body: AmrRawDto) {
     // 1. make params by PLC
     const amrBody: CreateAmrDto = {
-      name: body.CurrentNode.toString(),
+      name: body.Amrld.toString(),
       charging: body.PauseState === 1,
       prcsCD: body.PrcsCD,
       ACSMode: body.ACSMode === 1,
@@ -49,10 +51,10 @@ export class AmrService {
     };
 
     const amrChargerBody: CreateAmrChargerDto = {
-      name: body.CurrentNode.toString(),
-      working: true,
-      x: body.X,
-      y: body.Y,
+      name: body.Amrld.toString(),
+      working: body.PauseState > 0,
+      // x: body.X,
+      // y: body.Y,
       // z: body.Z,
     };
 
@@ -68,24 +70,60 @@ export class AmrService {
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
     try {
       const amrResult = await queryRunner.manager
         .getRepository(Amr)
-        .save(amrBody);
+        .upsert(amrBody, ['name']);
 
       const amrChargerResult = await queryRunner.manager
         .getRepository(AmrCharger)
-        .save(amrChargerBody);
+        .upsert(amrChargerBody, ['name']);
 
       // Amr 생성, amr충전 생성 될 시에만 이력 저장
-      if (amrResult.id && amrChargerResult.id) {
-        amrChargeHistoryBody.amr = amrResult.id;
-        amrChargeHistoryBody.amrCharger = amrChargerResult.id;
+      if (amrResult.identifiers[0].id && amrChargerResult.identifiers[0].id) {
+        amrChargeHistoryBody.amr = amrResult.identifiers[0].id;
+        amrChargeHistoryBody.amrCharger = amrChargerResult.identifiers[0].id;
 
         const amrChargeHistoryResult = await queryRunner.manager
           .getRepository(AmrChargeHistory)
           .save(amrChargeHistoryBody);
       }
+
+      // 지속적으로 amr 생성되는 정보들 타임테이블에 저장
+      const timeTableBody: CreateTimeTableDto = {
+        data: {
+          X: body.X,
+          Y: body.Y,
+          H: body.H,
+          Speed: body.Speed,
+          CurrentNode: body.CurrentNode,
+          TargetNode: body.TargetNode,
+          Connected: body.Connected,
+          ErrorInfo: body.ErrorInfo,
+          CurState: body.CurState,
+          PauseState: body.PauseState,
+          Loaded: body.Loaded,
+          MDir: body.MDir,
+          TurnTableStatus: body.TurnTableStatus,
+          PLTNo: body.PLTNo,
+          PLTType: body.PLTType,
+          TransNo: body.TransNo,
+          OrderNo: body.OrderNo,
+          PartInfo: body.PartInfo,
+          Paths: body.Paths,
+          GroupNo: body.GroupNo,
+          MissionNo: body.MissionNo,
+          JobId: body.JobId,
+          ActionId: body.ActionId,
+          Prog: body.Prog,
+          DestTime: body.DestTime,
+          CreationTime: body.CreationTime,
+          AccuBattery: body.AccuBattery,
+        },
+        Amr: amrResult.identifiers[0].id,
+      };
+      await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
 
       await queryRunner.commitTransaction();
     } catch (error) {

@@ -177,7 +177,7 @@ export class AmrRawDto {
     example: '',
     description: '파트정보',
   })
-  public Partinfo: string;
+  public PartInfo: string;
   @ApiProperty({
     example: '{ test: test }',
     description: '로봇경로정보(json타입)',
@@ -202,12 +202,12 @@ export class AmrRawDto {
     example: 1,
     description: '수행중인 작업번호',
   })
-  public Jobld: number;
+  public JobId: number;
   @ApiProperty({
     example: 1,
     description: '수행중인 액션아이디',
   })
-  public Actionld: number;
+  public ActionId: number;
   @ApiProperty({
     example: 1,
     description: '미션 진척율',
@@ -263,4 +263,9 @@ export class AmrRawDto {
     description: '마지막 동기화 시간',
   })
   public LastBatteryLevel: number;
+  @ApiProperty({
+    example: 1,
+    description: '마지막 볼륨 레벨',
+  })
+  public AccuBattery: number;
 }
