@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpException,
+  Inject,
   Param,
   ParseIntPipe,
   Post,
@@ -21,11 +22,15 @@ import {
 import { Asrs } from './entities/asrs.entity';
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('asrs')
 @ApiTags('Asrs(자동창고)')
 export class AsrsController {
-  constructor(private readonly asrsService: AsrsService) {}
+  constructor(
+    private readonly asrsService: AsrsService,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
+  ) {}
 
   @Post()
   @ApiOperation({

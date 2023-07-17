@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -10,12 +11,27 @@ import {
 import { Asrs } from '../../asrs/entities/asrs.entity';
 import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 
 @Entity()
 export class AsrsHistory {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ApiProperty({
+    example: 'in',
+    description: '부모 창고의 id',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Column({ type: 'varchar', nullable: false, length: 50, default: 0 })
+  inOutType: string;
 
   @CreateDateColumn()
   createdAt: Date;
