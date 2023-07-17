@@ -33,6 +33,14 @@ export class AsrsHistory {
   @Column({ type: 'varchar', nullable: false, length: 50, default: 0 })
   inOutType: string;
 
+  @ApiProperty({
+    example: 0,
+    description: '창고안의 개수',
+  })
+  @IsNumber()
+  @Column({ type: 'int', nullable: false, default: 0 })
+  count: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
