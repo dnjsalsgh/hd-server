@@ -9,12 +9,15 @@ import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dt
 import { Awb } from '../awb/entities/awb.entity';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
+import { print } from '../lib/util/consolelog.convert';
 
 @Injectable()
 export class AsrsService {
   constructor(
     @InjectRepository(Asrs)
     private readonly asrsRepository: Repository<Asrs>,
+    @InjectRepository(AsrsHistory)
+    private readonly asrsHistoryRepository: Repository<AsrsHistory>,
     private dataSource: DataSource,
   ) {}
   async create(createAsrsDto: CreateAsrsDto): Promise<Asrs> {
@@ -57,12 +60,14 @@ export class AsrsService {
     try {
       const asrsResult = await this.dataSource.manager
         .getRepository(Asrs)
-        .save(createAsrsHistoryDto.Asrs);
+        .save(createAsrsHistoryDto.Asrs as unknown);
 
       const awbResult = await this.dataSource.manager
         .getRepository(Awb)
-        .save(createAsrsHistoryDto.Awb);
+        .save(createAsrsHistoryDto.Awb as unknown);
 
+      print(asrsResult);
+      print(awbResult);
       const resultParam = {
         Asrs: asrsResult,
         awb: awbResult,
@@ -159,5 +164,38 @@ export class AsrsService {
     return this.asrsRepository.delete(id);
   }
 
-  async createByPlc(createAsrsPlcDto: CreateAsrsPlcDto) {}
+  /**
+   * plc로 들어온 데이터를 가지고 이력 등록
+   * awb와 asrs의 정보를 처리해야함
+   * @param body
+   */
+  async createByPlc(body: CreateAsrsPlcDto) {
+    // TODO: 가정된 데이터들 어떤 화물정보가 들어있을줄 모르니 다 분기처리할 것
+    // 자동창고 Id 들어왔다고 가정
+    const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
+    const awbInfo = body.ASRS_LH_Rack1_Part_Info as unknown as {
+      awbId: number;
+      count: number;
+    };
+    // 화물정보 안에 화물Id 들어왔다고 가정
+    const awbId = awbInfo.awbId;
+    // 화물정보 안에 화물수량 들어왔다고 가정
+    const count = awbInfo.count;
+    // 화물이 인입인지 인출인지 확인
+    let inOutType = '';
+    if (body.In_Conveyor_Start) {
+      inOutType = 'in';
+    } else if (body.Out_Conveyor_Start) {
+      inOutType = 'out';
+    }
+
+    const asrsHistoryBody: CreateAsrsHistoryDto = {
+      Asrs: asrsId,
+      Awb: awbId,
+      inOutType: inOutType,
+      count: count,
+    };
+
+    await this.asrsHistoryRepository.save(asrsHistoryBody);
+  }
 }

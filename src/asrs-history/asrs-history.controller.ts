@@ -12,6 +12,7 @@ import { AsrsHistoryService } from './asrs-history.service';
 import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 
 @Controller('asrs-history')
 @ApiTags('asrs-history')
@@ -21,6 +22,11 @@ export class AsrsHistoryController {
   @Post()
   create(@Body() createAsrsHistoryDto: CreateAsrsHistoryDto) {
     return this.asrsHistoryService.create(createAsrsHistoryDto);
+  }
+
+  @Post('/plc')
+  createByPlc(@Body() body: CreateAsrsPlcDto) {
+    return this.asrsHistoryService.createByPlc(body);
   }
 
   @Get()
