@@ -30,14 +30,14 @@ export class AmrService {
   }
 
   async createAmrByPlcData(body: AmrRawDto) {
-    // 1. make params by PLC
+    // 1. make params by MS-SQL DBMS
     const amrBody: CreateAmrDto = {
       name: body.Amrld.toString(),
       charging: body.PauseState === 1,
       prcsCD: body.PrcsCD,
-      ACSMode: body.ACSMode === 1,
-      mode: body.Mode,
-      errorLevel: body.ErrorLevel,
+      // ACSMode: body.ACSMode === 1,
+      // mode: body.Mode,
+      // errorLevel: body.ErrorLevel,
       errorCode: body.ErrorCode.toString(),
       startTime: body.StartTime,
       endTime: body.EndTime,
@@ -45,7 +45,7 @@ export class AmrService {
       oprTime: new Date(body.OprTime),
       stopTime: new Date(body.StopTime),
       startBatteryLevel: body.StartBatteryLevel,
-      lastBatteryLevel: body.LastBatteryLevel,
+      // lastBatteryLevel: body.LastBatteryLevel,
       simulation: true,
       logDT: new Date(body.LogDT),
     };
@@ -97,8 +97,8 @@ export class AmrService {
           Y: body.Y,
           H: body.H,
           Speed: body.Speed,
-          CurrentNode: body.CurrentNode,
-          TargetNode: body.TargetNode,
+          // CurrentNode: body.CurrentNode,
+          // TargetNode: body.TargetNode,
           Connected: body.Connected,
           ErrorInfo: body.ErrorInfo,
           CurState: body.CurState,
@@ -109,17 +109,17 @@ export class AmrService {
           PLTNo: body.PLTNo,
           PLTType: body.PLTType,
           TransNo: body.TransNo,
-          OrderNo: body.OrderNo,
-          PartInfo: body.PartInfo,
+          // OrderNo: body.OrderNo,
+          // PartInfo: body.PartInfo,
           Paths: body.Paths,
-          GroupNo: body.GroupNo,
+          // GroupNo: body.GroupNo,
           MissionNo: body.MissionNo,
-          JobId: body.JobId,
-          ActionId: body.ActionId,
+          // JobId: body.JobId,
+          // ActionId: body.ActionId,
           Prog: body.Prog,
-          DestTime: body.DestTime,
+          // DestTime: body.DestTime,
           CreationTime: body.CreationTime,
-          AccuBattery: body.AccuBattery,
+          // AccuBattery: body.AccuBattery,
         },
         Amr: amrResult.identifiers[0].id,
       };

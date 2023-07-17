@@ -20,6 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { Asrs } from './entities/asrs.entity';
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
+import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 
 @Controller('asrs')
 @ApiTags('Asrs(자동창고)')
@@ -28,11 +29,11 @@ export class AsrsController {
 
   @Post()
   @ApiOperation({
-    summary: 'VMS(화물측정시스템) 생성 API',
-    description: 'VMS(화물측정시스템) 생성 한다',
+    summary: 'Asrs(자동창고) 생성 API',
+    description: 'Asrs(자동창고) 생성 한다',
   })
   @ApiBody({ type: CreateAsrsDto })
-  @ApiCreatedResponse({ description: '유저를 생성한다.', type: Asrs })
+  @ApiCreatedResponse({ description: '창고를 생성한다.', type: Asrs })
   async create(@Body() body: CreateAsrsDto) {
     // parent 정보 확인
     if (typeof body.parent === 'number' && body.parent < 0) {
@@ -49,6 +50,12 @@ export class AsrsController {
   @Post('/with')
   createWithObject(@Body() createAsrsHistoryDto: CreateAsrsHistoryDto) {
     return this.asrsService.createWithAwb(createAsrsHistoryDto);
+  }
+
+  @ApiOperation({ summary: 'plc를 활용한 데이터 수집' })
+  @Post('/plc')
+  createByPlc(@Body() body: CreateAsrsPlcDto) {
+    return this.asrsService.createByPlc(body);
   }
 
   @Get()

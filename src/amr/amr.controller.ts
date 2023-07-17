@@ -23,8 +23,12 @@ export class AmrController {
     return this.amrService.create(createAmrDto);
   }
 
-  @ApiOperation({ summary: 'plc의 데이터 입력' })
-  @Post('/plc')
+  @ApiOperation({
+    summary: 'amr의 움직임 데이터 입력',
+    description:
+      'amr, amrCharge, amrChargeHistory, timeTable를 모두 등록함 / name',
+  })
+  @Post('/moving-data')
   createByPlc(@Body() body: AmrRawDto) {
     return this.amrService.createAmrByPlcData(body);
   }

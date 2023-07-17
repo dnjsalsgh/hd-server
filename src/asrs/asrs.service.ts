@@ -8,6 +8,7 @@ import { ResponseDto } from '../lib/dto/response.dto';
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { Awb } from '../awb/entities/awb.entity';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
+import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 
 @Injectable()
 export class AsrsService {
@@ -157,4 +158,6 @@ export class AsrsService {
   remove(id: number) {
     return this.asrsRepository.delete(id);
   }
+
+  async createByPlc(createAsrsPlcDto: CreateAsrsPlcDto) {}
 }

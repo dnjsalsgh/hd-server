@@ -20,12 +20,12 @@ export class AmrRawDto {
     example: 1,
     description: 'ACS 모드',
   })
-  public ACSMode: number;
+  public ACSMode?: number;
   @ApiProperty({
     example: 2,
     description: '로봇모드',
   })
-  public Mode: number;
+  public Mode?: number;
   @ApiProperty({
     example: 1,
     description: 'x좌표',
