@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateAmrDto } from './dto/create-amr.dto';
 import { UpdateAmrDto } from './dto/update-amr.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +14,8 @@ import { CreateAmrChargerDto } from '../amr-charger/dto/create-amr-charger.dto';
 import { CreateAmrChargeHistoryDto } from '../amr-charge-history/dto/create-amr-charge-history.dto';
 import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
 import { TimeTable } from '../time-table/entities/time-table.entity';
+import { ClientProxy } from '@nestjs/microservices';
+import { take } from 'rxjs';
 
 @Injectable()
 export class AmrService {
@@ -24,12 +26,18 @@ export class AmrService {
     @InjectRepository(AmrChargeHistory)
     private readonly amrChargeHistoryRepository: Repository<AmrChargeHistory>,
     private dataSource: DataSource,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
+
   create(createAmrDto: CreateAmrDto) {
     return this.amrRepository.save(createAmrDto);
   }
 
-  async createAmrByPlcData(body: AmrRawDto) {
+  /**
+   * 실시간으로 ms-sql에서 오는 데이터를 가져다가 postgresSQL에 저장하기 위함
+   * @param body
+   */
+  async createAmrByData(body: AmrRawDto) {
     // 1. make params by MS-SQL DBMS
     const amrBody: CreateAmrDto = {
       name: body.Amrld.toString(),
@@ -44,7 +52,7 @@ export class AmrService {
       travelDist: body.TravelDist,
       oprTime: new Date(body.OprTime),
       stopTime: new Date(body.StopTime),
-      startBatteryLevel: body.StartBatteryLevel,
+      startBatteryLevel: body.StartBatteryLevel, // 충전을 시작할 때만 입력하기
       // lastBatteryLevel: body.LastBatteryLevel,
       simulation: true,
       logDT: new Date(body.LogDT),
@@ -77,6 +85,8 @@ export class AmrService {
     await queryRunner.startTransaction();
 
     try {
+      // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
+      // 나머지 실시간 데이터는 timeTable에 저장하기 위함
       const amrResult = await queryRunner.manager
         .getRepository(Amr)
         .upsert(amrBody, ['name']);
@@ -125,10 +135,26 @@ export class AmrService {
           // DestTime: body.DestTime,
           CreationTime: body.CreationTime,
           // AccuBattery: body.AccuBattery,
+          // 배터리 정보
+          soc: body.SOC.toString(),
+          soh: body.SOH.toString(),
         },
         Amr: amrResult.identifiers[0].id,
       };
+
       await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
+
+      // amr실시간 데이터 mqtt로 publish 하기 위함
+      await this.client
+        .send('amr', {
+          amrBody: amrBody,
+          amrChargerBody: amrChargerBody,
+          amrChargeHistoryBody: amrChargeHistoryBody,
+          timeTableBody: timeTableBody,
+          time: new Date().toISOString(),
+        })
+        .pipe(take(1))
+        .subscribe();
 
       await queryRunner.commitTransaction();
     } catch (error) {

@@ -30,7 +30,7 @@ export class AmrController {
   })
   @Post('/moving-data')
   createByPlc(@Body() body: AmrRawDto) {
-    return this.amrService.createAmrByPlcData(body);
+    return this.amrService.createAmrByData(body);
   }
 
   @Get()

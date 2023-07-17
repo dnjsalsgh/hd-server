@@ -44,21 +44,21 @@ export class Amr {
     example: false,
     description: 'ACS 모드 (Auto = 0, Manual = 1)',
   })
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   ACSMode?: boolean;
 
   @ApiProperty({
     example: 2,
     description: '로봇모드 (Manual = 0, semiAuto = 1, auto = 2)',
   })
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   mode?: number;
 
   @ApiProperty({
     example: 0,
     description: '마지막에러의 에러레벨 (info=0, warning=1, critical=2)',
   })
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   errorLevel?: number;
 
   @ApiProperty({
@@ -114,7 +114,7 @@ export class Amr {
     example: 90,
     description: '마지막 동기화시간',
   })
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   lastBatteryLevel?: number;
 
   @ApiProperty({
