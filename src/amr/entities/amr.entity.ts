@@ -38,7 +38,7 @@ export class Amr {
     description: '공정 코드',
   })
   @Column({ type: 'varchar', length: 50, nullable: true })
-  prcsCD: string;
+  prcsCD?: string;
 
   @ApiProperty({
     example: false,

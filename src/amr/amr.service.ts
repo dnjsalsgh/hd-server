@@ -34,7 +34,7 @@ export class AmrService {
     const amrBody: CreateAmrDto = {
       name: body.Amrld.toString(),
       charging: body.PauseState === 1,
-      prcsCD: body.PrcsCD,
+      // prcsCD: body.PrcsCD,
       // ACSMode: body.ACSMode === 1,
       // mode: body.Mode,
       // errorLevel: body.ErrorLevel,
@@ -50,12 +50,17 @@ export class AmrService {
       logDT: new Date(body.LogDT),
     };
 
+    // 충전중 판단을 위한 findOne
+    const lastAmrByName = await this.amrRepository.findOne({
+      where: { name: body.Amrld.toString() },
+      order: { createdAt: 'DESC' },
+    });
     const amrChargerBody: CreateAmrChargerDto = {
       name: body.Amrld.toString(),
-      working: body.PauseState > 0,
-      x: body.ChargeX,
-      y: body.ChargeY,
-      z: body.ChargeZ,
+      working: lastAmrByName.startBatteryLevel < body.SOC, // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
+      x: body.ChargeX, // 유니티에서 보여지는 amr의 x좌표
+      y: body.ChargeY, // 유니티에서 보여지는 amr의 y좌표
+      z: body.ChargeZ, // 유니티에서 보여지는 amr의 z좌표
     };
 
     const amrChargeHistoryBody: CreateAmrChargeHistoryDto = {
@@ -93,8 +98,8 @@ export class AmrService {
       // 지속적으로 amr 생성되는 정보들 타임테이블에 저장
       const timeTableBody: CreateTimeTableDto = {
         data: {
-          X: body.X,
-          Y: body.Y,
+          X: body.X, // 움직이는 amr의 x좌표
+          Y: body.Y, // 움직이는 amr의 y좌표
           H: body.H,
           Speed: body.Speed,
           // CurrentNode: body.CurrentNode,
@@ -104,11 +109,11 @@ export class AmrService {
           CurState: body.CurState,
           PauseState: body.PauseState,
           Loaded: body.Loaded,
-          MDir: body.MDir,
+          // MDir: body.MDir,
           TurnTableStatus: body.TurnTableStatus,
           PLTNo: body.PLTNo,
           PLTType: body.PLTType,
-          TransNo: body.TransNo,
+          // TransNo: body.TransNo,
           // OrderNo: body.OrderNo,
           // PartInfo: body.PartInfo,
           Paths: body.Paths,

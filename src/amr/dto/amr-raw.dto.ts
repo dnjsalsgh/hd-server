@@ -11,21 +11,21 @@ export class AmrRawDto {
     description: '데이터 업데이트 일자',
   })
   public LogDT: string;
-  @ApiProperty({
-    example: 'Amr-001',
-    description: '공정코드',
-  })
-  public PrcsCD: string;
-  @ApiProperty({
-    example: 1,
-    description: 'ACS 모드',
-  })
-  public ACSMode?: number;
-  @ApiProperty({
-    example: 2,
-    description: '로봇모드',
-  })
-  public Mode?: number;
+  // @ApiProperty({
+  //   example: 'Amr-001',
+  //   description: '공정코드',
+  // })
+  // public PrcsCD: string;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: 'ACS 모드',
+  // })
+  // public ACSMode?: number;
+  // @ApiProperty({
+  //   example: 2,
+  //   description: '로봇모드',
+  // })
+  // public Mode?: number;
   @ApiProperty({
     example: 1,
     description: 'x좌표',
@@ -51,31 +51,31 @@ export class AmrRawDto {
     description: '현재속도(m/s)',
   })
   public Speed: number;
-  @ApiProperty({
-    example: 1,
-    description: '현재노드번호',
-  })
-  public CurrentNode: number;
-  @ApiProperty({
-    example: 1,
-    description: '시작지노드번호(미사용)',
-  })
-  public StartNode: number;
-  @ApiProperty({
-    example: 1,
-    description: '목적지 노드번호',
-  })
-  public TargetNode: number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '현재노드번호',
+  // })
+  // public CurrentNode: number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '시작지노드번호(미사용)',
+  // })
+  // public StartNode: number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '목적지 노드번호',
+  // })
+  // public TargetNode: number;
   @ApiProperty({
     example: 1,
     description: '통신 연결상태',
   })
   public Connected: number;
-  @ApiProperty({
-    example: 0,
-    description: '마지막 에러의 에러레벨',
-  })
-  public ErrorLevel: number;
+  // @ApiProperty({
+  //   example: 0,
+  //   description: '마지막 에러의 에러레벨',
+  // })
+  // public ErrorLevel: number;
   @ApiProperty({
     example: 0,
     description: '마지막 에러의 에러코드',
@@ -127,11 +127,11 @@ export class AmrRawDto {
       '턴테이블 상태(미감지 = 0, 12시 방향 = 1, 3시 방향 = 2, 6시 방향 = 3, 9시 방향 = 4)',
   })
   public Turn: number;
-  @ApiProperty({
-    example: 0,
-    description: '자체방향',
-  })
-  public MDir: number;
+  // @ApiProperty({
+  //   example: 0,
+  //   description: '자체방향',
+  // })
+  // public MDir: number;
   @ApiProperty({
     example: 0,
     description: '턴테이블',
@@ -163,31 +163,31 @@ export class AmrRawDto {
     description: '파레트 타입',
   })
   public PLTType: number;
-  @ApiProperty({
-    example: '1',
-    description: '전표번호',
-  })
-  public TransNo: string;
-  @ApiProperty({
-    example: 'order-001',
-    description: '작업지시 번호',
-  })
-  public OrderNo: string;
-  @ApiProperty({
-    example: '',
-    description: '파트정보',
-  })
-  public PartInfo: string;
+  // @ApiProperty({
+  //   example: '1',
+  //   description: '전표번호',
+  // })
+  // public TransNo: string;
+  // @ApiProperty({
+  //   example: 'order-001',
+  //   description: '작업지시 번호',
+  // })
+  // public OrderNo: string;
+  // @ApiProperty({
+  //   example: '',
+  //   description: '파트정보',
+  // })
+  // public PartInfo: string;
   @ApiProperty({
     example: '{ test: test }',
     description: '로봇경로정보(json타입)',
   })
   public Paths: string;
-  @ApiProperty({
-    example: 1,
-    description: '수행중인 미션 그룹번호',
-  })
-  public GroupNo: number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '수행중인 미션 그룹번호',
+  // })
+  // public GroupNo: number;
   @ApiProperty({
     example: 1,
     description: '수행중인 미션번호',
@@ -198,26 +198,26 @@ export class AmrRawDto {
     description: '수행중인 미션번호',
   })
   public Missionld: number;
-  @ApiProperty({
-    example: 1,
-    description: '수행중인 작업번호',
-  })
-  public JobId: number;
-  @ApiProperty({
-    example: 1,
-    description: '수행중인 액션아이디',
-  })
-  public ActionId: number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '수행중인 작업번호',
+  // })
+  // public JobId: number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '수행중인 액션아이디',
+  // })
+  // public ActionId: number;
   @ApiProperty({
     example: 1,
     description: '미션 진척율',
   })
   public Prog: number;
-  @ApiProperty({
-    example: '2023-07-10',
-    description: '도착예상시간',
-  })
-  public DestTime: Date;
+  // @ApiProperty({
+  //   example: '2023-07-10',
+  //   description: '도착예상시간',
+  // })
+  // public DestTime: Date;
   @ApiProperty({
     example: '2023-07-10',
     description: '미션할당시간',
