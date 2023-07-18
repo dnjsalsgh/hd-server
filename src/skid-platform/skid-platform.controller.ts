@@ -45,7 +45,7 @@ export class SkidPlatformController {
   }
 
   @ApiOperation({
-    summary: 'plc를 활용한 창고의 화물을 안착대에 넣기(이력등록)',
+    summary: 'plc를 활용한 자동창고 작업지시 만들기',
   })
   @Post('/plc/asrs-out')
   createByPlcOut(@Body() body: CreateAsrsPlcDto) {

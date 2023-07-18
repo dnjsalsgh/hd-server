@@ -11,7 +11,11 @@ import {
 import { SkidPlatformHistoryService } from './skid-platform-history.service';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
 import { UpdateSkidPlatformHistoryDto } from './dto/update-skid-platform-history.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { SkidPlatformHistoryPlcDataDto } from './dto/skid-platform-history-plc-data.dto';
+import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
+import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
+import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
 
 @Controller('skid-platform-history')
 @ApiTags('skid-platform-history')
@@ -49,5 +53,16 @@ export class SkidPlatformHistoryController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.skidPlatformHistoryService.remove(+id);
+  }
+
+  @ApiOperation({
+    summary:
+      'plc의 데이터중 안착대 화물정보가 변경되었을 때 안착대 이력을 등록하기 위함.',
+    description: '안착대 화물정보가 변경 시 동작',
+  })
+  @ApiBody({ type: CreateSkidPlatformAndAsrsPlcDto })
+  @Post('/plc')
+  checkSkidPlatformChange(@Body() body: CreateSkidPlatformAndAsrsPlcDto) {
+    return this.skidPlatformHistoryService.checkSkidPlatformChange(body);
   }
 }
