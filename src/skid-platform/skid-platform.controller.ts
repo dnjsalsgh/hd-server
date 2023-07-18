@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Param,
   Post,
   Put,
@@ -10,16 +11,36 @@ import {
 import { SkidPlatformService } from './skid-platform.service';
 import { CreateSkidPlatformDto } from './dto/create-skid-platform.dto';
 import { UpdateSkidPlatformDto } from './dto/update-skid-platform.dto';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
+import { Asrs } from '../asrs/entities/asrs.entity';
 
 @Controller('skid-platform')
 @ApiTags('skid-platform')
 export class SkidPlatformController {
   constructor(private readonly skidPlatformService: SkidPlatformService) {}
 
+  @ApiOperation({
+    summary: 'skidPlatform(안착대) 생성 API',
+    description: 'skidPlatform(안착대) 생성 한다',
+  })
+  @ApiBody({ type: CreateAsrsDto })
+  @ApiCreatedResponse({ description: '안착대를 생성한다.', type: Asrs })
   @Post()
-  create(@Body() createSkidPlatformDto: CreateSkidPlatformDto) {
-    return this.skidPlatformService.create(createSkidPlatformDto);
+  create(@Body() body: CreateSkidPlatformDto) {
+    // parent 정보 확인
+    if (typeof body.parent === 'number' && body.parent < 0) {
+      throw new HttpException('parent 정보를 정확히 입력해주세요', 400);
+    }
+
+    body.parent = typeof body.parent === 'number' ? body.parent : 0;
+    body.fullPath = body.name;
+    return this.skidPlatformService.create(body);
   }
 
   @Get()
