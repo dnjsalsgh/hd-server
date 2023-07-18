@@ -8,6 +8,7 @@ import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
+import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-order.dto';
 
 @Injectable()
 export class SkidPlatformService {
@@ -147,36 +148,19 @@ export class SkidPlatformService {
     const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
     const awbInfo = body.ASRS_LH_Rack1_Part_Info as unknown as {
       awbId: number;
-      count: number;
     };
     // 화물정보 안에 화물Id 들어왔다고 가정
     const awbId = awbInfo.awbId;
-    // 화물정보 안에 화물수량 들어왔다고 가정
-    const count = awbInfo.count;
-    // 화물이 인입인지 인출인지 확인
-    let inOutType = '';
-    if (body.In_Conveyor_Start) {
-      inOutType = 'in';
-    } else if (body.Out_Conveyor_Start) {
-      inOutType = 'out';
-    }
 
-    // 자동창고, 화물을 특정해서 작업지시의 id 찾기
-    const asrsOutOrderResult = await this.asrsOutOrderRepository.findOne({
-      where: { Asrs: asrsId, Awb: awbId },
-    });
-
-    if (!asrsOutOrderResult)
-      return new NotFoundException('자동창고 작업지시가 없습니다.');
-
-    const skidPlatformHistoryBody: CreateSkidPlatformHistoryDto = {
-      AsrsOutOrder: asrsOutOrderResult?.id,
+    // TODO: 패키지 시뮬레이터의 api를 활용해서 자동창고 작업지시를 만들어야 합니다.
+    const asrsOutOrderBody: CreateAsrsOutOrderDto = {
+      order: 1,
       Asrs: asrsId,
-      SkidPlatform: null,
+      SkidPlatform: 1, // api에서는 목표 안착대의 id가 들어온다.
       Awb: awbId,
     };
 
-    // TODO: 패키지 시뮬레이터의 api를 활용해서 자동창고 작업지시를 만들어야 합니다.
-    await this.skidPlatformHistoryRepository.save(skidPlatformHistoryBody);
+    // plc 데이터를 기반으로 작업지시 생성
+    await this.asrsOutOrderRepository.save(asrsOutOrderBody);
   }
 }
