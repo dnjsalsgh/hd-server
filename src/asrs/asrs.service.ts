@@ -56,39 +56,6 @@ export class AsrsService {
     return asrs;
   }
 
-  async createWithAwb(createAsrsHistoryDto: CreateAsrsHistoryDto) {
-    const queryRunner = await this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      const asrsResult = await this.dataSource.manager
-        .getRepository(Asrs)
-        .save(createAsrsHistoryDto.Asrs as unknown);
-
-      const awbResult = await this.dataSource.manager
-        .getRepository(Awb)
-        .save(createAsrsHistoryDto.Awb as unknown);
-
-      print(asrsResult);
-      print(awbResult);
-      const resultParam = {
-        Asrs: asrsResult,
-        awb: awbResult,
-      };
-      await this.dataSource.manager
-        .getRepository(AsrsHistory)
-        .save(resultParam);
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
   async findAll() {
     return await this.asrsRepository.find();
   }

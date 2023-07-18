@@ -1,20 +1,16 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
 } from '@nestjs/common';
 import { SkidPlatformHistoryService } from './skid-platform-history.service';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
 import { UpdateSkidPlatformHistoryDto } from './dto/update-skid-platform-history.dto';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SkidPlatformHistoryPlcDataDto } from './dto/skid-platform-history-plc-data.dto';
-import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
-import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
 
 @Controller('skid-platform-history')
