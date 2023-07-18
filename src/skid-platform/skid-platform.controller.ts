@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
 import { Asrs } from '../asrs/entities/asrs.entity';
+import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 
 @Controller('skid-platform')
 @ApiTags('skid-platform')
@@ -41,6 +42,14 @@ export class SkidPlatformController {
     body.parent = typeof body.parent === 'number' ? body.parent : 0;
     body.fullPath = body.name;
     return this.skidPlatformService.create(body);
+  }
+
+  @ApiOperation({
+    summary: 'plc를 활용한 창고의 화물을 안착대에 넣기(이력등록)',
+  })
+  @Post('/plc/asrs-out')
+  createByPlcOut(@Body() body: CreateAsrsPlcDto) {
+    return this.skidPlatformService.createByPlcOut(body);
   }
 
   @Get()

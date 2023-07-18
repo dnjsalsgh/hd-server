@@ -1,16 +1,23 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSkidPlatformDto } from './dto/create-skid-platform.dto';
 import { UpdateSkidPlatformDto } from './dto/update-skid-platform.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { SkidPlatform } from './entities/skid-platform.entity';
-import { UpdateAsrsDto } from '../asrs/dto/update-asrs.dto';
+import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
+import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
+import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
+import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
 
 @Injectable()
 export class SkidPlatformService {
   constructor(
     @InjectRepository(SkidPlatform)
     private readonly skidPlatformRepository: Repository<SkidPlatform>,
+    @InjectRepository(SkidPlatformHistory)
+    private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
+    @InjectRepository(AsrsOutOrder)
+    private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
   ) {}
   async create(createSkidPlatformDto: CreateSkidPlatformDto) {
     let parentSkidPlatform;
@@ -127,5 +134,49 @@ export class SkidPlatformService {
 
   remove(id: number) {
     return this.skidPlatformRepository.delete(id);
+  }
+
+  /**
+   * plc로 들어온 데이터를 가지고 창고에서 안착대로 이동
+   * asrs와 skid-platform의 정보를 처리해야함
+   * @param body
+   */
+  async createByPlcOut(body: CreateAsrsPlcDto) {
+    // TODO: 가정된 데이터들 어떤 화물정보가 들어있을줄 모르니 다 분기처리할 것
+    // 자동창고 Id 들어왔다고 가정
+    const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
+    const awbInfo = body.ASRS_LH_Rack1_Part_Info as unknown as {
+      awbId: number;
+      count: number;
+    };
+    // 화물정보 안에 화물Id 들어왔다고 가정
+    const awbId = awbInfo.awbId;
+    // 화물정보 안에 화물수량 들어왔다고 가정
+    const count = awbInfo.count;
+    // 화물이 인입인지 인출인지 확인
+    let inOutType = '';
+    if (body.In_Conveyor_Start) {
+      inOutType = 'in';
+    } else if (body.Out_Conveyor_Start) {
+      inOutType = 'out';
+    }
+
+    // 자동창고, 화물을 특정해서 작업지시의 id 찾기
+    const asrsOutOrderResult = await this.asrsOutOrderRepository.findOne({
+      where: { Asrs: asrsId, Awb: awbId },
+    });
+
+    if (!asrsOutOrderResult)
+      return new NotFoundException('자동창고 작업지시가 없습니다.');
+
+    const skidPlatformHistoryBody: CreateSkidPlatformHistoryDto = {
+      AsrsOutOrder: asrsOutOrderResult?.id,
+      Asrs: asrsId,
+      SkidPlatform: null,
+      Awb: awbId,
+    };
+
+    // TODO: 패키지 시뮬레이터의 api를 활용해서 자동창고 작업지시를 만들어야 합니다.
+    await this.skidPlatformHistoryRepository.save(skidPlatformHistoryBody);
   }
 }

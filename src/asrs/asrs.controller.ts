@@ -57,10 +57,10 @@ export class AsrsController {
     return this.asrsService.createWithAwb(createAsrsHistoryDto);
   }
 
-  @ApiOperation({ summary: 'plc를 활용한 데이터 수집' })
-  @Post('/plc')
-  createByPlc(@Body() body: CreateAsrsPlcDto) {
-    return this.asrsService.createByPlc(body);
+  @ApiOperation({ summary: 'plc를 활용한 창고에 화물 넣기(이력등록)' })
+  @Post('/plc/asrs-in')
+  createByPlcIn(@Body() body: CreateAsrsPlcDto) {
+    return this.asrsService.createByPlcIn(body);
   }
 
   @Get()

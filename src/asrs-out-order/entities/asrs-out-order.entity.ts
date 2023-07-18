@@ -42,7 +42,7 @@ export class AsrsOutOrder {
     type: () => Asrs,
   })
   @ManyToOne(() => Asrs, (asrs) => asrs.asrsOutOrders)
-  Asrs: Relation<Asrs>;
+  Asrs: Relation<Asrs> | number;
 
   @ApiProperty({
     example: 1,
@@ -50,7 +50,7 @@ export class AsrsOutOrder {
     type: () => SkidPlatform,
   })
   @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.asrsOutOrders)
-  SkidPlatform: Relation<SkidPlatform>;
+  SkidPlatform: Relation<SkidPlatform> | number;
 
   @ApiProperty({
     example: 1,
@@ -58,7 +58,7 @@ export class AsrsOutOrder {
     type: () => Awb,
   })
   @ManyToOne(() => Awb, (awb) => awb.asrsOutOrders)
-  Awb: Relation<Awb>;
+  Awb: Relation<Awb> | number;
 
   @OneToMany(
     () => SkidPlatformHistory,
@@ -71,7 +71,4 @@ export const AsrsOutOrderAttribute = {
   id: true,
   order: true,
   createdAt: true,
-  // Asrs: true,
-  // SkidPlatform: true,
-  // Awb: true,
 };

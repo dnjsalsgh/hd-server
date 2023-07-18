@@ -10,6 +10,9 @@ import { Awb } from '../awb/entities/awb.entity';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { print } from '../lib/util/consolelog.convert';
+import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
+import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
+import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 
 @Injectable()
 export class AsrsService {
@@ -18,6 +21,7 @@ export class AsrsService {
     private readonly asrsRepository: Repository<Asrs>,
     @InjectRepository(AsrsHistory)
     private readonly asrsHistoryRepository: Repository<AsrsHistory>,
+
     private dataSource: DataSource,
   ) {}
   async create(createAsrsDto: CreateAsrsDto): Promise<Asrs> {
@@ -165,11 +169,11 @@ export class AsrsService {
   }
 
   /**
-   * plc로 들어온 데이터를 가지고 이력 등록
+   * plc로 들어온 데이터를 창고에 입력 데이터로 입력 후 이력 등록
    * awb와 asrs의 정보를 처리해야함
    * @param body
    */
-  async createByPlc(body: CreateAsrsPlcDto) {
+  async createByPlcIn(body: CreateAsrsPlcDto) {
     // TODO: 가정된 데이터들 어떤 화물정보가 들어있을줄 모르니 다 분기처리할 것
     // 자동창고 Id 들어왔다고 가정
     const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
