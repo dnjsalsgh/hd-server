@@ -13,7 +13,7 @@ export class MqttController {
         text: MqttController.name,
         time: `진행${new Date().getTime()}`,
       };
-      this.client.send('Korean', data).pipe(take(100)).subscribe();
+      this.client.send('Start', data).pipe(take(1)).subscribe();
     }, 5000);
   }
 
