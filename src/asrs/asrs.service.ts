@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAsrsDto } from './dto/create-asrs.dto';
 import { UpdateAsrsDto } from './dto/update-asrs.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,10 +20,9 @@ export class AsrsService {
     @InjectRepository(Asrs)
     private readonly asrsRepository: Repository<Asrs>,
     @InjectRepository(AsrsHistory)
-    private readonly asrsHistoryRepository: Repository<AsrsHistory>,
-
-    private dataSource: DataSource,
+    private readonly asrsHistoryRepository: Repository<AsrsHistory>, // private dataSource: DataSource,
   ) {}
+
   async create(createAsrsDto: CreateAsrsDto): Promise<Asrs> {
     let parentAsrs;
     let parentFullPath = '';
@@ -71,9 +70,9 @@ export class AsrsService {
       where: { id: updateAsrsDto.parent },
     });
     if (!parentInfo)
-      throw new HttpException('asrs의 부모 정보가 없습니다.', 400);
+      throw new NotFoundException('asrs의 부모 정보가 없습니다.');
 
-    if (!myInfo) throw new HttpException('asrs의 정보가 없습니다.', 400);
+    if (!myInfo) throw new NotFoundException('asrs의 정보가 없습니다.');
     // 부모의 fullPath 찾기
     const asrsFamily = await this.asrsRepository.find({
       where: { fullPath: Like(`%${myInfo.fullPath}%`) },
