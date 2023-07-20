@@ -30,14 +30,14 @@ export class SkidPlatform {
     example: 0,
     description: '부모 안착대',
   })
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'int', nullable: false, default: 0 })
   parent: number;
 
   @ApiProperty({
     example: 0,
     description: '안착대 트리 레벨',
   })
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'int', nullable: false, default: 0 })
   level: number;
 
   @ApiProperty({
@@ -103,7 +103,7 @@ export class SkidPlatform {
   )
   skidPlatformHistories: Relation<SkidPlatformHistory[]>;
 
-  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
+  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
   uldHistories: Relation<UldHistory[]>;
 }
 

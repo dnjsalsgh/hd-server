@@ -8,5 +8,5 @@ export class CreateUldHistoryDto extends PickType(UldHistory, [
   'pieceCount',
   'recommend',
   'worker',
-  'buildUpOrder',
+  'BuildUpOrder',
 ]) {}

@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   Relation,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
@@ -16,6 +17,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity';
 
 @Entity()
+@Unique(['Uld', 'Awb'])
 export class BuildUpOrder {
   @PrimaryGeneratedColumn()
   id: number;
@@ -63,7 +65,7 @@ export class BuildUpOrder {
     type: () => SkidPlatform,
   })
   @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.buildUpOrders)
-  SkidPlatform: Relation<SkidPlatform>;
+  SkidPlatform: Relation<SkidPlatform> | number;
 
   @ApiProperty({
     example: 1,
@@ -71,7 +73,7 @@ export class BuildUpOrder {
     type: () => Uld,
   })
   @ManyToOne(() => Uld, (uld) => uld.buildUpOrders)
-  Uld: Relation<Uld>;
+  Uld: Relation<Uld> | number;
 
   @ApiProperty({
     example: 1,
@@ -79,8 +81,8 @@ export class BuildUpOrder {
     type: () => Awb,
   })
   @ManyToOne(() => Awb, (awb) => awb.BuildUpOrders)
-  Awb: Relation<Awb>;
+  Awb: Relation<Awb> | number;
 
-  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
-  uldHistories: Relation<UldHistory[]>;
+  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
+  uldHistories: Relation<UldHistory[]> | number;
 }

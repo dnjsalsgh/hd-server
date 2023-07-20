@@ -76,7 +76,7 @@ export class UldHistory {
     type: () => BuildUpOrder,
   })
   @ManyToOne(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.uldHistories)
-  buildUpOrder: Relation<BuildUpOrder>;
+  BuildUpOrder: Relation<BuildUpOrder> | number;
 
   @ApiProperty({
     example: 1,
@@ -84,11 +84,21 @@ export class UldHistory {
     type: () => SkidPlatform,
   })
   @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.uldHistories)
-  skidPlatform: Relation<SkidPlatform>;
+  SkidPlatform: Relation<SkidPlatform> | number;
 
+  @ApiProperty({
+    example: 1,
+    description: 'UldFK',
+    type: () => Uld,
+  })
   @ManyToOne(() => Uld, (uld) => uld.uldHistories)
-  uld: Relation<Uld>;
+  Uld: Relation<Uld> | number;
 
-  @ManyToOne(() => Awb, (cargo) => cargo.uldHistories)
-  cargo: Relation<Awb>;
+  @ApiProperty({
+    example: 1,
+    description: 'AwbFK',
+    type: () => Awb,
+  })
+  @ManyToOne(() => Awb, (awb) => awb.uldHistories)
+  Awb: Relation<Awb> | number;
 }

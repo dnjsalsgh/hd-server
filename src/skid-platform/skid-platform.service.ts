@@ -15,8 +15,6 @@ export class SkidPlatformService {
   constructor(
     @InjectRepository(SkidPlatform)
     private readonly skidPlatformRepository: Repository<SkidPlatform>,
-    @InjectRepository(SkidPlatformHistory)
-    private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
     @InjectRepository(AsrsOutOrder)
     private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
   ) {}

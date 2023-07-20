@@ -24,6 +24,7 @@ import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-sche
 import { CommonCode } from '../../common-code/entities/common-code.entity';
 import { AwbGroup } from '../../awb-group/entities/awb-group.entity';
 import { DataSourceOptions } from 'typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 export const setTypeOrmForTest = TypeOrmModule.forRoot({
   type: 'postgres',
@@ -60,6 +61,7 @@ export const setTypeOrmForTest = TypeOrmModule.forRoot({
   port: 5432,
   logging: false,
   synchronize: true,
+  namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
 });
 
 export const setDataSourceForTest: DataSourceOptions = {

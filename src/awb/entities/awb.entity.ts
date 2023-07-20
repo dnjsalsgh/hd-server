@@ -257,7 +257,7 @@ export class Awb {
   )
   skidPlatformHistories: Relation<SkidPlatformHistory[]>;
 
-  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
+  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
   uldHistories: Relation<UldHistory[]>;
 
   @OneToMany(() => AwbSccJoin, (awbSccJoin) => awbSccJoin.awb)

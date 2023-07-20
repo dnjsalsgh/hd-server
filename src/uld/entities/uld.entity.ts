@@ -74,7 +74,7 @@ export class Uld {
     description: 'uld유형 FK',
   })
   @ManyToOne(() => UldType, (uldType) => uldType.ulds)
-  UldType: Relation<UldType>;
+  UldType: Relation<UldType> | number;
 
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Uld)
   buildUpOrders: Relation<BuildUpOrder[]>;
@@ -85,7 +85,7 @@ export class Uld {
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.Uld)
   simulatorHistories: Relation<SimulatorHistory[]>;
 
-  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.buildUpOrder)
+  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
   uldHistories: Relation<UldHistory[]>;
 
   @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
