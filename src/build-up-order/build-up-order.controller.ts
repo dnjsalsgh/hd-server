@@ -24,6 +24,14 @@ export class BuildUpOrderController {
     return this.inspectWorkOrderService.create(createBuildUpOrderDto);
   }
 
+  @ApiOperation({
+    summary: '패키지 시뮬레이터의 결과를 저장하기 위한 컨트롤러',
+  })
+  @Post()
+  createList(@Body() createBuildUpOrderDto: CreateBuildUpOrderDto[]) {
+    return this.inspectWorkOrderService.createList(createBuildUpOrderDto);
+  }
+
   @Get()
   findAll() {
     return this.inspectWorkOrderService.findAll();
