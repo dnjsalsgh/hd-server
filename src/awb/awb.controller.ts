@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   UploadedFile,
@@ -54,6 +55,32 @@ export class AwbController {
   @Put(':id')
   update(@Param('id') id: string, @Body() updateAwbDto: UpdateAwbDto) {
     return this.awbService.update(+id, updateAwbDto);
+  }
+
+  @ApiOperation({
+    summary: '화물의 상태를 변경하기 위함',
+    description:
+      '예약미입고(saved): vms에 들어가지 않고 화물만 등록되있는 상태 입니다.\n' +
+      '\n' +
+      '입고중(invms): vms에 들어가 있는 상태입니다.\n' +
+      '\n' +
+      '창고대기(inasrs): 창고안에 들어있는 상태입니다\n' +
+      '\n' +
+      '불출예정(register): 자동창고작업지시에 등록되어있는 상태 입니다.\n' +
+      '\n' +
+      '이동중(outasrs): amr에 출고 신호를 보내고 바뀌어야 할 상태 입니다.\n' +
+      '\n' +
+      'uld 작업장 대기(inskidplatform): 안착대에 있는 상태입니다.\n' +
+      '\n' +
+      'uld 작업(inuld): uld 이력에 들어가 있는 상태입니다.',
+  })
+  @Put(':id/:state')
+  updateState(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('state') state: string,
+    @Body() updateAwbDto?: UpdateAwbDto,
+  ) {
+    return this.awbService.updateState(id, state, updateAwbDto);
   }
 
   @Delete(':id')

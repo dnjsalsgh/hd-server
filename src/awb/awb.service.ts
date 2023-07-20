@@ -64,6 +64,11 @@ export class AwbService {
     return this.cargoRepository.update(id, updateCargoDto);
   }
 
+  updateState(id: number, state: string, updateCargoDto?: UpdateAwbDto) {
+    if (state) updateCargoDto.state = state;
+    return this.cargoRepository.update(id, updateCargoDto);
+  }
+
   async breakDown(parentName: string, createCargoDtoArray: CreateAwbDto[]) {
     const parentCargo = await this.cargoRepository.findOne({
       where: { name: parentName },

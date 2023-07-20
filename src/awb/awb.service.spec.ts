@@ -154,6 +154,7 @@ describe('AwbService', () => {
     await awbRepository.save(awbBodyTest);
 
     // 4. 모델링 완료 신호를 받았다고 가정합니다.
+    // 최신 awb의 정보를 가져와서 모델링파일을 연결합니다.
     const lastedAwb = await awbRepository.find({
       order: { id: 'desc' },
       take: 1,
@@ -173,7 +174,7 @@ describe('AwbService', () => {
     const findOneResult = await awbRepository.findOne({
       where: { id: lastedAwb[0].id },
     });
-
+    // mqtt에 publish 합니다.
     await client
       .send('amr', {
         test: findOneResult,

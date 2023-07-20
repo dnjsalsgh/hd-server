@@ -21,6 +21,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { SimulatorResultAwbJoin } from '../../simulator-result-awb-join/entities/simulator-result-awb-join.entity';
 import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
 import { AsrsOutOrder } from '../../asrs-out-order/entities/asrs-out-order.entity';
+import { IsEnum, IsString } from 'class-validator';
 
 @Entity()
 export class Awb {
@@ -126,9 +127,11 @@ export class Awb {
   piece: number;
 
   @ApiProperty({
-    example: 'not breakDown',
+    example: 'saved',
     description: '상태',
   })
+  @IsString()
+  @IsEnum(['saved', 'invms', 'inasrs', 'inskid', 'inuld'])
   @Column({ type: 'varchar', length: 50, nullable: true })
   state: string;
 
