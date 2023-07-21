@@ -20,7 +20,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Asrs } from './entities/asrs.entity';
-import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { ClientProxy } from '@nestjs/microservices';
 

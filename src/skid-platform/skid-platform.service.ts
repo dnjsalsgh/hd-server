@@ -18,6 +18,7 @@ export class SkidPlatformService {
     @InjectRepository(AsrsOutOrder)
     private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
   ) {}
+
   async create(createSkidPlatformDto: CreateSkidPlatformDto) {
     let parentSkidPlatform;
     let parentFullPath = '';
@@ -71,7 +72,7 @@ export class SkidPlatformService {
     const parentInfo = await this.skidPlatformRepository.findOne({
       where: { id: updateSkidPlatformDto.parent },
     });
-    if (!parentInfo)
+    if (updateSkidPlatformDto.parent && !parentInfo)
       throw new HttpException('asrs의 부모 정보가 없습니다.', 400);
 
     if (!myInfo) throw new HttpException('asrs의 정보가 없습니다.', 400);
@@ -84,6 +85,7 @@ export class SkidPlatformService {
     const newFamilyList = [];
 
     const newLevel = parentInfo ? parentInfo.level + 1 : 0;
+    const parentId = parentInfo ? parentInfo.id : 0;
     const parentFullPath = parentInfo ? parentInfo.fullPath : '';
 
     // 부모의 fullPath 조회 함수
@@ -98,7 +100,7 @@ export class SkidPlatformService {
     for (let i = 0; i < asrsFamily.length; i += 1) {
       // (주의!)나의 정보인경우(familyList[i].id === myInfo.id)의 세팅값과 (나를 제외한)패밀리의 세팅값이 다르다.
       const parent =
-        asrsFamily[i].id === myInfo.id ? parentInfo.id : asrsFamily[i].parent;
+        asrsFamily[i].id === myInfo.id ? parentId : asrsFamily[i].parent;
       const level =
         asrsFamily[i].id === myInfo.id
           ? newLevel

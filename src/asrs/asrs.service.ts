@@ -3,16 +3,10 @@ import { CreateAsrsDto } from './dto/create-asrs.dto';
 import { UpdateAsrsDto } from './dto/update-asrs.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Asrs } from './entities/asrs.entity';
-import { DataSource, Like, Repository, TypeORMError } from 'typeorm';
-import { ResponseDto } from '../lib/dto/response.dto';
+import { Like, Repository } from 'typeorm';
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
-import { Awb } from '../awb/entities/awb.entity';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
-import { print } from '../lib/util/consolelog.convert';
-import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
-import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
-import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 
 @Injectable()
 export class AsrsService {
@@ -69,26 +63,31 @@ export class AsrsService {
     const parentInfo = await this.asrsRepository.findOne({
       where: { id: updateAsrsDto.parent },
     });
-    if (!parentInfo)
+
+    if (updateAsrsDto.parent && !parentInfo)
       throw new NotFoundException('asrs의 부모 정보가 없습니다.');
 
     if (!myInfo) throw new NotFoundException('asrs의 정보가 없습니다.');
-    // 부모의 fullPath 찾기
+
+    // 부모 찾기
     const asrsFamily = await this.asrsRepository.find({
       where: { fullPath: Like(`%${myInfo.fullPath}%`) },
     });
 
     // 각 패밀리들의 업데이트 정보 세팅하기
-    const newFamilyList = [];
+    const newFamilyList: UpdateAsrsDto[] = [];
 
     const newLevel = parentInfo ? parentInfo.level + 1 : 0;
-    const parentFullPath = parentInfo ? parentInfo.fullPath : '';
+    const parentId = parentInfo ? parentInfo.id : 0;
+    const parentFullPath = parentInfo
+      ? parentInfo.fullPath
+      : updateAsrsDto.fullPath || '';
 
     // 부모의 fullPath 조회 함수
     const getParentFullPath = (parent: number): string => {
-      const foundElement = newFamilyList.find(
-        (element) => element.id === parent,
-      );
+      const foundElement = newFamilyList.find((element) => {
+        if (element && element.id) return element.id === parent;
+      });
       return foundElement ? foundElement.fullPath || '' : '';
     };
 
@@ -96,7 +95,7 @@ export class AsrsService {
     for (let i = 0; i < asrsFamily.length; i += 1) {
       // (주의!)나의 정보인경우(familyList[i].id === myInfo.id)의 세팅값과 (나를 제외한)패밀리의 세팅값이 다르다.
       const parent =
-        asrsFamily[i].id === myInfo.id ? parentInfo.id : asrsFamily[i].parent;
+        asrsFamily[i].id === myInfo.id ? parentId : asrsFamily[i].parent;
       const level =
         asrsFamily[i].id === myInfo.id
           ? newLevel
@@ -127,7 +126,6 @@ export class AsrsService {
     }
 
     return this.asrsRepository.save(newFamilyList);
-    // return this.asrsRepository.update(id, updateAsrsDto);
   }
 
   remove(id: number) {

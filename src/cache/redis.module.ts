@@ -10,9 +10,9 @@ console.log(process.env.REDIS_HOST, process.env.REDIS_PORT);
 const cacheModule = CacheModule.register({
   useFactory: async () => ({
     store: redisStore,
-    host: process.env.REDIS_HOST, // env에서 정의함
-    port: process.env.REDIS_PORT, // env에서 정의함
-    ttl: 1000, // 캐시 유지 시간
+    host: 'localhost', // env에서 정의함
+    port: 6379, // env에서 정의함
+    ttl: 900000, // 캐시 유지 시간
   }),
 });
 

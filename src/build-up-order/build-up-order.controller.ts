@@ -11,7 +11,8 @@ import {
 import { BuildUpOrderService } from './build-up-order.service';
 import { CreateBuildUpOrderDto } from './dto/create-build-up-order.dto';
 import { UpdateBuildUpOrderDto } from './dto/update-build-up-order.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateAwbDto } from '../awb/dto/create-awb.dto';
 
 @Controller('build-up-order')
 @ApiTags('build-up-order(작업자 작업지시)')
@@ -27,6 +28,7 @@ export class BuildUpOrderController {
   @ApiOperation({
     summary: '패키지 시뮬레이터의 결과를 저장하기 위한 컨트롤러',
   })
+  @ApiBody({ type: [CreateBuildUpOrderDto] })
   @Post()
   createList(@Body() createBuildUpOrderDto: CreateBuildUpOrderDto[]) {
     return this.inspectWorkOrderService.createList(createBuildUpOrderDto);

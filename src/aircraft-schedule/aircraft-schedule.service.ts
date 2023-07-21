@@ -26,12 +26,12 @@ export class AircraftScheduleService {
   }
 
   async findAll(
-    source: string,
-    createdAtFrom: Date,
-    createdAtTo: Date,
-    order: string,
-    limit: number,
-    offset: number,
+    source?: string,
+    createdAtFrom?: Date,
+    createdAtTo?: Date,
+    order?: string,
+    limit?: number,
+    offset?: number,
   ) {
     let findDate: FindOperator<Date>;
     if (createdAtFrom && createdAtTo) {
