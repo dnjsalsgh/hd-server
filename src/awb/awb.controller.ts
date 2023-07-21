@@ -31,7 +31,7 @@ export class AwbController {
   @Post('/break-down/:parent')
   breakDown(
     @Param('parent') parent: string,
-    @Body() createAwbDtoArray: Array<CreateAwbDto>,
+    @Body() createAwbDtoArray: CreateAwbDto[],
   ) {
     return this.awbService.breakDown(parent, createAwbDtoArray);
   }

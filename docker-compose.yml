@@ -1,0 +1,25 @@
+version: '3.9'  # Docker Compose 버전 (필요에 따라 변경 가능)
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: my_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASS}
+      POSTGRES_DB: ${DATABASE_NAME}
+
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: my_mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+
+  redis:
+    image: redis:latest
+    container_name: my_redis
+    ports:
+      - "6379:6379"
