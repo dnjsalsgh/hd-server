@@ -21,6 +21,19 @@ async function bootstrap() {
       options: { url: 'mqtt://localhost:1883' },
     },
   );
+
+  // 3. redis서버로 사용
+  const redisApp = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.REDIS,
+      options: {
+        host: 'localhost',
+        port: 6379,
+      },
+    },
+  );
+
   app.useGlobalPipes(new ValidationPipe()); // class validator 처리
   app.useGlobalFilters(new HttpExceptionFilter()); // Http 에러 처리
   app.useGlobalFilters(new TypeOrmExceptionFilter()); // Typeorm 에러 처리
@@ -42,6 +55,7 @@ async function bootstrap() {
   // cors 설정
   app.enableCors();
   await mqttApp.listen();
+  await redisApp.listen();
   await app.listen(port);
 
   // 핫 리로딩 적용

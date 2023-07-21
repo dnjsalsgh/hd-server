@@ -51,10 +51,11 @@ import { AircraftSchedule } from './aircraft-schedule/entities/aircraft-schedule
 import { CommonCode } from './common-code/entities/common-code.entity';
 import { AwbGroup } from './awb-group/entities/awb-group.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { MqttModule } from '../src/mqtt.module';
-import { BuildUpOrder } from '../src/build-up-order/entities/build-up-order.entity';
-import { SkidPlatform } from '../src/skid-platform/entities/skid-platform.entity';
-import { SkidPlatformHistory } from '../src/skid-platform-history/entities/skid-platform-history.entity';
+import { MqttModule } from './mqtt.module';
+import { BuildUpOrder } from './build-up-order/entities/build-up-order.entity';
+import { SkidPlatform } from './skid-platform/entities/skid-platform.entity';
+import { SkidPlatformHistory } from './skid-platform-history/entities/skid-platform-history.entity';
+import { RedisCacheModule } from './cache/redis.module';
 
 @Module({
   imports: [
@@ -137,6 +138,9 @@ import { SkidPlatformHistory } from '../src/skid-platform-history/entities/skid-
     AwbGroupModule,
     // mqtt 모듈설정
     MqttModule,
+
+    // redis 모듈설정
+    RedisCacheModule,
   ],
   controllers: [AppController],
   providers: [AppService],
