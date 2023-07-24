@@ -58,6 +58,30 @@ export class AwbController {
   }
 
   @ApiOperation({
+    summary: '모델링 완료 신호를 받으면 awb에 model파일 경로 결합해주기',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @Put('modeling-complete/:id/')
+  @UseInterceptors(FileInterceptor('file'))
+  modelingComplete(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.awbService.modelingComplete(id, file);
+  }
+
+  @ApiOperation({
     summary: '화물의 상태를 변경하기 위함',
     description:
       '예약미입고(saved): vms에 들어가지 않고 화물만 등록되있는 상태 입니다.\n' +

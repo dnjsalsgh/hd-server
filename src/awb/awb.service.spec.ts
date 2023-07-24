@@ -20,6 +20,9 @@ import {
   Transport,
 } from '@nestjs/microservices';
 import { take } from 'rxjs';
+import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
+import { Asrs } from '../asrs/entities/asrs.entity';
+import { AsrsModule } from '../asrs/asrs.module';
 
 const clients = ClientsModule.register([
   {
@@ -35,6 +38,7 @@ const clients = ClientsModule.register([
 describe('AwbService', () => {
   let awbService: AwbService;
   let awbRepository: Repository<Awb>;
+  let asrsRepository: Repository<Asrs>;
   let awbJoinRepository: Repository<AwbSccJoin>;
   let app: INestApplication;
   let datasource: DataSource;
@@ -42,7 +46,7 @@ describe('AwbService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [setTypeOrmForTest, AwbModule, clients],
+      imports: [setTypeOrmForTest, AwbModule, AsrsModule, clients],
     }).compile();
 
     app = module.createNestApplication();
@@ -57,6 +61,7 @@ describe('AwbService', () => {
     });
     awbRepository = module.get('AwbRepository');
     awbJoinRepository = module.get('AwbSccJoinRepository');
+    asrsRepository = module.get('AsrsRepository');
     datasource = new DataSource(setDataSourceForTest);
     awbService = new AwbService(awbRepository, awbJoinRepository, datasource);
   });
@@ -112,6 +117,7 @@ describe('AwbService', () => {
   it('VMS 데이터 수집 및 처리', async () => {
     // 1. mqtt로 vms가 들어왔다고 가정합니다.
     // 2. scc정보가 같이 들어왔다고 가정합니다.
+
     const awbBodyTest: Partial<CreateAwbDto> = {
       name: '화물-001',
       prefab: '3d Model Name',
@@ -152,6 +158,19 @@ describe('AwbService', () => {
 
     // 3. awb db에 저장합니다.
     await awbRepository.save(awbBodyTest);
+
+    // 단위 테스트용 창고(asrs)를 생성합니다.
+    const asrsBodyTest: Partial<CreateAsrsDto> = {
+      name: 'test',
+      parent: 0,
+      level: 0,
+      orderby: 0,
+      x: 0,
+      y: 0,
+      z: 0,
+      simulation: true,
+    };
+    await asrsRepository.save(asrsBodyTest);
 
     // 4. 모델링 완료 신호를 받았다고 가정합니다.
     // 최신 awb의 정보를 가져와서 모델링파일을 연결합니다.

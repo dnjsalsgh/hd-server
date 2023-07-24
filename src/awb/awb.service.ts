@@ -13,7 +13,7 @@ import { Scc } from '../scc/entities/scc.entity';
 export class AwbService {
   constructor(
     @InjectRepository(Awb)
-    private readonly cargoRepository: Repository<Awb>,
+    private readonly awbRepository: Repository<Awb>,
     @InjectRepository(AwbSccJoin)
     private readonly cargoSccJoinRepository: Repository<AwbSccJoin>,
     private dataSource: DataSource,
@@ -49,28 +49,28 @@ export class AwbService {
   }
 
   findAll() {
-    return this.cargoRepository.find();
+    return this.awbRepository.find();
   }
 
   findFamily(id: number) {
-    return this.cargoRepository.find({ where: [{ id: id }, { parent: id }] });
+    return this.awbRepository.find({ where: [{ id: id }, { parent: id }] });
   }
 
   findOne(id: number) {
-    return this.cargoRepository.find({ where: { id: id } });
+    return this.awbRepository.find({ where: { id: id } });
   }
 
   update(id: number, updateCargoDto: UpdateAwbDto) {
-    return this.cargoRepository.update(id, updateCargoDto);
+    return this.awbRepository.update(id, updateCargoDto);
   }
 
   updateState(id: number, state: string, updateCargoDto?: UpdateAwbDto) {
     if (state) updateCargoDto.state = state;
-    return this.cargoRepository.update(id, updateCargoDto);
+    return this.awbRepository.update(id, updateCargoDto);
   }
 
   async breakDown(parentName: string, createCargoDtoArray: CreateAwbDto[]) {
-    const parentCargo = await this.cargoRepository.findOne({
+    const parentCargo = await this.awbRepository.findOne({
       where: { name: parentName },
     });
     // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
@@ -119,6 +119,11 @@ export class AwbService {
   }
 
   remove(id: number) {
-    return this.cargoRepository.delete(id);
+    return this.awbRepository.delete(id);
+  }
+
+  async modelingComplete(id: number, file: Express.Multer.File) {
+    // parameter에 있는 awb 정보에 모델링파일을 연결합니다.
+    await this.awbRepository.update(id, { path: file.path });
   }
 }

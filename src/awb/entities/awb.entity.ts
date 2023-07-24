@@ -128,10 +128,19 @@ export class Awb {
 
   @ApiProperty({
     example: 'saved',
-    description: '상태',
+    description:
+      '상태(예약미입고, 입고중, 창고대기, 불출예정, 이동중, uld 작업장 대기, ULD작업',
   })
   @IsString()
-  @IsEnum(['saved', 'invms', 'inasrs', 'inskid', 'inuld'])
+  @IsEnum([
+    'saved',
+    'invms',
+    'inasrs',
+    'register',
+    'outasrs',
+    'inskidplatform',
+    'inuld',
+  ])
   @Column({ type: 'varchar', length: 50, nullable: true })
   state: string;
 
