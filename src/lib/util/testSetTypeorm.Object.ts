@@ -97,6 +97,6 @@ export const setDataSourceForTest: DataSourceOptions = {
   username: 'postgres',
   password: '1234',
   port: 5432,
-  logging: false,
+  logging: true,
   synchronize: true,
 };

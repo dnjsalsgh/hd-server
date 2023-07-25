@@ -63,7 +63,7 @@ describe('AwbService', () => {
     awbJoinRepository = module.get('AwbSccJoinRepository');
     asrsRepository = module.get('AsrsRepository');
     datasource = new DataSource(setDataSourceForTest);
-    awbService = new AwbService(awbRepository, awbJoinRepository, datasource);
+    awbService = new AwbService(awbRepository, datasource);
   });
 
   it('should be defined', () => {

@@ -63,7 +63,7 @@ export class SimulatorResult {
   })
   @IsNotEmpty()
   @ManyToOne(() => Uld, (uld) => uld.simulatorResult, { nullable: false })
-  Uld: Relation<Uld>;
+  Uld: Relation<Uld> | number;
 
   @OneToMany(
     () => SimulatorResultAwbJoin,

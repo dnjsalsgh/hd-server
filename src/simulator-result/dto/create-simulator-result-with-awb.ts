@@ -16,7 +16,7 @@ export class CreateSimulatorResultWithAwbAndHistoryDto extends PickType(
     ],
     description: '시뮬레이션에 활용된 화물',
   })
-  AwbWithXYZ: [{ Awb: Awb; x: number; y: number; z: number }];
+  AwbWithXYZ: { Awb: Awb | number; x: number; y: number; z: number }[];
   //
   // @ApiProperty({
   //   example: 1.0,
