@@ -59,7 +59,7 @@ export const setTypeOrmForTest = TypeOrmModule.forRoot({
   username: 'postgres',
   password: '1234',
   port: 5432,
-  logging: false,
+  logging: true,
   synchronize: true,
   namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
 });

@@ -31,7 +31,6 @@ export class CreateAwbDto extends PickType(Awb, [
   'rmComment',
   'localTime',
   'localInTerminal',
-  'createdAt',
 ]) {
   @ApiProperty({
     example:
