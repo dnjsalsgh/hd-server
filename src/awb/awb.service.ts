@@ -14,8 +14,8 @@ export class AwbService {
   constructor(
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-    @InjectRepository(AwbSccJoin)
-    private readonly cargoSccJoinRepository: Repository<AwbSccJoin>,
+    // @InjectRepository(AwbSccJoin)
+    // private readonly awbSccJoinRepository: Repository<AwbSccJoin>,
     private dataSource: DataSource,
   ) {}
 
@@ -82,7 +82,7 @@ export class AwbService {
       throw new HttpException('상위 화물 정보가 잘못되었습니다.', 400);
     }
 
-    const queryRunner = await this.dataSource.createQueryRunner();
+    const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
@@ -104,7 +104,7 @@ export class AwbService {
         await queryRunner.manager.getRepository(AwbSccJoin).save(joinParams);
       }
 
-      // 2-3. 부모 화물 breakDown:True로 상태 변경
+      // 2-3. 부모 화물 breakDown: True로 상태 변경
       await queryRunner.manager
         .getRepository(Awb)
         .update({ name: parentName }, { breakDown: true });

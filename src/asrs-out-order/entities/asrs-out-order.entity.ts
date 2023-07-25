@@ -24,7 +24,7 @@ export class AsrsOutOrder {
     example: 1,
     description: '불출서열',
   })
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   order: number;
 
   @CreateDateColumn()
@@ -41,7 +41,7 @@ export class AsrsOutOrder {
     description: '자동창고FK',
     type: () => Asrs,
   })
-  @ManyToOne(() => Asrs, (asrs) => asrs.asrsOutOrders)
+  @ManyToOne(() => Asrs, (asrs) => asrs.asrsOutOrders, { nullable: false })
   Asrs: Relation<Asrs> | number;
 
   @ApiProperty({
@@ -49,15 +49,17 @@ export class AsrsOutOrder {
     description: '안착대FK',
     type: () => SkidPlatform,
   })
-  @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.asrsOutOrders)
-  SkidPlatform: Relation<SkidPlatform> | number;
+  @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.asrsOutOrders, {
+    nullable: true,
+  })
+  SkidPlatform: Relation<SkidPlatform> | number; // 어떤 안착대로 가는지 정해지지 않았기 때문에 null 허용
 
   @ApiProperty({
     example: 1,
     description: '화물FK',
     type: () => Awb,
   })
-  @ManyToOne(() => Awb, (awb) => awb.asrsOutOrders)
+  @ManyToOne(() => Awb, (awb) => awb.asrsOutOrders, { nullable: false })
   Awb: Relation<Awb> | number;
 
   @OneToMany(
