@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Column } from 'typeorm';
 
 export class AmrRawDto {
   @ApiProperty({
@@ -286,4 +287,10 @@ export class AmrRawDto {
     description: '충전기의 X좌표',
   })
   public ChargeZ: number;
+
+  @ApiProperty({
+    example: '인입용',
+    description: '인입용, 인출용 구분',
+  })
+  distinguish: string;
 }

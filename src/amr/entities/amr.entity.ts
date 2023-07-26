@@ -136,7 +136,7 @@ export class Amr {
     description: '인입용, 인출용 구분',
   })
   @Column({ nullable: true })
-  distinguish: Date;
+  distinguish: string;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -63,6 +63,7 @@ export class AmrService {
       // lastBatteryLevel: body.LastBatteryLevel,
       simulation: true,
       logDT: new Date(body.LogDT),
+      distinguish: body.distinguish,
     };
 
     // 충전중 판단을 위한 findOne
@@ -173,6 +174,25 @@ export class AmrService {
   }
 
   findAll(
+    name?: string,
+    charging?: boolean,
+    prcsCD?: string,
+    ACSMode?: boolean,
+    mode?: number,
+    errorLevel?: number,
+    errorCode?: string,
+    startTimeFrom?: Date,
+    startTimeTo?: Date,
+    endTimeFrom?: Date,
+    endTimeTo?: Date,
+    travelDist?: number,
+    oprTime?: Date,
+    stopTime?: Date,
+    startBatteryLevel?: number,
+    lastBatteryLevel?: number,
+    simulation?: boolean,
+    logDT?: Date,
+    distinguish?: string,
     createdAtFrom?: Date,
     createdAtTo?: Date,
     order?: string,
@@ -188,8 +208,43 @@ export class AmrService {
       findDate = LessThanOrEqual(createdAtTo);
     }
 
+    let findStartDate: FindOperator<Date>;
+    if (startTimeFrom && startTimeTo) {
+      findStartDate = Between(startTimeFrom, startTimeTo);
+    } else if (startTimeFrom) {
+      findStartDate = MoreThanOrEqual(startTimeFrom);
+    } else if (startTimeTo) {
+      findStartDate = LessThanOrEqual(startTimeTo);
+    }
+
+    let findEndDate: FindOperator<Date>;
+    if (endTimeFrom && endTimeTo) {
+      findEndDate = Between(endTimeFrom, endTimeTo);
+    } else if (endTimeFrom) {
+      findEndDate = MoreThanOrEqual(endTimeFrom);
+    } else if (endTimeTo) {
+      findEndDate = LessThanOrEqual(endTimeTo);
+    }
+
     return this.amrRepository.find({
       where: {
+        name: name,
+        charging: charging,
+        prcsCD: prcsCD,
+        ACSMode: ACSMode,
+        mode: mode,
+        errorLevel: errorLevel,
+        errorCode: errorCode,
+        startTime: findStartDate,
+        endTime: findEndDate,
+        travelDist: travelDist,
+        oprTime: oprTime,
+        stopTime: stopTime,
+        startBatteryLevel: startBatteryLevel,
+        lastBatteryLevel: lastBatteryLevel,
+        simulation: simulation,
+        logDT: logDT,
+        distinguish: distinguish,
         createdAt: findDate,
       },
       order: getOrderBy(order),

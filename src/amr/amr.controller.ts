@@ -34,6 +34,25 @@ export class AmrController {
     return this.amrService.createAmrByData(body);
   }
 
+  @ApiQuery({ name: 'name', required: false, type: 'string' })
+  @ApiQuery({ name: 'charging', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'prcsCD', required: false, type: 'string' })
+  @ApiQuery({ name: 'ACSMode', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'mode', required: false, type: 'number' })
+  @ApiQuery({ name: 'errorLevel', required: false, type: 'number' })
+  @ApiQuery({ name: 'errorCode', required: false, type: 'string' })
+  @ApiQuery({ name: 'startTimeFrom', required: false, type: 'Date' })
+  @ApiQuery({ name: 'startTimeTo', required: false, type: 'Date' })
+  @ApiQuery({ name: 'endTimeFrom', required: false, type: 'Date' })
+  @ApiQuery({ name: 'endTimeTo', required: false, type: 'Date' })
+  @ApiQuery({ name: 'travelDist', required: false, type: 'number' })
+  @ApiQuery({ name: 'oprTime', required: false, type: 'Date' })
+  @ApiQuery({ name: 'stopTime', required: false, type: 'Date' })
+  @ApiQuery({ name: 'startBatteryLevel', required: false, type: 'number' })
+  @ApiQuery({ name: 'lastBatteryLevel', required: false, type: 'number' })
+  @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'logDT', required: false, type: 'Date' })
+  @ApiQuery({ name: 'distinguish', required: false, type: 'string' })
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })
   @ApiQuery({ name: 'order', required: false })
@@ -41,6 +60,25 @@ export class AmrController {
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
   findAll(
+    @Query('name') name?: string,
+    @Query('charging') charging?: boolean,
+    @Query('prcsCD') prcsCD?: string,
+    @Query('ACSMode') ACSMode?: boolean,
+    @Query('mode') mode?: number,
+    @Query('errorLevel') errorLevel?: number,
+    @Query('errorCode') errorCode?: string,
+    @Query('startTimeFrom') startTimeFrom?: Date,
+    @Query('startTimeTo') startTimeTo?: Date,
+    @Query('endTimeFrom') endTimeFrom?: Date,
+    @Query('endTimeTo') endTimeTo?: Date,
+    @Query('travelDist') travelDist?: number,
+    @Query('oprTime') oprTime?: Date,
+    @Query('stopTime') stopTime?: Date,
+    @Query('startBatteryLevel') startBatteryLevel?: number,
+    @Query('lastBatteryLevel') lastBatteryLevel?: number,
+    @Query('simulation') simulation?: boolean,
+    @Query('logDT') logDT?: Date,
+    @Query('distinguish') distinguish?: string,
     @Query('createdAtFrom') createdAtFrom?: Date,
     @Query('createdAtTo') createdAtTo?: Date,
     @Query('order') order?: string,
@@ -48,6 +86,25 @@ export class AmrController {
     @Query('offset') offset?: number,
   ) {
     return this.amrService.findAll(
+      name,
+      charging,
+      prcsCD,
+      ACSMode,
+      mode,
+      errorLevel,
+      errorCode,
+      startTimeFrom,
+      startTimeTo,
+      endTimeFrom,
+      endTimeTo,
+      travelDist,
+      oprTime,
+      stopTime,
+      startBatteryLevel,
+      lastBatteryLevel,
+      simulation,
+      logDT,
+      distinguish,
       createdAtFrom,
       createdAtTo,
       order,

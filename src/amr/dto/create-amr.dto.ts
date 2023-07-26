@@ -19,6 +19,7 @@ export class CreateAmrDto extends PickType(Amr, [
   'lastBatteryLevel',
   'simulation',
   'logDT',
+  'distinguish',
 ]) {
   // @ApiProperty({
   //   example: '충전기이름',
