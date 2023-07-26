@@ -52,6 +52,18 @@ export class Scc {
   @Column({ type: 'varchar', length: 500, nullable: true })
   path: string;
 
+  // [23-07-26] scc의 선적 불가능List를 db에 저장하는 요청으로 인해 만든 column
+  @ApiProperty({
+    example: ['RRY', 'AVI'],
+    description: 'scc 금지 목록',
+  })
+  @Column({
+    type: 'simple-array', // 배열 타입으로 선언
+    nullable: true, // null 허용 여부 (선택 사항)
+    default: [], // 기본값 (선택 사항)
+  })
+  notTogetherList: string[];
+
   @CreateDateColumn()
   createdAt: Date;
 
