@@ -6,11 +6,12 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { AmrService } from './amr.service';
 import { CreateAmrDto } from './dto/create-amr.dto';
 import { UpdateAmrDto } from './dto/update-amr.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AmrRawDto } from './dto/amr-raw.dto';
 
 @Controller('amr')
@@ -33,9 +34,26 @@ export class AmrController {
     return this.amrService.createAmrByData(body);
   }
 
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.amrService.findAll();
+  findAll(
+    @Query('createdAtFrom') createdAtFrom?: Date,
+    @Query('createdAtTo') createdAtTo?: Date,
+    @Query('order') order?: string,
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number,
+  ) {
+    return this.amrService.findAll(
+      createdAtFrom,
+      createdAtTo,
+      order,
+      limit,
+      offset,
+    );
   }
 
   @Get(':id')

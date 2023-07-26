@@ -3,7 +3,16 @@ import { CreateAmrDto } from './dto/create-amr.dto';
 import { UpdateAmrDto } from './dto/update-amr.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Amr } from './entities/amr.entity';
-import { DataSource, Repository, TypeORMError } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  FindOperator,
+  ILike,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+  TypeORMError,
+} from 'typeorm';
 import { AmrRawDto } from './dto/amr-raw.dto';
 import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-history.entity';
@@ -13,6 +22,7 @@ import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
 import { TimeTable } from '../time-table/entities/time-table.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class AmrService {
@@ -162,8 +172,30 @@ export class AmrService {
     }
   }
 
-  findAll() {
-    return this.amrRepository.find();
+  findAll(
+    createdAtFrom?: Date,
+    createdAtTo?: Date,
+    order?: string,
+    limit?: number,
+    offset?: number,
+  ) {
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+
+    return this.amrRepository.find({
+      where: {
+        createdAt: findDate,
+      },
+      order: getOrderBy(order),
+      take: limit,
+      skip: offset,
+    });
   }
 
   findOne(id: number) {

@@ -13,6 +13,7 @@ import {
 } from 'typeorm';
 import { AircraftAttribute } from '../aircraft/entities/aircraft.entity';
 import { CcIdDestinationAttribute } from '../common-code/entities/common-code.entity';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class AircraftScheduleService {
@@ -59,9 +60,7 @@ export class AircraftScheduleService {
         source: source ? ILike(`%${source}%`) : null,
         createdAt: findDate,
       },
-      order: {
-        id: 'desc',
-      },
+      order: getOrderBy(order),
       take: limit, // limit
       skip: offset, // offset
       cache: 60000, // 1 minute caching
