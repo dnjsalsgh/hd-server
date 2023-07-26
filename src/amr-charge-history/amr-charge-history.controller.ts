@@ -12,7 +12,6 @@ import { AmrChargeHistoryService } from './amr-charge-history.service';
 import { CreateAmrChargeHistoryDto } from './dto/create-amr-charge-history.dto';
 import { UpdateAmrChargeHistoryDto } from './dto/update-amr-charge-history.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { QueryParam } from '../lib/dto/query.param';
 import { AmrChargeHistory } from './entities/amr-charge-history.entity';
 
