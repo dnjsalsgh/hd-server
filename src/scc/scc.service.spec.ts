@@ -52,7 +52,7 @@ describe('SccService', () => {
     expect(result).toEqual(undefined); // 진짜 에러 발생했넴
   });
 
-  it('should create scc', async () => {
+  it('should create Scc', async () => {
     sccRepository.save.mockResolvedValue(mockCreateSccDto); // 성공할꺼라고 가정
     const result = await service.create(mockCreateSccDto);
 

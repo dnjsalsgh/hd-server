@@ -70,7 +70,7 @@ describe('AwbService', () => {
     expect(awbService).toBeDefined();
   });
 
-  it('awb 테스트 데이터 넣기', async () => {
+  it('Awb 테스트 데이터 넣기', async () => {
     const awbTestData: Partial<CreateAwbDto> = {
       name: '화물-001',
       prefab: '3d Model Name',
@@ -101,7 +101,7 @@ describe('AwbService', () => {
       localTime: new Date(),
       localInTerminal: 'AIR-001',
       scc: {
-        code: 'scc-001',
+        code: 'Scc-001',
         name: '드라이아이스',
         score: 1,
         description: '',
@@ -148,7 +148,7 @@ describe('AwbService', () => {
       localTime: new Date(),
       localInTerminal: 'AIR-001',
       scc: {
-        code: 'scc-001',
+        code: 'Scc-001',
         name: '드라이아이스',
         score: 1,
         description: '',
@@ -156,7 +156,7 @@ describe('AwbService', () => {
       },
     };
 
-    // 3. awb db에 저장합니다.
+    // 3. Awb db에 저장합니다.
     await awbRepository.save(awbBodyTest);
 
     // 단위 테스트용 창고(asrs)를 생성합니다.

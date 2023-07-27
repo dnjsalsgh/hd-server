@@ -124,7 +124,7 @@ describe('BuildUpOrderService', () => {
       localTime: new Date(),
       localInTerminal: 'AIR-001',
       scc: {
-        code: 'scc-001',
+        code: 'Scc-001',
         name: '드라이아이스',
         score: 1,
         description: '',
@@ -167,7 +167,7 @@ describe('BuildUpOrderService', () => {
         localTime: new Date(),
         localInTerminal: 'AIR-001',
         scc: {
-          code: 'scc-001',
+          code: 'Scc-001',
           name: '드라이아이스',
           score: 1,
           description: '',
@@ -204,7 +204,7 @@ describe('BuildUpOrderService', () => {
         localTime: new Date(),
         localInTerminal: 'AIR-001',
         scc: {
-          code: 'scc-001',
+          code: 'Scc-001',
           name: '드라이아이스',
           score: 1,
           description: '',
@@ -275,7 +275,7 @@ describe('BuildUpOrderService', () => {
       },
     ];
 
-    // 등록된 awb, buildUpOrder는 삭제하지 않기 위해서 uld의 이력을 가져옵니다.
+    // 등록된 Awb, buildUpOrder는 삭제하지 않기 위해서 uld의 이력을 가져옵니다.
     const uldHistoryResult = await uldHistoryRepository.find({
       where: { Uld: buildUpOrderBodyArray[0].Uld },
       relations: {

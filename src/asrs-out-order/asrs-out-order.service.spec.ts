@@ -106,7 +106,7 @@ describe('AsrsOutOrderService', () => {
       localTime: new Date(),
       localInTerminal: 'AIR-001',
       scc: {
-        code: 'scc-001',
+        code: 'Scc-001',
         name: '드라이아이스',
         score: 1,
         description: '',
@@ -135,7 +135,7 @@ describe('AsrsOutOrderService', () => {
       order: { id: 'desc' },
       take: 1,
     });
-    // 최상위 awb 데이터 가져오기
+    // 최상위 Awb 데이터 가져오기
     const lastestAwb = await awbRepository.find({
       order: { id: 'desc' },
       take: 1,

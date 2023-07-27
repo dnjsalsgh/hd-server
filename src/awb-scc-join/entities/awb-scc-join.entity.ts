@@ -32,7 +32,7 @@ export class AwbSccJoin {
     type: () => Awb,
   })
   @ManyToOne(() => Awb, (awb) => awb.awbSccJoin)
-  awb: Relation<Awb>;
+  Awb: Relation<Awb> | number;
 
   @ApiProperty({
     example: 1,
@@ -40,5 +40,5 @@ export class AwbSccJoin {
     type: () => Scc,
   })
   @ManyToOne(() => Scc, (scc) => scc.awbSccJoin)
-  scc: Relation<Scc>;
+  Scc: Relation<Scc> | number;
 }

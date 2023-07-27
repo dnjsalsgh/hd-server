@@ -36,7 +36,7 @@ export class BuildUpOrderService {
   }
 
   async createList(createBuildUpOrderDto: CreateBuildUpOrderDto[]) {
-    // 등록된 awb, buildUpOrder는 삭제하지 않기 위해서 uld의 이력을 가져옵니다.
+    // 등록된 Awb, buildUpOrder는 삭제하지 않기 위해서 uld의 이력을 가져옵니다.
     const uldHistoryResult = await this.uldHistoryRepository.find({
       where: { Uld: createBuildUpOrderDto[0].Uld },
       relations: { Uld: true, Awb: true, BuildUpOrder: true },

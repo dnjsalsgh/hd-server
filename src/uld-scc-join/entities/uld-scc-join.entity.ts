@@ -33,7 +33,7 @@ export class UldSccJoin {
 
   @ApiProperty({
     example: 1,
-    description: 'scc FK',
+    description: 'Scc FK',
     type: () => Scc,
   })
   @ManyToOne(() => Scc, (scc) => scc.uldSccJoin)

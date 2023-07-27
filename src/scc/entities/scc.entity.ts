@@ -17,14 +17,14 @@ export class Scc {
   id: number;
 
   @ApiProperty({
-    example: 'scc-001',
+    example: 'Scc-001',
     description: 'scc의 고유코드',
   })
   @Column({ type: 'varchar', length: 50, nullable: true })
   code: string;
 
   @ApiProperty({
-    example: 'scc-001',
+    example: 'Scc-001',
     description: 'scc의 이름',
   })
   @Column({ type: 'varchar', length: 50, nullable: true })
@@ -55,7 +55,7 @@ export class Scc {
   // [23-07-26] scc의 선적 불가능List를 db에 저장하는 요청으로 인해 만든 column
   @ApiProperty({
     example: ['RRY', 'AVI'],
-    description: 'scc 금지 목록',
+    description: 'Scc 금지 목록',
   })
   @Column({
     type: 'simple-array', // 배열 타입으로 선언
@@ -73,9 +73,20 @@ export class Scc {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => AwbSccJoin, (cargoSccJoin) => cargoSccJoin.scc)
+  @OneToMany(() => AwbSccJoin, (cargoSccJoin) => cargoSccJoin.Scc)
   awbSccJoin: AwbSccJoin[];
 
   @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.scc)
   uldSccJoin: UldSccJoin[];
 }
+
+export const SccAttribute = {
+  id: true,
+  code: true,
+  name: true,
+  score: true,
+  description: true,
+  path: true,
+  notTogetherList: true,
+  createdAt: true,
+};

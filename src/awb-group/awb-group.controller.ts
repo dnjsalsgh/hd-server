@@ -15,8 +15,8 @@ import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { AwbGroup } from './entities/awb-group.entity';
 
-@Controller('awb-group')
-@ApiTags('awb-group')
+@Controller('Awb-group')
+@ApiTags('Awb-group')
 export class AwbGroupController {
   constructor(private readonly awbGroupService: AwbGroupService) {}
 

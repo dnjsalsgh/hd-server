@@ -42,8 +42,8 @@ export class AwbService {
       const sccResult = await queryRunner.manager.getRepository(Scc).save(scc);
 
       const joinParams: CreateAwbSccJoinDto = {
-        scc: sccResult.id,
-        cargo: result,
+        Scc: sccResult.id,
+        Awb: result,
       };
       await queryRunner.manager.getRepository(AwbSccJoin).save(joinParams);
 
@@ -123,7 +123,7 @@ export class AwbService {
     return this.awbRepository.update(id, updateCargoDto);
   }
 
-  async breakDown(parentName: string, createCargoDtoArray: CreateAwbDto[]) {
+  async breakDown(parentName: string, createAwbDtos: CreateAwbDto[]) {
     const parentCargo = await this.awbRepository.findOne({
       where: { name: parentName },
     });
@@ -141,20 +141,20 @@ export class AwbService {
     await queryRunner.startTransaction();
     try {
       // 2. 해포된 화물들 등록
-      for (let i = 0; i < createCargoDtoArray.length; i++) {
+      for (let i = 0; i < createAwbDtos.length; i++) {
         // 2-1. 하위 화물 등록
-        const subCargo = createCargoDtoArray[i];
-        subCargo.parent = parentCargo.id;
+        const subAwb = createAwbDtos[i];
+        subAwb.parent = parentCargo.id;
 
         const result = await queryRunner.manager
           .getRepository(Awb)
-          .save(subCargo);
+          .save(subAwb);
 
         const joinParams: CreateAwbSccJoinDto = {
-          scc: createCargoDtoArray[i].scc,
-          cargo: result,
+          Scc: subAwb.scc as Scc, // 해포되는 화물의 scc를 저장하기 위함
+          Awb: result,
         };
-        // 2-2. scc join에 등록
+        // 2-2. Scc join에 등록
         await queryRunner.manager.getRepository(AwbSccJoin).save(joinParams);
       }
 
@@ -177,7 +177,7 @@ export class AwbService {
   }
 
   async modelingComplete(id: number, file: Express.Multer.File) {
-    // parameter에 있는 awb 정보에 모델링파일을 연결합니다.
+    // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
     await this.awbRepository.update(id, { path: file.path });
   }
 }

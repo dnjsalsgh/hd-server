@@ -34,7 +34,7 @@ export class CreateAwbDto extends PickType(Awb, [
 ]) {
   @ApiProperty({
     example:
-      '{"code": "scc-001",\n' +
+      '{"code": "Scc-001",\n' +
       '"name": "드라이아이스",\n' +
       '"score": "1",\n' +
       '"description": "",\n' +

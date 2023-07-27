@@ -7,30 +7,41 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { AwbSccJoinService } from './awb-scc-join.service';
 import { CreateAwbSccJoinDto } from './dto/create-awb-scc-join.dto';
 import { UpdateAwbSccJoinDto } from './dto/update-awb-scc-join.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { AwbSccJoin } from './entities/awb-scc-join.entity';
 
-@Controller('awb-scc-join')
-@ApiTags('awb-scc-join')
+@Controller('Awb-Scc-join')
+@ApiTags('Awb-Scc-join')
 export class AwbSccJoinController {
-  constructor(private readonly cargoSccJoinService: AwbSccJoinService) {}
+  constructor(private readonly awbSccJoinService: AwbSccJoinService) {}
 
   @Post()
-  create(@Body() createCargoSccJoinDto: CreateAwbSccJoinDto) {
-    return this.cargoSccJoinService.create(createCargoSccJoinDto);
+  create(@Body() createAwbSccJoinDto: CreateAwbSccJoinDto) {
+    return this.awbSccJoinService.create(createAwbSccJoinDto);
   }
 
+  @ApiQuery({ name: 'Scc', required: false, type: 'number' })
+  @ApiQuery({ name: 'Awb', required: false, type: 'number' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.cargoSccJoinService.findAll();
+  findAll(@Query() query: AwbSccJoin & BasicQueryParam) {
+    return this.awbSccJoinService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.cargoSccJoinService.findOne(+id);
+    return this.awbSccJoinService.findOne(+id);
   }
 
   @Put(':id')
@@ -38,11 +49,11 @@ export class AwbSccJoinController {
     @Param('id') id: string,
     @Body() updateCargoSccJoinDto: UpdateAwbSccJoinDto,
   ) {
-    return this.cargoSccJoinService.update(+id, updateCargoSccJoinDto);
+    return this.awbSccJoinService.update(+id, updateCargoSccJoinDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.cargoSccJoinService.remove(+id);
+    return this.awbSccJoinService.remove(+id);
   }
 }

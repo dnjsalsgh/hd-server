@@ -88,7 +88,7 @@ describe('SccController (e2e)', () => {
     expect(sccService).toBeDefined();
   });
 
-  it('scc 등록할 수 있는지 테스트', async () => {
+  it('Scc 등록할 수 있는지 테스트', async () => {
     const mockCreateSccDto: CreateSccDto = {
       code: '',
       name: '',
@@ -107,6 +107,6 @@ describe('SccController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await sccRepository.query('DELETE FROM scc');
+    await sccRepository.query('DELETE FROM Scc');
   });
 });
