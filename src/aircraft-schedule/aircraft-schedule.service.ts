@@ -57,7 +57,7 @@ export class AircraftScheduleService {
         },
       },
       where: {
-        source: source ? ILike(`%${source}%`) : null,
+        source: source ? ILike(`%${source}%`) : undefined,
         createdAt: findDate,
       },
       order: getOrderBy(order),

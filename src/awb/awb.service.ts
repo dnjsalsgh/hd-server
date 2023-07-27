@@ -2,11 +2,22 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, TypeORMError } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  FindOperator,
+  ILike,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+  TypeORMError,
+} from 'typeorm';
 import { Awb } from './entities/awb.entity';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { CreateAwbSccJoinDto } from '../awb-scc-join/dto/create-awb-scc-join.dto';
 import { Scc } from '../scc/entities/scc.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class AwbService {
@@ -45,8 +56,54 @@ export class AwbService {
     }
   }
 
-  findAll() {
-    return this.awbRepository.find();
+  findAll(query: Awb & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+
+    return this.awbRepository.find({
+      where: {
+        name: query.name ? ILike(`%${query.name}%`) : undefined,
+        prefab: query.prefab,
+        waterVolume: query.waterVolume,
+        squareVolume: query.squareVolume,
+        width: query.width,
+        length: query.length,
+        depth: query.depth,
+        weight: query.weight,
+        isStructure: query.isStructure,
+        barcode: query.barcode,
+        destination: query.destination,
+        source: query.source,
+        breakDown: query.breakDown,
+        piece: query.piece,
+        state: query.state,
+        parent: query.parent,
+        modelPath: query.modelPath,
+        dataCapacity: query.dataCapacity,
+        flight: query.flight,
+        from: query.from,
+        airportArrival: query.airportArrival,
+        path: query.path,
+        spawnRatio: query.spawnRatio,
+        description: query.description,
+        rmComment: query.rmComment,
+        localTime: query.localTime,
+        localInTerminal: query.localInTerminal,
+        simulation: query.simulation,
+        createdAt: findDate,
+      },
+      order: getOrderBy(query.order),
+      take: query.limit,
+      skip: query.offset,
+    });
   }
 
   findFamily(id: number) {

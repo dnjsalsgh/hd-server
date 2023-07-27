@@ -72,7 +72,7 @@ export class AsrsService {
     }
     return await this.asrsRepository.find({
       where: {
-        name: ILike(`%${query.name}%`),
+        name: query.name ? ILike(`%${query.name}%`) : undefined,
         simulation: query.simulation,
         createdAt: findDate,
       },

@@ -7,14 +7,23 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { AwbService } from './awb.service';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Awb } from './entities/awb.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
 @Controller('awb')
 @ApiTags('Awb(화물,vms)')
@@ -36,9 +45,42 @@ export class AwbController {
     return this.awbService.breakDown(parent, createAwbDtoArray);
   }
 
+  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'prefab', required: false, type: 'string' })
+  @ApiQuery({ name: 'waterVolume', required: false, type: 'number' })
+  @ApiQuery({ name: 'squareVolume', required: false, type: 'number' })
+  @ApiQuery({ name: 'width', required: false, type: 'number' })
+  @ApiQuery({ name: 'length', required: false, type: 'number' })
+  @ApiQuery({ name: 'depth', required: false, type: 'number' })
+  @ApiQuery({ name: 'weight', required: false, type: 'number' })
+  @ApiQuery({ name: 'isStructure', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'barcode', required: false, type: 'string' })
+  @ApiQuery({ name: 'destination', required: false, type: 'string' })
+  @ApiQuery({ name: 'source', required: false, type: 'string' })
+  @ApiQuery({ name: 'breakDown', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'piece', required: false, type: 'number' })
+  @ApiQuery({ name: 'state', required: false, type: 'string' })
+  @ApiQuery({ name: 'parent', required: false, type: 'number' })
+  @ApiQuery({ name: 'modelPath', required: false, type: 'string' })
+  @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'dataCapacity', required: false, type: 'number' })
+  @ApiQuery({ name: 'flight', required: false, type: 'string' })
+  @ApiQuery({ name: 'from', required: false, type: 'string' })
+  @ApiQuery({ name: 'airportArrival', required: false, type: 'string' })
+  @ApiQuery({ name: 'path', required: false, type: 'string' })
+  @ApiQuery({ name: 'spawnRatio', required: false, type: 'number' })
+  @ApiQuery({ name: 'description', required: false, type: 'string' })
+  @ApiQuery({ name: 'rmComment', required: false, type: 'string' })
+  @ApiQuery({ name: 'localTime', required: false, type: 'Date' })
+  @ApiQuery({ name: 'localInTerminal', required: false, type: 'string' })
+  @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.awbService.findAll();
+  findAll(@Query() query: Awb & BasicQueryParam) {
+    return this.awbService.findAll(query);
   }
 
   @ApiOperation({ summary: '해포화물 검색' })
