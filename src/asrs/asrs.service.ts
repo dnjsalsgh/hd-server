@@ -3,10 +3,20 @@ import { CreateAsrsDto } from './dto/create-asrs.dto';
 import { UpdateAsrsDto } from './dto/update-asrs.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Asrs } from './entities/asrs.entity';
-import { Like, Repository } from 'typeorm';
+import {
+  Between,
+  FindOperator,
+  ILike,
+  LessThanOrEqual,
+  Like,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
+import { QueryParam } from '../lib/dto/query.param';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class AsrsService {
@@ -49,8 +59,27 @@ export class AsrsService {
     return asrs;
   }
 
-  async findAll() {
-    return await this.asrsRepository.find();
+  async findAll(query: Asrs & QueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+    return await this.asrsRepository.find({
+      where: {
+        name: ILike(`%${query.name}%`),
+        simulation: query.simulation,
+        createdAt: findDate,
+      },
+      order: getOrderBy(query.order),
+      take: query.limit,
+      skip: query.offset,
+    });
   }
 
   async findOne(id: number) {

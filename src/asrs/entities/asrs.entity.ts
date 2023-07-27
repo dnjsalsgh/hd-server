@@ -82,7 +82,7 @@ export class Asrs {
     example: true,
     description: '시뮬레이션 모드 확인',
   })
-  @Column({ type: 'boolean', nullable: true })
+  @Column({ type: 'boolean', nullable: false, default: true })
   simulation: boolean;
 
   @CreateDateColumn()

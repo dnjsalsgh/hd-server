@@ -25,8 +25,8 @@ export class AmrChargerService {
   }
 
   findAll(query: AmrCharger & QueryParam) {
-    const { createdAtFrom, createdAtTo } = query;
     // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
     if (createdAtFrom && createdAtTo) {
       findDate = Between(createdAtFrom, createdAtTo);

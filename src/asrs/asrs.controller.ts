@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { AsrsService } from './asrs.service';
 import { CreateAsrsDto } from './dto/create-asrs.dto';
@@ -17,11 +18,14 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Asrs } from './entities/asrs.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { ClientProxy } from '@nestjs/microservices';
+import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
+import { QueryParam } from '../lib/dto/query.param';
 
 @Controller('asrs')
 @ApiTags('Asrs(자동창고)')
@@ -59,9 +63,16 @@ export class AsrsController {
     return this.asrsService.createByPlcIn(body);
   }
 
+  @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  async findAll() {
-    const asrs = await this.asrsService.findAll();
+  async findAll(@Query() query: Asrs & QueryParam) {
+    const asrs = await this.asrsService.findAll(query);
     return asrs;
   }
 
