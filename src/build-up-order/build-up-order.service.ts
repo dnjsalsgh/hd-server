@@ -2,12 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { CreateBuildUpOrderDto } from './dto/create-build-up-order.dto';
 import { UpdateBuildUpOrderDto } from './dto/update-build-up-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, TypeORMError } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  Equal,
+  FindOperator,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+  TypeORMError,
+} from 'typeorm';
 import { BuildUpOrder } from './entities/build-up-order.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
 import { UldAttribute } from '../uld/entities/uld.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { UldHistory } from '../uld-history/entities/uld-history.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
 @Injectable()
 export class BuildUpOrderService {
@@ -73,7 +83,17 @@ export class BuildUpOrderService {
     }
   }
 
-  async findAll() {
+  async findAll(query: BuildUpOrder & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
     return await this.buildUpOrderRepository.find({
       relations: {
         SkidPlatform: true,
@@ -84,6 +104,15 @@ export class BuildUpOrderService {
         SkidPlatform: SkidPlatformAttribute,
         Uld: UldAttribute,
         Awb: AwbAttribute,
+      },
+      where: {
+        // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
+        SkidPlatform: query.SkidPlatform
+          ? Equal(+query.SkidPlatform)
+          : undefined,
+        Uld: query.Uld ? Equal(+query.Uld) : undefined,
+        Awb: query.Awb ? Equal(+query.Awb) : undefined,
+        createdAt: findDate,
       },
     });
   }

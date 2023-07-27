@@ -6,11 +6,15 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { BuildUpOrderService } from './build-up-order.service';
 import { CreateBuildUpOrderDto } from './dto/create-build-up-order.dto';
 import { UpdateBuildUpOrderDto } from './dto/update-build-up-order.dto';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Asrs } from '../asrs/entities/asrs.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BuildUpOrder } from './entities/build-up-order.entity';
 
 @Controller('build-up-order')
 @ApiTags('build-up-order(작업자 작업지시)')
@@ -32,9 +36,17 @@ export class BuildUpOrderController {
     return this.buildUpOrderService.createList(createBuildUpOrderDto);
   }
 
+  @ApiQuery({ name: 'SkidPlatform', required: false, type: 'number' })
+  @ApiQuery({ name: 'Uld', required: false, type: 'number' })
+  @ApiQuery({ name: 'Awb', required: false, type: 'number' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.buildUpOrderService.findAll();
+  findAll(@Query() query: BuildUpOrder & BasicQueryParam) {
+    return this.buildUpOrderService.findAll(query);
   }
 
   @Get(':id')
