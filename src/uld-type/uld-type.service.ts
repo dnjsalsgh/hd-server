@@ -2,8 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { CreateUldTypeDto } from './dto/create-uld-type.dto';
 import { UpdateUldTypeDto } from './dto/update-uld-type.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  Between,
+  FindOperator,
+  ILike,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { UldType } from './entities/uld-type.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class UldTypeService {
@@ -18,8 +27,27 @@ export class UldTypeService {
     return result;
   }
 
-  async findAll() {
-    return await this.uldTypeRepository.find();
+  async findAll(query: UldType & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+    return await this.uldTypeRepository.find({
+      where: {
+        code: query.code ? ILike(`%${query.code}%`) : undefined,
+        name: query.name ? ILike(`%${query.name}%`) : undefined,
+        createdAt: findDate,
+      },
+      order: getOrderBy(query.order),
+      take: query.limit,
+      skip: query.offset,
+    });
   }
 
   async findOne(id: number) {
