@@ -86,3 +86,11 @@ export class BuildUpOrder {
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
   uldHistories: Relation<UldHistory[]> | number;
 }
+
+export const BuildUpOrderAttribute = {
+  id: true,
+  order: true,
+  x: true,
+  y: true,
+  z: true,
+};
