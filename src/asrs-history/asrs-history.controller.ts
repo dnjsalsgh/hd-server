@@ -1,18 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { AsrsHistoryService } from './asrs-history.service';
 import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
+import { QueryParam } from '../lib/dto/query.param';
+import { AsrsHistory } from './entities/asrs-history.entity';
 
 @Controller('asrs-history')
 @ApiTags('asrs-history')
@@ -29,9 +31,16 @@ export class AsrsHistoryController {
     return this.asrsHistoryService.createByPlc(body);
   }
 
+  @ApiQuery({ name: 'Asrs', required: false, type: 'number' })
+  @ApiQuery({ name: 'Awb', required: false, type: 'number' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.asrsHistoryService.findAll();
+  findAll(@Query() query: AsrsHistory & QueryParam) {
+    return this.asrsHistoryService.findAll(query);
   }
 
   @Get(':id')

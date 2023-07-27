@@ -3,10 +3,21 @@ import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Asrs, AsrsAttribute } from '../asrs/entities/asrs.entity';
-import { DataSource, Repository, TypeORMError } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  Equal,
+  EqualOperator,
+  FindOperator,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+  TypeORMError,
+} from 'typeorm';
 import { AsrsHistory } from './entities/asrs-history.entity';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
+import { QueryParam } from '../lib/dto/query.param';
 
 @Injectable()
 export class AsrsHistoryService {
@@ -25,7 +36,24 @@ export class AsrsHistoryService {
     }
   }
 
-  async findAll() {
+  async findAll(query: AsrsHistory & QueryParam) {
+    // join 되는 테이블들의 FK를 typeorm에 맞추기위한 조정하기 위한 과정
+    let asrsId: EqualOperator<number>;
+    if (query.Asrs) asrsId = Equal(+query.Asrs);
+    let awbId: EqualOperator<number>;
+    if (query.Awb) awbId = Equal(+query.Awb);
+
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+
     return await this.asrsHistoryRepository.find({
       select: {
         Asrs: AsrsAttribute,
@@ -34,6 +62,11 @@ export class AsrsHistoryService {
       relations: {
         Asrs: true,
         Awb: true,
+      },
+      where: {
+        Asrs: asrsId,
+        Awb: awbId,
+        createdAt: findDate,
       },
     });
   }
