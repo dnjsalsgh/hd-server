@@ -120,6 +120,8 @@ export class SimulatorResultService {
         Uld: UldAttribute,
       },
       where: {
+        loadRate: query.loadRate,
+        version: query.version,
         Uld: query.Uld ? Equal(+query.Uld) : undefined,
         createdAt: findDate,
       },
