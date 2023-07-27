@@ -6,12 +6,16 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { SimulatorResultService } from './simulator-result.service';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateSimulatorResultWithAwbAndHistoryDto } from './dto/create-simulator-result-with-awb';
+import { Asrs } from '../asrs/entities/asrs.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { SimulatorResult } from './entities/simulator-result.entity';
 
 @Controller('simulator-result')
 @ApiTags('simulator-result')
@@ -31,9 +35,17 @@ export class SimulatorResultController {
     return this.simulatorResultService.createWithAwb(body);
   }
 
+  @ApiQuery({ name: 'Uld', required: false, type: 'number' })
+  @ApiQuery({ name: 'loadRate', required: false })
+  @ApiQuery({ name: 'version', required: false })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.simulatorResultService.findAll();
+  findAll(@Query() query: SimulatorResult & BasicQueryParam) {
+    return this.simulatorResultService.findAll(query);
   }
 
   @Get(':id')

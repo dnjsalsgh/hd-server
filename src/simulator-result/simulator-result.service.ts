@@ -1,7 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SimulatorResult } from './entities/simulator-result.entity';
-import { DataSource, Repository, TypeORMError } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  Equal,
+  FindOperator,
+  ILike,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+  TypeORMError,
+} from 'typeorm';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
 import { UldAttribute } from '../uld/entities/uld.entity';
@@ -10,6 +20,8 @@ import { SimulatorResultAwbJoin } from '../simulator-result-awb-join/entities/si
 import { SimulatorHistory } from '../simulator-history/entities/simulator-history.entity';
 import { CreateSimulatorHistoryDto } from '../simulator-history/dto/create-simulator-history.dto';
 import { CreateSimulatorResultAwbJoinDto } from '../simulator-result-awb-join/dto/create-simulator-result-awb-join.dto';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class SimulatorResultService {
@@ -89,7 +101,17 @@ export class SimulatorResultService {
     }
   }
 
-  async findAll() {
+  async findAll(query: SimulatorResult & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
     return await this.simulatorResultRepository.find({
       relations: {
         Uld: true,
@@ -97,6 +119,13 @@ export class SimulatorResultService {
       select: {
         Uld: UldAttribute,
       },
+      where: {
+        Uld: query.Uld ? Equal(+query.Uld) : undefined,
+        createdAt: findDate,
+      },
+      order: getOrderBy(query.order),
+      take: query.limit,
+      skip: query.offset,
     });
   }
 
