@@ -2,7 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
 import { UpdateSkidPlatformHistoryDto } from './dto/update-skid-platform-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  Between,
+  Equal,
+  FindOperator,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { SkidPlatformHistory } from './entities/skid-platform-history.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { AsrsAttribute } from '../asrs/entities/asrs.entity';
@@ -14,6 +21,7 @@ import {
 import { SkidPlatformHistoryPlcDataDto } from './dto/skid-platform-history-plc-data.dto';
 import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -32,7 +40,17 @@ export class SkidPlatformHistoryService {
     return asrs;
   }
 
-  async findAll() {
+  async findAll(query: SkidPlatformHistory & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
     return await this.skidPlatformHistoryRepository.find({
       select: {
         Awb: AwbAttribute,
@@ -44,7 +62,6 @@ export class SkidPlatformHistoryService {
           Asrs: AsrsAttribute,
           SkidPlatform: SkidPlatformAttribute,
         },
-        // AsrsOutOrder: AsrsOutOrderAttribute,
       },
       relations: {
         Awb: true,
@@ -55,6 +72,18 @@ export class SkidPlatformHistoryService {
           Asrs: true,
           SkidPlatform: true,
         },
+      },
+      where: {
+        // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
+        Asrs: query.Asrs ? Equal(+query.Asrs) : undefined,
+        Awb: query.Awb ? Equal(+query.Awb) : undefined,
+        SkidPlatform: query.SkidPlatform
+          ? Equal(+query.SkidPlatform)
+          : undefined,
+        AsrsOutOrder: query.AsrsOutOrder
+          ? Equal(+query.AsrsOutOrder)
+          : undefined,
+        createdAt: findDate,
       },
     });
   }

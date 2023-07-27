@@ -6,12 +6,16 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { SkidPlatformHistoryService } from './skid-platform-history.service';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
 import { UpdateSkidPlatformHistoryDto } from './dto/update-skid-platform-history.dto';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
+import { Asrs } from '../asrs/entities/asrs.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { SkidPlatformHistory } from './entities/skid-platform-history.entity';
 
 @Controller('skid-platform-history')
 @ApiTags('skid-platform-history')
@@ -25,9 +29,18 @@ export class SkidPlatformHistoryController {
     return this.skidPlatformHistoryService.create(createSkidPlatformHistoryDto);
   }
 
+  @ApiQuery({ name: 'Awb', required: false, type: 'number' })
+  @ApiQuery({ name: 'Asrs', required: false, type: 'number' })
+  @ApiQuery({ name: 'SkidPlatform', required: false, type: 'number' })
+  @ApiQuery({ name: 'AsrsOutOrder', required: false, type: 'number' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.skidPlatformHistoryService.findAll();
+  findAll(@Query() query: SkidPlatformHistory & BasicQueryParam) {
+    return this.skidPlatformHistoryService.findAll(query);
   }
 
   @Get(':id')
