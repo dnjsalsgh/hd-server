@@ -3,7 +3,16 @@ import { CreateCommonCodeDto } from './dto/create-common-code.dto';
 import { UpdateCommonCodeDto } from './dto/update-common-code.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonCode } from './entities/common-code.entity';
-import { Repository } from 'typeorm';
+import {
+  Between,
+  FindOperator,
+  ILike,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class CommonCodeService {
@@ -16,8 +25,28 @@ export class CommonCodeService {
     return result;
   }
 
-  async findAll() {
-    return await this.commonCodeRepository.find();
+  async findAll(query: CommonCode & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+    return await this.commonCodeRepository.find({
+      where: {
+        name: query.name ? ILike(`%${query.name}%`) : undefined,
+        code: query.code ? ILike(`%${query.code}%`) : undefined,
+        type: query.type ? ILike(`%${query.type}%`) : undefined,
+        createdAt: findDate,
+      },
+      order: getOrderBy(query.order),
+      take: query.limit,
+      skip: query.offset,
+    });
   }
 
   async findOne(id: number) {

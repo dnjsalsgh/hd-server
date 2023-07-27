@@ -7,11 +7,14 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CommonCodeService } from './common-code.service';
 import { CreateCommonCodeDto } from './dto/create-common-code.dto';
 import { UpdateCommonCodeDto } from './dto/update-common-code.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { CommonCode } from './entities/common-code.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
 @Controller('common-code')
 @ApiTags('common-code')
@@ -23,9 +26,17 @@ export class CommonCodeController {
     return this.commonCodeService.create(createCommonCodeDto);
   }
 
+  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'code', required: false })
+  @ApiQuery({ name: 'type', required: false })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.commonCodeService.findAll();
+  findAll(@Query() query: CommonCode & BasicQueryParam) {
+    return this.commonCodeService.findAll(query);
   }
 
   @Get(':id')
