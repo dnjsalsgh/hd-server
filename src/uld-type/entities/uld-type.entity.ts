@@ -83,7 +83,7 @@ export class UldType {
     description: '꼭지점좌표, 바닥부터 시계방향으로 0부터 시작',
   })
   @Column({ type: 'json', nullable: true })
-  vertexCord: JSON;
+  vertexCord: string;
 
   // 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({
@@ -105,3 +105,19 @@ export class UldType {
   @OneToMany(() => Uld, (uld) => uld.UldType)
   ulds: Uld[];
 }
+
+export const UldTypeAttribute = {
+  id: true,
+  code: true,
+  name: true,
+  waterVolume: true,
+  squareVolume: true,
+  width: true,
+  length: true,
+  depth: true,
+  capacity: true,
+  modelPath: true,
+  vertexCord: true,
+  squareWeight: true,
+  createdAt: true,
+};
