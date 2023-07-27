@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  Between,
+  Equal,
+  FindOperator,
+  ILike,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { CreateAsrsOutOrderDto } from './dto/create-asrs-out-order.dto';
 import { AsrsOutOrder } from './entities/asrs-out-order.entity';
 import { UpdateAsrsOutOrderDto } from './dto/update-asrs-out-order.dto';
 import { AsrsAttribute } from '../asrs/entities/asrs.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
 @Injectable()
 export class AsrsOutOrderService {
@@ -25,7 +34,17 @@ export class AsrsOutOrderService {
     return asrs;
   }
 
-  async findAll() {
+  async findAll(query: AsrsOutOrder & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
     return await this.asrsOutOrderRepository.find({
       relations: {
         Asrs: true,
@@ -36,6 +55,15 @@ export class AsrsOutOrderService {
         Asrs: AsrsAttribute,
         SkidPlatform: SkidPlatformAttribute,
         Awb: AwbAttribute,
+      },
+      where: {
+        // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
+        Asrs: query.Asrs ? Equal(+query.Asrs) : undefined,
+        Awb: query.Awb ? Equal(+query.Awb) : undefined,
+        SkidPlatform: query.SkidPlatform
+          ? Equal(+query.SkidPlatform)
+          : undefined,
+        createdAt: findDate,
       },
     });
   }

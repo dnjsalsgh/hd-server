@@ -17,7 +17,7 @@ import {
 import { AsrsHistory } from './entities/asrs-history.entity';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
-import { QueryParam } from '../lib/dto/query.param';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
 @Injectable()
 export class AsrsHistoryService {
@@ -36,13 +36,7 @@ export class AsrsHistoryService {
     }
   }
 
-  async findAll(query: AsrsHistory & QueryParam) {
-    // join 되는 테이블들의 FK를 typeorm에 맞추기위한 조정하기 위한 과정
-    let asrsId: EqualOperator<number>;
-    if (query.Asrs) asrsId = Equal(+query.Asrs);
-    let awbId: EqualOperator<number>;
-    if (query.Awb) awbId = Equal(+query.Awb);
-
+  async findAll(query: AsrsHistory & BasicQueryParam) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -53,7 +47,6 @@ export class AsrsHistoryService {
     } else if (createdAtTo) {
       findDate = LessThanOrEqual(createdAtTo);
     }
-
     return await this.asrsHistoryRepository.find({
       select: {
         Asrs: AsrsAttribute,
@@ -64,8 +57,9 @@ export class AsrsHistoryService {
         Awb: true,
       },
       where: {
-        Asrs: asrsId,
-        Awb: awbId,
+        // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
+        Asrs: query.Asrs ? Equal(+query.Asrs) : undefined,
+        Awb: query.Awb ? Equal(+query.Awb) : undefined,
         createdAt: findDate,
       },
     });

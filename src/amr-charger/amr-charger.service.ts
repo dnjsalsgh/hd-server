@@ -11,7 +11,7 @@ import {
   Repository,
 } from 'typeorm';
 import { AmrCharger } from './entities/amr-charger.entity';
-import { QueryParam } from '../lib/dto/query.param';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class AmrChargerService {
     return this.amrChargerRepository.save(createAmrChargerDto);
   }
 
-  findAll(query: AmrCharger & QueryParam) {
+  findAll(query: AmrCharger & BasicQueryParam) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

@@ -25,7 +25,7 @@ import { Asrs } from './entities/asrs.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
-import { QueryParam } from '../lib/dto/query.param';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
 @Controller('asrs')
 @ApiTags('Asrs(자동창고)')
@@ -71,7 +71,7 @@ export class AsrsController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  async findAll(@Query() query: Asrs & QueryParam) {
+  async findAll(@Query() query: Asrs & BasicQueryParam) {
     const asrs = await this.asrsService.findAll(query);
     return asrs;
   }
