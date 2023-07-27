@@ -14,20 +14,28 @@ import { AwbSccJoin } from './entities/awb-scc-join.entity';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { AsrsAttribute } from '../asrs/entities/asrs.entity';
-import { AwbAttribute } from '../awb/entities/awb.entity';
-import { SccAttribute } from '../scc/entities/scc.entity';
+import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
+import { Scc, SccAttribute } from '../scc/entities/scc.entity';
 
 @Injectable()
 export class AwbSccJoinService {
   constructor(
     @InjectRepository(AwbSccJoin)
     private readonly awbSccJoinRepository: Repository<AwbSccJoin>,
+    @InjectRepository(Awb)
+    private readonly awbRepository: Repository<Awb>,
+    @InjectRepository(Scc)
+    private readonly sccRepository: Repository<Scc>,
   ) {}
   create(createAwbSccJoinDto: CreateAwbSccJoinDto) {
     return this.awbSccJoinRepository.save(createAwbSccJoinDto);
   }
 
-  findAll(query: AwbSccJoin & BasicQueryParam) {
+  async findAll(
+    query: AwbSccJoin & BasicQueryParam,
+    SccName: string,
+    AwbName: string,
+  ) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -37,6 +45,19 @@ export class AwbSccJoinService {
       findDate = MoreThanOrEqual(createdAtFrom);
     } else if (createdAtTo) {
       findDate = LessThanOrEqual(createdAtTo);
+    }
+
+    let sccResult;
+    let awbResult;
+    if (SccName) {
+      sccResult = await this.sccRepository.findOne({
+        where: { name: SccName },
+      });
+    }
+    if (AwbName) {
+      awbResult = await this.awbRepository.findOne({
+        where: { name: AwbName },
+      });
     }
     return this.awbSccJoinRepository.find({
       select: {
@@ -49,8 +70,8 @@ export class AwbSccJoinService {
       },
       where: {
         // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
-        Scc: query.Scc ? Equal(+query.Scc) : undefined,
-        Awb: query.Awb ? Equal(+query.Awb) : undefined,
+        Scc: sccResult ? Equal(+sccResult.id) : undefined,
+        Awb: awbResult ? Equal(+awbResult.id) : undefined,
         createdAt: findDate,
       },
     });

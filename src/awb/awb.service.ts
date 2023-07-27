@@ -39,10 +39,12 @@ export class AwbService {
     try {
       const result = await queryRunner.manager.getRepository(Awb).save(awbDto);
 
-      const sccResult = await queryRunner.manager.getRepository(Scc).save(scc);
+      const sccResult = await queryRunner.manager
+        .getRepository(Scc)
+        .upsert(scc, ['name']);
 
       const joinParams: CreateAwbSccJoinDto = {
-        Scc: sccResult.id,
+        Scc: sccResult.identifiers[0].id,
         Awb: result,
       };
       await queryRunner.manager.getRepository(AwbSccJoin).save(joinParams);
@@ -150,8 +152,12 @@ export class AwbService {
           .getRepository(Awb)
           .save(subAwb);
 
+        const sccResult = await queryRunner.manager
+          .getRepository(Scc)
+          .upsert(subAwb.scc, ['name']);
+
         const joinParams: CreateAwbSccJoinDto = {
-          Scc: subAwb.scc as Scc, // 해포되는 화물의 scc를 저장하기 위함
+          Scc: sccResult.identifiers[0].id, // 해포되는 화물의 scc를 저장하기 위함
           Awb: result,
         };
         // 2-2. Scc join에 등록

@@ -1,11 +1,10 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
   Query,
 } from '@nestjs/common';
@@ -13,7 +12,6 @@ import { AwbSccJoinService } from './awb-scc-join.service';
 import { CreateAwbSccJoinDto } from './dto/create-awb-scc-join.dto';
 import { UpdateAwbSccJoinDto } from './dto/update-awb-scc-join.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { AwbSccJoin } from './entities/awb-scc-join.entity';
 
@@ -27,16 +25,24 @@ export class AwbSccJoinController {
     return this.awbSccJoinService.create(createAwbSccJoinDto);
   }
 
-  @ApiQuery({ name: 'Scc', required: false, type: 'number' })
-  @ApiQuery({ name: 'Awb', required: false, type: 'number' })
+  // @ApiQuery({ name: 'Scc', required: false, type: 'string' })
+  // @ApiQuery({ name: 'Awb', required: false, type: 'string' })
+  @ApiQuery({ name: 'SccName', required: false, type: 'string' })
+  @ApiQuery({ name: 'AwbName', required: false, type: 'string' })
+  @ApiQuery({ name: 'SccName', required: false })
+  @ApiQuery({ name: 'AwbName', required: false })
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })
   @ApiQuery({ name: 'order', required: false })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: AwbSccJoin & BasicQueryParam) {
-    return this.awbSccJoinService.findAll(query);
+  findAll(
+    @Query() query: AwbSccJoin & BasicQueryParam,
+    @Query('SccName') SccName: string,
+    @Query('AwbName') AwbName: string,
+  ) {
+    return this.awbSccJoinService.findAll(query, SccName, AwbName);
   }
 
   @Get(':id')
