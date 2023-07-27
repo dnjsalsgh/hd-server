@@ -2,13 +2,23 @@ import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSkidPlatformDto } from './dto/create-skid-platform.dto';
 import { UpdateSkidPlatformDto } from './dto/update-skid-platform.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import {
+  Between,
+  FindOperator,
+  ILike,
+  LessThanOrEqual,
+  Like,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { SkidPlatform } from './entities/skid-platform.entity';
 import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-order.dto';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class SkidPlatformService {
@@ -54,8 +64,27 @@ export class SkidPlatformService {
     return asrs;
   }
 
-  async findAll() {
-    return await this.skidPlatformRepository.find();
+  async findAll(query: SkidPlatform & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+    return await this.skidPlatformRepository.find({
+      where: {
+        name: query.name ? ILike(`%${query.name}%`) : undefined,
+        simulation: query.simulation,
+        createdAt: findDate,
+      },
+      order: getOrderBy(query.order),
+      take: query.limit,
+      skip: query.offset,
+    });
   }
 
   async findOne(id: number) {

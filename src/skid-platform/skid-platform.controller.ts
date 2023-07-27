@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { SkidPlatformService } from './skid-platform.service';
 import { CreateSkidPlatformDto } from './dto/create-skid-platform.dto';
@@ -15,11 +16,14 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
 import { Asrs } from '../asrs/entities/asrs.entity';
 import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { SkidPlatform } from './entities/skid-platform.entity';
 
 @Controller('skid-platform')
 @ApiTags('skid-platform')
@@ -52,9 +56,16 @@ export class SkidPlatformController {
     return this.skidPlatformService.createByPlcOut(body);
   }
 
+  @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.skidPlatformService.findAll();
+  findAll(@Query() query: SkidPlatform & BasicQueryParam) {
+    return this.skidPlatformService.findAll(query);
   }
 
   @Get(':id')
