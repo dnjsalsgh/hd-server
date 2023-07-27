@@ -77,3 +77,12 @@ export class SimulatorResult {
   )
   simulatorHistories: Relation<SimulatorHistory[]>;
 }
+
+export const SimulatorResultAttribute = {
+  id: true,
+  startDate: true,
+  endDate: true,
+  loadRate: true,
+  version: true,
+  createdAt: true,
+};
