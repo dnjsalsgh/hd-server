@@ -16,10 +16,10 @@ import { Awb } from '../../awb/entities/awb.entity';
 @Entity('awb_scc_join')
 export class AwbSccJoin {
   @Column('int', { primary: true, name: 'awb_id', nullable: false })
-  awb_id: number;
+  Awb: number;
 
   @Column('int', { primary: true, name: 'scc_id', nullable: false })
-  scc_id: number;
+  Scc: number;
 
   // @ApiProperty({
   //   example: 1,

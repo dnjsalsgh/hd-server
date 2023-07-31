@@ -52,8 +52,8 @@ export class AwbService {
       // awb와 scc를 연결해주기 위한 작업
       const joinParam = sccResult.identifiers.map((item) => {
         return {
-          awb_id: awbResult.id,
-          scc_id: item.id,
+          Awb: awbResult.id,
+          Scc: item.id,
         };
       });
 
