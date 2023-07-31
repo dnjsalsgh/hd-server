@@ -58,7 +58,7 @@ export class AwbService {
     }
   }
 
-  findAll(query: Awb & BasicQueryParam) {
+  async findAll(query: Awb & BasicQueryParam) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -70,7 +70,7 @@ export class AwbService {
       findDate = LessThanOrEqual(createdAtTo);
     }
 
-    return this.awbRepository.find({
+    const searchResult = await this.awbRepository.find({
       where: {
         name: query.name ? ILike(`%${query.name}%`) : undefined,
         prefab: query.prefab,
@@ -105,7 +105,20 @@ export class AwbService {
       order: getOrderBy(query.order),
       take: query.limit,
       skip: query.offset,
+      relations: {
+        awbSccJoin: {
+          Scc: true,
+        },
+      },
     });
+    const filteredData = searchResult.map((item) => {
+      const { awbSccJoin, ...itemWithout } = item;
+      return {
+        ...itemWithout,
+        Scc: item.awbSccJoin.map((csItem) => csItem.Scc),
+      };
+    });
+    return filteredData;
   }
 
   findFamily(id: number) {
@@ -157,7 +170,7 @@ export class AwbService {
           .upsert(subAwb.scc, ['name']);
 
         const joinParams: CreateAwbSccJoinDto = {
-          Scc: sccResult.identifiers[0].id, // 해포되는 화물의 scc를 저장하기 위함
+          Scc: sccResult.identifiers.map((item) => item.id), // 해포되는 화물의 scc를 저장하기 위함
           Awb: result,
         };
         // 2-2. Scc join에 등록

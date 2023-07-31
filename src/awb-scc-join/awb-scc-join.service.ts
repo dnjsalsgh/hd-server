@@ -72,7 +72,6 @@ export class AwbSccJoinService {
         // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
         Scc: sccResult ? Equal(+sccResult.id) : undefined,
         Awb: awbResult ? Equal(+awbResult.id) : undefined,
-        createdAt: findDate,
       },
     });
   }

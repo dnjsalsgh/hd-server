@@ -16,16 +16,6 @@ import { Awb } from '../../awb/entities/awb.entity';
 export class AwbSccJoin {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date | null;
-
   @ApiProperty({
     example: 1,
     description: '화물FK',
@@ -40,5 +30,5 @@ export class AwbSccJoin {
     type: () => Scc,
   })
   @ManyToOne(() => Scc, (scc) => scc.awbSccJoin)
-  Scc: Relation<Scc> | number;
+  Scc: Relation<Scc> | Relation<Scc>[] | number;
 }
