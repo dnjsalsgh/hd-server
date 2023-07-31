@@ -69,6 +69,7 @@ export class SccService {
       },
     });
 
+    return searchResult;
     const filteredData = searchResult.map((item) => {
       const { awbSccJoin, ...itemWithout } = item;
       return {
