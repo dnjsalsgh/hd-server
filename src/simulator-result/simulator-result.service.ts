@@ -6,7 +6,6 @@ import {
   DataSource,
   Equal,
   FindOperator,
-  ILike,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
@@ -22,6 +21,7 @@ import { CreateSimulatorHistoryDto } from '../simulator-history/dto/create-simul
 import { CreateSimulatorResultAwbJoinDto } from '../simulator-result-awb-join/dto/create-simulator-result-awb-join.dto';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
+import { AwbAttribute } from '../awb/entities/awb.entity';
 
 @Injectable()
 export class SimulatorResultService {
@@ -112,12 +112,14 @@ export class SimulatorResultService {
     } else if (createdAtTo) {
       findDate = LessThanOrEqual(createdAtTo);
     }
-    return await this.simulatorResultRepository.find({
+    const simulatorResultResult = await this.simulatorResultRepository.find({
       relations: {
         Uld: true,
+        Awb: true,
       },
       select: {
         Uld: UldAttribute,
+        Awb: AwbAttribute,
       },
       where: {
         loadRate: query.loadRate,
@@ -129,6 +131,7 @@ export class SimulatorResultService {
       take: query.limit,
       skip: query.offset,
     });
+    return simulatorResultResult;
   }
 
   async findOne(id: number) {

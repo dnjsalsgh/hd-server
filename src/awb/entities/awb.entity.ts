@@ -25,6 +25,7 @@ import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entit
 import { AsrsOutOrder } from '../../asrs-out-order/entities/asrs-out-order.entity';
 import { IsEnum, IsString } from 'class-validator';
 import { Scc } from '../../scc/entities/scc.entity';
+import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 
 @Entity()
 export class Awb {
@@ -283,6 +284,22 @@ export class Awb {
     (simulatorResultAwbJoin) => simulatorResultAwbJoin.Awb,
   )
   srJoin: Relation<SimulatorResultAwbJoin[]>;
+
+  @ManyToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.Awb, {
+    cascade: true,
+  })
+  @JoinTable({
+    name: 'simulator_result_awb_join',
+    joinColumn: {
+      name: 'awb_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'simulator_result_id',
+      referencedColumnName: 'id',
+    },
+  })
+  SimulatorResult: SimulatorResult[];
 
   @OneToMany(() => TimeTable, (timeTable) => timeTable.Awb)
   timeTables: Relation<TimeTable[]>;

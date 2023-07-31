@@ -1,38 +1,35 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  Relation,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Awb } from '../../awb/entities/awb.entity';
-import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
+import { Column, Entity } from 'typeorm';
 
 @Entity()
 export class SimulatorResultAwbJoin {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @Column('int', {
+    name: 'simulator_result_id',
+    nullable: false,
+  })
+  SimulatorResult: number;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Column('int', { primary: true, name: 'awb_id', nullable: false })
+  Awb: number;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date | null;
-
-  @ManyToOne(
-    () => SimulatorResult,
-    (simulatorResult) => simulatorResult.simulatorResultAwbJoin,
-    { nullable: false },
-  )
-  SimulatorResult: Relation<SimulatorResult> | number;
-
-  @ManyToOne(() => Awb, (awb) => awb.srJoin, { nullable: false })
-  Awb: Relation<Awb> | number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
+  //
+  // @CreateDateColumn()
+  // createdAt: Date;
+  //
+  // @UpdateDateColumn()
+  // updatedAt: Date;
+  //
+  // @DeleteDateColumn()
+  // deletedAt: Date | null;
+  //
+  // @ManyToOne(
+  //   () => SimulatorResult,
+  //   (simulatorResult) => simulatorResult.simulatorResultAwbJoin,
+  //   { nullable: false },
+  // )
+  // SimulatorResult: Relation<SimulatorResult> | number;
+  //
+  // @ManyToOne(() => Awb, (awb) => awb.srJoin, { nullable: false })
+  // Awb: Relation<Awb> | number;
 }
