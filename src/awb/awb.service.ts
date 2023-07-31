@@ -117,9 +117,6 @@ export class AwbService {
       skip: query.offset,
       relations: {
         Scc: true,
-        awbSccJoin: {
-          Scc: true,
-        },
       },
     });
     const filteredData = searchResult.map((item) => {

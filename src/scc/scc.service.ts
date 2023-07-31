@@ -38,21 +38,6 @@ export class SccService {
       findDate = LessThanOrEqual(createdAtTo);
     }
 
-    // return await this.sccRepository
-    //   .createQueryBuilder()
-    //   .leftJoinAndSelect('awbSccJoin.Scc', 'Scc')
-    //   .where('Scc.name = :sccName', { sccName: query.name })
-    //   .getMany();
-
-    // await this.sccRepository
-    //   .createQueryBuilder()
-    //   .select(['scc.id', 'asj.awb_id', 'asj.scc_id'])
-    //   .addSelect('awb.*')
-    //   .innerJoin('AwbSccJoin', 'asj', 'scc.id = asj.scc_id')
-    //   .innerJoin('Awb', 'awb', 'asj.awb_id = awb.id')
-    //   .where('sc.name = :name', { name: query.name })
-    //   .getRawMany();
-
     const searchResult = await this.sccRepository.find({
       where: {
         name: query.name ? ILike(`%${query.name}%`) : undefined,
@@ -63,35 +48,24 @@ export class SccService {
       take: query.limit,
       skip: query.offset,
       relations: {
-        awbSccJoin: {
-          Awb: true,
-        },
+        Awb: true,
       },
     });
 
-    const filteredData = searchResult.map((item) => {
-      const { awbSccJoin, ...itemWithout } = item;
-      return {
-        ...itemWithout,
-        Awb: item.awbSccJoin.map((Item) => Item.Awb),
-      };
-    });
-    return filteredData;
+    return searchResult;
   }
 
   async findOne(id: number) {
-    return await this.sccRepository.find({ where: { id: id } });
+    return await this.sccRepository.find({
+      where: { id: id },
+      relations: {
+        Awb: true,
+      },
+    });
   }
 
   async update(id: number, updateSccDto: UpdateSccDto) {
     const updateResult = await this.sccRepository.update(id, updateSccDto);
-    // const updateResult1 = await this.sccRepository
-    //   .createQueryBuilder()
-    //   .update(Scc)
-    //   .set(updateSccDto)
-    //   .where('id = :id', { id: id })
-    //   .execute();
-
     return updateResult;
   }
 

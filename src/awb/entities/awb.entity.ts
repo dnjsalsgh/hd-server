@@ -287,7 +287,7 @@ export class Awb {
   @OneToMany(() => TimeTable, (timeTable) => timeTable.Awb)
   timeTables: Relation<TimeTable[]>;
 
-  @ManyToMany(() => Scc, (scc) => scc.Awbs, { cascade: true })
+  @ManyToMany(() => Scc, (scc) => scc.Awb, { cascade: true })
   @JoinTable({
     name: 'awb_scc_join',
     joinColumn: {

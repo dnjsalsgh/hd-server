@@ -82,7 +82,7 @@ export class Scc {
   uldSccJoin: UldSccJoin[];
 
   @ManyToMany(() => Awb, (awb) => awb.Scc)
-  Awbs: Awb[];
+  Awb: Awb[];
 }
 
 export const SccAttribute = {
