@@ -24,8 +24,10 @@ export class AwbService {
   constructor(
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-    // @InjectRepository(AwbSccJoin)
-    // private readonly awbSccJoinRepository: Repository<AwbSccJoin>,
+    @InjectRepository(AwbSccJoin)
+    private readonly awbSccJoinRepository: Repository<AwbSccJoin>,
+    @InjectRepository(Scc)
+    private readonly sccRepository: Repository<Scc>,
     private dataSource: DataSource,
   ) {}
 
@@ -38,7 +40,9 @@ export class AwbService {
 
     try {
       // awb를 입력하기
-      const result = await queryRunner.manager.getRepository(Awb).save(awbDto);
+      const awbResult = await queryRunner.manager
+        .getRepository(Awb)
+        .save(awbDto);
 
       // scc를 입력하기(존재한다면 update)
       const sccResult = await queryRunner.manager
@@ -46,14 +50,14 @@ export class AwbService {
         .upsert(scc, ['name']);
 
       // awb와 scc를 연결해주기 위한 작업
-      const sccCollection = sccResult.identifiers.map((item) => {
+      const joinParam = sccResult.identifiers.map((item) => {
         return {
-          Awb: result,
-          Scc: item.id,
+          awb_id: awbResult.id,
+          scc_id: item.id,
         };
       });
 
-      await queryRunner.manager.getRepository(AwbSccJoin).save(sccCollection);
+      await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -112,6 +116,7 @@ export class AwbService {
       take: query.limit,
       skip: query.offset,
       relations: {
+        Scc: true,
         awbSccJoin: {
           Scc: true,
         },
@@ -131,8 +136,23 @@ export class AwbService {
     return this.awbRepository.find({ where: [{ id: id }, { parent: id }] });
   }
 
-  findOne(id: number) {
-    return this.awbRepository.find({ where: { id: id } });
+  async findOne(id: number) {
+    const searchResult = await this.awbRepository.find({
+      where: { id: id },
+      relations: {
+        awbSccJoin: {
+          Scc: true,
+        },
+      },
+    });
+    const filteredData = searchResult.map((item) => {
+      const { awbSccJoin, ...itemWithout } = item;
+      return {
+        ...itemWithout,
+        Scc: item.awbSccJoin.map((csItem) => csItem.Scc),
+      };
+    });
+    return filteredData;
   }
 
   update(id: number, updateCargoDto: UpdateAwbDto) {

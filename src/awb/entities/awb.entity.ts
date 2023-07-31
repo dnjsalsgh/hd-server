@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -22,6 +24,7 @@ import { SimulatorResultAwbJoin } from '../../simulator-result-awb-join/entities
 import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
 import { AsrsOutOrder } from '../../asrs-out-order/entities/asrs-out-order.entity';
 import { IsEnum, IsString } from 'class-validator';
+import { Scc } from '../../scc/entities/scc.entity';
 
 @Entity()
 export class Awb {
@@ -283,6 +286,20 @@ export class Awb {
 
   @OneToMany(() => TimeTable, (timeTable) => timeTable.Awb)
   timeTables: Relation<TimeTable[]>;
+
+  @ManyToMany(() => Scc, (scc) => scc.Awbs, { cascade: true })
+  @JoinTable({
+    name: 'awb_scc_join',
+    joinColumn: {
+      name: 'awb_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'scc_id',
+      referencedColumnName: 'id',
+    },
+  })
+  Scc: Scc[];
 }
 
 export const AwbAttribute = {

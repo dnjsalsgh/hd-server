@@ -5,10 +5,11 @@ import { Awb } from './entities/awb.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { MulterModule } from '@nestjs/platform-express';
+import { Scc } from '../scc/entities/scc.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Awb, AwbSccJoin]),
+    TypeOrmModule.forFeature([Awb, AwbSccJoin, Scc]),
     MulterModule.register({ dest: './upload' }),
   ],
   controllers: [AwbController],

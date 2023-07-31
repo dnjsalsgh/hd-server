@@ -77,7 +77,7 @@ export class AwbSccJoinService {
   }
 
   findOne(id: number) {
-    return this.awbSccJoinRepository.find({ where: { id: id } });
+    // return this.awbSccJoinRepository.find({ where: { id: id } });
   }
 
   update(id: number, updateCargoSccJoinDto: UpdateAwbSccJoinDto) {

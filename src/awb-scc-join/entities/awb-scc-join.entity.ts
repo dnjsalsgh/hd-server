@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -12,10 +13,14 @@ import { Scc } from '../../scc/entities/scc.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Awb } from '../../awb/entities/awb.entity';
 
-@Entity()
+@Entity('awb_scc_join')
 export class AwbSccJoin {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @Column('int', { primary: true, name: 'awb_id', nullable: false })
+  awb_id: number;
+
+  @Column('int', { primary: true, name: 'scc_id', nullable: false })
+  scc_id: number;
+
   @ApiProperty({
     example: 1,
     description: '화물FK',

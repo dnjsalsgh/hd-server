@@ -34,11 +34,16 @@ export class CreateAwbDto extends PickType(Awb, [
 ]) {
   @ApiProperty({
     example:
-      '{"code": "Scc-001",\n' +
+      '[{"code": "Scc-001",\n' +
       '"name": "드라이아이스",\n' +
       '"score": "1",\n' +
       '"description": "",\n' +
-      '"path": ""}',
+      '"path": ""},\n' +
+      '{"code": "Scc-002",\n' +
+      '"name": "위험물질",\n' +
+      '"score": "2",\n' +
+      '"description": "",\n' +
+      '"path": ""}]',
     description: 'SCCFK',
   })
   scc: Partial<Scc>;
