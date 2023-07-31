@@ -275,8 +275,8 @@ export class Awb {
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
   uldHistories: Relation<UldHistory[]>;
 
-  @OneToMany(() => AwbSccJoin, (awbSccJoin) => awbSccJoin.Awb)
-  awbSccJoin: Relation<AwbSccJoin[]>;
+  // @OneToMany(() => AwbSccJoin, (awbSccJoin) => awbSccJoin.Awb)
+  // awbSccJoin: Relation<AwbSccJoin[]>;
 
   @OneToMany(
     () => SimulatorResultAwbJoin,

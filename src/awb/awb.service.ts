@@ -119,14 +119,7 @@ export class AwbService {
         Scc: true,
       },
     });
-    const filteredData = searchResult.map((item) => {
-      const { awbSccJoin, ...itemWithout } = item;
-      return {
-        ...itemWithout,
-        Scc: item.awbSccJoin.map((csItem) => csItem.Scc),
-      };
-    });
-    return filteredData;
+    return searchResult;
   }
 
   findFamily(id: number) {
@@ -137,19 +130,10 @@ export class AwbService {
     const searchResult = await this.awbRepository.find({
       where: { id: id },
       relations: {
-        awbSccJoin: {
-          Scc: true,
-        },
+        Scc: true,
       },
     });
-    const filteredData = searchResult.map((item) => {
-      const { awbSccJoin, ...itemWithout } = item;
-      return {
-        ...itemWithout,
-        Scc: item.awbSccJoin.map((csItem) => csItem.Scc),
-      };
-    });
-    return filteredData;
+    return searchResult;
   }
 
   update(id: number, updateCargoDto: UpdateAwbDto) {

@@ -35,46 +35,7 @@ export class AwbSccJoinService {
     query: AwbSccJoin & BasicQueryParam,
     SccName: string,
     AwbName: string,
-  ) {
-    // createdAt 기간검색 처리
-    const { createdAtFrom, createdAtTo } = query;
-    let findDate: FindOperator<Date>;
-    if (createdAtFrom && createdAtTo) {
-      findDate = Between(createdAtFrom, createdAtTo);
-    } else if (createdAtFrom) {
-      findDate = MoreThanOrEqual(createdAtFrom);
-    } else if (createdAtTo) {
-      findDate = LessThanOrEqual(createdAtTo);
-    }
-
-    let sccResult;
-    let awbResult;
-    if (SccName) {
-      sccResult = await this.sccRepository.findOne({
-        where: { name: SccName },
-      });
-    }
-    if (AwbName) {
-      awbResult = await this.awbRepository.findOne({
-        where: { name: AwbName },
-      });
-    }
-    return this.awbSccJoinRepository.find({
-      select: {
-        Scc: SccAttribute,
-        Awb: AwbAttribute,
-      },
-      relations: {
-        Scc: true,
-        Awb: true,
-      },
-      where: {
-        // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
-        Scc: sccResult ? Equal(+sccResult.id) : undefined,
-        Awb: awbResult ? Equal(+awbResult.id) : undefined,
-      },
-    });
-  }
+  ) {}
 
   findOne(id: number) {
     // return this.awbSccJoinRepository.find({ where: { id: id } });

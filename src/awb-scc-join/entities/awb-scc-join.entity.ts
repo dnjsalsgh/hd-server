@@ -21,19 +21,19 @@ export class AwbSccJoin {
   @Column('int', { primary: true, name: 'scc_id', nullable: false })
   scc_id: number;
 
-  @ApiProperty({
-    example: 1,
-    description: '화물FK',
-    type: () => Awb,
-  })
-  @ManyToOne(() => Awb, (awb) => awb.awbSccJoin)
-  Awb: Relation<Awb> | number;
-
-  @ApiProperty({
-    example: 1,
-    description: 'sccFK',
-    type: () => Scc,
-  })
-  @ManyToOne(() => Scc, (scc) => scc.awbSccJoin)
-  Scc: Relation<Scc> | Relation<Scc>[] | number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '화물FK',
+  //   type: () => Awb,
+  // })
+  // @ManyToOne(() => Awb, (awb) => awb.awbSccJoin)
+  // Awb: Relation<Awb> | number;
+  //
+  // @ApiProperty({
+  //   example: 1,
+  //   description: 'sccFK',
+  //   type: () => Scc,
+  // })
+  // @ManyToOne(() => Scc, (scc) => scc.awbSccJoin)
+  // Scc: Relation<Scc> | Relation<Scc>[] | number;
 }
