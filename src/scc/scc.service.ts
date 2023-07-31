@@ -44,25 +44,39 @@ export class SccService {
     //   .where('Scc.name = :sccName', { sccName: query.name })
     //   .getMany();
 
-    await this.sccRepository
-      .createQueryBuilder()
-      .select(['scc.id', 'asj.awb_id', 'asj.scc_id'])
-      .addSelect('awb.*')
-      .innerJoin('AwbSccJoin', 'asj', 'scc.id = asj.scc_id')
-      .innerJoin('Awb', 'awb', 'asj.awb_id = awb.id')
-      .where('sc.name = :name', { name: query.name })
-      .getRawMany();
+    // await this.sccRepository
+    //   .createQueryBuilder()
+    //   .select(['scc.id', 'asj.awb_id', 'asj.scc_id'])
+    //   .addSelect('awb.*')
+    //   .innerJoin('AwbSccJoin', 'asj', 'scc.id = asj.scc_id')
+    //   .innerJoin('Awb', 'awb', 'asj.awb_id = awb.id')
+    //   .where('sc.name = :name', { name: query.name })
+    //   .getRawMany();
 
-    // return await this.sccRepository.find({
-    //   where: {
-    //     name: query.name ? ILike(`%${query.name}%`) : undefined,
-    //     code: query.code ? ILike(`%${query.code}%`) : undefined,
-    //     createdAt: findDate,
-    //   },
-    //   order: getOrderBy(query.order),
-    //   take: query.limit,
-    //   skip: query.offset,
-    // });
+    const searchResult = await this.sccRepository.find({
+      where: {
+        name: query.name ? ILike(`%${query.name}%`) : undefined,
+        code: query.code ? ILike(`%${query.code}%`) : undefined,
+        createdAt: findDate,
+      },
+      order: getOrderBy(query.order),
+      take: query.limit,
+      skip: query.offset,
+      relations: {
+        awbSccJoin: {
+          Awb: true,
+        },
+      },
+    });
+
+    const filteredData = searchResult.map((item) => {
+      const { awbSccJoin, ...itemWithout } = item;
+      return {
+        ...itemWithout,
+        Awb: item.awbSccJoin.map((Item) => Item.Awb),
+      };
+    });
+    return filteredData;
   }
 
   async findOne(id: number) {

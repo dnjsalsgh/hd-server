@@ -37,17 +37,23 @@ export class AwbService {
     await queryRunner.startTransaction();
 
     try {
+      // awb를 입력하기
       const result = await queryRunner.manager.getRepository(Awb).save(awbDto);
 
+      // scc를 입력하기(존재한다면 update)
       const sccResult = await queryRunner.manager
         .getRepository(Scc)
         .upsert(scc, ['name']);
 
-      const joinParams: CreateAwbSccJoinDto = {
-        Scc: sccResult.identifiers[0].id,
-        Awb: result,
-      };
-      await queryRunner.manager.getRepository(AwbSccJoin).save(joinParams);
+      // awb와 scc를 연결해주기 위한 작업
+      const sccCollection = sccResult.identifiers.map((item) => {
+        return {
+          Awb: result,
+          Scc: item.id,
+        };
+      });
+
+      await queryRunner.manager.getRepository(AwbSccJoin).save(sccCollection);
 
       await queryRunner.commitTransaction();
     } catch (error) {
