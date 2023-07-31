@@ -13,6 +13,7 @@ import {
 import { Scc } from './entities/scc.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
+import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 
 @Injectable()
 export class SccService {
@@ -36,16 +37,32 @@ export class SccService {
     } else if (createdAtTo) {
       findDate = LessThanOrEqual(createdAtTo);
     }
-    return await this.sccRepository.find({
-      where: {
-        name: query.name ? ILike(`%${query.name}%`) : undefined,
-        code: query.code ? ILike(`%${query.code}%`) : undefined,
-        createdAt: findDate,
-      },
-      order: getOrderBy(query.order),
-      take: query.limit,
-      skip: query.offset,
-    });
+
+    // return await this.sccRepository
+    //   .createQueryBuilder()
+    //   .leftJoinAndSelect('awbSccJoin.Scc', 'Scc')
+    //   .where('Scc.name = :sccName', { sccName: query.name })
+    //   .getMany();
+
+    await this.sccRepository
+      .createQueryBuilder()
+      .select(['scc.id', 'asj.awb_id', 'asj.scc_id'])
+      .addSelect('awb.*')
+      .innerJoin('AwbSccJoin', 'asj', 'scc.id = asj.scc_id')
+      .innerJoin('Awb', 'awb', 'asj.awb_id = awb.id')
+      .where('sc.name = :name', { name: query.name })
+      .getRawMany();
+
+    // return await this.sccRepository.find({
+    //   where: {
+    //     name: query.name ? ILike(`%${query.name}%`) : undefined,
+    //     code: query.code ? ILike(`%${query.code}%`) : undefined,
+    //     createdAt: findDate,
+    //   },
+    //   order: getOrderBy(query.order),
+    //   take: query.limit,
+    //   skip: query.offset,
+    // });
   }
 
   async findOne(id: number) {
