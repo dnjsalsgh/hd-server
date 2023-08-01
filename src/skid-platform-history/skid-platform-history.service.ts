@@ -18,8 +18,6 @@ import {
   AsrsOutOrder,
   AsrsOutOrderAttribute,
 } from '../asrs-out-order/entities/asrs-out-order.entity';
-import { SkidPlatformHistoryPlcDataDto } from './dto/skid-platform-history-plc-data.dto';
-import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
@@ -111,17 +109,72 @@ export class SkidPlatformHistoryService {
 
   // plc의 데이터중 안착대 화물정보가 변경되었을 때 안착대 이력을 등록하기 위함입니다.
   async checkSkidPlatformChange(body: CreateSkidPlatformAndAsrsPlcDto) {
+    // 안착대의 정보를 가져오기
+    const platInfo =
+      (body.Pallet_Rack1_Part_Info as unknown as {
+        skidPlatformId: number;
+        awbId: number;
+      }) ||
+      (body.Pallet_Rack2_Part_Info as unknown as {
+        skidPlatformId: number;
+        awbId: number;
+      }) ||
+      (body.Pallet_Rack3_Part_Info as unknown as {
+        skidPlatformId: number;
+        awbId: number;
+      }) ||
+      (body.Pallet_Rack4_Part_Info as unknown as {
+        skidPlatformId: number;
+        awbId: number;
+      });
+
     // 어떤 안착대로 가야하는지
-    const skidPlatformId = body.Pallet_Rack1_Part_On ? 1 : null;
+    const skidPlatformId = platInfo.skidPlatformId;
+
     // 어떤 화물인지
-    const awbInfo = body.ASRS_LH_Rack1_Part_Info as unknown as {
-      awbId: number;
-    };
+    const awbInfo =
+      (body.ASRS_LH_Rack1_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack2_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack3_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack4_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack5_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack6_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack7_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack8_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack9_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      });
     const awbId = awbInfo.awbId;
 
     // 어떤 창고에서 나왔는지
-    const asrsId = +body.LH_Rack1_ID;
+    const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
 
+    //TODO 테스트용으로 가장 최신 작업지시를 넣기(실제 로직에서는 작업지시 만들어지고 사용)
     const asrsOutOrderResult = await this.asrsOutOrderRepository.findOne({
       where: { Asrs: asrsId, Awb: awbId },
       order: { id: 'desc' },

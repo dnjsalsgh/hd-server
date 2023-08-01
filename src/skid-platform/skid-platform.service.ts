@@ -17,6 +17,8 @@ import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-order.dto';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
+import { SkidPlatformPlcDto } from './dto/skid-platform-plc.dto';
+import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 
 @Injectable()
 export class SkidPlatformService {
@@ -162,40 +164,5 @@ export class SkidPlatformService {
 
   remove(id: number) {
     return this.skidPlatformRepository.delete(id);
-  }
-
-  /**
-   * plc로 들어온 데이터를 가지고 창고에서 안착대로 이동
-   * asrs와 skid-platform의 정보를 처리해야함
-   * @param body
-   */
-  async createByPlcOut(body: CreateAsrsPlcDto) {
-    // TODO: 가정된 데이터들 어떤 화물정보가 들어있을줄 모르니 다 분기처리할 것
-    // 자동창고 Id 들어왔다고 가정
-    const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
-    const awbInfo =
-      (body.ASRS_LH_Rack1_Part_Info as unknown as { awbId: number }) ||
-      (body.ASRS_LH_Rack2_Part_Info as unknown as { awbId: number }) ||
-      (body.ASRS_LH_Rack3_Part_Info as unknown as { awbId: number }) ||
-      (body.ASRS_LH_Rack4_Part_Info as unknown as { awbId: number }) ||
-      (body.ASRS_LH_Rack5_Part_Info as unknown as { awbId: number }) ||
-      (body.ASRS_LH_Rack6_Part_Info as unknown as { awbId: number }) ||
-      (body.ASRS_LH_Rack7_Part_Info as unknown as { awbId: number }) ||
-      (body.ASRS_LH_Rack8_Part_Info as unknown as { awbId: number }) ||
-      (body.ASRS_LH_Rack9_Part_Info as unknown as { awbId: number });
-
-    // 화물정보 안에 화물Id 들어왔다고 가정
-    const awbId = awbInfo.awbId;
-
-    // TODO: 패키지 시뮬레이터의 api를 활용해서 자동창고 작업지시를 만들어야 합니다.
-    const asrsOutOrderBody: CreateAsrsOutOrderDto = {
-      order: 1,
-      Asrs: asrsId,
-      SkidPlatform: 1, // api에서는 목표 안착대의 id가 들어온다.
-      Awb: awbId,
-    };
-
-    // plc 데이터를 기반으로 작업지시 생성
-    await this.asrsOutOrderRepository.save(asrsOutOrderBody);
   }
 }

@@ -177,10 +177,43 @@ export class AsrsService {
     // TODO: 가정된 데이터들 어떤 화물정보가 들어있을줄 모르니 다 분기처리할 것
     // 자동창고 Id 들어왔다고 가정
     const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
-    const awbInfo = body.ASRS_LH_Rack1_Part_Info as unknown as {
-      awbId: number;
-      count: number;
-    };
+    const awbInfo =
+      (body.ASRS_LH_Rack1_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack2_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack3_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack4_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack5_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack6_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack7_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack8_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      }) ||
+      (body.ASRS_LH_Rack9_Part_Info as unknown as {
+        awbId: number;
+        count: number;
+      });
 
     // 화물정보 안에 화물Id 들어왔다고 가정
     const awbId = awbInfo.awbId;

@@ -13,7 +13,6 @@ import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history
 import { UpdateSkidPlatformHistoryDto } from './dto/update-skid-platform-history.dto';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
-import { Asrs } from '../asrs/entities/asrs.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { SkidPlatformHistory } from './entities/skid-platform-history.entity';
 
