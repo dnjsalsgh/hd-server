@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -18,6 +20,7 @@ import { UldSccJoin } from '../../uld-scc-join/entities/uld-scc-join.entity';
 import { TimeTable } from '../../time-table/entities/time-table.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
+import { Scc } from '../../scc/entities/scc.entity';
 
 @Entity()
 export class Uld {
@@ -88,8 +91,24 @@ export class Uld {
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
   uldHistories: Relation<UldHistory[]>;
 
-  @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
-  uldSccJoin: Relation<UldSccJoin[]>;
+  // @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
+  // uldSccJoin: Relation<UldSccJoin[]>;
+
+  @ManyToMany(() => Scc, (scc) => scc.Uld, {
+    cascade: true,
+  })
+  @JoinTable({
+    name: 'uld-scc-join',
+    joinColumn: {
+      name: 'uld_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'scc_id',
+      referencedColumnName: 'id',
+    },
+  })
+  Scc: Scc[];
 
   @OneToMany(() => TimeTable, (timeTable) => timeTable.Uld)
   timeTables: Relation<TimeTable[]>;

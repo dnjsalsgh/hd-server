@@ -12,6 +12,7 @@ import { AwbSccJoin } from '../../awb-scc-join/entities/awb-scc-join.entity';
 import { UldSccJoin } from '../../uld-scc-join/entities/uld-scc-join.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Awb } from '../../awb/entities/awb.entity';
+import { Uld } from '../../uld/entities/uld.entity';
 
 @Entity()
 export class Scc {
@@ -78,8 +79,11 @@ export class Scc {
   // @OneToMany(() => AwbSccJoin, (cargoSccJoin) => cargoSccJoin.Scc)
   // awbSccJoin: AwbSccJoin[];
 
-  @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.scc)
-  uldSccJoin: UldSccJoin[];
+  // @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.scc)
+  // uldSccJoin: UldSccJoin[];
+
+  @ManyToMany(() => Uld, (uld) => uld.Scc)
+  Uld: Uld[];
 
   @ManyToMany(() => Awb, (awb) => awb.Scc)
   Awb: Awb[];
