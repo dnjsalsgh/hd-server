@@ -63,6 +63,14 @@ export class Uld {
   @Column({ type: 'varchar', length: 50, nullable: true })
   boundaryPrefab: string;
 
+  // 적재율이 필요해서 넣은 칼럼
+  @ApiProperty({
+    example: 10.0,
+    description: '적재율',
+  })
+  @Column({ type: 'double precision', nullable: true })
+  loadRate: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -121,5 +129,6 @@ export const UldAttribute = {
   airplaneType: true,
   simulation: true,
   boundaryPrefab: true,
+  loadRate: true,
   createdAt: true,
 };

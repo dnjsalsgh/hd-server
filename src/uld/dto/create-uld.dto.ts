@@ -6,5 +6,8 @@ export class CreateUldDto extends PickType(Uld, [
   'prefab',
   'airplaneType',
   'simulation',
+  'boundaryPrefab',
+  'loadRate',
+  'createdAt',
   'UldType',
 ]) {}
