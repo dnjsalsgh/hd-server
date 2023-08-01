@@ -175,8 +175,9 @@ export class AsrsService {
    */
   async createByPlcIn(body: CreateAsrsPlcDto) {
     // TODO: 가정된 데이터들 어떤 화물정보가 들어있을줄 모르니 다 분기처리할 것
-    // 자동창고 Id 들어왔다고 가정
+
     const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
+
     const awbInfo =
       (body.ASRS_LH_Rack1_Part_Info as unknown as {
         awbId: number;

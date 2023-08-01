@@ -26,12 +26,14 @@ import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
 @Controller('asrs')
 @ApiTags('Asrs(자동창고)')
 export class AsrsController {
   constructor(
     private readonly asrsService: AsrsService,
+    private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
@@ -94,9 +96,19 @@ export class AsrsController {
     return this.asrsService.createByPlcIn(body);
   }
 
+  // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/asrs1/eqData') //구독하는 주제
   createByPlcMatt(@Payload() data) {
-    // console.log(data);
-    // return this.asrsService.createByPlcIn(data);
+    console.log(data);
+    if (
+      data.Pallet_Rack1_Part_On ||
+      data.Pallet_Rack2_Part_On ||
+      data.Pallet_Rack3_Part_On ||
+      data.Pallet_Rack4_Part_On
+    ) {
+      return this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+    }
+
+    return this.asrsService.createByPlcIn(data);
   }
 }

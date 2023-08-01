@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { CreateSimulatorHistoryDto } from './dto/create-simulator-history.dto';
 import { UpdateSimulatorHistoryDto } from './dto/update-simulator-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Scc } from '../scc/entities/scc.entity';
 import {
   Between,
   Equal,
@@ -11,11 +10,8 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { CreateSccDto } from '../scc/dto/create-scc.dto';
-import { UpdateSccDto } from '../scc/dto/update-scc.dto';
 import { SimulatorHistory } from './entities/simulator-history.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
-import { AsrsAttribute } from '../asrs/entities/asrs.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { UldAttribute } from '../uld/entities/uld.entity';
 import { SimulatorResultAttribute } from '../simulator-result/entities/simulator-result.entity';

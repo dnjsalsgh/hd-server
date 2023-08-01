@@ -12,13 +12,9 @@ import {
   Repository,
 } from 'typeorm';
 import { SkidPlatform } from './entities/skid-platform.entity';
-import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
-import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-order.dto';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
-import { SkidPlatformPlcDto } from './dto/skid-platform-plc.dto';
-import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 
 @Injectable()
 export class SkidPlatformService {
