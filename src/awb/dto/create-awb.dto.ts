@@ -46,5 +46,5 @@ export class CreateAwbDto extends PickType(Awb, [
       '"path": ""}]',
     description: 'SCCFK',
   })
-  scc: Partial<Scc>;
+  scc: Partial<Scc>[];
 }

@@ -24,12 +24,14 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Awb } from './entities/awb.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('awb')
 @ApiTags('Awb(화물,vms)')
 export class AwbController {
   constructor(private readonly awbService: AwbService) {}
 
+  @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
   @Post()
   create(@Body() createAwbDto: CreateAwbDto) {
     return this.awbService.create(createAwbDto);
@@ -171,5 +173,12 @@ export class AwbController {
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     console.log(file);
+  }
+
+  // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
+  @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
+  createByPlcMatt(@Payload() data) {
+    console.log(data);
+    return this.awbService.create(data);
   }
 }

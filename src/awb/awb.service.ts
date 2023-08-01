@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,6 +18,8 @@ import { CreateAwbSccJoinDto } from '../awb-scc-join/dto/create-awb-scc-join.dto
 import { Scc } from '../scc/entities/scc.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
+import { ClientProxy } from '@nestjs/microservices';
+import { take } from 'rxjs';
 
 @Injectable()
 export class AwbService {
@@ -29,6 +31,7 @@ export class AwbService {
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
     private dataSource: DataSource,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
   async create(createAwbDto: CreateAwbDto) {

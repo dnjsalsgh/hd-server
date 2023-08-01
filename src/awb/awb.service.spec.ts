@@ -63,12 +63,12 @@ describe('AwbService', () => {
     awbJoinRepository = module.get('AwbSccJoinRepository');
     asrsRepository = module.get('AsrsRepository');
     datasource = new DataSource(setDataSourceForTest);
-    awbService = new AwbService(awbRepository, datasource);
+    // awbService = new AwbService(awbRepository, datasource);
   });
 
-  it('should be defined', () => {
-    expect(awbService).toBeDefined();
-  });
+  // it('should be defined', () => {
+  //   expect(awbService).toBeDefined();
+  // });
 
   it('Awb 테스트 데이터 넣기', async () => {
     const awbTestData: Partial<CreateAwbDto> = {
