@@ -98,7 +98,7 @@ export class Uld {
     cascade: true,
   })
   @JoinTable({
-    name: 'uld-scc-join',
+    name: 'uld_scc_join',
     joinColumn: {
       name: 'uld_id',
       referencedColumnName: 'id',
