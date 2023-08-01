@@ -174,7 +174,7 @@ export class SkidPlatformHistoryService {
     // 어떤 창고에서 나왔는지
     const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
 
-    //TODO 테스트용으로 가장 최신 작업지시를 넣기(실제 로직에서는 작업지시 만들어지고 사용)
+    //TODO 어느 창고에서 왔는지, 어떤 화물인지를 추적해서 작업지시를 가져옵니다.
     const asrsOutOrderResult = await this.asrsOutOrderRepository.findOne({
       where: { Asrs: asrsId, Awb: awbId },
       order: { id: 'desc' },
