@@ -21,6 +21,8 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
 import { TimeTable } from '../time-table/entities/time-table.entity';
 import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
+import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
+import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
 
 @Injectable()
 export class AsrsService {
@@ -202,13 +204,16 @@ export class AsrsService {
       Awb: awbId,
       data: body,
     };
+
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
+      // timeTable에 스태커 크레인 데이터 입력
       await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
 
+      // asrs에서 동작한 data를 이력 등록
       await queryRunner.manager
         .getRepository(AsrsHistory)
         .save(asrsHistoryBody);

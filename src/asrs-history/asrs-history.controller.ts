@@ -26,11 +26,6 @@ export class AsrsHistoryController {
     return this.asrsHistoryService.create(createAsrsHistoryDto);
   }
 
-  @Post('/plc')
-  createByPlc(@Body() body: CreateAsrsPlcDto) {
-    return this.asrsHistoryService.createByPlc(body);
-  }
-
   @ApiQuery({ name: 'Asrs', required: false, type: 'number' })
   @ApiQuery({ name: 'Awb', required: false, type: 'number' })
   @ApiQuery({ name: 'createdAtFrom', required: false })

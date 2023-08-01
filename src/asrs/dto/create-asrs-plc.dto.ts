@@ -134,40 +134,94 @@ export class CreateAsrsPlcDto {
   RH_Rack8_ID?: string;
   @ApiProperty({ example: 1, description: 'Rack9 ID(RH)' })
   RH_Rack9_ID?: string;
-  @ApiProperty({ example: { awbId: 1 }, description: 'LH Rack1 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'LH Rack1 화물정보',
+  })
   ASRS_LH_Rack1_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'LH Rack2 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'LH Rack2 화물정보',
+  })
   ASRS_LH_Rack2_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'LH Rack3 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'LH Rack3 화물정보',
+  })
   ASRS_LH_Rack3_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'LH Rack4 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'LH Rack4 화물정보',
+  })
   ASRS_LH_Rack4_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'LH Rack5 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'LH Rack5 화물정보',
+  })
   ASRS_LH_Rack5_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'LH Rack6 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'LH Rack6 화물정보',
+  })
   ASRS_LH_Rack6_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'LH Rack7 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'LH Rack7 화물정보',
+  })
   ASRS_LH_Rack7_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'LH Rack8 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'LH Rack8 화물정보',
+  })
   ASRS_LH_Rack8_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'LH Rack9 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'LH Rack9 화물정보',
+  })
   ASRS_LH_Rack9_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'RH Rack1 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'RH Rack1 화물정보',
+  })
   ASRS_RH_Rack1_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'RH Rack2 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'RH Rack2 화물정보',
+  })
   ASRS_RH_Rack2_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'RH Rack3 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'RH Rack3 화물정보',
+  })
   ASRS_RH_Rack3_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'RH Rack4 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'RH Rack4 화물정보',
+  })
   ASRS_RH_Rack4_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'RH Rack5 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'RH Rack5 화물정보',
+  })
   ASRS_RH_Rack5_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'RH Rack6 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'RH Rack6 화물정보',
+  })
   ASRS_RH_Rack6_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'RH Rack7 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'RH Rack7 화물정보',
+  })
   ASRS_RH_Rack7_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'RH Rack8 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'RH Rack8 화물정보',
+  })
   ASRS_RH_Rack8_Part_Info?: string | unknown;
-  @ApiProperty({ example: { awbId: 1 }, description: 'RH Rack9 화물정보' })
+  @ApiProperty({
+    example: { awbId: 1, count: 10 },
+    description: 'RH Rack9 화물정보',
+  })
   ASRS_RH_Rack9_Part_Info?: string | unknown;
 }

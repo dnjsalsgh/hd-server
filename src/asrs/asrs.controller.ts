@@ -86,10 +86,10 @@ export class AsrsController {
   }
 
   @ApiOperation({
-    summary: 'plc를 활용한 창고에 화물 넣기(이력등록)',
+    summary: 'plc를 활용한 창고에 화물 이력(이력등록)',
     description: '창고로 일어나는 작업이기 때문에 asrs로 넣음',
   })
-  @Post('/plc/asrs-in')
+  @Post('/plc/asrs')
   createByPlcIn(@Body() body: CreateAsrsPlcDto) {
     return this.asrsService.createByPlcIn(body);
   }
