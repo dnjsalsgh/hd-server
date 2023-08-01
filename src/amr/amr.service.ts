@@ -153,8 +153,8 @@ export class AmrService {
       await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
 
       // amr실시간 데이터 mqtt로 publish 하기 위함
-      await this.client
-        .send('amr', {
+      this.client
+        .send(`${body.Amrld.toString()}`, {
           amrBody: amrBody,
           amrChargerBody: amrChargerBody,
           amrChargeHistoryBody: amrChargeHistoryBody,

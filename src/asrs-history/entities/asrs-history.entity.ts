@@ -12,6 +12,7 @@ import { Asrs } from '../../asrs/entities/asrs.entity';
 import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -30,6 +31,7 @@ export class AsrsHistory {
   })
   @IsString()
   @IsNotEmpty()
+  @IsEnum(['in', 'out'])
   @Column({ type: 'varchar', nullable: false, length: 50, default: 0 })
   inOutType: string;
 

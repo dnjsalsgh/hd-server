@@ -5,10 +5,11 @@ import { Asrs } from './entities/asrs.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MqttModule } from '../mqtt.module';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
+import { TimeTable } from '../time-table/entities/time-table.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Asrs, AsrsHistory]),
+    TypeOrmModule.forFeature([Asrs, AsrsHistory, TimeTable]),
     // mqtt 모듈설정
     MqttModule,
   ],

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAsrsPlcDto {
-  @ApiProperty({ example: false, description: '인입 컨베이어 시작' })
+  @ApiProperty({ example: true, description: '인입 컨베이어 시작' })
   In_Conveyor_Start?: boolean;
   @ApiProperty({ example: false, description: '인입 컨베이어 정지' })
   In_Conveyor_Stop?: boolean;

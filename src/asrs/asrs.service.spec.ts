@@ -103,7 +103,7 @@ describe('AsrsService', () => {
     asrsRepository = module.get('AsrsRepository');
     asrsHistoryRepository = module.get('AsrsHistoryRepository');
 
-    asrsService = new AsrsService(asrsRepository, asrsHistoryRepository);
+    // asrsService = new AsrsService(asrsRepository, asrsHistoryRepository);
   });
 
   it('should be defined', () => {

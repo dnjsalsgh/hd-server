@@ -23,7 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { Asrs } from './entities/asrs.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
@@ -52,15 +52,6 @@ export class AsrsController {
     body.fullPath = body.name;
     const asrs = await this.asrsService.create(body);
     return asrs;
-  }
-
-  @ApiOperation({
-    summary: 'plc를 활용한 창고에 화물 넣기(이력등록)',
-    description: '창고로 일어나는 작업이기 때문에 asrs로 넣음',
-  })
-  @Post('/plc/asrs-in')
-  createByPlcIn(@Body() body: CreateAsrsPlcDto) {
-    return this.asrsService.createByPlcIn(body);
   }
 
   @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
@@ -92,5 +83,20 @@ export class AsrsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.asrsService.remove(+id);
+  }
+
+  @ApiOperation({
+    summary: 'plc를 활용한 창고에 화물 넣기(이력등록)',
+    description: '창고로 일어나는 작업이기 때문에 asrs로 넣음',
+  })
+  @Post('/plc/asrs-in')
+  createByPlcIn(@Body() body: CreateAsrsPlcDto) {
+    return this.asrsService.createByPlcIn(body);
+  }
+
+  @MessagePattern('hyundai/asrs1/eqData') //구독하는 주제
+  createByPlcMatt(@Payload() data) {
+    // console.log(data);
+    // return this.asrsService.createByPlcIn(data);
   }
 }

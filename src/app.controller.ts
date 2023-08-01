@@ -14,10 +14,10 @@ export class AppController {
 
   @Get()
   async getHello(): Promise<string> {
-    await this.client
-      .send('test', { data: 'test', time: new Date().toISOString() })
-      .pipe(take(1))
-      .subscribe();
+    // await this.client
+    //   .send('test', { data: 'test', time: new Date().toISOString() })
+    //   .pipe(take(1))
+    //   .subscribe();
 
     return this.appService.getHello();
   }

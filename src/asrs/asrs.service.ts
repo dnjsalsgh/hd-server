@@ -5,18 +5,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Asrs } from './entities/asrs.entity';
 import {
   Between,
+  DataSource,
   FindOperator,
   ILike,
   LessThanOrEqual,
   Like,
   MoreThanOrEqual,
   Repository,
+  TypeORMError,
 } from 'typeorm';
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
+import { TimeTable } from '../time-table/entities/time-table.entity';
+import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
 
 @Injectable()
 export class AsrsService {
@@ -24,7 +28,8 @@ export class AsrsService {
     @InjectRepository(Asrs)
     private readonly asrsRepository: Repository<Asrs>,
     @InjectRepository(AsrsHistory)
-    private readonly asrsHistoryRepository: Repository<AsrsHistory>, // private dataSource: DataSource,
+    private readonly asrsHistoryRepository: Repository<AsrsHistory>,
+    private dataSource: DataSource,
   ) {}
 
   async create(createAsrsDto: CreateAsrsDto): Promise<Asrs> {
@@ -174,6 +179,7 @@ export class AsrsService {
       awbId: number;
       count: number;
     };
+
     // 화물정보 안에 화물Id 들어왔다고 가정
     const awbId = awbInfo.awbId;
     // 화물정보 안에 화물수량 들어왔다고 가정
@@ -192,7 +198,27 @@ export class AsrsService {
       inOutType: inOutType,
       count: count,
     };
+    const timeTableBody: CreateTimeTableDto = {
+      Awb: awbId,
+      data: body,
+    };
+    const queryRunner = await this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    await this.asrsHistoryRepository.save(asrsHistoryBody);
+    try {
+      await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
+
+      await queryRunner.manager
+        .getRepository(AsrsHistory)
+        .save(asrsHistoryBody);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
   }
 }
