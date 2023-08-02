@@ -38,11 +38,11 @@ describe('SimulatorResultService', () => {
     );
     simulatorHistoryRepository = module.get('SimulatorHistoryRepository');
     dataSource = new DataSource(setDataSourceForTest);
-    // testdataSource = module.get('DataSource');
-    simulatorResultService = new SimulatorResultService(
-      simulatorResultRepository,
-      dataSource,
-    );
+    // // testdataSource = module.get('DataSource');
+    // simulatorResultService = new SimulatorResultService(
+    //   simulatorResultRepository,
+    //   dataSource,
+    // );
   });
 
   it('should be defined', async () => {

@@ -181,4 +181,12 @@ export class AwbController {
     console.log(data);
     return this.awbService.create(data);
   }
+
+  // 3D 모델링파일 생성 완료 트리거
+  @MessagePattern('hyundai/vms1/createFile') //구독하는 주제
+  updateFileByMqttSignal(@Payload() data) {
+    // nas 서버 접속해서 이미지 파일을 다운 받고 upload 진행하기
+    console.log(data);
+    // service 로직에서 이미지를 read완료 했다는 신호 발생
+  }
 }

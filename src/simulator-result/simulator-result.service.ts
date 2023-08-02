@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import {
@@ -163,83 +168,50 @@ export class SimulatorResultService {
      * */
 
     // 패키시 시뮬레이터에서 자동창고 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
-    const asrsOutOrderTestBody = {
-      Uld: 1,
-      outOrder: [
-        {
-          Asrs: 1,
-          Awb: 1,
-        },
-        {
-          Asrs: 2,
-          Awb: 2,
-        },
-        {
-          Asrs: 3,
-          Awb: 3,
-        },
-      ],
-    };
 
-    // 1. 자동창고 작업지시를 만들기
-    const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
+    try {
+      // 1. 자동창고 작업지시를 만들기
+      const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
 
-    for (const [index, element] of asrsOutOrderTestBody.outOrder.entries()) {
-      const asrsOutOrderParam = {
-        order: index,
-        Asrs: element.Asrs,
-        Awb: element.Awb,
-        SkidPlatform: asrsOutOrderTestBody.Uld,
-      };
-      asrsOutOrderParamArray.push(asrsOutOrderParam);
-    }
-    const asrsOutOrderResult = await this.asrsOutOrderRepository.save(
-      asrsOutOrderParamArray,
-    );
+      for (const [index, element] of body.outOrder.entries()) {
+        const asrsOutOrderParam = {
+          order: index,
+          Asrs: element.Asrs,
+          Awb: element.Awb,
+          SkidPlatform: body.Uld,
+        };
+        asrsOutOrderParamArray.push(asrsOutOrderParam);
+      }
+      const asrsOutOrderResult = await this.asrsOutOrderRepository.save(
+        asrsOutOrderParamArray,
+      );
+      // 2. 자동창고 작업지시 데이터 mqtt로 publish 하기 위함
+      // 자동창고 작업지시가 생성되었을 때만 동작합니다.
+      if (asrsOutOrderResult) {
+        // 패키징 시뮬레이터에서 도출된 최적 불출순서
+        this.client
+          .send(`hyundai/asrs1/outOrder`, {
+            asrsOurOrderResult: asrsOutOrderResult,
+            time: new Date().toISOString(),
+          })
+          .pipe(take(1))
+          .subscribe();
 
-    // 2. 자동창고 작업지시 데이터 mqtt로 publish 하기 위함
-    // 자동창고 작업지시가 생성되었을 때만 동작합니다.
-    if (asrsOutOrderResult) {
-      this.client
-        .send(`hyundai/asrs1/outOrder`, {
-          asrsOurOrderResult: asrsOutOrderResult,
-          time: new Date().toISOString(),
-        })
-        .pipe(take(1))
-        .subscribe();
+        // 최적 불출순서를 자동창고(ASRS) PLC에 write 완료했다는 신호
+        this.client
+          .send(`hyundai/asrs1/writeCompl`, {
+            asrsOurOrderResult: asrsOutOrderResult,
+            time: new Date().toISOString(),
+          })
+          .pipe(take(1))
+          .subscribe();
+      }
+    } catch (e) {
+      throw new HttpException('asrsOutOrder가 생성되지 않았습니다.', 403);
     }
 
     // 패키시 시뮬레이터에서 작업자 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
-    const buildUpOrderTestBody = {
-      startDate: new Date().toISOString(),
-      endDate: new Date().toISOString(),
-      loadRate: 10,
-      version: 0.1,
-      Uld: 1,
-      AwbWithXYZ: [
-        {
-          Awb: 1,
-          SkidPlatform: 1,
-          x: 10,
-          y: 20,
-          z: 30,
-        },
-        {
-          Awb: 2,
-          SkidPlatform: 2,
-          x: 20,
-          y: 30,
-          z: 40,
-        },
-        {
-          Awb: 3,
-          SkidPlatform: 3,
-          x: 30,
-          y: 40,
-          z: 50,
-        },
-      ],
-    };
+
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -247,7 +219,7 @@ export class SimulatorResultService {
     try {
       // Awb의 정보 validation 체크
       if (
-        !buildUpOrderTestBody.AwbWithXYZ.every(
+        !body.AwbWithXYZ.every(
           (obj) => 'Awb' in obj && 'x' in obj && 'y' in obj && 'z' in obj,
         )
       ) {
@@ -257,41 +229,41 @@ export class SimulatorResultService {
       // 1. simulatorResult 입력
       const simulatorResultResult = await queryRunner.manager
         .getRepository(SimulatorResult)
-        .save(buildUpOrderTestBody);
+        .save(body);
 
       const joinParamArray: CreateSimulatorResultAwbJoinDto[] = [];
       const historyParamArray: CreateSimulatorHistoryDto[] = [];
       const buildUpOrderParamArray: CreateBuildUpOrderDto[] = [];
 
       // 2. 입력되는 화물과 좌표를 이력에 입력
-      for (let i = 0; i < buildUpOrderTestBody.AwbWithXYZ.length; i++) {
+      for (let i = 0; i < body.AwbWithXYZ.length; i++) {
         // 2-1. Awb 이력 입력
         const joinParam: CreateSimulatorResultAwbJoinDto = {
-          Awb: buildUpOrderTestBody.AwbWithXYZ[i].Awb,
+          Awb: body.AwbWithXYZ[i].Awb,
           SimulatorResult: simulatorResultResult.id,
         };
         joinParamArray.push(joinParam);
 
         // 2-2. SimulatorHistory 입력
         const historyParam: CreateSimulatorHistoryDto = {
-          Uld: buildUpOrderTestBody.Uld,
-          Awb: buildUpOrderTestBody.AwbWithXYZ[i].Awb,
+          Uld: body.Uld,
+          Awb: body.AwbWithXYZ[i].Awb,
           SimulatorResult: simulatorResultResult.id,
-          x: buildUpOrderTestBody.AwbWithXYZ[i].x,
-          y: buildUpOrderTestBody.AwbWithXYZ[i].y,
-          z: buildUpOrderTestBody.AwbWithXYZ[i].z,
+          x: body.AwbWithXYZ[i].x,
+          y: body.AwbWithXYZ[i].y,
+          z: body.AwbWithXYZ[i].z,
         };
         historyParamArray.push(historyParam);
 
         // 2-3. 작업자 작업지시를 만들기
         const buildUpOrderBody: CreateBuildUpOrderDto = {
           order: i,
-          x: buildUpOrderTestBody.AwbWithXYZ[i].x,
-          y: buildUpOrderTestBody.AwbWithXYZ[i].y,
-          z: buildUpOrderTestBody.AwbWithXYZ[i].z,
-          SkidPlatform: buildUpOrderTestBody.AwbWithXYZ[i].SkidPlatform,
-          Uld: buildUpOrderTestBody.Uld,
-          Awb: buildUpOrderTestBody.AwbWithXYZ[i].Awb,
+          x: body.AwbWithXYZ[i].x,
+          y: body.AwbWithXYZ[i].y,
+          z: body.AwbWithXYZ[i].z,
+          SkidPlatform: body.AwbWithXYZ[i].SkidPlatform,
+          Uld: body.Uld,
+          Awb: body.AwbWithXYZ[i].Awb,
         };
         buildUpOrderParamArray.push(buildUpOrderBody);
       }
