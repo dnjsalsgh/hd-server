@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AircraftSchedule } from './entities/aircraft-schedule.entity';
 import {
   Between,
+  Equal,
   FindOperator,
   ILike,
   LessThanOrEqual,
@@ -27,6 +28,9 @@ export class AircraftScheduleService {
   }
 
   async findAll(
+    Aircraft: number,
+    CcIdDestination: number,
+    CcIdDeparture: number,
     source?: string,
     createdAtFrom?: Date,
     createdAtTo?: Date,
@@ -47,17 +51,18 @@ export class AircraftScheduleService {
       relations: {
         Aircraft: true,
         CcIdDestination: true,
+        CcIdDeparture: true,
       },
       select: {
-        Aircraft: {
-          ...AircraftAttribute,
-        },
-        CcIdDestination: {
-          ...CcIdDestinationAttribute,
-        },
+        Aircraft: AircraftAttribute,
+        CcIdDestination: CcIdDestinationAttribute,
+        CcIdDeparture: CcIdDestinationAttribute,
       },
       where: {
         source: source ? ILike(`%${source}%`) : undefined,
+        Aircraft: Aircraft ? Equal(+Aircraft) : undefined,
+        CcIdDestination: CcIdDestination ? Equal(+CcIdDestination) : undefined,
+        CcIdDeparture: CcIdDeparture ? Equal(+CcIdDeparture) : undefined,
         createdAt: findDate,
       },
       order: getOrderBy(order),
@@ -74,6 +79,13 @@ export class AircraftScheduleService {
       where: { id: id },
       relations: {
         Aircraft: true,
+        CcIdDestination: true,
+        CcIdDeparture: true,
+      },
+      select: {
+        Aircraft: AircraftAttribute,
+        CcIdDestination: CcIdDestinationAttribute,
+        CcIdDeparture: CcIdDestinationAttribute,
       },
     });
   }

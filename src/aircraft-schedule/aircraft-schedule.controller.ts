@@ -26,6 +26,9 @@ export class AircraftScheduleController {
     return await this.aircraftScheduleService.create(createAircraftScheduleDto);
   }
 
+  @ApiQuery({ name: 'Aircraft', required: false, type: 'number' })
+  @ApiQuery({ name: 'CcIdDestination', required: false, type: 'number' })
+  @ApiQuery({ name: 'CcIdDeparture', required: false, type: 'number' })
   @ApiQuery({ name: 'source', required: false })
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })
@@ -34,6 +37,9 @@ export class AircraftScheduleController {
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
   findAll(
+    @Query('Aircraft') Aircraft?: number,
+    @Query('CcIdDestination') CcIdDestination?: number,
+    @Query('CcIdDeparture') CcIdDeparture?: number,
     @Query('source') source?: string,
     @Query('createdAtFrom') createdAtFrom?: Date,
     @Query('createdAtTo') createdAtTo?: Date,
@@ -42,6 +48,9 @@ export class AircraftScheduleController {
     @Query('offset') offset?: number,
   ) {
     return this.aircraftScheduleService.findAll(
+      Aircraft,
+      CcIdDestination,
+      CcIdDeparture,
       source,
       createdAtFrom,
       createdAtTo,
