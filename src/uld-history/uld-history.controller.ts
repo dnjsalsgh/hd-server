@@ -12,7 +12,6 @@ import { UldHistoryService } from './uld-history.service';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
 import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { UldHistory } from './entities/uld-history.entity';
 

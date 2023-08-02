@@ -64,6 +64,16 @@ export class TimeTableService {
   async findOne(id: number) {
     const result = await this.timeTableRepository.findOne({
       where: { id: id },
+      relations: {
+        Uld: true,
+        Amr: true,
+        Awb: true,
+      },
+      select: {
+        Uld: UldAttribute,
+        Amr: AmrAttribute,
+        Awb: AwbAttribute,
+      },
     });
     return result;
   }
