@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import {
@@ -22,12 +22,31 @@ import { CreateSimulatorResultAwbJoinDto } from '../simulator-result-awb-join/dt
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
 import { AwbAttribute } from '../awb/entities/awb.entity';
+import { CreateSimulatorResultOrderDto } from './dto/create-simulator-result-order.dto';
+import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
+import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
+import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
+import { BuildUpOrder } from '../build-up-order/entities/build-up-order.entity';
+import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-order.dto';
+import { CreateBuildUpOrderDto } from '../build-up-order/dto/create-build-up-order.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { take } from 'rxjs';
+import { Asrs } from '../asrs/entities/asrs.entity';
 
 @Injectable()
 export class SimulatorResultService {
   constructor(
     @InjectRepository(SimulatorResult)
     private readonly simulatorResultRepository: Repository<SimulatorResult>,
+    @InjectRepository(AsrsHistory)
+    private readonly asrsHistoryRepository: Repository<AsrsHistory>,
+    @InjectRepository(SkidPlatformHistory)
+    private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
+    @InjectRepository(AsrsOutOrder)
+    private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
+    @InjectRepository(BuildUpOrder)
+    private readonly buildUpOrderRepository: Repository<BuildUpOrder>,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
     private dataSource: DataSource,
   ) {}
 
@@ -101,6 +120,204 @@ export class SimulatorResultService {
     }
   }
 
+  async createOrder(body: CreateSimulatorResultOrderDto) {
+    // 자동창고의 최신 이력을 화물 기준으로 가져오기
+    const asrsHistorySubQueryBuilder = this.asrsHistoryRepository
+      .createQueryBuilder('sub_asrsHistory')
+      .select('awb_id, MAX(id) AS max_id')
+      .groupBy('awb_id');
+    const asrsHistoryResult = await this.asrsHistoryRepository
+      .createQueryBuilder('asrsHistory')
+      .leftJoinAndSelect('asrsHistory.Awb', 'Awb')
+      .leftJoinAndSelect('asrsHistory.Asrs', 'Asrs')
+      .where(
+        `(asrsHistory.awb_id, asrsHistory.id) IN (${asrsHistorySubQueryBuilder.getQuery()})`,
+      )
+      .andWhere('asrsHistory.deleted_at IS NULL')
+      .orderBy('asrsHistory.id', 'DESC')
+      .getMany();
+
+    // 안착대의 최신 이력을 화물 기준으로 가져오기
+    const skidPlatformHistorySubQueryBuilder =
+      this.skidPlatformHistoryRepository
+        .createQueryBuilder('sub_skidPlatformHistory')
+        .select('skid_platform_id, MAX(id) AS max_id')
+        .groupBy('skid_platform_id');
+    const skidPlatformHistoryResult = await this.skidPlatformHistoryRepository
+      .createQueryBuilder('skidPlatformHistory')
+      .leftJoinAndSelect('skidPlatformHistory.Awb', 'Awb')
+      .leftJoinAndSelect('skidPlatformHistory.Asrs', 'Asrs')
+      .where(
+        `(skidPlatformHistory.skid_platform_id, skidPlatformHistory.id) IN (${skidPlatformHistorySubQueryBuilder.getQuery()})`,
+      )
+      .andWhere('skidPlatformHistory.deleted_at IS NULL')
+      .orderBy('skidPlatformHistory.id', 'DESC')
+      .getMany();
+
+    // TODO 패키지 시뮬레이터에 자동창고 정보, 안착대 정보, uld 정보를 같이 묶어서 api 호출하기
+    // 호출하는 부분
+    /*
+     *
+     *
+     *
+     * */
+
+    // 패키시 시뮬레이터에서 자동창고 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
+    const asrsOutOrderTestBody = {
+      Uld: 1,
+      outOrder: [
+        {
+          Asrs: 1,
+          Awb: 1,
+        },
+        {
+          Asrs: 2,
+          Awb: 2,
+        },
+        {
+          Asrs: 3,
+          Awb: 3,
+        },
+      ],
+    };
+
+    // 1. 자동창고 작업지시를 만들기
+    const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
+
+    for (const [index, element] of asrsOutOrderTestBody.outOrder.entries()) {
+      const asrsOutOrderParam = {
+        order: index,
+        Asrs: element.Asrs,
+        Awb: element.Awb,
+        SkidPlatform: asrsOutOrderTestBody.Uld,
+      };
+      asrsOutOrderParamArray.push(asrsOutOrderParam);
+    }
+    const asrsOutOrderResult = await this.asrsOutOrderRepository.save(
+      asrsOutOrderParamArray,
+    );
+
+    // 2. 자동창고 작업지시 데이터 mqtt로 publish 하기 위함
+    // 자동창고 작업지시가 생성되었을 때만 동작합니다.
+    if (asrsOutOrderResult) {
+      this.client
+        .send(`hyundai/asrs1/outOrder`, {
+          asrsOurOrderResult: asrsOutOrderResult,
+          time: new Date().toISOString(),
+        })
+        .pipe(take(1))
+        .subscribe();
+    }
+
+    // 패키시 시뮬레이터에서 작업자 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
+    const buildUpOrderTestBody = {
+      startDate: new Date().toISOString(),
+      endDate: new Date().toISOString(),
+      loadRate: 10,
+      version: 0.1,
+      Uld: 1,
+      AwbWithXYZ: [
+        {
+          Awb: 1,
+          SkidPlatform: 1,
+          x: 10,
+          y: 20,
+          z: 30,
+        },
+        {
+          Awb: 2,
+          SkidPlatform: 2,
+          x: 20,
+          y: 30,
+          z: 40,
+        },
+        {
+          Awb: 3,
+          SkidPlatform: 3,
+          x: 30,
+          y: 40,
+          z: 50,
+        },
+      ],
+    };
+    const queryRunner = await this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Awb의 정보 validation 체크
+      if (
+        !buildUpOrderTestBody.AwbWithXYZ.every(
+          (obj) => 'Awb' in obj && 'x' in obj && 'y' in obj && 'z' in obj,
+        )
+      ) {
+        throw new NotFoundException('Awb 상세 정보가 없습니다.');
+      }
+
+      // 1. simulatorResult 입력
+      const simulatorResultResult = await queryRunner.manager
+        .getRepository(SimulatorResult)
+        .save(buildUpOrderTestBody);
+
+      const joinParamArray: CreateSimulatorResultAwbJoinDto[] = [];
+      const historyParamArray: CreateSimulatorHistoryDto[] = [];
+      const buildUpOrderParamArray: CreateBuildUpOrderDto[] = [];
+
+      // 2. 입력되는 화물과 좌표를 이력에 입력
+      for (let i = 0; i < buildUpOrderTestBody.AwbWithXYZ.length; i++) {
+        // 2-1. Awb 이력 입력
+        const joinParam: CreateSimulatorResultAwbJoinDto = {
+          Awb: buildUpOrderTestBody.AwbWithXYZ[i].Awb,
+          SimulatorResult: simulatorResultResult.id,
+        };
+        joinParamArray.push(joinParam);
+
+        // 2-2. SimulatorHistory 입력
+        const historyParam: CreateSimulatorHistoryDto = {
+          Uld: buildUpOrderTestBody.Uld,
+          Awb: buildUpOrderTestBody.AwbWithXYZ[i].Awb,
+          SimulatorResult: simulatorResultResult.id,
+          x: buildUpOrderTestBody.AwbWithXYZ[i].x,
+          y: buildUpOrderTestBody.AwbWithXYZ[i].y,
+          z: buildUpOrderTestBody.AwbWithXYZ[i].z,
+        };
+        historyParamArray.push(historyParam);
+
+        // 2-3. 작업자 작업지시를 만들기
+        const buildUpOrderBody: CreateBuildUpOrderDto = {
+          order: i,
+          x: buildUpOrderTestBody.AwbWithXYZ[i].x,
+          y: buildUpOrderTestBody.AwbWithXYZ[i].y,
+          z: buildUpOrderTestBody.AwbWithXYZ[i].z,
+          SkidPlatform: buildUpOrderTestBody.AwbWithXYZ[i].SkidPlatform,
+          Uld: buildUpOrderTestBody.Uld,
+          Awb: buildUpOrderTestBody.AwbWithXYZ[i].Awb,
+        };
+        buildUpOrderParamArray.push(buildUpOrderBody);
+      }
+
+      const joinResult = queryRunner.manager
+        .getRepository(SimulatorResultAwbJoin)
+        .save(joinParamArray);
+      const historyResult = queryRunner.manager
+        .getRepository(SimulatorHistory)
+        .save(historyParamArray);
+      const buildUpOrderResult = queryRunner.manager
+        .getRepository(BuildUpOrder)
+        .save(buildUpOrderParamArray);
+
+      // awbjoin 테이블, 이력 테이블 함께 저장
+      await Promise.all([joinResult, historyResult, buildUpOrderResult]);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   async findAll(query: SimulatorResult & BasicQueryParam) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
@@ -135,7 +352,17 @@ export class SimulatorResultService {
   }
 
   async findOne(id: number) {
-    return await this.simulatorResultRepository.find({ where: { id: id } });
+    return await this.simulatorResultRepository.find({
+      where: { id: id },
+      relations: {
+        Uld: true,
+        Awb: true,
+      },
+      select: {
+        Uld: UldAttribute,
+        Awb: AwbAttribute,
+      },
+    });
   }
 
   update(id: number, updateSimulatorResultDto: UpdateSimulatorResultDto) {

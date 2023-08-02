@@ -65,7 +65,19 @@ export class SimulatorHistoryService {
   }
 
   async findOne(id: number) {
-    return await this.simulatorHistoryRepository.find({ where: { id: id } });
+    return await this.simulatorHistoryRepository.find({
+      where: { id: id },
+      select: {
+        SimulatorResult: SimulatorResultAttribute,
+        Uld: UldAttribute,
+        Awb: AwbAttribute,
+      },
+      relations: {
+        SimulatorResult: true,
+        Uld: true,
+        Awb: true,
+      },
+    });
   }
 
   update(id: number, updateSimulatorHistoryDto: UpdateSimulatorHistoryDto) {

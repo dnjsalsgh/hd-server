@@ -71,6 +71,16 @@ export class AsrsOutOrderService {
   async findOne(id: number) {
     const result = await this.asrsOutOrderRepository.findOne({
       where: { id: id },
+      relations: {
+        Asrs: true,
+        SkidPlatform: true,
+        Awb: true,
+      },
+      select: {
+        Asrs: AsrsAttribute,
+        SkidPlatform: SkidPlatformAttribute,
+        Awb: AwbAttribute,
+      },
     });
     return result;
   }
