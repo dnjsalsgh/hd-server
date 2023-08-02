@@ -126,7 +126,12 @@ export class AwbService {
   }
 
   findFamily(id: number) {
-    return this.awbRepository.find({ where: [{ id: id }, { parent: id }] });
+    return this.awbRepository.find({
+      where: [{ id: id }, { parent: id }],
+      relations: {
+        Scc: true,
+      },
+    });
   }
 
   async findOne(id: number) {

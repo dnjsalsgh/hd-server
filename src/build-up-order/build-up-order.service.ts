@@ -118,7 +118,19 @@ export class BuildUpOrderService {
   }
 
   async findOne(id: number) {
-    return await this.buildUpOrderRepository.find({ where: { id: id } });
+    return await this.buildUpOrderRepository.find({
+      where: { id: id },
+      relations: {
+        SkidPlatform: true,
+        Uld: true,
+        Awb: true,
+      },
+      select: {
+        SkidPlatform: SkidPlatformAttribute,
+        Uld: UldAttribute,
+        Awb: AwbAttribute,
+      },
+    });
   }
 
   update(id: number, updateBuildUpOrderDto: UpdateBuildUpOrderDto) {

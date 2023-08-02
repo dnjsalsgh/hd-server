@@ -4,7 +4,6 @@ import {
   Between,
   Equal,
   FindOperator,
-  ILike,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,

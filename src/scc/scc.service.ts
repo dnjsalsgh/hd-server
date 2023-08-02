@@ -13,7 +13,6 @@ import {
 import { Scc } from './entities/scc.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
-import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 
 @Injectable()
 export class SccService {

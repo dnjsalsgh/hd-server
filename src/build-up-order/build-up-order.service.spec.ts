@@ -60,7 +60,7 @@ describe('BuildUpOrderService', () => {
     skidPlatformRepository = testModule.get('SkidPlatformRepository');
     asrsOutOrderRepository = testModule.get('AsrsOutOrderRepository');
     datasource = new DataSource(setDataSourceForTest);
-    awbService = new AwbService(awbRepository, datasource);
+    // awbService = new AwbService(awbRepository, datasource);
     skidPlatformService = new SkidPlatformService(
       skidPlatformRepository,
       asrsOutOrderRepository,
@@ -71,12 +71,14 @@ describe('BuildUpOrderService', () => {
     expect(buildUpOrderRepository).toBeDefined();
   });
   it('목표객체 설정', async () => {
-    const uldTestBody: CreateUldDto = {
+    const uldTestBody: Partial<CreateUldDto> = {
       code: 'Uld-001',
       prefab: '프리맵명',
       airplaneType: '보잉070',
       simulation: true,
       UldType: 1,
+      boundaryPrefab: '1',
+      loadRate: 1,
     };
     await uldRepository.save(uldTestBody);
 
@@ -123,13 +125,15 @@ describe('BuildUpOrderService', () => {
       rmComment: 'RM 코멘트',
       localTime: new Date(),
       localInTerminal: 'AIR-001',
-      scc: {
-        code: 'Scc-001',
-        name: '드라이아이스',
-        score: 1,
-        description: '',
-        path: '',
-      },
+      scc: [
+        {
+          code: 'Scc-001',
+          name: '드라이아이스',
+          score: 1,
+          description: '',
+          path: '',
+        },
+      ],
     };
     await awbRepository.save(awbBody);
   });
@@ -166,13 +170,15 @@ describe('BuildUpOrderService', () => {
         rmComment: 'RM 코멘트',
         localTime: new Date(),
         localInTerminal: 'AIR-001',
-        scc: {
-          code: 'Scc-001',
-          name: '드라이아이스',
-          score: 1,
-          description: '',
-          path: '',
-        },
+        scc: [
+          {
+            code: 'Scc-001',
+            name: '드라이아이스',
+            score: 1,
+            description: '',
+            path: '',
+          },
+        ],
       },
       {
         name: '화물-003',
@@ -203,13 +209,15 @@ describe('BuildUpOrderService', () => {
         rmComment: 'RM 코멘트',
         localTime: new Date(),
         localInTerminal: 'AIR-001',
-        scc: {
-          code: 'Scc-001',
-          name: '드라이아이스',
-          score: 1,
-          description: '',
-          path: '',
-        },
+        scc: [
+          {
+            code: 'Scc-001',
+            name: '드라이아이스',
+            score: 1,
+            description: '',
+            path: '',
+          },
+        ],
       },
     ];
 

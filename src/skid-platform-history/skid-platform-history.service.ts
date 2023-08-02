@@ -89,6 +89,27 @@ export class SkidPlatformHistoryService {
   async findOne(id: number) {
     const result = await this.skidPlatformHistoryRepository.findOne({
       where: { id: id },
+      select: {
+        Awb: AwbAttribute,
+        Asrs: AsrsAttribute,
+        SkidPlatform: SkidPlatformAttribute,
+        AsrsOutOrder: {
+          ...AsrsOutOrderAttribute,
+          Awb: AwbAttribute,
+          Asrs: AsrsAttribute,
+          SkidPlatform: SkidPlatformAttribute,
+        },
+      },
+      relations: {
+        Awb: true,
+        Asrs: true,
+        SkidPlatform: true,
+        AsrsOutOrder: {
+          Awb: true,
+          Asrs: true,
+          SkidPlatform: true,
+        },
+      },
     });
     return result;
   }

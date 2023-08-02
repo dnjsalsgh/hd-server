@@ -21,8 +21,6 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
 import { TimeTable } from '../time-table/entities/time-table.entity';
 import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
-import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
-import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
 
 @Injectable()
 export class AsrsService {

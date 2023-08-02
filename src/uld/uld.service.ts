@@ -4,7 +4,6 @@ import { UpdateUldDto } from './dto/update-uld.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
-  DataSource,
   Equal,
   FindOperator,
   ILike,
@@ -72,7 +71,7 @@ export class UldService {
       },
       select: {
         UldType: UldTypeAttribute,
-        // Scc: SccAttribute,
+        Scc: SccAttribute,
       },
     });
     return result;
