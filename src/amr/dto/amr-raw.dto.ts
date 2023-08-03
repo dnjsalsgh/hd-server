@@ -93,7 +93,7 @@ export class AmrRawDto {
   // })
   // public DisplayState: string;
   @ApiProperty({
-    example: '0',
+    example: 'moving',
     description: '로봇의 현재 상태(이동, 리프팅 등)',
   })
   public CurState: string;

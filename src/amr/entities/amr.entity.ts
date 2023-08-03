@@ -68,6 +68,13 @@ export class Amr {
   @Column({ nullable: false })
   errorCode: string;
 
+  @ApiProperty({
+    example: 74,
+    description: '배터리SOH(현재 배터리량)',
+  })
+  @Column({ type: 'int', nullable: false })
+  soc?: number;
+
   // @ApiProperty({
   //   example: new Date(),
   //   description: '미션시작시간',

@@ -10,6 +10,7 @@ export class CreateAmrDto extends PickType(Amr, [
   'mode',
   // 'errorLevel',
   'errorCode',
+  'soc',
   // 'startTime',
   // 'endTime',
   'travelDist',
