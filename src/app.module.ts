@@ -21,7 +21,6 @@ import { SimulatorResultModule } from './simulator-result/simulator-result.modul
 import { SimulatorHistoryModule } from './simulator-history/simulator-history.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import * as process from 'process';
 import { Amr } from './amr/entities/amr.entity';
 import { AmrCharger } from './amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from './amr-charge-history/entities/amr-charge-history.entity';
@@ -105,7 +104,7 @@ import { RedisCacheModule } from './cache/redis.module';
           ],
           // autoLoadEntities: true,  [버그있어서 사용 지양]
           logging: true, // 쿼리 보여주는 옵션
-          // synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
+          synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
           namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
         };
       },

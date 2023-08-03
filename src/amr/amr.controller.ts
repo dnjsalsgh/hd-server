@@ -31,6 +31,7 @@ export class AmrController {
   })
   @Post('/moving-data')
   createByPlc(@Body() body: AmrRawDto) {
+    // return this.amrService.createAmrByData(body); 충전기의 위치 데이터까지 가져오려 했지만 ms-sql에 데이터가 없어서 실패
     return this.amrService.createAmrByData(body);
   }
 
@@ -72,8 +73,8 @@ export class AmrController {
     @Query('endTimeFrom') endTimeFrom?: Date,
     @Query('endTimeTo') endTimeTo?: Date,
     @Query('travelDist') travelDist?: number,
-    @Query('oprTime') oprTime?: Date,
-    @Query('stopTime') stopTime?: Date,
+    @Query('oprTime') oprTime?: number,
+    @Query('stopTime') stopTime?: number,
     @Query('startBatteryLevel') startBatteryLevel?: number,
     @Query('lastBatteryLevel') lastBatteryLevel?: number,
     @Query('simulation') simulation?: boolean,

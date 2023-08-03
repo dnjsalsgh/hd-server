@@ -172,7 +172,6 @@ export class SimulatorResultService {
     try {
       // 1. 자동창고 작업지시를 만들기
       const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
-
       for (const [index, element] of body.outOrder.entries()) {
         const asrsOutOrderParam = {
           order: index,
@@ -185,6 +184,7 @@ export class SimulatorResultService {
       const asrsOutOrderResult = await this.asrsOutOrderRepository.save(
         asrsOutOrderParamArray,
       );
+
       // 2. 자동창고 작업지시 데이터 mqtt로 publish 하기 위함
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
       if (asrsOutOrderResult) {

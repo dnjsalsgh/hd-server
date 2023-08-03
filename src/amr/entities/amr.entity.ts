@@ -30,22 +30,22 @@ export class Amr {
     example: false,
     description: '충전중 여부',
   })
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: false }) // 이전 배터리 충전량과 비교해서 충전여부 판단하기 때문에 처음에 생기면 무조건 false
   charging: boolean;
 
-  @ApiProperty({
-    example: 1,
-    description: '공정 코드',
-  })
-  @Column({ type: 'varchar', length: 50, nullable: true })
-  prcsCD?: string;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '공정 코드',
+  // })
+  // @Column({ type: 'varchar', length: 50, nullable: true })
+  // prcsCD?: string;
 
-  @ApiProperty({
-    example: false,
-    description: 'ACS 모드 (Auto = 0, Manual = 1)',
-  })
-  @Column({ nullable: true })
-  ACSMode?: boolean;
+  // @ApiProperty({
+  //   example: false,
+  //   description: 'ACS 모드 (Auto = 0, Manual = 1)',
+  // })
+  // @Column({ nullable: true })
+  // ACSMode?: boolean;
 
   @ApiProperty({
     example: 2,
@@ -54,12 +54,12 @@ export class Amr {
   @Column({ nullable: true })
   mode?: number;
 
-  @ApiProperty({
-    example: 0,
-    description: '마지막에러의 에러레벨 (info=0, warning=1, critical=2)',
-  })
-  @Column({ nullable: true })
-  errorLevel?: number;
+  // @ApiProperty({
+  //   example: 0,
+  //   description: '마지막에러의 에러레벨 (info=0, warning=1, critical=2)',
+  // })
+  // @Column({ nullable: true })
+  // errorLevel?: number;
 
   @ApiProperty({
     example: 'Error found',
@@ -68,40 +68,40 @@ export class Amr {
   @Column({ nullable: false })
   errorCode: string;
 
-  @ApiProperty({
-    example: new Date(),
-    description: '미션시작시간',
-  })
-  @Column({ nullable: false })
-  startTime: Date;
+  // @ApiProperty({
+  //   example: new Date(),
+  //   description: '미션시작시간',
+  // })
+  // @Column({ nullable: false })
+  // startTime: Date;
 
-  @ApiProperty({
-    example: new Date(),
-    description: '미션종료시간',
-  })
-  @Column({ nullable: false })
-  endTime: Date;
+  // @ApiProperty({
+  //   example: new Date(),
+  //   description: '미션종료시간',
+  // })
+  // @Column({ nullable: false })
+  // endTime: Date;
 
   @ApiProperty({
     example: 10,
     description: '누적이동거리(m)',
   })
-  @Column({ nullable: false })
+  @Column({ type: 'double precision', nullable: false })
   travelDist: number;
 
   @ApiProperty({
     example: new Date(),
     description: '누적운행시간(M)',
   })
-  @Column({ nullable: false })
-  oprTime: Date;
+  @Column({ type: 'double precision', nullable: false })
+  oprTime: number;
 
   @ApiProperty({
     example: new Date(),
     description: '누적정지시간(M)',
   })
-  @Column({ nullable: false })
-  stopTime: Date;
+  @Column({ type: 'double precision', nullable: false })
+  stopTime: number;
 
   @ApiProperty({
     example: 90,
@@ -110,12 +110,12 @@ export class Amr {
   @Column({ nullable: false })
   startBatteryLevel: number;
 
-  @ApiProperty({
-    example: 90,
-    description: '마지막 동기화시간',
-  })
-  @Column({ nullable: true })
-  lastBatteryLevel?: number;
+  // @ApiProperty({
+  //   example: 90,
+  //   description: '마지막 동기화시간',
+  // })
+  // @Column({ nullable: true })
+  // lastBatteryLevel?: number;
 
   @ApiProperty({
     example: true,
@@ -156,18 +156,18 @@ export const AmrAttribute = {
   id: true,
   name: true,
   charging: true,
-  prcsCD: true,
-  ACSMode: true,
+  // prcsCD: true,
+  // ACSMode: true,
   mode: true,
-  errorLevel: true,
+  // errorLevel: true,
   errorCode: true,
-  startTime: true,
-  endTime: true,
+  // startTime: true,
+  // endTime: true,
   travelDist: true,
   oprTime: true,
   stopTime: true,
   startBatteryLevel: true,
-  lastBatteryLevel: true,
+  // lastBatteryLevel: true,
   simulation: true,
   logDT: true,
   distinguish: true,
