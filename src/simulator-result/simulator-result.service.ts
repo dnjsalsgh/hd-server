@@ -164,6 +164,7 @@ export class SimulatorResultService {
       .getMany();
 
     // TODO 패키지 시뮬레이터에 자동창고 정보, 안착대 정보, uld 정보를 같이 묶어서 api 호출하기
+    // TODO 나중에 패키지 시뮬레이터에 값을 주고 받는 데이터 format을 맞춰야 함
     // 호출하는 부분
     /*
      *
@@ -189,10 +190,10 @@ export class SimulatorResultService {
         .getRepository(AsrsOutOrder)
         .save(asrsOutOrderParamArray);
 
-      // 2. 자동창고 작업지시 데이터 mqtt로 publish 하기 위함
+      // 1-1. 자동창고 작업지시 데이터 mqtt로 publish 하기
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
       if (asrsOutOrderResult) {
-        // 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
+        // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
         this.client
           .send(`hyundai/asrs1/outOrder`, {
             asrsOurOrderResult: asrsOutOrderResult,
@@ -201,7 +202,7 @@ export class SimulatorResultService {
           .pipe(take(1))
           .subscribe();
 
-        // 최적 불출순서를 자동창고(ASRS) PLC에 write 완료했다는 신호
+        // 1-3. 최적 불출순서를 자동창고(ASRS) PLC에 write 완료했다는 신호
         this.client
           .send(`hyundai/asrs1/writeCompl`, {
             asrsOurOrderResult: asrsOutOrderResult,
@@ -212,8 +213,8 @@ export class SimulatorResultService {
       }
 
       // 패키시 시뮬레이터에서 작업자 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
-
-      // Awb의 정보 validation 체크
+      // 2. 작업자 작업지시 만들기
+      // 2-1. Awb의 정보 validation 체크
       if (
         !body.AwbWithXYZ.every(
           (obj) => 'Awb' in obj && 'x' in obj && 'y' in obj && 'z' in obj,
@@ -222,7 +223,7 @@ export class SimulatorResultService {
         throw new NotFoundException('Awb 상세 정보가 없습니다.');
       }
 
-      // 1. simulatorResult 입력
+      // 2-2. simulatorResult 입력
       const simulatorResultResult = await queryRunner.manager
         .getRepository(SimulatorResult)
         .save(body);
@@ -231,16 +232,16 @@ export class SimulatorResultService {
       const historyParamArray: CreateSimulatorHistoryDto[] = [];
       const buildUpOrderParamArray: CreateBuildUpOrderDto[] = [];
 
-      // 2. 입력되는 화물과 좌표를 이력에 입력
+      // 2-3. 입력되는 화물과 좌표를 이력에 입력
       for (let i = 0; i < body.AwbWithXYZ.length; i++) {
-        // 2-1. Awb 이력 입력
+        // 2-1. 어떤 Awb를 썼는지 등록
         const joinParam: CreateSimulatorResultAwbJoinDto = {
           Awb: body.AwbWithXYZ[i].Awb,
           SimulatorResult: simulatorResultResult.id,
         };
         joinParamArray.push(joinParam);
 
-        // 2-2. SimulatorHistory 입력
+        // 2-2. 어떤 Uld, 각각의 화물의 좌표 값, 시뮬레이터를 썼는지 이력저장
         const historyParam: CreateSimulatorHistoryDto = {
           Uld: body.Uld,
           Awb: body.AwbWithXYZ[i].Awb,
@@ -274,8 +275,8 @@ export class SimulatorResultService {
         .getRepository(BuildUpOrder)
         .save(buildUpOrderParamArray);
 
-      // awbjoin 테이블, 이력 테이블 함께 저장
-      await Promise.all([joinResult, historyResult, buildUpOrderResult]);
+      // 3. awbjoin 테이블, 이력 테이블 함께 저장
+      await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳
 
       await queryRunner.commitTransaction();
     } catch (error) {
