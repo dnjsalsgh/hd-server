@@ -52,7 +52,7 @@ export class AwbService {
     await queryRunner.startTransaction();
 
     try {
-      // aircraft 입력하기 있다면 update
+      // 1. aircraft 입력하기 있다면 update
       const aircraftBody: CreateAircraftDto = {
         name: createAwbDto.name,
         code: createAwbDto.code,
@@ -62,7 +62,6 @@ export class AwbService {
       };
       const aircraftResult = await queryRunner.manager
         .getRepository(Aircraft)
-        // .save(aircraftBody);
         .upsert(aircraftBody, ['code']);
 
       // 출발지, 도착지를 찾기위해 공통코드 검색
@@ -70,12 +69,12 @@ export class AwbService {
         .getRepository(CommonCode)
         .find({ where: { masterCode: 'route' } });
 
-      // awb를 입력하기
+      // 2. awb를 입력하기
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
         .save(awbDto);
 
-      // aircraftSchedule 입력하기
+      // 3. aircraftSchedule 입력하기
       const aircraftScheduleBody: CreateAircraftScheduleDto = {
         source: createAwbDto.source,
         localDepartureTime: createAwbDto.localDepartureTime,
@@ -85,7 +84,6 @@ export class AwbService {
         koreaDepartureTime: createAwbDto.koreaDepartureTime,
         localArrivalTime: createAwbDto.localArrivalTime,
         waypoint: createAwbDto.waypoint,
-        // Aircraft: aircraftResult.id,
         Aircraft: aircraftResult.identifiers[0].id,
         CcIdDestination: routeResult.find(
           (item) => item.code === createAwbDto.destination,
@@ -99,12 +97,12 @@ export class AwbService {
         .getRepository(AircraftSchedule)
         .save(aircraftScheduleBody);
 
-      // scc를 입력하기(존재한다면 update)
+      // 4. scc를 입력하기(존재한다면 update)
       const sccResult = await queryRunner.manager
         .getRepository(Scc)
         .upsert(scc, ['name']);
 
-      // awb와 scc를 연결해주기 위한 작업
+      // 5. awb와 scc를 연결해주기 위한 작업
       const joinParam = sccResult.identifiers.map((item) => {
         return {
           Awb: awbResult.id,
