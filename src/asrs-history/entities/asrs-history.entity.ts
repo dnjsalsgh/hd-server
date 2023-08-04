@@ -67,6 +67,6 @@ export class AsrsHistory {
     type: () => Awb,
   })
   @IsNotEmpty()
-  @ManyToOne(() => Awb, (awb) => awb.asrsHistories, { nullable: false })
+  @ManyToOne(() => Awb, (awb) => awb.AsrsHistories, { nullable: false })
   Awb: Relation<Awb> | number;
 }

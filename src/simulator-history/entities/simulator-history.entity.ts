@@ -70,6 +70,6 @@ export class SimulatorHistory {
     example: 1,
     description: 'Awb FK',
   })
-  @ManyToOne(() => Awb, (awb) => awb.simulatorHistories)
+  @ManyToOne(() => Awb, (awb) => awb.SimulatorHistories)
   Awb: Relation<Awb> | number;
 }

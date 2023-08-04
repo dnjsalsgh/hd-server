@@ -59,7 +59,7 @@ export class AsrsOutOrder {
     description: '화물FK',
     type: () => Awb,
   })
-  @ManyToOne(() => Awb, (awb) => awb.asrsOutOrders, { nullable: false })
+  @ManyToOne(() => Awb, (awb) => awb.AsrsOutOrders, { nullable: false })
   Awb: Relation<Awb> | number;
 
   @OneToMany(

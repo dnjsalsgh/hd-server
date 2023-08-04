@@ -25,6 +25,11 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { getOrderBy } from '../lib/util/getOrderBy';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
+import { Aircraft } from '../aircraft/entities/aircraft.entity';
+import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
+import { CreateAircraftScheduleDto } from '../aircraft-schedule/dto/create-aircraft-schedule.dto';
+import { CommonCode } from '../common-code/entities/common-code.entity';
+import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Injectable()
 export class AwbService {
@@ -47,10 +52,52 @@ export class AwbService {
     await queryRunner.startTransaction();
 
     try {
+      // aircraft 입력하기 있다면 update
+      const aircraftBody: CreateAircraftDto = {
+        name: createAwbDto.name,
+        code: createAwbDto.code,
+        info: createAwbDto.info,
+        allow: createAwbDto.allow,
+        allowDryIce: createAwbDto.allowDryIce,
+      };
+      const aircraftResult = await queryRunner.manager
+        .getRepository(Aircraft)
+        // .save(aircraftBody);
+        .upsert(aircraftBody, ['code']);
+
+      // 출발지, 도착지를 찾기위해 공통코드 검색
+      const routeResult = await queryRunner.manager
+        .getRepository(CommonCode)
+        .find({ where: { masterCode: 'route' } });
+
       // awb를 입력하기
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
         .save(awbDto);
+
+      // aircraftSchedule 입력하기
+      const aircraftScheduleBody: CreateAircraftScheduleDto = {
+        source: createAwbDto.source,
+        localDepartureTime: createAwbDto.localDepartureTime,
+        koreaArrivalTime: createAwbDto.koreaArrivalTime,
+        workStartTime: createAwbDto.workStartTime,
+        workCompleteTargetTime: createAwbDto.workCompleteTargetTime,
+        koreaDepartureTime: createAwbDto.koreaDepartureTime,
+        localArrivalTime: createAwbDto.localArrivalTime,
+        waypoint: createAwbDto.waypoint,
+        // Aircraft: aircraftResult.id,
+        Aircraft: aircraftResult.identifiers[0].id,
+        CcIdDestination: routeResult.find(
+          (item) => item.code === createAwbDto.destination,
+        ).id,
+        CcIdDeparture: routeResult.find(
+          (item) => item.code === createAwbDto.departure,
+        ).id,
+        Awb: awbResult.id,
+      };
+      await queryRunner.manager
+        .getRepository(AircraftSchedule)
+        .save(aircraftScheduleBody);
 
       // scc를 입력하기(존재한다면 update)
       const sccResult = await queryRunner.manager
@@ -64,7 +111,6 @@ export class AwbService {
           Scc: item.id,
         };
       });
-
       await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
 
       await queryRunner.commitTransaction();
@@ -133,6 +179,7 @@ export class AwbService {
       skip: query.offset,
       relations: {
         Scc: true,
+        AirCraftSchedules: true,
       },
     });
     return searchResult;
@@ -143,6 +190,7 @@ export class AwbService {
       where: [{ id: id }, { parent: id }],
       relations: {
         Scc: true,
+        AirCraftSchedules: true,
       },
     });
   }
@@ -152,6 +200,7 @@ export class AwbService {
       where: { id: id },
       relations: {
         Scc: true,
+        AirCraftSchedules: true,
       },
     });
     return searchResult;

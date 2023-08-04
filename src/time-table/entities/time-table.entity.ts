@@ -54,6 +54,6 @@ export class TimeTable {
     example: 1,
     description: '화물 FK',
   })
-  @ManyToOne(() => Awb, (awb) => awb.timeTables)
+  @ManyToOne(() => Awb, (awb) => awb.TimeTables)
   Awb: Relation<Awb> | number;
 }

@@ -15,8 +15,6 @@ import { SimulatorHistory } from '../../simulator-history/entities/simulator-his
 import { AsrsHistory } from '../../asrs-history/entities/asrs-history.entity';
 import { SkidPlatformHistory } from '../../skid-platform-history/entities/skid-platform-history.entity';
 import { UldHistory } from '../../uld-history/entities/uld-history.entity';
-
-import { AwbSccJoin } from '../../awb-scc-join/entities/awb-scc-join.entity';
 import { AwbGroup } from '../../awb-group/entities/awb-group.entity';
 import { TimeTable } from '../../time-table/entities/time-table.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -26,6 +24,7 @@ import { AsrsOutOrder } from '../../asrs-out-order/entities/asrs-out-order.entit
 import { IsEnum, IsString } from 'class-validator';
 import { Scc } from '../../scc/entities/scc.entity';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
+import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Entity()
 export class Awb {
@@ -259,31 +258,31 @@ export class Awb {
   BuildUpOrders: Relation<BuildUpOrder[]>;
 
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.Awb)
-  simulatorHistories: Relation<SimulatorHistory[]>;
+  SimulatorHistories: Relation<SimulatorHistory[]>;
 
   @OneToMany(() => AsrsHistory, (asrsHistory) => asrsHistory.Awb)
-  asrsHistories: Relation<AsrsHistory[]>;
+  AsrsHistories: Relation<AsrsHistory[]>;
 
   @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.Awb)
-  asrsOutOrders: Relation<AsrsOutOrder[]>;
+  AsrsOutOrders: Relation<AsrsOutOrder[]>;
 
   @OneToMany(
     () => SkidPlatformHistory,
     (skidPlatformHistory) => skidPlatformHistory.Awb,
   )
-  skidPlatformHistories: Relation<SkidPlatformHistory[]>;
+  SkidPlatformHistories: Relation<SkidPlatformHistory[]>;
 
   @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
   uldHistories: Relation<UldHistory[]>;
-
-  // @OneToMany(() => AwbSccJoin, (awbSccJoin) => awbSccJoin.Awb)
-  // awbSccJoin: Relation<AwbSccJoin[]>;
 
   @OneToMany(
     () => SimulatorResultAwbJoin,
     (simulatorResultAwbJoin) => simulatorResultAwbJoin.Awb,
   )
   srJoin: Relation<SimulatorResultAwbJoin[]>;
+
+  @OneToMany(() => AircraftSchedule, (aircraftSchedule) => aircraftSchedule.Awb)
+  AirCraftSchedules: Relation<AircraftSchedule[]>;
 
   @ManyToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.Awb, {
     cascade: true,
@@ -302,7 +301,7 @@ export class Awb {
   SimulatorResult: SimulatorResult[];
 
   @OneToMany(() => TimeTable, (timeTable) => timeTable.Awb)
-  timeTables: Relation<TimeTable[]>;
+  TimeTables: Relation<TimeTable[]>;
 
   @ManyToMany(() => Scc, (scc) => scc.Awb, { cascade: true })
   @JoinTable({

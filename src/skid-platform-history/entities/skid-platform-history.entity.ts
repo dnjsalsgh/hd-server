@@ -82,6 +82,6 @@ export class SkidPlatformHistory {
     description: '화물 FK',
     type: () => Awb,
   })
-  @ManyToOne(() => Awb, (awb) => awb.skidPlatformHistories)
+  @ManyToOne(() => Awb, (awb) => awb.SkidPlatformHistories)
   Awb: Relation<Awb> | number;
 }

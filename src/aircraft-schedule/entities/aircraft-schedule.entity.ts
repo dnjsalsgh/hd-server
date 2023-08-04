@@ -13,6 +13,7 @@ import { Aircraft } from '../../aircraft/entities/aircraft.entity';
 import { CommonCode } from '../../common-code/entities/common-code.entity';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Awb } from '../../awb/entities/awb.entity';
 
 @Entity()
 export class AircraftSchedule {
@@ -87,6 +88,14 @@ export class AircraftSchedule {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '화물FK',
+  //   type: () => Awb,
+  // })
+  @ManyToOne(() => Awb, (awb) => awb.AirCraftSchedules)
+  Awb: Relation<Awb> | number;
+
   @ApiProperty({
     example: 1,
     description: '항공기FK',
@@ -96,7 +105,7 @@ export class AircraftSchedule {
   @ManyToOne(() => Aircraft, (aircraft) => aircraft.AircraftSchedules, {
     nullable: false,
   })
-  Aircraft: Relation<Aircraft>;
+  Aircraft: Relation<Aircraft> | number;
 
   // commonCode의 일방향 관계설정
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.aircraftSchedules)
