@@ -1,4 +1,9 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -171,7 +176,7 @@ export class AwbService {
       parentCargo.parent !== 0 &&
       parentCargo.breakDown === false
     ) {
-      throw new HttpException('상위 화물 정보가 잘못되었습니다.', 400);
+      throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
     }
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -184,7 +189,7 @@ export class AwbService {
         const subAwb = createAwbDtos[i];
         subAwb.parent = parentCargo.id;
 
-        const result = await queryRunner.manager
+        const awbResult = await queryRunner.manager
           .getRepository(Awb)
           .save(subAwb);
 
@@ -192,12 +197,16 @@ export class AwbService {
           .getRepository(Scc)
           .upsert(subAwb.scc, ['name']);
 
-        const joinParams: CreateAwbSccJoinDto = {
-          Scc: sccResult.identifiers.map((item) => item.id), // 해포되는 화물의 scc를 저장하기 위함
-          Awb: result,
-        };
+        // awb와 scc를 연결해주기 위한 작업
+        const joinParam = sccResult.identifiers.map((item) => {
+          return {
+            Awb: awbResult.id,
+            Scc: item.id,
+          };
+        });
+
         // 2-2. Scc join에 등록
-        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParams);
+        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
       }
 
       // 2-3. 부모 화물 breakDown: True로 상태 변경

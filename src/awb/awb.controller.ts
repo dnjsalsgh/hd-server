@@ -37,7 +37,11 @@ export class AwbController {
     return this.awbService.create(createAwbDto);
   }
 
-  @ApiOperation({ summary: '해포 실행' })
+  @ApiOperation({
+    summary: '해포 실행',
+    description:
+      '부모 화물의 이름을 parameter로 넣고, body에 자식 awb를 배열형태로 입력합니다.',
+  })
   @ApiBody({ type: [CreateAwbDto] })
   @Post('/break-down/:parent')
   breakDown(

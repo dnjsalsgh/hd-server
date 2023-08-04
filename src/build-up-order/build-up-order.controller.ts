@@ -12,7 +12,6 @@ import { BuildUpOrderService } from './build-up-order.service';
 import { CreateBuildUpOrderDto } from './dto/create-build-up-order.dto';
 import { UpdateBuildUpOrderDto } from './dto/update-build-up-order.dto';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Asrs } from '../asrs/entities/asrs.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { BuildUpOrder } from './entities/build-up-order.entity';
 
