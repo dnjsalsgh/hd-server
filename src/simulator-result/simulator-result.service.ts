@@ -126,7 +126,11 @@ export class SimulatorResultService {
   }
 
   async createOrder(body: CreateSimulatorResultOrderDto) {
-    // 자동창고의 최신 이력을 화물 기준으로 가져오기
+    const queryRunner = await this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    // 자동창고의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const asrsHistorySubQueryBuilder = this.asrsHistoryRepository
       .createQueryBuilder('sub_asrsHistory')
       .select('awb_id, MAX(id) AS max_id')
@@ -142,7 +146,7 @@ export class SimulatorResultService {
       .orderBy('asrsHistory.id', 'DESC')
       .getMany();
 
-    // 안착대의 최신 이력을 화물 기준으로 가져오기
+    // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const skidPlatformHistorySubQueryBuilder =
       this.skidPlatformHistoryRepository
         .createQueryBuilder('sub_skidPlatformHistory')
@@ -181,14 +185,14 @@ export class SimulatorResultService {
         };
         asrsOutOrderParamArray.push(asrsOutOrderParam);
       }
-      const asrsOutOrderResult = await this.asrsOutOrderRepository.save(
-        asrsOutOrderParamArray,
-      );
+      const asrsOutOrderResult = await queryRunner.manager
+        .getRepository(AsrsOutOrder)
+        .save(asrsOutOrderParamArray);
 
       // 2. 자동창고 작업지시 데이터 mqtt로 publish 하기 위함
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
       if (asrsOutOrderResult) {
-        // 패키징 시뮬레이터에서 도출된 최적 불출순서
+        // 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
         this.client
           .send(`hyundai/asrs1/outOrder`, {
             asrsOurOrderResult: asrsOutOrderResult,
@@ -206,17 +210,9 @@ export class SimulatorResultService {
           .pipe(take(1))
           .subscribe();
       }
-    } catch (e) {
-      throw new HttpException('asrsOutOrder가 생성되지 않았습니다.', 403);
-    }
 
-    // 패키시 시뮬레이터에서 작업자 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
+      // 패키시 시뮬레이터에서 작업자 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
 
-    const queryRunner = await this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
       // Awb의 정보 validation 체크
       if (
         !body.AwbWithXYZ.every(

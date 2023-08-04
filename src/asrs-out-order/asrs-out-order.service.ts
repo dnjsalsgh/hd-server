@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
@@ -15,12 +15,15 @@ import { AsrsAttribute } from '../asrs/entities/asrs.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { ClientProxy } from '@nestjs/microservices';
+import { take } from 'rxjs';
 
 @Injectable()
 export class AsrsOutOrderService {
   constructor(
     @InjectRepository(AsrsOutOrder)
     private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
   async create(
     createAsrsOutOrderDto: CreateAsrsOutOrderDto,
@@ -28,7 +31,14 @@ export class AsrsOutOrderService {
     const asrs = await this.asrsOutOrderRepository.create(
       createAsrsOutOrderDto,
     );
-
+    // amr실시간 데이터 mqtt로 publish 하기 위함
+    this.client
+      .send(`hyundai/asrs1/outOrder`, {
+        asrs: asrs,
+        time: new Date().toISOString(),
+      })
+      .pipe(take(1))
+      .subscribe();
     await this.asrsOutOrderRepository.save(asrs);
     return asrs;
   }
