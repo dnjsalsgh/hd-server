@@ -92,6 +92,8 @@ describe('AsrsHistoryService', () => {
           Asrs: asrsId,
           SkidPlatform: null, // 어떤 안착대에 갈 지 모르기 때문에 null 처리 가능한데;
           Awb: awbId,
+          inOutType: 'in',
+          count: 10,
         };
         await skidPlatformHistoryRepository.save(skidPlatformHistoryBody);
       }

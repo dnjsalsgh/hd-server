@@ -178,7 +178,6 @@ export class AwbController {
   // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
   createByPlcMatt(@Payload() data) {
-    console.log(data);
     return this.awbService.create(data);
   }
 

@@ -63,6 +63,14 @@ export class AwbService {
       await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
 
       await queryRunner.commitTransaction();
+      // amr실시간 데이터 mqtt로 publish 하기 위함
+      this.client
+        .send(`hyundai/vms1/readCompl`, {
+          amr: awbResult,
+          time: new Date().toISOString(),
+        })
+        .pipe(take(1))
+        .subscribe();
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
