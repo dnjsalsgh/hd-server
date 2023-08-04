@@ -5,6 +5,7 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
@@ -33,7 +34,7 @@ export class Aircraft {
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   code: string;
 
   @ApiProperty({
@@ -42,6 +43,21 @@ export class Aircraft {
   })
   @Column({ type: 'jsonb', nullable: false })
   info: unknown;
+
+  // 피드백 반영 후 새로생긴 칼럼
+  @ApiProperty({
+    example: true,
+    description: '허용가능',
+  })
+  @Column({ type: 'boolean', nullable: true })
+  allow: boolean;
+
+  @ApiProperty({
+    example: true,
+    description: '허용가능 드라이아이스',
+  })
+  @Column({ type: 'boolean', nullable: true })
+  allowDryIce: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -56,7 +72,7 @@ export class Aircraft {
     () => AircraftSchedule,
     (aircraftSchedule) => aircraftSchedule.Aircraft,
   )
-  AircraftSchedules: AircraftSchedule[];
+  AircraftSchedules: Relation<AircraftSchedule[]>;
 }
 
 export const AircraftAttribute = {

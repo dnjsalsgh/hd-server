@@ -5,11 +5,12 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
 import { Amr } from '../../amr/entities/amr.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -18,11 +19,11 @@ export class TimeTable {
   id: number;
 
   @ApiProperty({
-    example: '{ test: 1}',
+    example: '{ test: 1 }',
     description: '이력데이터',
   })
   @Column({ type: 'jsonb' })
-  data: JSON;
+  data: unknown;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -39,7 +40,7 @@ export class TimeTable {
     type: () => Uld,
   })
   @ManyToOne(() => Uld, (uld) => uld.timeTables)
-  uld: Uld;
+  Uld: Relation<Uld> | number;
 
   @ApiProperty({
     example: 1,
@@ -47,12 +48,12 @@ export class TimeTable {
     type: () => Amr,
   })
   @ManyToOne(() => Amr, (amr) => amr.timeTables)
-  amr: Amr;
+  Amr: Relation<Amr> | number;
 
   @ApiProperty({
     example: 1,
     description: '화물 FK',
   })
-  @ManyToOne(() => Cargo, (cargo) => cargo.timeTables)
-  cargo: Cargo;
+  @ManyToOne(() => Awb, (awb) => awb.TimeTables)
+  Awb: Relation<Awb> | number;
 }

@@ -6,11 +6,14 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { AmrChargeHistoryService } from './amr-charge-history.service';
 import { CreateAmrChargeHistoryDto } from './dto/create-amr-charge-history.dto';
 import { UpdateAmrChargeHistoryDto } from './dto/update-amr-charge-history.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { AmrChargeHistory } from './entities/amr-charge-history.entity';
 
 @Controller('amr-charge-history')
 @ApiTags('amr-charge-history')
@@ -24,9 +27,29 @@ export class AmrChargeHistoryController {
     return this.amrChargeHistoryService.create(createAmrChargeHistoryDto);
   }
 
+  @ApiQuery({ name: 'chargeStartFrom', required: false, type: 'Date' })
+  @ApiQuery({ name: 'chargeStartTo', required: false, type: 'Date' })
+  @ApiQuery({ name: 'chargeEndFrom', required: false, type: 'Date' })
+  @ApiQuery({ name: 'chargeEndTo', required: false, type: 'Date' })
+  @ApiQuery({ name: 'soc', required: false, type: 'string' })
+  @ApiQuery({ name: 'soh', required: false, type: 'string' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.amrChargeHistoryService.findAll();
+  findAll(
+    @Query()
+    query: AmrChargeHistory &
+      BasicQueryParam & {
+        chargeStartFrom: Date;
+        chargeStartTo: Date;
+        chargeEndFrom: Date;
+        chargeEndTo: Date;
+      },
+  ) {
+    return this.amrChargeHistoryService.findAll(query);
   }
 
   @Get(':id')

@@ -5,11 +5,12 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 import { Uld } from '../../uld/entities/uld.entity';
-import { Cargo } from '../../cargo/entities/cargo.entity';
+import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -47,15 +48,28 @@ export class SimulatorHistory {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
+  @ApiProperty({
+    example: 1,
+    description: '시뮬레이션 FK',
+  })
   @ManyToOne(
     () => SimulatorResult,
     (simulatorResult) => simulatorResult.simulatorHistories,
+    { nullable: false },
   )
-  simulatorResult: SimulatorResult;
+  SimulatorResult: Relation<SimulatorResult> | number;
 
+  @ApiProperty({
+    example: 1,
+    description: 'ULD FK',
+  })
   @ManyToOne(() => Uld, (uld) => uld.simulatorHistories)
-  uld: Uld;
+  Uld: Relation<Uld> | number;
 
-  @ManyToOne(() => Cargo, (cargo) => cargo.simulatorHistories)
-  cargo: Cargo;
+  @ApiProperty({
+    example: 1,
+    description: 'Awb FK',
+  })
+  @ManyToOne(() => Awb, (awb) => awb.SimulatorHistories)
+  Awb: Relation<Awb> | number;
 }

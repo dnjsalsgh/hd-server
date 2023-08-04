@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AircraftSchedule } from './entities/aircraft-schedule.entity';
 import {
   Between,
+  Equal,
   FindOperator,
   ILike,
   LessThanOrEqual,
@@ -13,6 +14,7 @@ import {
 } from 'typeorm';
 import { AircraftAttribute } from '../aircraft/entities/aircraft.entity';
 import { CcIdDestinationAttribute } from '../common-code/entities/common-code.entity';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class AircraftScheduleService {
@@ -26,12 +28,15 @@ export class AircraftScheduleService {
   }
 
   async findAll(
-    source: string,
-    createdAtFrom: Date,
-    createdAtTo: Date,
-    order: string,
-    limit: number,
-    offset: number,
+    Aircraft: number,
+    CcIdDestination: number,
+    CcIdDeparture: number,
+    source?: string,
+    createdAtFrom?: Date,
+    createdAtTo?: Date,
+    order?: string,
+    limit?: number,
+    offset?: number,
   ) {
     let findDate: FindOperator<Date>;
     if (createdAtFrom && createdAtTo) {
@@ -46,22 +51,21 @@ export class AircraftScheduleService {
       relations: {
         Aircraft: true,
         CcIdDestination: true,
+        CcIdDeparture: true,
       },
       select: {
-        Aircraft: {
-          ...AircraftAttribute,
-        },
-        CcIdDestination: {
-          ...CcIdDestinationAttribute,
-        },
+        Aircraft: AircraftAttribute,
+        CcIdDestination: CcIdDestinationAttribute,
+        CcIdDeparture: CcIdDestinationAttribute,
       },
       where: {
-        source: source ? ILike(`%${source}%`) : null,
+        source: source ? ILike(`%${source}%`) : undefined,
+        Aircraft: Aircraft ? Equal(+Aircraft) : undefined,
+        CcIdDestination: CcIdDestination ? Equal(+CcIdDestination) : undefined,
+        CcIdDeparture: CcIdDeparture ? Equal(+CcIdDeparture) : undefined,
         createdAt: findDate,
       },
-      order: {
-        id: 'desc',
-      },
+      order: getOrderBy(order),
       take: limit, // limit
       skip: offset, // offset
       cache: 60000, // 1 minute caching
@@ -75,6 +79,13 @@ export class AircraftScheduleService {
       where: { id: id },
       relations: {
         Aircraft: true,
+        CcIdDestination: true,
+        CcIdDeparture: true,
+      },
+      select: {
+        Aircraft: AircraftAttribute,
+        CcIdDestination: CcIdDestinationAttribute,
+        CcIdDeparture: CcIdDestinationAttribute,
       },
     });
   }

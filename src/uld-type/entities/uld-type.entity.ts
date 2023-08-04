@@ -19,12 +19,12 @@ export class UldType {
     example: 'uldType-001',
     description: '고유code',
   })
-  @Column({ type: 'int', nullable: false })
-  code: number;
+  @Column({ type: 'varchar', length: 50, nullable: false })
+  code: string;
 
   @ApiProperty({
-    example: 'uld-A',
-    description: 'uld 이름',
+    example: 'Uld-A',
+    description: 'Uld 이름',
   })
   @Column({ type: 'varchar', length: 50, nullable: true })
   name: string;
@@ -45,24 +45,24 @@ export class UldType {
 
   @ApiProperty({
     example: 1.0,
-    description: '폭',
+    description: '폭(x)',
   })
   @Column({ type: 'double precision', nullable: true })
   width: number;
 
   @ApiProperty({
     example: 1.0,
-    description: '길이',
+    description: '길이(y)',
   })
   @Column({ type: 'double precision', nullable: true })
   length: number;
 
   @ApiProperty({
     example: 1.0,
-    description: '높이',
+    description: '높이(z)',
   })
   @Column({ type: 'double precision', nullable: true })
-  height: number;
+  depth: number;
 
   @ApiProperty({
     example: 1.0,
@@ -83,7 +83,15 @@ export class UldType {
     description: '꼭지점좌표, 바닥부터 시계방향으로 0부터 시작',
   })
   @Column({ type: 'json', nullable: true })
-  vertexCord: JSON;
+  vertexCord: string;
+
+  // 피드백 반영 후 새로생긴 칼럼
+  @ApiProperty({
+    example: 1.0,
+    description: '스키드 무게',
+  })
+  @Column({ type: 'double precision', nullable: true })
+  squareWeight: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -94,6 +102,22 @@ export class UldType {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => Uld, (uld) => uld.uldType)
+  @OneToMany(() => Uld, (uld) => uld.UldType)
   ulds: Uld[];
 }
+
+export const UldTypeAttribute = {
+  id: true,
+  code: true,
+  name: true,
+  waterVolume: true,
+  squareVolume: true,
+  width: true,
+  length: true,
+  depth: true,
+  capacity: true,
+  modelPath: true,
+  vertexCord: true,
+  squareWeight: true,
+  createdAt: true,
+};

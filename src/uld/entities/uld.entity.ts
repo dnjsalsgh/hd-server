@@ -3,12 +3,15 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { InspectWorkOrder } from '../../inspect-work-order/entities/inspect-work-order.entity';
+
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
 import { UldType } from '../../uld-type/entities/uld-type.entity';
@@ -16,6 +19,8 @@ import { UldHistory } from '../../uld-history/entities/uld-history.entity';
 import { UldSccJoin } from '../../uld-scc-join/entities/uld-scc-join.entity';
 import { TimeTable } from '../../time-table/entities/time-table.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
+import { Scc } from '../../scc/entities/scc.entity';
 
 @Entity()
 export class Uld {
@@ -23,8 +28,8 @@ export class Uld {
   id: number;
 
   @ApiProperty({
-    example: 'uld-001',
-    description: 'uld 코드',
+    example: 'Uld-001',
+    description: 'Uld 코드',
   })
   @Column({ type: 'varchar', length: 50, nullable: true })
   code: string;
@@ -50,6 +55,22 @@ export class Uld {
   @Column({ type: 'boolean', nullable: true })
   simulation: boolean;
 
+  // 피드백 반영 후 새로생긴 칼럼
+  @ApiProperty({
+    example: '경계 프리맵',
+    description: '경계 프리맵',
+  })
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  boundaryPrefab: string;
+
+  // 적재율이 필요해서 넣은 칼럼
+  @ApiProperty({
+    example: 10.0,
+    description: '적재율',
+  })
+  @Column({ type: 'double precision', nullable: true })
+  loadRate: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -64,23 +85,50 @@ export class Uld {
     description: 'uld유형 FK',
   })
   @ManyToOne(() => UldType, (uldType) => uldType.ulds)
-  uldType: UldType;
+  UldType: Relation<UldType> | number;
 
-  @OneToMany(() => InspectWorkOrder, (inspectWorkOrder) => inspectWorkOrder.uld)
-  inspectWorkOrders: InspectWorkOrder[];
+  @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Uld)
+  buildUpOrders: Relation<BuildUpOrder[]>;
 
-  @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.uld)
-  simulatorResult: SimulatorResult[];
+  @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.Uld)
+  simulatorResult: Relation<SimulatorResult[]>;
 
-  @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.uld)
-  simulatorHistories: SimulatorHistory[];
+  @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.Uld)
+  simulatorHistories: Relation<SimulatorHistory[]>;
 
-  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.inspectWorkOrder)
-  uldHistories: UldHistory[];
+  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
+  uldHistories: Relation<UldHistory[]>;
 
-  @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
-  uldSccJoin: UldSccJoin[];
+  // @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
+  // uldSccJoin: Relation<UldSccJoin[]>;
 
-  @OneToMany(() => TimeTable, (timeTable) => timeTable.uld)
-  timeTables: TimeTable[];
+  @ManyToMany(() => Scc, (scc) => scc.Uld, {
+    cascade: true,
+  })
+  @JoinTable({
+    name: 'uld_scc_join',
+    joinColumn: {
+      name: 'uld_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'scc_id',
+      referencedColumnName: 'id',
+    },
+  })
+  Scc: Scc[];
+
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.Uld)
+  timeTables: Relation<TimeTable[]>;
 }
+
+export const UldAttribute = {
+  id: true,
+  code: true,
+  prefab: true,
+  airplaneType: true,
+  simulation: true,
+  boundaryPrefab: true,
+  loadRate: true,
+  createdAt: true,
+};

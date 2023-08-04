@@ -6,11 +6,14 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { AmrChargerService } from './amr-charger.service';
 import { CreateAmrChargerDto } from './dto/create-amr-charger.dto';
 import { UpdateAmrChargerDto } from './dto/update-amr-charger.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { AmrCharger } from './entities/amr-charger.entity';
 
 @Controller('amr-charger')
 @ApiTags('amr-charge')
@@ -22,9 +25,22 @@ export class AmrChargerController {
     return this.amrChargerService.create(createAmrChargerDto);
   }
 
+  @ApiQuery({ name: 'name', required: false, type: 'string' })
+  @ApiQuery({ name: 'working', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'x', required: false, type: 'number' })
+  @ApiQuery({ name: 'y', required: false, type: 'number' })
+  @ApiQuery({ name: 'z', required: false, type: 'number' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.amrChargerService.findAll();
+  findAll(
+    @Query()
+    query: AmrCharger & BasicQueryParam,
+  ) {
+    return this.amrChargerService.findAll(query);
   }
 
   @Get(':id')

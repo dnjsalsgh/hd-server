@@ -23,10 +23,10 @@ export class UldSccJoinService {
   }
 
   async findOne(id: number) {
-    const result = await this.uldSccJoinRepository.findOne({
-      where: { id: id },
-    });
-    return result;
+    // const result = await this.uldSccJoinRepository.findOne({
+    //   where: { id: id },
+    // });
+    // return result;
   }
 
   update(id: number, updateUldSccJoinDto: UpdateUldSccJoinDto) {

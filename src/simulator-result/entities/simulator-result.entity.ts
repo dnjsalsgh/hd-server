@@ -3,15 +3,20 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
-import { SimulatorResultCargoJoin } from '../../simulator-result-cargo-join/entities/simulator-result-cargo-join.entity';
+import { SimulatorResultAwbJoin } from '../../simulator-result-awb-join/entities/simulator-result-awb-join.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
+import { Awb } from '../../awb/entities/awb.entity';
 
 @Entity()
 export class SimulatorResult {
@@ -39,6 +44,13 @@ export class SimulatorResult {
   @Column({ type: 'double precision', nullable: true })
   loadRate: number;
 
+  @ApiProperty({
+    example: '0.1',
+    description: '알고리즘 버전',
+  })
+  @Column({ type: 'varchar', length: 5, nullable: true })
+  version: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -48,18 +60,36 @@ export class SimulatorResult {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @ManyToOne(() => Uld, (uld) => uld.simulatorResult)
-  uld: Uld;
+  @ApiProperty({
+    example: 1,
+    description: 'ULD FK',
+  })
+  @IsNotEmpty()
+  @ManyToOne(() => Uld, (uld) => uld.simulatorResult, { nullable: false })
+  Uld: Relation<Uld> | number;
 
-  @OneToMany(
-    () => SimulatorResultCargoJoin,
-    (simulatorResultCargoJoin) => simulatorResultCargoJoin.simulatorResult,
-  )
-  simulatorResultCargoJoin: SimulatorResultCargoJoin[];
+  // @OneToMany(
+  //   () => SimulatorResultAwbJoin,
+  //   (simulatorResultAwbJoin) => simulatorResultAwbJoin.SimulatorResult,
+  // )
+  // simulatorResultAwbJoin: Relation<SimulatorResultAwbJoin[]>;
+
+  @ManyToMany(() => Awb, (awb) => awb.SimulatorResult)
+  @JoinColumn({ name: 'awb_id' })
+  Awb: Awb[];
 
   @OneToMany(
     () => SimulatorHistory,
-    (simulatorHistory) => simulatorHistory.simulatorResult,
+    (simulatorHistory) => simulatorHistory.SimulatorResult,
   )
-  simulatorHistories: SimulatorHistory[];
+  simulatorHistories: Relation<SimulatorHistory[]>;
 }
+
+export const SimulatorResultAttribute = {
+  id: true,
+  startDate: true,
+  endDate: true,
+  loadRate: true,
+  version: true,
+  createdAt: true,
+};

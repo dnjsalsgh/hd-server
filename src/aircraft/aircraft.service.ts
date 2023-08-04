@@ -4,7 +4,7 @@ import { UpdateAircraftDto } from './dto/update-aircraft.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Aircraft } from './entities/aircraft.entity';
 import { Repository } from 'typeorm';
-import { Storage } from '../storage/entities/storage.entity';
+import { Asrs } from '../asrs/entities/asrs.entity';
 
 @Injectable()
 export class AircraftService {

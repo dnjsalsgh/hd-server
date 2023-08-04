@@ -3,8 +3,16 @@ import { CreateAmrChargerDto } from './dto/create-amr-charger.dto';
 import { UpdateAmrChargerDto } from './dto/update-amr-charger.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Amr } from '../amr/entities/amr.entity';
-import { Repository } from 'typeorm';
+import {
+  Between,
+  FindOperator,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { AmrCharger } from './entities/amr-charger.entity';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { getOrderBy } from '../lib/util/getOrderBy';
 
 @Injectable()
 export class AmrChargerService {
@@ -16,8 +24,30 @@ export class AmrChargerService {
     return this.amrChargerRepository.save(createAmrChargerDto);
   }
 
-  findAll() {
-    return this.amrChargerRepository.find();
+  findAll(query: AmrCharger & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+    return this.amrChargerRepository.find({
+      where: {
+        name: query.name,
+        working: query.working,
+        x: query.x,
+        y: query.y,
+        z: query.z,
+        createdAt: findDate,
+      },
+      order: getOrderBy(query.order),
+      take: query.limit,
+      skip: query.offset,
+    });
   }
 
   findOne(id: number) {

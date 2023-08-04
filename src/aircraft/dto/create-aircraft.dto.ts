@@ -5,6 +5,8 @@ export class CreateAircraftDto extends PickType(Aircraft, [
   'name',
   'code',
   'info',
+  'allow',
+  'allowDryIce',
 ]) {
   // @ApiProperty({
   //   example: 'test',

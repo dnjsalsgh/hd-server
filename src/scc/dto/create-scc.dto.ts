@@ -6,4 +6,6 @@ export class CreateSccDto extends PickType(Scc, [
   'name',
   'score',
   'description',
+  'path',
+  'notTogetherList',
 ]) {}

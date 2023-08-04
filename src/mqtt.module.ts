@@ -1,7 +1,7 @@
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { Module } from '@nestjs/common';
 import { MqttController } from './mqtt.controller';
 import { MqttService } from './mqtt.service';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 const clients = ClientsModule.register([
   {

@@ -1,17 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { TimeTableService } from './time-table.service';
 import { CreateTimeTableDto } from './dto/create-time-table.dto';
 import { UpdateTimeTableDto } from './dto/update-time-table.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { TimeTable } from './entities/time-table.entity';
 
 @Controller('time-table')
 @ApiTags('time-table')
@@ -23,9 +25,17 @@ export class TimeTableController {
     return this.timeTableService.create(createTimeTableDto);
   }
 
+  @ApiQuery({ name: 'Uld', required: false, type: 'number' })
+  @ApiQuery({ name: 'Amr', required: false, type: 'number' })
+  @ApiQuery({ name: 'Awb', required: false, type: 'number' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll() {
-    return this.timeTableService.findAll();
+  findAll(@Query() query: TimeTable & BasicQueryParam) {
+    return this.timeTableService.findAll(query);
   }
 
   @Get(':id')

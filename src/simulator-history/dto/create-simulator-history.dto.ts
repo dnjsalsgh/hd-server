@@ -5,4 +5,7 @@ export class CreateSimulatorHistoryDto extends PickType(SimulatorHistory, [
   'x',
   'y',
   'z',
+  'SimulatorResult',
+  'Uld',
+  'Awb',
 ]) {}
