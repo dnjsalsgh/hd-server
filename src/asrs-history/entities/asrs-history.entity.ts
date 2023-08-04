@@ -27,7 +27,7 @@ export class AsrsHistory {
 
   @ApiProperty({
     example: 'in',
-    description: '부모 창고의 id',
+    description: '입, 출고 구분',
   })
   @IsString()
   @IsNotEmpty()

@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -12,11 +13,30 @@ import { ApiProperty } from '@nestjs/swagger';
 import { AsrsOutOrder } from '../../asrs-out-order/entities/asrs-out-order.entity';
 import { Asrs } from '../../asrs/entities/asrs.entity';
 import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 @Entity()
 export class SkidPlatformHistory {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ApiProperty({
+    example: 'in',
+    description: '입, 출고 구분',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(['in', 'out'])
+  @Column({ type: 'varchar', nullable: false, length: 50, default: 0 })
+  inOutType: string;
+
+  @ApiProperty({
+    example: 0,
+    description: '창고안의 개수',
+  })
+  @IsNumber()
+  @Column({ type: 'int', nullable: false, default: 0 })
+  count: number;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -245,6 +245,17 @@ export class AsrsService {
       // timeTable에 스태커 크레인 데이터 입력
       await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
 
+      // 이전의 이력 가져오기
+      const topLevelHistory = await this.asrsHistoryRepository.findOne({
+        where: { Awb: asrsHistoryBody.Awb, Asrs: asrsHistoryBody.Asrs },
+        order: { createdAt: 'desc' },
+      });
+      // 입고, 출고에 따른 값 계산
+      if (asrsHistoryBody.inOutType === 'in')
+        asrsHistoryBody.count += topLevelHistory.count;
+      else if (asrsHistoryBody.inOutType === 'out')
+        asrsHistoryBody.count = topLevelHistory.count - asrsHistoryBody.count;
+
       // asrs에서 동작한 data를 이력 등록
       await queryRunner.manager
         .getRepository(AsrsHistory)

@@ -152,6 +152,9 @@ export class SkidPlatformHistoryService {
     // 어떤 안착대로 가야하는지
     const skidPlatformId = platInfo.skidPlatformId;
 
+    // 어떤 창고에서 나왔는지
+    const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
+
     // 어떤 화물인지
     const awbInfo =
       (body.ASRS_LH_Rack1_Part_Info as unknown as {
@@ -190,10 +193,19 @@ export class SkidPlatformHistoryService {
         awbId: number;
         count: number;
       });
-    const awbId = awbInfo.awbId;
 
-    // 어떤 창고에서 나왔는지
-    const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
+    // 화물정보 안에 화물Id 들어왔다고 가정
+    const awbId = awbInfo.awbId;
+    // 화물정보 안에 화물수량 들어왔다고 가정
+    const count = awbInfo.count;
+    // 화물이 인입인지 인출인지 확인
+    let inOutType = '';
+    if (body.Out_Conveyor_Start) {
+      // out 컨베이어 밸트가 움직일 때만 안착대에 입고되었다고 판단
+      inOutType = 'in';
+    } else {
+      inOutType = 'out';
+    }
 
     //TODO 어느 창고에서 왔는지, 어떤 화물인지를 추적해서 작업지시를 가져옵니다.
     const asrsOutOrderResult = await this.asrsOutOrderRepository.findOne({
@@ -209,8 +221,20 @@ export class SkidPlatformHistoryService {
       Asrs: asrsId,
       SkidPlatform: skidPlatformId,
       Awb: awbId,
+      inOutType: inOutType,
+      count: count,
     };
 
-    this.skidPlatformHistoryRepository.save(skidPlatformHistoryBody);
+    // 입고, 출고에 따른 값 계산
+    const topLevelHistory = await this.skidPlatformHistoryRepository.findOne({
+      where: { Awb: awbId, Asrs: asrsId },
+      order: { createdAt: 'desc' },
+    });
+    if (skidPlatformHistoryBody.inOutType === 'in')
+      skidPlatformHistoryBody.count += topLevelHistory.count;
+    else if (skidPlatformHistoryBody.inOutType === 'out')
+      skidPlatformHistoryBody.count -= topLevelHistory.count;
+
+    await this.skidPlatformHistoryRepository.save(skidPlatformHistoryBody);
   }
 }
