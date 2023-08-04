@@ -105,8 +105,8 @@ export class AsrsController {
       data.Pallet_Rack3_Part_On ||
       data.Pallet_Rack4_Part_On
     ) {
-      return this.asrsService.createByPlcIn(data);
-      // return this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+      this.asrsService.createByPlcIn(data);
+      return this.skidPlatformHistoryService.checkSkidPlatformChange(data);
     }
 
     return this.asrsService.createByPlcIn(data);

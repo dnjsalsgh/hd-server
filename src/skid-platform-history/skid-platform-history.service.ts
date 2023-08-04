@@ -233,7 +233,8 @@ export class SkidPlatformHistoryService {
     if (skidPlatformHistoryBody.inOutType === 'in')
       skidPlatformHistoryBody.count += topLevelHistory.count;
     else if (skidPlatformHistoryBody.inOutType === 'out')
-      skidPlatformHistoryBody.count -= topLevelHistory.count;
+      skidPlatformHistoryBody.count =
+        topLevelHistory.count - skidPlatformHistoryBody.count;
 
     await this.skidPlatformHistoryRepository.save(skidPlatformHistoryBody);
   }
