@@ -6,12 +6,12 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisController } from './redis.controller';
 dotenv.config();
 
-console.log(process.env.REDIS_HOST, process.env.REDIS_PORT);
+console.log('redis에서', process.env.REDIS_HOST, process.env.REDIS_PORT);
 const cacheModule = CacheModule.register({
   useFactory: async () => ({
     store: redisStore,
-    host: 'localhost', // env에서 정의함
-    port: 6379, // env에서 정의함
+    host: process.env.REDIS_HOST, // env에서 정의함
+    port: +process.env.REDIS_PORT, // env에서 정의함
     ttl: 900000, // 캐시 유지 시간
   }),
 });

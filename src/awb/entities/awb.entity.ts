@@ -42,7 +42,7 @@ export class Awb {
     example: '3d Model Name',
     description: '생성된 3D 모델링명',
   })
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   prefab: string;
 
   @ApiProperty({

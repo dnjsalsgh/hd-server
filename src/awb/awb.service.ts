@@ -97,19 +97,22 @@ export class AwbService {
         .getRepository(AircraftSchedule)
         .save(aircraftScheduleBody);
 
-      // 4. scc를 입력하기(존재한다면 update)
-      const sccResult = await queryRunner.manager
-        .getRepository(Scc)
-        .upsert(scc, ['name']);
+      // scc 정보, awb이 입력되어야 동작하게끔
+      if (scc && awbResult) {
+        // 4. scc를 입력하기(존재한다면 update)
+        const sccResult = await queryRunner.manager
+          .getRepository(Scc)
+          .upsert(scc, ['name']);
 
-      // 5. awb와 scc를 연결해주기 위한 작업
-      const joinParam = sccResult.identifiers.map((item) => {
-        return {
-          Awb: awbResult.id,
-          Scc: item.id,
-        };
-      });
-      await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+        // 5. awb와 scc를 연결해주기 위한 작업
+        const joinParam = sccResult.identifiers.map((item) => {
+          return {
+            Awb: awbResult.id,
+            Scc: item.id,
+          };
+        });
+        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+      }
 
       await queryRunner.commitTransaction();
       // amr실시간 데이터 mqtt로 publish 하기 위함
