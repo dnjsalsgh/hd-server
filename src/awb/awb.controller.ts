@@ -25,6 +25,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Awb } from './entities/awb.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 
 @Controller('awb')
 @ApiTags('Awb(화물,vms)')
@@ -44,11 +45,23 @@ export class AwbController {
   })
   @ApiBody({ type: [CreateAwbDto] })
   @Post('/break-down/:parent')
-  breakDown(
+  breakDownByName(
     @Param('parent') parent: string,
     @Body() createAwbDtoArray: CreateAwbDto[],
   ) {
     return this.awbService.breakDown(parent, createAwbDtoArray);
+  }
+
+  @ApiOperation({
+    summary: '해포 실행 by id',
+    description: '부모 화물의 id를 넣고, 자식을 body의 [id]로 넣습니다.',
+  })
+  @Post('/break-down-by-id/:awbId')
+  breakDownById(
+    @Param('awbId', ParseIntPipe) awbId: number,
+    @Body() body: CreateAwbBreakDownDto,
+  ) {
+    return this.awbService.breakDownById(awbId, body);
   }
 
   @ApiQuery({ name: 'name', required: false })

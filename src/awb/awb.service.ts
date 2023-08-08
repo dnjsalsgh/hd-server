@@ -30,6 +30,7 @@ import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
 import { CreateAircraftScheduleDto } from '../aircraft-schedule/dto/create-aircraft-schedule.dto';
 import { CommonCode } from '../common-code/entities/common-code.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
+import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 
 @Injectable()
 export class AwbService {
@@ -263,6 +264,52 @@ export class AwbService {
       await queryRunner.manager
         .getRepository(Awb)
         .update({ name: parentName }, { breakDown: true });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async breakDownById(awbId: number, body: CreateAwbBreakDownDto) {
+    try {
+      const parentAwb = await this.awbRepository.findOneBy({
+        id: awbId,
+      });
+      console.log('parentAwb = ', parentAwb, awbId, body);
+      // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
+      if (
+        !parentAwb &&
+        parentAwb.parent !== 0 &&
+        parentAwb.breakDown === false
+      ) {
+        throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
+      }
+    } catch (e) {
+      throw new NotFoundException(`${e}`);
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      // 2. 해포된 화물들 등록
+      for (let i = 0; i < body.awbs.length; i++) {
+        // 2-1. 하위 화물 등록
+        const subAwb = body.awbs[i];
+
+        await queryRunner.manager
+          .getRepository(Awb)
+          .update({ id: subAwb }, { parent: awbId, breakDown: true });
+      }
+
+      // 2-3. 부모 화물 breakDown: True로 상태 변경
+      await queryRunner.manager
+        .getRepository(Awb)
+        .update({ id: awbId }, { breakDown: true });
 
       await queryRunner.commitTransaction();
     } catch (error) {
