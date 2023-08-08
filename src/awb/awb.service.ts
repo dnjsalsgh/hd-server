@@ -103,7 +103,7 @@ export class AwbService {
         // 4. scc를 입력하기(존재한다면 update)
         const sccResult = await queryRunner.manager
           .getRepository(Scc)
-          .upsert(scc, ['name']);
+          .upsert(scc, ['code']);
 
         // 5. awb와 scc를 연결해주기 위한 작업
         const joinParam = sccResult.identifiers.map((item) => {
