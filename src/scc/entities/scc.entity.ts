@@ -27,7 +27,7 @@ export class Scc {
     example: 'Scc-001',
     description: 'scc의 이름',
   })
-  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   name: string;
 
   @ApiProperty({
