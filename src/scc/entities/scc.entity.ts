@@ -62,7 +62,7 @@ export class Scc {
     nullable: true, // null 허용 여부 (선택 사항)
     default: [], // 기본값 (선택 사항)
   })
-  notTogetherList: string[];
+  banList: string[];
 
   @CreateDateColumn()
   createdAt: Date;

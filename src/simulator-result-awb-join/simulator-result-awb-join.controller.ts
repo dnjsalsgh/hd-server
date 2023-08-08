@@ -16,7 +16,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('simulator-result-Awb-join')
 export class SimulatorResultAwbJoinController {
   constructor(
-    private readonly simulatorResultCargoJoinService: SimulatorResultAwbJoinService,
+    private readonly simulatorResultAwbJoinService: SimulatorResultAwbJoinService,
   ) {}
 
   @Post()
@@ -24,19 +24,19 @@ export class SimulatorResultAwbJoinController {
     @Body()
     createSimulatorResultCargoJoinDto: CreateSimulatorResultAwbJoinDto,
   ) {
-    return this.simulatorResultCargoJoinService.create(
+    return this.simulatorResultAwbJoinService.create(
       createSimulatorResultCargoJoinDto,
     );
   }
 
   @Get()
   findAll() {
-    return this.simulatorResultCargoJoinService.findAll();
+    return this.simulatorResultAwbJoinService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.simulatorResultCargoJoinService.findOne(+id);
+    return this.simulatorResultAwbJoinService.findOne(+id);
   }
 
   @Put(':id')
@@ -45,7 +45,7 @@ export class SimulatorResultAwbJoinController {
     @Body()
     updateSimulatorResultCargoJoinDto: UpdateSimulatorResultAwbJoinDto,
   ) {
-    return this.simulatorResultCargoJoinService.update(
+    return this.simulatorResultAwbJoinService.update(
       +id,
       updateSimulatorResultCargoJoinDto,
     );
@@ -53,6 +53,6 @@ export class SimulatorResultAwbJoinController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.simulatorResultCargoJoinService.remove(+id);
+    return this.simulatorResultAwbJoinService.remove(+id);
   }
 }

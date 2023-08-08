@@ -54,6 +54,37 @@ export class SccService {
     return searchResult;
   }
 
+  async findBanList(query: Scc & BasicQueryParam) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+
+    const searchResult = await this.sccRepository.find({
+      where: {
+        name: query.name ? ILike(`%${query.name}%`) : undefined,
+        code: query.code ? ILike(`%${query.code}%`) : undefined,
+        createdAt: findDate,
+      },
+      order: getOrderBy(query.order),
+      take: query.limit,
+      skip: query.offset,
+      select: {
+        name: true,
+        code: true,
+        banList: true,
+      },
+    });
+
+    return searchResult;
+  }
+
   async findOne(id: number) {
     return await this.sccRepository.find({
       where: { id: id },
