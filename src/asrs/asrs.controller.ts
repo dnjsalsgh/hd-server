@@ -29,7 +29,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
 @Controller('asrs')
-@ApiTags('Asrs(자동창고)')
+@ApiTags('[자동창고]Asrs')
 export class AsrsController {
   constructor(
     private readonly asrsService: AsrsService,

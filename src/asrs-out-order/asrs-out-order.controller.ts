@@ -1,11 +1,10 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
   Query,
 } from '@nestjs/common';
@@ -17,7 +16,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { AsrsOutOrder } from './entities/asrs-out-order.entity';
 
 @Controller('asrs-out-order')
-@ApiTags('asrs-out-order(자동창고 작업지시)')
+@ApiTags('[자동창고 작업지시]asrs-out-order')
 export class AsrsOutOrderController {
   constructor(private readonly asrsOutOrderService: AsrsOutOrderService) {}
 

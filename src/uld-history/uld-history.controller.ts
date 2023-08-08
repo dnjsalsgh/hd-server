@@ -16,7 +16,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { UldHistory } from './entities/uld-history.entity';
 
 @Controller('uld-history')
-@ApiTags('uld-history')
+@ApiTags('[Uld 이력]uld-history')
 export class UldHistoryController {
   constructor(private readonly uldHistoryService: UldHistoryService) {}
 

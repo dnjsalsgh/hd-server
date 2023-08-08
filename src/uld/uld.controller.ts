@@ -18,7 +18,7 @@ import { Uld } from './entities/uld.entity';
 import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
 
 @Controller('uld')
-@ApiTags('uld')
+@ApiTags('[Uld]uld')
 export class UldController {
   constructor(private readonly uldService: UldService) {}
 

@@ -17,7 +17,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { SkidPlatformHistory } from './entities/skid-platform-history.entity';
 
 @Controller('skid-platform-history')
-@ApiTags('skid-platform-history')
+@ApiTags('[안착대 이력]skid-platform-history')
 export class SkidPlatformHistoryController {
   constructor(
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,

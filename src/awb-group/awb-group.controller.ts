@@ -16,7 +16,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { AwbGroup } from './entities/awb-group.entity';
 
 @Controller('Awb-group')
-@ApiTags('Awb-group')
+@ApiTags('[화물그룹]Awb-group')
 export class AwbGroupController {
   constructor(private readonly awbGroupService: AwbGroupService) {}
 

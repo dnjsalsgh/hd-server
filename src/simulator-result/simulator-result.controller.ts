@@ -19,7 +19,7 @@ import { SimulatorResult } from './entities/simulator-result.entity';
 import { CreateSimulatorResultOrderDto } from './dto/create-simulator-result-order.dto';
 
 @Controller('simulator-result')
-@ApiTags('simulator-result')
+@ApiTags('[시뮬레이터 결과]simulator-result')
 export class SimulatorResultController {
   constructor(
     private readonly simulatorResultService: SimulatorResultService,

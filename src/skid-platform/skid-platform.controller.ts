@@ -25,7 +25,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { SkidPlatform } from './entities/skid-platform.entity';
 
 @Controller('skid-platform')
-@ApiTags('skid-platform')
+@ApiTags('[안착대]skid-platform')
 export class SkidPlatformController {
   constructor(private readonly skidPlatformService: SkidPlatformService) {}
 

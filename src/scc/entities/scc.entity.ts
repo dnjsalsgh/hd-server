@@ -4,12 +4,9 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToMany,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { AwbSccJoin } from '../../awb-scc-join/entities/awb-scc-join.entity';
-import { UldSccJoin } from '../../uld-scc-join/entities/uld-scc-join.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Awb } from '../../awb/entities/awb.entity';
 import { Uld } from '../../uld/entities/uld.entity';

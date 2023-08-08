@@ -16,7 +16,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { Scc } from './entities/scc.entity';
 
 @Controller('scc')
-@ApiTags('scc')
+@ApiTags('[Scc]scc')
 export class SccController {
   constructor(private readonly sccService: SccService) {}
 

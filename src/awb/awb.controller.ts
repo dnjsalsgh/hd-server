@@ -28,7 +28,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 
 @Controller('awb')
-@ApiTags('Awb(화물,vms)')
+@ApiTags('[화물,vms]Awb')
 export class AwbController {
   constructor(private readonly awbService: AwbService) {}
 

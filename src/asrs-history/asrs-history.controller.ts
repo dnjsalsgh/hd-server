@@ -12,12 +12,11 @@ import { AsrsHistoryService } from './asrs-history.service';
 import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { AsrsHistory } from './entities/asrs-history.entity';
 
 @Controller('asrs-history')
-@ApiTags('asrs-history')
+@ApiTags('[창고 히스토리]asrs-history')
 export class AsrsHistoryController {
   constructor(private readonly asrsHistoryService: AsrsHistoryService) {}
 

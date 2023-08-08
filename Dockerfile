@@ -13,6 +13,9 @@ RUN npm install
 # Copy the rest of the application code to the container
 COPY . .
 
+# Copy the built application to the host folder
+RUN cp -r dist /host-folder
+
 # Expose the port that the app will run on
 EXPOSE 3000
 

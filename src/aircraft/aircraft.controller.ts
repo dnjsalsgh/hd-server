@@ -1,11 +1,10 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
 } from '@nestjs/common';
 import { AircraftService } from './aircraft.service';
@@ -14,7 +13,7 @@ import { UpdateAircraftDto } from './dto/update-aircraft.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('aircraft')
-@ApiTags('aircraft')
+@ApiTags('[항공기]aircraft')
 export class AircraftController {
   constructor(private readonly aircraftService: AircraftService) {}
 

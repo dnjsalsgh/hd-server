@@ -16,7 +16,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { TimeTable } from './entities/time-table.entity';
 
 @Controller('time-table')
-@ApiTags('time-table')
+@ApiTags('[타임 테이블]time-table')
 export class TimeTableController {
   constructor(private readonly timeTableService: TimeTableService) {}
 

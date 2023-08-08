@@ -16,7 +16,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { BuildUpOrder } from './entities/build-up-order.entity';
 
 @Controller('build-up-order')
-@ApiTags('build-up-order(작업자 작업지시)')
+@ApiTags('[작업자 작업지시]build-up-order')
 export class BuildUpOrderController {
   constructor(private readonly buildUpOrderService: BuildUpOrderService) {}
 

@@ -16,7 +16,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { AmrChargeHistory } from './entities/amr-charge-history.entity';
 
 @Controller('amr-charge-history')
-@ApiTags('amr-charge-history')
+@ApiTags('[Amr 충전이력]amr-charge-history')
 export class AmrChargeHistoryController {
   constructor(
     private readonly amrChargeHistoryService: AmrChargeHistoryService,

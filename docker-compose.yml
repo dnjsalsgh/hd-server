@@ -51,7 +51,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./:/back/
+      - ./logs:/app/logs
     networks:
       - overlay
     links:

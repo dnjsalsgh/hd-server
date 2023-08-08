@@ -1,11 +1,10 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
   Query,
 } from '@nestjs/common';
@@ -17,7 +16,7 @@ import { CommonCode } from './entities/common-code.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 
 @Controller('common-code')
-@ApiTags('common-code')
+@ApiTags('[공통코드]common-code')
 export class CommonCodeController {
   constructor(private readonly commonCodeService: CommonCodeService) {}
 

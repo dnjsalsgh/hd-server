@@ -16,7 +16,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { SimulatorHistory } from './entities/simulator-history.entity';
 
 @Controller('simulator-history')
-@ApiTags('simulator-history')
+@ApiTags('[시뮬레이터 이력]simulator-history')
 export class SimulatorHistoryController {
   constructor(
     private readonly simulatorHistoryService: SimulatorHistoryService,

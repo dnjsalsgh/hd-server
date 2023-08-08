@@ -16,7 +16,7 @@ import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { AmrCharger } from './entities/amr-charger.entity';
 
 @Controller('amr-charger')
-@ApiTags('amr-charge')
+@ApiTags('[Amr 충전기]amr-charge')
 export class AmrChargerController {
   constructor(private readonly amrChargerService: AmrChargerService) {}
 

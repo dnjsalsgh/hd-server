@@ -12,12 +12,11 @@ import { UldTypeService } from './uld-type.service';
 import { CreateUldTypeDto } from './dto/create-uld-type.dto';
 import { UpdateUldTypeDto } from './dto/update-uld-type.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Asrs } from '../asrs/entities/asrs.entity';
 import { BasicQueryParam } from '../lib/dto/basicQueryParam';
 import { UldType } from './entities/uld-type.entity';
 
 @Controller('uld-type')
-@ApiTags('uld-type')
+@ApiTags('[Uld 타입]uld-type')
 export class UldTypeController {
   constructor(private readonly uldTypeService: UldTypeService) {}
 
