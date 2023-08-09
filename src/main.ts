@@ -45,7 +45,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   const mqttHost = process.env.MQTT_HOST;
-  console.log(`listening on port ${port},이거적용됨? ${mqttHost}`);
+  console.log(`listening on port ${port}`);
 
   // swagger 생성
   const config = new DocumentBuilder()

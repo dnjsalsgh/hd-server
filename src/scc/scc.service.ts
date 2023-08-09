@@ -76,7 +76,7 @@ export class SccService {
       take: query.limit,
       skip: query.offset,
       select: {
-        name: true,
+        // name: true,
         code: true,
         banList: true,
       },

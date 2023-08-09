@@ -20,7 +20,7 @@ export class Scc {
     example: 'Scc-001',
     description: 'scc의 고유코드',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true, unique: true })
   code: string;
 
   @ApiProperty({

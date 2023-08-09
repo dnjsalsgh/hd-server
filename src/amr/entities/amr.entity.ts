@@ -97,14 +97,14 @@ export class Amr {
   travelDist: number;
 
   @ApiProperty({
-    example: new Date(),
+    example: 10,
     description: '누적운행시간(M)',
   })
   @Column({ type: 'double precision', nullable: false })
   oprTime: number;
 
   @ApiProperty({
-    example: new Date(),
+    example: 10,
     description: '누적정지시간(M)',
   })
   @Column({ type: 'double precision', nullable: false })
