@@ -360,4 +360,13 @@ export class AwbService {
       .pipe(take(1))
       .subscribe();
   }
+
+  async getAwbNotCombineModelPath() {
+    return await this.awbRepository.find({
+      where: [
+        { modelPath: '' }, // modelPath가 빈 문자열인 경우
+        { modelPath: null }, // modelPath가 null인 경우
+      ],
+    });
+  }
 }

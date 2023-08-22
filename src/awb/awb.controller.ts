@@ -234,7 +234,7 @@ export class AwbController implements OnModuleInit {
       );
 
       // upload된 파일의 경로를 awb정보에 update
-      // await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
+      await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
 
       if (this.dTimer === 0) {
         this.performAction();
@@ -261,7 +261,8 @@ export class AwbController implements OnModuleInit {
     this.dTimer = +this.configService.getOrThrow('TIMER');
   }
 
-  private performAction() {
+  private async performAction() {
+    const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
     console.log('Performing the action...');
     this.resetTimer();
   }
