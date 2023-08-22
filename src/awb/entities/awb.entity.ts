@@ -155,7 +155,7 @@ export class Awb {
   parent: number;
 
   @ApiProperty({
-    example: '/c/file/xxx',
+    example: '',
     description: '모델파일 경로',
   })
   @Column({ type: 'varchar', length: 500, nullable: true })

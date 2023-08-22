@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  OnModuleInit,
   Param,
   ParseIntPipe,
   Post,
@@ -28,14 +29,20 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
 import path from 'path';
+import console from 'console';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
-export class AwbController {
+export class AwbController implements OnModuleInit {
   constructor(
     private readonly awbService: AwbService,
     private readonly fileService: FileService,
+    private readonly configService: ConfigService,
   ) {}
+
+  private dTimer = +this.configService.getOrThrow('TIMER');
+  private timer: NodeJS.Timeout | null = null;
 
   @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
   @Post()
@@ -227,9 +234,35 @@ export class AwbController {
       );
 
       // upload된 파일의 경로를 awb정보에 update
-      await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
+      // await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
 
+      if (this.dTimer === 0) {
+        this.performAction();
+      } else {
+        this.resetTimer();
+      }
       console.log('File uploaded to:', fileResult);
     }
+  }
+
+  onModuleInit() {
+    this.startTimer(); // 서버가 시작될 때 타이머를 시작하거나 초기화합니다.
+  }
+
+  private startTimer() {
+    if (!this.timer) {
+      this.timer = setInterval(() => {
+        this.dTimer -= 1;
+      }, 1000);
+    }
+  }
+
+  private resetTimer() {
+    this.dTimer = +this.configService.getOrThrow('TIMER');
+  }
+
+  private performAction() {
+    console.log('Performing the action...');
+    this.resetTimer();
   }
 }
