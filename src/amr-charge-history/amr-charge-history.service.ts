@@ -10,8 +10,8 @@ import {
   Repository,
 } from 'typeorm';
 import { AmrChargeHistory } from './entities/amr-charge-history.entity';
-import { getOrderBy } from '../lib/util/getOrderBy';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { orderByUtil } from '../lib/util/orderBy.util';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 
 @Injectable()
 export class AmrChargeHistoryService {
@@ -25,7 +25,7 @@ export class AmrChargeHistoryService {
 
   findAll(
     query: AmrChargeHistory &
-      BasicQueryParam & {
+      BasicqueryparamDto & {
         chargeStartFrom: Date;
         chargeStartTo: Date;
         chargeEndFrom: Date;
@@ -78,7 +78,7 @@ export class AmrChargeHistoryService {
         chargeEnd: findEndDate,
         createdAt: findDate,
       },
-      order: getOrderBy(query.order),
+      order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
     });

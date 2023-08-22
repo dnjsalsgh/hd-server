@@ -12,7 +12,7 @@ import { UldHistoryService } from './uld-history.service';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
 import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { UldHistory } from './entities/uld-history.entity';
 
 @Controller('uld-history')
@@ -37,7 +37,7 @@ export class UldHistoryController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: UldHistory & BasicQueryParam) {
+  findAll(@Query() query: UldHistory & BasicqueryparamDto) {
     return this.uldHistoryService.findAll(query);
   }
 

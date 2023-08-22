@@ -12,7 +12,7 @@ import {
   Repository,
 } from 'typeorm';
 import { Uld } from './entities/uld.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { UldTypeAttribute } from '../uld-type/entities/uld-type.entity';
 import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
 import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
@@ -33,7 +33,7 @@ export class UldService {
     return result;
   }
 
-  async findAll(query: Uld & BasicQueryParam) {
+  async findAll(query: Uld & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

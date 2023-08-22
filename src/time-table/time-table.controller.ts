@@ -12,7 +12,7 @@ import { TimeTableService } from './time-table.service';
 import { CreateTimeTableDto } from './dto/create-time-table.dto';
 import { UpdateTimeTableDto } from './dto/update-time-table.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { TimeTable } from './entities/time-table.entity';
 
 @Controller('time-table')
@@ -34,7 +34,7 @@ export class TimeTableController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: TimeTable & BasicQueryParam) {
+  findAll(@Query() query: TimeTable & BasicqueryparamDto) {
     return this.timeTableService.findAll(query);
   }
 

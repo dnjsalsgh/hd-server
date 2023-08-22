@@ -13,7 +13,7 @@ import { CreateCommonCodeDto } from './dto/create-common-code.dto';
 import { UpdateCommonCodeDto } from './dto/update-common-code.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CommonCode } from './entities/common-code.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 
 @Controller('common-code')
 @ApiTags('[공통코드]common-code')
@@ -34,7 +34,7 @@ export class CommonCodeController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: CommonCode & BasicQueryParam) {
+  findAll(@Query() query: CommonCode & BasicqueryparamDto) {
     return this.commonCodeService.findAll(query);
   }
 

@@ -9,7 +9,7 @@ import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
 import {
   setDataSourceForTest,
   setTypeOrmForTest,
-} from '../lib/util/testSetTypeorm.Object';
+} from '../lib/util/testSetTypeorm.util';
 import { BuildUpOrderModule } from './build-up-order.module';
 import { UldModule } from '../uld/uld.module';
 import { AwbModule } from '../awb/awb.module';

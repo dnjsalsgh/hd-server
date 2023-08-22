@@ -12,7 +12,7 @@ import { AmrChargeHistoryService } from './amr-charge-history.service';
 import { CreateAmrChargeHistoryDto } from './dto/create-amr-charge-history.dto';
 import { UpdateAmrChargeHistoryDto } from './dto/update-amr-charge-history.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { AmrChargeHistory } from './entities/amr-charge-history.entity';
 
 @Controller('amr-charge-history')
@@ -42,7 +42,7 @@ export class AmrChargeHistoryController {
   findAll(
     @Query()
     query: AmrChargeHistory &
-      BasicQueryParam & {
+      BasicqueryparamDto & {
         chargeStartFrom: Date;
         chargeStartTo: Date;
         chargeEndFrom: Date;

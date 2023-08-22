@@ -21,7 +21,7 @@ import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
 import { TimeTable } from '../time-table/entities/time-table.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
-import { getOrderBy } from '../lib/util/getOrderBy';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class AmrService {
@@ -257,7 +257,7 @@ export class AmrService {
         distinguish: distinguish,
         createdAt: findDate,
       },
-      order: getOrderBy(order),
+      order: orderByUtil(order),
       take: limit,
       skip: offset,
     });

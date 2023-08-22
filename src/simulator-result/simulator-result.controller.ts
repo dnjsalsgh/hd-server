@@ -14,7 +14,7 @@ import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateSimulatorResultWithAwbAndHistoryDto } from './dto/create-simulator-result-with-awb';
 import { Asrs } from '../asrs/entities/asrs.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import { CreateSimulatorResultOrderDto } from './dto/create-simulator-result-order.dto';
 
@@ -53,7 +53,7 @@ export class SimulatorResultController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: SimulatorResult & BasicQueryParam) {
+  findAll(@Query() query: SimulatorResult & BasicqueryparamDto) {
     return this.simulatorResultService.findAll(query);
   }
 

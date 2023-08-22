@@ -11,8 +11,8 @@ import {
   Repository,
 } from 'typeorm';
 import { UldType } from './entities/uld-type.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
-import { getOrderBy } from '../lib/util/getOrderBy';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class UldTypeService {
@@ -27,7 +27,7 @@ export class UldTypeService {
     return result;
   }
 
-  async findAll(query: UldType & BasicQueryParam) {
+  async findAll(query: UldType & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -44,7 +44,7 @@ export class UldTypeService {
         name: query.name ? ILike(`%${query.name}%`) : undefined,
         createdAt: findDate,
       },
-      order: getOrderBy(query.order),
+      order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
     });

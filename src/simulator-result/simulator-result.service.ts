@@ -24,8 +24,8 @@ import { SimulatorResultAwbJoin } from '../simulator-result-awb-join/entities/si
 import { SimulatorHistory } from '../simulator-history/entities/simulator-history.entity';
 import { CreateSimulatorHistoryDto } from '../simulator-history/dto/create-simulator-history.dto';
 import { CreateSimulatorResultAwbJoinDto } from '../simulator-result-awb-join/dto/create-simulator-result-awb-join.dto';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
-import { getOrderBy } from '../lib/util/getOrderBy';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { CreateSimulatorResultOrderDto } from './dto/create-simulator-result-order.dto';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
@@ -287,7 +287,7 @@ export class SimulatorResultService {
     }
   }
 
-  async findAll(query: SimulatorResult & BasicQueryParam) {
+  async findAll(query: SimulatorResult & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -313,7 +313,7 @@ export class SimulatorResultService {
         Uld: query.Uld ? Equal(+query.Uld) : undefined,
         createdAt: findDate,
       },
-      order: getOrderBy(query.order),
+      order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
     });

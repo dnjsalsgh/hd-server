@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UploadedFile,
 } from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
@@ -21,8 +22,8 @@ import { Awb } from './entities/awb.entity';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { CreateAwbSccJoinDto } from '../awb-scc-join/dto/create-awb-scc-join.dto';
 import { Scc } from '../scc/entities/scc.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
-import { getOrderBy } from '../lib/util/getOrderBy';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { Aircraft } from '../aircraft/entities/aircraft.entity';
@@ -133,7 +134,7 @@ export class AwbService {
     }
   }
 
-  async findAll(query: Awb & BasicQueryParam) {
+  async findAll(query: Awb & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -177,7 +178,7 @@ export class AwbService {
         simulation: query.simulation,
         createdAt: findDate,
       },
-      order: getOrderBy(query.order),
+      order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
       relations: {
@@ -325,8 +326,13 @@ export class AwbService {
     return this.awbRepository.delete(id);
   }
 
-  async modelingComplete(id: number, file: Express.Multer.File) {
+  async modelingCompleteForTest(id: number, file: Express.Multer.File) {
     // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
-    await this.awbRepository.update(id, { path: file.path });
+    await this.awbRepository.update(id, { modelPath: file.path });
+  }
+
+  async modelingCompleteWithNAS(name: string) {
+    // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
+    // await this.awbRepository.update(id, { modelPath: file.path });
   }
 }

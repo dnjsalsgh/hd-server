@@ -1,4 +1,4 @@
-export const getOrderBy = (order: string | undefined | null) => {
+export const orderByUtil = (order: string | undefined | null) => {
   const insertObject: { [key: string]: string } = {};
 
   if (order) {

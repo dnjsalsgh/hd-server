@@ -23,7 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Awb } from './entities/awb.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 
@@ -98,7 +98,7 @@ export class AwbController {
   @ApiQuery({ name: 'order', required: false })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: Awb & BasicQueryParam) {
+  findAll(@Query() query: Awb & BasicqueryparamDto) {
     return this.awbService.findAll(query);
   }
 
@@ -139,7 +139,7 @@ export class AwbController {
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.awbService.modelingComplete(id, file);
+    return this.awbService.modelingCompleteForTest(id, file);
   }
 
   @ApiOperation({
@@ -203,6 +203,10 @@ export class AwbController {
   updateFileByMqttSignal(@Payload() data) {
     // nas 서버 접속해서 이미지 파일을 다운 받고 upload 진행하기
     console.log(data);
+    if (data.name) {
+      const name = data.name as string;
+      this.awbService.modelingCompleteWithNAS(name);
+    }
     // service 로직에서 이미지를 read완료 했다는 신호 발생
   }
 }

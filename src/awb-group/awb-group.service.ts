@@ -11,8 +11,8 @@ import {
 import { AwbGroup } from './entities/awb-group.entity';
 import { CreateAwbGroupDto } from './dto/create-awb-group.dto';
 import { UpdateAwbGroupDto } from './dto/update-awb-group.dto';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
-import { getOrderBy } from '../lib/util/getOrderBy';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class AwbGroupService {
@@ -24,7 +24,7 @@ export class AwbGroupService {
     return this.awbGroupRepository.save(createCargoGroupDto);
   }
 
-  findAll(query: AwbGroup & BasicQueryParam) {
+  findAll(query: AwbGroup & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -41,7 +41,7 @@ export class AwbGroupService {
         code: query.code ? ILike(`%${query.code}%`) : undefined,
         createdAt: findDate,
       },
-      order: getOrderBy(query.order),
+      order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
     });

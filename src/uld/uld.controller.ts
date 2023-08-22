@@ -13,7 +13,7 @@ import { UldService } from './uld.service';
 import { CreateUldDto } from './dto/create-uld.dto';
 import { UpdateUldDto } from './dto/update-uld.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { Uld } from './entities/uld.entity';
 import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
 
@@ -37,7 +37,7 @@ export class UldController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: Uld & BasicQueryParam) {
+  findAll(@Query() query: Uld & BasicqueryparamDto) {
     return this.uldService.findAll(query);
   }
 
