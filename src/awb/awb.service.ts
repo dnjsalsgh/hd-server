@@ -120,7 +120,7 @@ export class AwbService {
       }
 
       await queryRunner.commitTransaction();
-      // amr실시간 데이터 mqtt로 publish 하기 위함
+      // awb실시간 데이터 mqtt로 publish 하기 위함
       this.client
         .send(`hyundai/vms1/readCompl`, {
           amr: awbResult,
@@ -328,18 +328,36 @@ export class AwbService {
     return this.awbRepository.delete(id);
   }
 
-  async modelingCompleteForTest(id: number, file: Express.Multer.File) {
-    // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
-    await this.awbRepository.update(id, { modelPath: file.path });
+  async modelingCompleteById(id: number, file: Express.Multer.File) {
+    try {
+      // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
+      await this.awbRepository.update(id, { modelPath: file.path });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async modelingCompleteToHandlingPath(name: string, filePath: string) {
+    try {
+      const targetAwb = await this.awbRepository.findOne({
+        where: { name: name },
+      });
+      // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
+      await this.awbRepository.update(targetAwb.id, { modelPath: filePath });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async modelingCompleteWithNAS(name: string) {
-    // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
-    const fileResult = await this.fileService.readFile(
-      `/Users/wmh/Pictures/${name}.png`,
-    );
-
-    console.log(typeof fileResult);
-    // await this.awbRepository.update(id, { modelPath: file.path });
+    // vms데이터를 받았다는 신호를전송합니다
+    // awb실시간 데이터 mqtt로 publish 하기 위함
+    this.client
+      .send(`hyundai/vms1/readCompl`, {
+        awbId: name,
+        time: new Date().toISOString(),
+      })
+      .pipe(take(1))
+      .subscribe();
   }
 }

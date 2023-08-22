@@ -27,7 +27,6 @@ import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
-import { uploadFile } from '../lib/util/upload.util';
 import path from 'path';
 
 @Controller('awb')
@@ -145,7 +144,7 @@ export class AwbController {
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.awbService.modelingCompleteForTest(id, file);
+    return this.awbService.modelingCompleteById(id, file);
   }
 
   @ApiOperation({
@@ -216,6 +215,9 @@ export class AwbController {
       const directory = path.join('C:', 'Users', user, documentsFolder);
       const filePath = path.join(directory, filename);
 
+      // vms데이터를 받았다는 신호를전송합니다
+      await this.awbService.modelingCompleteWithNAS(name);
+
       // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정
       const fileContent = await this.fileService.readFile(filePath);
 
@@ -223,6 +225,9 @@ export class AwbController {
         fileContent,
         `${name}.png`,
       );
+
+      // upload된 파일의 경로를 awb정보에 update
+      await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
 
       console.log('File uploaded to:', fileResult);
     }
