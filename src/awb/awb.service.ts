@@ -31,6 +31,7 @@ import { CreateAircraftScheduleDto } from '../aircraft-schedule/dto/create-aircr
 import { CommonCode } from '../common-code/entities/common-code.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
+import { CreateCommonCodeDto } from '../common-code/dto/create-common-code.dto';
 
 @Injectable()
 export class AwbService {
@@ -86,12 +87,12 @@ export class AwbService {
         localArrivalTime: createAwbDto.localArrivalTime,
         waypoint: createAwbDto.waypoint,
         Aircraft: aircraftResult.identifiers[0].id,
-        CcIdDestination: routeResult.find(
-          (item) => item.code === createAwbDto.destination,
-        ).id,
-        CcIdDeparture: routeResult.find(
-          (item) => item.code === createAwbDto.departure,
-        ).id,
+        CcIdDestination:
+          routeResult.find((item) => item.code === createAwbDto.destination)
+            ?.id || 0,
+        CcIdDeparture:
+          routeResult.find((item) => item.code === createAwbDto.departure)
+            ?.id || 0,
         Awb: awbResult.id,
       };
       await queryRunner.manager
