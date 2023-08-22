@@ -7,6 +7,7 @@ import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { Scc } from '../scc/entities/scc.entity';
 import { MqttModule } from '../mqtt.module';
+import { FileService } from '../file/file.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { MqttModule } from '../mqtt.module';
     MqttModule,
   ],
   controllers: [AwbController],
-  providers: [AwbService],
+  providers: [AwbService, FileService],
 })
 export class AwbModule {}

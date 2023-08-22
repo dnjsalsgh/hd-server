@@ -26,11 +26,17 @@ import { Awb } from './entities/awb.entity';
 import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
+import { FileService } from '../file/file.service';
+import { uploadFile } from '../lib/util/upload.util';
+import path from 'path';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
 export class AwbController {
-  constructor(private readonly awbService: AwbService) {}
+  constructor(
+    private readonly awbService: AwbService,
+    private readonly fileService: FileService,
+  ) {}
 
   @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
   @Post()
@@ -200,13 +206,25 @@ export class AwbController {
 
   // 3D 모델링파일 생성 완료 트리거
   @MessagePattern('hyundai/vms1/createFile') //구독하는 주제
-  updateFileByMqttSignal(@Payload() data) {
+  async updateFileByMqttSignal(@Payload() data) {
     // nas 서버 접속해서 이미지 파일을 다운 받고 upload 진행하기
-    console.log(data);
     if (data.name) {
       const name = data.name as string;
-      this.awbService.modelingCompleteWithNAS(name);
+      const user = 'wmh';
+      const documentsFolder = 'Documents';
+      const filename = `${name}.png`;
+      const directory = path.join('C:', 'Users', user, documentsFolder);
+      const filePath = path.join(directory, filename);
+
+      // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정
+      const fileContent = await this.fileService.readFile(filePath);
+
+      const fileResult = await this.fileService.uploadFileToLocalServer(
+        fileContent,
+        `${name}.png`,
+      );
+
+      console.log('File uploaded to:', fileResult);
     }
-    // service 로직에서 이미지를 read완료 했다는 신호 발생
   }
 }

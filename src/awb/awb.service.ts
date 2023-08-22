@@ -33,6 +33,7 @@ import { CommonCode } from '../common-code/entities/common-code.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { CreateCommonCodeDto } from '../common-code/dto/create-common-code.dto';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class AwbService {
@@ -45,6 +46,7 @@ export class AwbService {
     private readonly sccRepository: Repository<Scc>,
     private dataSource: DataSource,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createAwbDto: CreateAwbDto) {
@@ -333,6 +335,11 @@ export class AwbService {
 
   async modelingCompleteWithNAS(name: string) {
     // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
+    const fileResult = await this.fileService.readFile(
+      `/Users/wmh/Pictures/${name}.png`,
+    );
+
+    console.log(typeof fileResult);
     // await this.awbRepository.update(id, { modelPath: file.path });
   }
 }

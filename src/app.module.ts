@@ -56,6 +56,7 @@ import { SkidPlatform } from './skid-platform/entities/skid-platform.entity';
 import { SkidPlatformHistory } from './skid-platform-history/entities/skid-platform-history.entity';
 import { RedisCacheModule } from './cache/redis.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -144,6 +145,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 
     // schedule 모듈 설정
     ScheduleModule.forRoot(),
+
+    // file 모듈 설정
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
