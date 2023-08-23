@@ -261,8 +261,38 @@ export class AwbController implements OnModuleInit {
     this.dTimer = +this.configService.getOrThrow('TIMER');
   }
 
+  /**
+   * 모델이 생성되었다는 신호가 10분동안 안왔을 때 model을 db와 연결시키기 위한 메서드
+   * db에 저장된 awb들 중 model_path가 없는 것들을 모두 선택
+   * nas서버에 awb name으로 파일을 찾는다.
+   * @private
+   */
   private async performAction() {
     const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
+    if (missModelAwbList && missModelAwbList.length > 0) {
+      for (const awb of missModelAwbList) {
+        const name = awb.name;
+        const user = 'wmh';
+        const documentsFolder = 'Documents';
+        const filename = `${name}.png`;
+        const directory = path.join('C:', 'Users', user, documentsFolder);
+        const filePath = path.join(directory, filename);
+
+        // vms데이터를 받았다는 신호를전송합니다
+        await this.awbService.modelingCompleteWithNAS(name);
+
+        // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정
+        const fileContent = await this.fileService.readFile(filePath);
+
+        const fileResult = await this.fileService.uploadFileToLocalServer(
+          fileContent,
+          `${name}.png`,
+        );
+
+        // upload된 파일의 경로를 awb정보에 update
+        await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
+      }
+    }
     console.log('Performing the action...');
     this.resetTimer();
   }
