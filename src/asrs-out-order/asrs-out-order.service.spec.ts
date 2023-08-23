@@ -3,7 +3,7 @@ import { AsrsOutOrderService } from './asrs-out-order.service';
 import { INestApplication } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
-import { setTypeOrmForTest } from '../lib/util/testSetTypeorm.Object';
+import { setTypeOrmForTest } from '../lib/util/testSetTypeorm.util';
 import { AsrsOutOrder } from './entities/asrs-out-order.entity';
 import { AsrsOutOrderModule } from './asrs-out-order.module';
 import { Asrs } from '../asrs/entities/asrs.entity';

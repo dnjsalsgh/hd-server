@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  OnModuleInit,
   Param,
   ParseIntPipe,
   Post,
@@ -23,13 +24,25 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Awb } from './entities/awb.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
+import { FileService } from '../file/file.service';
+import path from 'path';
+import console from 'console';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('awb')
-@ApiTags('Awb(화물,vms)')
-export class AwbController {
-  constructor(private readonly awbService: AwbService) {}
+@ApiTags('[화물,vms]Awb')
+export class AwbController implements OnModuleInit {
+  constructor(
+    private readonly awbService: AwbService,
+    private readonly fileService: FileService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  private dTimer = +this.configService.getOrThrow('TIMER');
+  private timer: NodeJS.Timeout | null = null;
 
   @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
   @Post()
@@ -44,11 +57,23 @@ export class AwbController {
   })
   @ApiBody({ type: [CreateAwbDto] })
   @Post('/break-down/:parent')
-  breakDown(
+  breakDownByName(
     @Param('parent') parent: string,
     @Body() createAwbDtoArray: CreateAwbDto[],
   ) {
     return this.awbService.breakDown(parent, createAwbDtoArray);
+  }
+
+  @ApiOperation({
+    summary: '해포 실행 by id',
+    description: '부모 화물의 id를 넣고, 자식을 body의 [id]로 넣습니다.',
+  })
+  @Post('/break-down-by-id/:awbId')
+  breakDownById(
+    @Param('awbId', ParseIntPipe) awbId: number,
+    @Body() body: CreateAwbBreakDownDto,
+  ) {
+    return this.awbService.breakDownById(awbId, body);
   }
 
   @ApiQuery({ name: 'name', required: false })
@@ -85,7 +110,7 @@ export class AwbController {
   @ApiQuery({ name: 'order', required: false })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: Awb & BasicQueryParam) {
+  findAll(@Query() query: Awb & BasicqueryparamDto) {
     return this.awbService.findAll(query);
   }
 
@@ -126,7 +151,7 @@ export class AwbController {
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.awbService.modelingComplete(id, file);
+    return this.awbService.modelingCompleteById(id, file);
   }
 
   @ApiOperation({
@@ -187,9 +212,88 @@ export class AwbController {
 
   // 3D 모델링파일 생성 완료 트리거
   @MessagePattern('hyundai/vms1/createFile') //구독하는 주제
-  updateFileByMqttSignal(@Payload() data) {
+  async updateFileByMqttSignal(@Payload() data) {
     // nas 서버 접속해서 이미지 파일을 다운 받고 upload 진행하기
-    console.log(data);
-    // service 로직에서 이미지를 read완료 했다는 신호 발생
+    if (data.name) {
+      const name = data.name as string;
+      const user = 'wmh';
+      const documentsFolder = 'Documents';
+      const filename = `${name}.png`;
+      const directory = path.join('C:', 'Users', user, documentsFolder);
+      const filePath = path.join(directory, filename);
+
+      // vms데이터를 받았다는 신호를전송합니다
+      await this.awbService.modelingCompleteWithNAS(name);
+
+      // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정
+      const fileContent = await this.fileService.readFile(filePath);
+
+      const fileResult = await this.fileService.uploadFileToLocalServer(
+        fileContent,
+        `${name}.png`,
+      );
+
+      // upload된 파일의 경로를 awb정보에 update
+      await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
+
+      if (this.dTimer === 0) {
+        this.performAction();
+      } else {
+        this.resetTimer();
+      }
+      console.log('File uploaded to:', fileResult);
+    }
+  }
+
+  onModuleInit() {
+    this.startTimer(); // 서버가 시작될 때 타이머를 시작하거나 초기화합니다.
+  }
+
+  private startTimer() {
+    if (!this.timer) {
+      this.timer = setInterval(() => {
+        this.dTimer -= 1;
+      }, 1000);
+    }
+  }
+
+  private resetTimer() {
+    this.dTimer = +this.configService.getOrThrow('TIMER');
+  }
+
+  /**
+   * 모델이 생성되었다는 신호가 10분동안 안왔을 때 model을 db와 연결시키기 위한 메서드
+   * db에 저장된 awb들 중 model_path가 없는 것들을 모두 선택
+   * nas서버에 awb name으로 파일을 찾는다.
+   * @private
+   */
+  private async performAction() {
+    const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
+    if (missModelAwbList && missModelAwbList.length > 0) {
+      for (const awb of missModelAwbList) {
+        const name = awb.name;
+        const user = 'wmh';
+        const documentsFolder = 'Documents';
+        const filename = `${name}.png`;
+        const directory = path.join('C:', 'Users', user, documentsFolder);
+        const filePath = path.join(directory, filename);
+
+        // vms데이터를 받았다는 신호를전송합니다
+        await this.awbService.modelingCompleteWithNAS(name);
+
+        // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정
+        const fileContent = await this.fileService.readFile(filePath);
+
+        const fileResult = await this.fileService.uploadFileToLocalServer(
+          fileContent,
+          `${name}.png`,
+        );
+
+        // upload된 파일의 경로를 awb정보에 update
+        await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
+      }
+    }
+    console.log('Performing the action...');
+    this.resetTimer();
   }
 }

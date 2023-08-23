@@ -11,8 +11,8 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
-import { getOrderBy } from '../lib/util/getOrderBy';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class CommonCodeService {
@@ -25,7 +25,7 @@ export class CommonCodeService {
     return result;
   }
 
-  async findAll(query: CommonCode & BasicQueryParam) {
+  async findAll(query: CommonCode & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -43,7 +43,7 @@ export class CommonCodeService {
         type: query.type ? ILike(`%${query.type}%`) : undefined,
         createdAt: findDate,
       },
-      order: getOrderBy(query.order),
+      order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
     });

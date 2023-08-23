@@ -12,7 +12,7 @@ import { AwbSccJoinService } from './awb-scc-join.service';
 import { CreateAwbSccJoinDto } from './dto/create-awb-scc-join.dto';
 import { UpdateAwbSccJoinDto } from './dto/update-awb-scc-join.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { AwbSccJoin } from './entities/awb-scc-join.entity';
 
 @Controller('Awb-Scc-join')
@@ -38,7 +38,7 @@ export class AwbSccJoinController {
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
   findAll(
-    @Query() query: AwbSccJoin & BasicQueryParam,
+    @Query() query: AwbSccJoin & BasicqueryparamDto,
     @Query('SccName') SccName: string,
     @Query('AwbName') AwbName: string,
   ) {

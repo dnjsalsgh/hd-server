@@ -12,11 +12,11 @@ import { SimulatorHistoryService } from './simulator-history.service';
 import { CreateSimulatorHistoryDto } from './dto/create-simulator-history.dto';
 import { UpdateSimulatorHistoryDto } from './dto/update-simulator-history.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { SimulatorHistory } from './entities/simulator-history.entity';
 
 @Controller('simulator-history')
-@ApiTags('simulator-history')
+@ApiTags('[시뮬레이터 이력]simulator-history')
 export class SimulatorHistoryController {
   constructor(
     private readonly simulatorHistoryService: SimulatorHistoryService,
@@ -36,7 +36,7 @@ export class SimulatorHistoryController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: SimulatorHistory & BasicQueryParam) {
+  findAll(@Query() query: SimulatorHistory & BasicqueryparamDto) {
     return this.simulatorHistoryService.findAll(query);
   }
 

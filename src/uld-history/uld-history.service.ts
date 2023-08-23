@@ -11,7 +11,7 @@ import {
   Repository,
 } from 'typeorm';
 import { UldHistory } from './entities/uld-history.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { AsrsAttribute } from '../asrs/entities/asrs.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
@@ -31,7 +31,7 @@ export class UldHistoryService {
     return result;
   }
 
-  async findAll(query: UldHistory & BasicQueryParam) {
+  async findAll(query: UldHistory & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

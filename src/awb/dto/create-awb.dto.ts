@@ -145,13 +145,13 @@ export class CreateAwbDto extends PickType(Awb, [
   waypoint: string[];
 
   @ApiProperty({
-    example: 'test',
+    example: 'USA',
     description: '도착지',
   })
   destination: string;
 
   @ApiProperty({
-    example: 'test1',
+    example: 'KOR',
     description: '출발지',
   })
   departure: string;

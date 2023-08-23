@@ -15,7 +15,7 @@ import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @Controller('aircraft-schedule')
-@ApiTags('aircraft-schedule')
+@ApiTags('[항공기 스케줄]aircraft-schedule')
 export class AircraftScheduleController {
   constructor(
     private readonly aircraftScheduleService: AircraftScheduleService,

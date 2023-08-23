@@ -11,12 +11,12 @@ import {
 import { SccService } from './scc.service';
 import { CreateSccDto } from './dto/create-scc.dto';
 import { UpdateSccDto } from './dto/update-scc.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { Scc } from './entities/scc.entity';
 
 @Controller('scc')
-@ApiTags('scc')
+@ApiTags('[Scc]scc')
 export class SccController {
   constructor(private readonly sccService: SccService) {}
 
@@ -33,8 +33,23 @@ export class SccController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: Scc & BasicQueryParam) {
+  findAll(@Query() query: Scc & BasicqueryparamDto) {
     return this.sccService.findAll(query);
+  }
+
+  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'code', required: false })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'offset', required: false, type: 'number' })
+  @ApiOperation({
+    summary: 'scc의 혼입금지 목록을 반환합니다.',
+  })
+  @Get('/ban-list')
+  findBanList(@Query() query: Scc & BasicqueryparamDto) {
+    return this.sccService.findBanList(query);
   }
 
   @Get(':id')

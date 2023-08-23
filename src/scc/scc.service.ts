@@ -11,8 +11,8 @@ import {
   Repository,
 } from 'typeorm';
 import { Scc } from './entities/scc.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
-import { getOrderBy } from '../lib/util/getOrderBy';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class SccService {
@@ -25,7 +25,7 @@ export class SccService {
     return result;
   }
 
-  async findAll(query: Scc & BasicQueryParam) {
+  async findAll(query: Scc & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -43,11 +43,42 @@ export class SccService {
         code: query.code ? ILike(`%${query.code}%`) : undefined,
         createdAt: findDate,
       },
-      order: getOrderBy(query.order),
+      order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
       relations: {
         Awb: true,
+      },
+    });
+
+    return searchResult;
+  }
+
+  async findBanList(query: Scc & BasicqueryparamDto) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+
+    const searchResult = await this.sccRepository.find({
+      where: {
+        name: query.name ? ILike(`%${query.name}%`) : undefined,
+        code: query.code ? ILike(`%${query.code}%`) : undefined,
+        createdAt: findDate,
+      },
+      order: orderByUtil(query.order),
+      take: query.limit,
+      skip: query.offset,
+      select: {
+        // name: true,
+        code: true,
+        banList: true,
       },
     });
 

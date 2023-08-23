@@ -13,8 +13,8 @@ import {
 } from 'typeorm';
 import { SkidPlatform } from './entities/skid-platform.entity';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
-import { getOrderBy } from '../lib/util/getOrderBy';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class SkidPlatformService {
@@ -60,7 +60,7 @@ export class SkidPlatformService {
     return asrs;
   }
 
-  async findAll(query: SkidPlatform & BasicQueryParam) {
+  async findAll(query: SkidPlatform & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -77,7 +77,7 @@ export class SkidPlatformService {
         simulation: query.simulation,
         createdAt: findDate,
       },
-      order: getOrderBy(query.order),
+      order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
     });

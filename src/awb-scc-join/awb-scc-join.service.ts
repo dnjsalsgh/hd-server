@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { AwbSccJoin } from './entities/awb-scc-join.entity';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { AsrsAttribute } from '../asrs/entities/asrs.entity';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { Scc, SccAttribute } from '../scc/entities/scc.entity';
@@ -32,7 +32,7 @@ export class AwbSccJoinService {
   }
 
   async findAll(
-    query: AwbSccJoin & BasicQueryParam,
+    query: AwbSccJoin & BasicqueryparamDto,
     SccName: string,
     AwbName: string,
   ) {}

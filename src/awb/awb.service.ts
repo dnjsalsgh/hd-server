@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UploadedFile,
 } from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
@@ -21,8 +22,8 @@ import { Awb } from './entities/awb.entity';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { CreateAwbSccJoinDto } from '../awb-scc-join/dto/create-awb-scc-join.dto';
 import { Scc } from '../scc/entities/scc.entity';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
-import { getOrderBy } from '../lib/util/getOrderBy';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { Aircraft } from '../aircraft/entities/aircraft.entity';
@@ -30,6 +31,9 @@ import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
 import { CreateAircraftScheduleDto } from '../aircraft-schedule/dto/create-aircraft-schedule.dto';
 import { CommonCode } from '../common-code/entities/common-code.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
+import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
+import { CreateCommonCodeDto } from '../common-code/dto/create-common-code.dto';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class AwbService {
@@ -42,6 +46,7 @@ export class AwbService {
     private readonly sccRepository: Repository<Scc>,
     private dataSource: DataSource,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createAwbDto: CreateAwbDto) {
@@ -85,34 +90,37 @@ export class AwbService {
         localArrivalTime: createAwbDto.localArrivalTime,
         waypoint: createAwbDto.waypoint,
         Aircraft: aircraftResult.identifiers[0].id,
-        CcIdDestination: routeResult.find(
-          (item) => item.code === createAwbDto.destination,
-        ).id,
-        CcIdDeparture: routeResult.find(
-          (item) => item.code === createAwbDto.departure,
-        ).id,
+        CcIdDestination:
+          routeResult.find((item) => item.code === createAwbDto.destination)
+            ?.id || 0,
+        CcIdDeparture:
+          routeResult.find((item) => item.code === createAwbDto.departure)
+            ?.id || 0,
         Awb: awbResult.id,
       };
       await queryRunner.manager
         .getRepository(AircraftSchedule)
         .save(aircraftScheduleBody);
 
-      // 4. scc를 입력하기(존재한다면 update)
-      const sccResult = await queryRunner.manager
-        .getRepository(Scc)
-        .upsert(scc, ['name']);
+      // scc 정보, awb이 입력되어야 동작하게끔
+      if (scc && awbResult) {
+        // 4. scc를 입력하기(존재한다면 update)
+        const sccResult = await queryRunner.manager
+          .getRepository(Scc)
+          .upsert(scc, ['code']);
 
-      // 5. awb와 scc를 연결해주기 위한 작업
-      const joinParam = sccResult.identifiers.map((item) => {
-        return {
-          Awb: awbResult.id,
-          Scc: item.id,
-        };
-      });
-      await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+        // 5. awb와 scc를 연결해주기 위한 작업
+        const joinParam = sccResult.identifiers.map((item) => {
+          return {
+            Awb: awbResult.id,
+            Scc: item.id,
+          };
+        });
+        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+      }
 
       await queryRunner.commitTransaction();
-      // amr실시간 데이터 mqtt로 publish 하기 위함
+      // awb실시간 데이터 mqtt로 publish 하기 위함
       this.client
         .send(`hyundai/vms1/readCompl`, {
           amr: awbResult,
@@ -128,7 +136,7 @@ export class AwbService {
     }
   }
 
-  async findAll(query: Awb & BasicQueryParam) {
+  async findAll(query: Awb & BasicqueryparamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -172,7 +180,7 @@ export class AwbService {
         simulation: query.simulation,
         createdAt: findDate,
       },
-      order: getOrderBy(query.order),
+      order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
       relations: {
@@ -270,12 +278,95 @@ export class AwbService {
     }
   }
 
+  async breakDownById(awbId: number, body: CreateAwbBreakDownDto) {
+    try {
+      const parentAwb = await this.awbRepository.findOneBy({
+        id: awbId,
+      });
+      console.log('parentAwb = ', parentAwb, awbId, body);
+      // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
+      if (
+        !parentAwb &&
+        parentAwb.parent !== 0 &&
+        parentAwb.breakDown === false
+      ) {
+        throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
+      }
+    } catch (e) {
+      throw new NotFoundException(`${e}`);
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      // 2. 해포된 화물들 등록
+      for (let i = 0; i < body.awbs.length; i++) {
+        // 2-1. 하위 화물 등록
+        const subAwb = body.awbs[i];
+
+        await queryRunner.manager
+          .getRepository(Awb)
+          .update({ id: subAwb }, { parent: awbId, breakDown: true });
+      }
+
+      // 2-3. 부모 화물 breakDown: True로 상태 변경
+      await queryRunner.manager
+        .getRepository(Awb)
+        .update({ id: awbId }, { breakDown: true });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   remove(id: number) {
     return this.awbRepository.delete(id);
   }
 
-  async modelingComplete(id: number, file: Express.Multer.File) {
-    // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
-    await this.awbRepository.update(id, { path: file.path });
+  async modelingCompleteById(id: number, file: Express.Multer.File) {
+    try {
+      // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
+      await this.awbRepository.update(id, { modelPath: file.path });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async modelingCompleteToHandlingPath(name: string, filePath: string) {
+    try {
+      const targetAwb = await this.awbRepository.findOne({
+        where: { name: name },
+      });
+      // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
+      await this.awbRepository.update(targetAwb.id, { modelPath: filePath });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async modelingCompleteWithNAS(name: string) {
+    // vms데이터를 받았다는 신호를전송합니다
+    // awb실시간 데이터 mqtt로 publish 하기 위함
+    this.client
+      .send(`hyundai/vms1/readCompl`, {
+        awbId: name,
+        time: new Date().toISOString(),
+      })
+      .pipe(take(1))
+      .subscribe();
+  }
+
+  async getAwbNotCombineModelPath() {
+    return await this.awbRepository.find({
+      where: [
+        { modelPath: '' }, // modelPath가 빈 문자열인 경우
+        { modelPath: null }, // modelPath가 null인 경우
+      ],
+    });
   }
 }

@@ -13,11 +13,11 @@ import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history
 import { UpdateSkidPlatformHistoryDto } from './dto/update-skid-platform-history.dto';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { SkidPlatformHistory } from './entities/skid-platform-history.entity';
 
 @Controller('skid-platform-history')
-@ApiTags('skid-platform-history')
+@ApiTags('[안착대 이력]skid-platform-history')
 export class SkidPlatformHistoryController {
   constructor(
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
@@ -38,7 +38,7 @@ export class SkidPlatformHistoryController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: SkidPlatformHistory & BasicQueryParam) {
+  findAll(@Query() query: SkidPlatformHistory & BasicqueryparamDto) {
     return this.skidPlatformHistoryService.findAll(query);
   }
 

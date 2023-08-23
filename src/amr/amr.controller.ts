@@ -15,7 +15,7 @@ import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AmrRawDto } from './dto/amr-raw.dto';
 
 @Controller('amr')
-@ApiTags('amr')
+@ApiTags('[Amr]amr')
 export class AmrController {
   constructor(private readonly amrService: AmrService) {}
 

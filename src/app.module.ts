@@ -55,6 +55,8 @@ import { BuildUpOrder } from './build-up-order/entities/build-up-order.entity';
 import { SkidPlatform } from './skid-platform/entities/skid-platform.entity';
 import { SkidPlatformHistory } from './skid-platform-history/entities/skid-platform-history.entity';
 import { RedisCacheModule } from './cache/redis.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -140,6 +142,12 @@ import { RedisCacheModule } from './cache/redis.module';
 
     // redis 모듈설정
     RedisCacheModule,
+
+    // schedule 모듈 설정
+    ScheduleModule.forRoot(),
+
+    // file 모듈 설정
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

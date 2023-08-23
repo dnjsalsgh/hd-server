@@ -4,12 +4,9 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToMany,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { AwbSccJoin } from '../../awb-scc-join/entities/awb-scc-join.entity';
-import { UldSccJoin } from '../../uld-scc-join/entities/uld-scc-join.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Awb } from '../../awb/entities/awb.entity';
 import { Uld } from '../../uld/entities/uld.entity';
@@ -23,14 +20,14 @@ export class Scc {
     example: 'Scc-001',
     description: 'scc의 고유코드',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true, unique: true })
   code: string;
 
   @ApiProperty({
     example: 'Scc-001',
     description: 'scc의 이름',
   })
-  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   name: string;
 
   @ApiProperty({
@@ -65,7 +62,7 @@ export class Scc {
     nullable: true, // null 허용 여부 (선택 사항)
     default: [], // 기본값 (선택 사항)
   })
-  notTogetherList: string[];
+  banList: string[];
 
   @CreateDateColumn()
   createdAt: Date;

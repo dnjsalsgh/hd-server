@@ -12,11 +12,11 @@ import { AwbGroupService } from './awb-group.service';
 import { CreateAwbGroupDto } from './dto/create-awb-group.dto';
 import { UpdateAwbGroupDto } from './dto/update-awb-group.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicQueryParam } from '../lib/dto/basicQueryParam';
+import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
 import { AwbGroup } from './entities/awb-group.entity';
 
 @Controller('Awb-group')
-@ApiTags('Awb-group')
+@ApiTags('[화물그룹]Awb-group')
 export class AwbGroupController {
   constructor(private readonly awbGroupService: AwbGroupService) {}
 
@@ -32,7 +32,7 @@ export class AwbGroupController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: AwbGroup & BasicQueryParam) {
+  findAll(@Query() query: AwbGroup & BasicqueryparamDto) {
     return this.awbGroupService.findAll(query);
   }
 
