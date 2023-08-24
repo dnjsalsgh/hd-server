@@ -16,7 +16,8 @@ import { orderByUtil } from '../lib/util/orderBy.util';
 @Injectable()
 export class VmsService {
   constructor(
-    @InjectRepository(Vms) private readonly vmsRepository: Repository<Vms>,
+    @InjectRepository(Vms, 'mssqlDB')
+    private readonly vmsRepository: Repository<Vms>,
   ) {}
 
   create(createVmsDto: CreateVmsDto) {

@@ -34,6 +34,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { FileModule } from './file/file.module';
 import { mssqlConfig, postgresConfig } from './config/db.config';
 import { VmsModule } from './vms/vms.module';
+import { Vms } from './vms/entities/vms.entity';
+import { CommonCode } from './common-code/entities/common-code.entity';
 
 @Module({
   imports: [
@@ -43,8 +45,19 @@ import { VmsModule } from './vms/vms.module';
     }),
 
     // DB 연결
-    TypeOrmModule.forRoot(postgresConfig), // PostgreSQL 연결 설정
-    TypeOrmModule.forRoot(mssqlConfig), // MSSQL 연결 설정
+    // PostgreSQL 연결 설정
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => {
+        return postgresConfig;
+      },
+    }),
+    // MSSQL 연결 설정
+    TypeOrmModule.forRootAsync({
+      name: 'mssqlDB',
+      useFactory: async () => {
+        return mssqlConfig;
+      },
+    }),
     AmrModule,
     AmrChargerModule,
     AmrChargeHistoryModule,

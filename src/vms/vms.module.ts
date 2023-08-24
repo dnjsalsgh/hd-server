@@ -5,7 +5,7 @@ import { VmsController } from './vms.controller';
 import { VmsService } from './vms.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Vms])],
+  imports: [TypeOrmModule.forFeature([Vms], 'mssqlDB')],
   controllers: [VmsController],
   providers: [VmsService],
 })
