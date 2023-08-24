@@ -24,7 +24,7 @@ import { SimulatorResultAwbJoin } from '../simulator-result-awb-join/entities/si
 import { SimulatorHistory } from '../simulator-history/entities/simulator-history.entity';
 import { CreateSimulatorHistoryDto } from '../simulator-history/dto/create-simulator-history.dto';
 import { CreateSimulatorResultAwbJoinDto } from '../simulator-result-awb-join/dto/create-simulator-result-awb-join.dto';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { CreateSimulatorResultOrderDto } from './dto/create-simulator-result-order.dto';
@@ -287,7 +287,7 @@ export class SimulatorResultService {
     }
   }
 
-  async findAll(query: SimulatorResult & BasicqueryparamDto) {
+  async findAll(query: SimulatorResult & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

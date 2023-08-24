@@ -1,4 +1,4 @@
-export interface BasicqueryparamDto {
+export interface BasicQueryParamDto {
   createdAtFrom?: Date;
   createdAtTo?: Date;
   order?: string;

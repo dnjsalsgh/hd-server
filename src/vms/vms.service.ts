@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Vms } from './entities/vms.entity';
 import {
   Between,
   FindOperator,
@@ -8,23 +9,21 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { AwbGroup } from './entities/awb-group.entity';
-import { CreateAwbGroupDto } from './dto/create-awb-group.dto';
-import { UpdateAwbGroupDto } from './dto/update-awb-group.dto';
+import { CreateVmsDto } from './dto/create-vms.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
-export class AwbGroupService {
+export class VmsService {
   constructor(
-    @InjectRepository(AwbGroup)
-    private readonly awbGroupRepository: Repository<AwbGroup>,
+    @InjectRepository(Vms) private readonly vmsRepository: Repository<Vms>,
   ) {}
-  create(createCargoGroupDto: CreateAwbGroupDto) {
-    return this.awbGroupRepository.save(createCargoGroupDto);
+
+  create(createVmsDto: CreateVmsDto) {
+    return this.vmsRepository.save(createVmsDto);
   }
 
-  findAll(query: AwbGroup & BasicQueryParamDto) {
+  async findAll(query: Vms & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -35,10 +34,11 @@ export class AwbGroupService {
     } else if (createdAtTo) {
       findDate = LessThanOrEqual(createdAtTo);
     }
-    return this.awbGroupRepository.find({
+
+    console.log(await this.vmsRepository.find({}));
+    return await this.vmsRepository.find({
       where: {
         name: query.name ? ILike(`%${query.name}%`) : undefined,
-        code: query.code ? ILike(`%${query.code}%`) : undefined,
         createdAt: findDate,
       },
       order: orderByUtil(query.order),
@@ -47,15 +47,10 @@ export class AwbGroupService {
     });
   }
 
-  findOne(id: number) {
-    return this.awbGroupRepository.find({ where: { id: id } });
-  }
-
-  update(id: number, updateCargoGroupDto: UpdateAwbGroupDto) {
-    return this.awbGroupRepository.update(id, updateCargoGroupDto);
-  }
-
-  remove(id: number) {
-    return this.awbGroupRepository.delete(id);
+  async findOne(id: number) {
+    const result = await this.vmsRepository.findOne({
+      where: { id: id },
+    });
+    return result;
   }
 }

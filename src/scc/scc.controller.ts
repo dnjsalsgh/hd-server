@@ -12,7 +12,7 @@ import { SccService } from './scc.service';
 import { CreateSccDto } from './dto/create-scc.dto';
 import { UpdateSccDto } from './dto/update-scc.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { Scc } from './entities/scc.entity';
 
 @Controller('scc')
@@ -33,7 +33,7 @@ export class SccController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: Scc & BasicqueryparamDto) {
+  findAll(@Query() query: Scc & BasicQueryParamDto) {
     return this.sccService.findAll(query);
   }
 
@@ -48,7 +48,7 @@ export class SccController {
     summary: 'scc의 혼입금지 목록을 반환합니다.',
   })
   @Get('/ban-list')
-  findBanList(@Query() query: Scc & BasicqueryparamDto) {
+  findBanList(@Query() query: Scc & BasicQueryParamDto) {
     return this.sccService.findBanList(query);
   }
 

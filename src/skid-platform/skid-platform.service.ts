@@ -13,7 +13,7 @@ import {
 } from 'typeorm';
 import { SkidPlatform } from './entities/skid-platform.entity';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
@@ -60,7 +60,7 @@ export class SkidPlatformService {
     return asrs;
   }
 
-  async findAll(query: SkidPlatform & BasicqueryparamDto) {
+  async findAll(query: SkidPlatform & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

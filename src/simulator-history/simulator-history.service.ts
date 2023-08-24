@@ -11,7 +11,7 @@ import {
   Repository,
 } from 'typeorm';
 import { SimulatorHistory } from './entities/simulator-history.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { UldAttribute } from '../uld/entities/uld.entity';
 import { SimulatorResultAttribute } from '../simulator-result/entities/simulator-result.entity';
@@ -30,7 +30,7 @@ export class SimulatorHistoryService {
     return result;
   }
 
-  async findAll(query: SimulatorHistory & BasicqueryparamDto) {
+  async findAll(query: SimulatorHistory & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

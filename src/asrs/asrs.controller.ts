@@ -25,7 +25,7 @@ import { Asrs } from './entities/asrs.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
 @Controller('asrs')
@@ -64,7 +64,7 @@ export class AsrsController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  async findAll(@Query() query: Asrs & BasicqueryparamDto) {
+  async findAll(@Query() query: Asrs & BasicQueryParamDto) {
     const asrs = await this.asrsService.findAll(query);
     return asrs;
   }

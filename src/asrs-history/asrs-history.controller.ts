@@ -12,7 +12,7 @@ import { AsrsHistoryService } from './asrs-history.service';
 import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AsrsHistory } from './entities/asrs-history.entity';
 
 @Controller('asrs-history')
@@ -33,7 +33,7 @@ export class AsrsHistoryController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: AsrsHistory & BasicqueryparamDto) {
+  findAll(@Query() query: AsrsHistory & BasicQueryParamDto) {
     return this.asrsHistoryService.findAll(query);
   }
 

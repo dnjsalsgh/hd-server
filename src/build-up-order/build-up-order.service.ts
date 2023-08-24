@@ -17,7 +17,7 @@ import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.e
 import { UldAttribute } from '../uld/entities/uld.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { UldHistory } from '../uld-history/entities/uld-history.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 
 @Injectable()
 export class BuildUpOrderService {
@@ -83,7 +83,7 @@ export class BuildUpOrderService {
     }
   }
 
-  async findAll(query: BuildUpOrder & BasicqueryparamDto) {
+  async findAll(query: BuildUpOrder & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
