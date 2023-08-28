@@ -386,18 +386,15 @@ export class AwbService {
         // take: 100,
         // skip: 0,
       });
-      console.log(
-        'awbResult.map((v) => v.name) = ',
-        awbResult.map((v) => v.name),
-      );
-      console.log(
-        'vmsResult.map((v) => v.name) = ',
-        vmsResult.map((v) => v.name),
-      );
 
       for (const vms of vmsResult) {
         const existVms = awbResult.find((awb) => awb.name === vms.name);
         if (!existVms) {
+          // vms에 등록된 scc 정보 찾기
+          const sccResult = await this.sccRepository.find({
+            where: { code: vms.scc },
+          });
+
           const createAwbDto: CreateAwbDto = {
             // awb
             name: vms.name,
@@ -429,7 +426,7 @@ export class AwbService {
             localTime: vms.localTime,
             localInTerminal: vms.localInTerminal,
             //
-            scc: [],
+            scc: sccResult,
             aircraftName: vms.aircraftName,
             aircraftCode: vms.aircraftCode,
             aircraftInfo: vms.aircraftInfo,
