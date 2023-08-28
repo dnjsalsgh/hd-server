@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
 import { Asrs } from '../asrs/entities/asrs.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SkidPlatform } from './entities/skid-platform.entity';
 
 @Controller('skid-platform')
@@ -55,7 +55,7 @@ export class SkidPlatformController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: SkidPlatform & BasicqueryparamDto) {
+  findAll(@Query() query: SkidPlatform & BasicQueryParamDto) {
     return this.skidPlatformService.findAll(query);
   }
 

@@ -19,7 +19,7 @@ import {
   AsrsOutOrderAttribute,
 } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -38,7 +38,7 @@ export class SkidPlatformHistoryService {
     return asrs;
   }
 
-  async findAll(query: SkidPlatformHistory & BasicqueryparamDto) {
+  async findAll(query: SkidPlatformHistory & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

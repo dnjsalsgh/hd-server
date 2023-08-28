@@ -12,7 +12,7 @@ import { BuildUpOrderService } from './build-up-order.service';
 import { CreateBuildUpOrderDto } from './dto/create-build-up-order.dto';
 import { UpdateBuildUpOrderDto } from './dto/update-build-up-order.dto';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { BuildUpOrder } from './entities/build-up-order.entity';
 
 @Controller('build-up-order')
@@ -44,7 +44,7 @@ export class BuildUpOrderController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: BuildUpOrder & BasicqueryparamDto) {
+  findAll(@Query() query: BuildUpOrder & BasicQueryParamDto) {
     return this.buildUpOrderService.findAll(query);
   }
 

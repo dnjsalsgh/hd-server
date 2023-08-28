@@ -14,7 +14,7 @@ import { TimeTable } from './entities/time-table.entity';
 import { UldAttribute } from '../uld/entities/uld.entity';
 import { AmrAttribute } from '../amr/entities/amr.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 
 @Injectable()
 export class TimeTableService {
@@ -29,7 +29,7 @@ export class TimeTableService {
     return asrs;
   }
 
-  async findAll(query: TimeTable & BasicqueryparamDto) {
+  async findAll(query: TimeTable & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

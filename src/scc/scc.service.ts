@@ -11,7 +11,7 @@ import {
   Repository,
 } from 'typeorm';
 import { Scc } from './entities/scc.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class SccService {
     return result;
   }
 
-  async findAll(query: Scc & BasicqueryparamDto) {
+  async findAll(query: Scc & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -54,7 +54,7 @@ export class SccService {
     return searchResult;
   }
 
-  async findBanList(query: Scc & BasicqueryparamDto) {
+  async findBanList(query: Scc & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

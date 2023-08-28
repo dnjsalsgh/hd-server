@@ -17,7 +17,7 @@ import {
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { TimeTable } from '../time-table/entities/time-table.entity';
 import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
@@ -64,7 +64,7 @@ export class AsrsService {
     return asrs;
   }
 
-  async findAll(query: Asrs & BasicqueryparamDto) {
+  async findAll(query: Asrs & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

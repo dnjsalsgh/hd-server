@@ -24,7 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Awb } from './entities/awb.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
@@ -110,7 +110,7 @@ export class AwbController implements OnModuleInit {
   @ApiQuery({ name: 'order', required: false })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: Awb & BasicqueryparamDto) {
+  findAll(@Query() query: Awb & BasicQueryParamDto) {
     return this.awbService.findAll(query);
   }
 
@@ -204,10 +204,15 @@ export class AwbController implements OnModuleInit {
     console.log(file);
   }
 
-  // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
+  // VMS 설비데이터 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
-  createByPlcMatt(@Payload() data) {
-    return this.awbService.create(data);
+  async createByPlcMatt(@Payload() data) {
+    // TODO: edge에서 데이터 형식이 정해지면 로직 변경
+    // 만약 누락된 데이터를 등록하기 위한 과정
+    if (data && data.count) {
+      await this.awbService.preventMissingData(data.count);
+    }
+    // return this.awbService.create(data);
   }
 
   // 3D 모델링파일 생성 완료 트리거
@@ -295,5 +300,12 @@ export class AwbController implements OnModuleInit {
     }
     console.log('Performing the action...');
     this.resetTimer();
+  }
+
+  @Get('/test/prevent')
+  private async preventMissingData() {
+    // mssql과 postgres의 vms 정보 개수가 같다면
+
+    return await this.awbService.preventMissingData(206);
   }
 }

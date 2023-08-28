@@ -35,14 +35,14 @@ export class Awb {
     example: '화물-001',
     description: '화물의 이름',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: false, unique: true })
   name: string;
 
   @ApiProperty({
     example: '3d Model Name',
     description: '생성된 3D 모델링명',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   prefab: string;
 
   @ApiProperty({
@@ -98,21 +98,21 @@ export class Awb {
     example: '010101',
     description: '바코드',
   })
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 5000, nullable: true })
   barcode: string;
 
   @ApiProperty({
     example: '미국',
     description: '목적지',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   destination: string;
 
   @ApiProperty({
     example: '한국',
     description: '생성출처',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   source: string;
 
   @ApiProperty({
@@ -144,7 +144,7 @@ export class Awb {
     'inskidplatform',
     'inuld',
   ])
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   state: string;
 
   @ApiProperty({
@@ -158,7 +158,7 @@ export class Awb {
     example: '',
     description: '모델파일 경로',
   })
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 5000, nullable: true })
   modelPath: string;
 
   @ApiProperty({
@@ -180,21 +180,21 @@ export class Awb {
     example: 'fly',
     description: '항공편',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   flight: string;
 
   @ApiProperty({
     example: '출발지',
     description: '출발지',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   from: string;
 
   @ApiProperty({
     example: '공항도착',
     description: '공항도착',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   airportArrival: string;
   // ========= v1 피드백 반영 후 새로생긴 칼럼 끝 =========
 
@@ -203,7 +203,7 @@ export class Awb {
     example: '/c/file/xxx',
     description: '이미지 경로',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   path: string;
 
   @ApiProperty({
@@ -217,14 +217,14 @@ export class Awb {
     example: '배송설명',
     description: '배송설명',
   })
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 5000, nullable: true })
   description: string;
 
   @ApiProperty({
     example: 'RM 코멘트',
     description: 'RM 코멘트',
   })
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 5000, nullable: true })
   rmComment: string;
 
   @ApiProperty({
@@ -238,7 +238,7 @@ export class Awb {
     example: 'AIR-001',
     description: '터미널 내에 화물이 현재 위치하고 있는 사항',
   })
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 5000, nullable: true })
   localInTerminal: string;
   // ============v0.2 추가 끝=================
 

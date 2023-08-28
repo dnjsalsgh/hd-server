@@ -14,7 +14,7 @@ import {
 } from 'typeorm';
 import { AsrsHistory } from './entities/asrs-history.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 
 @Injectable()
 export class AsrsHistoryService {
@@ -33,7 +33,7 @@ export class AsrsHistoryService {
     }
   }
 
-  async findAll(query: AsrsHistory & BasicqueryparamDto) {
+  async findAll(query: AsrsHistory & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

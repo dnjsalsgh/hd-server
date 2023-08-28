@@ -12,7 +12,7 @@ import { AmrChargerService } from './amr-charger.service';
 import { CreateAmrChargerDto } from './dto/create-amr-charger.dto';
 import { UpdateAmrChargerDto } from './dto/update-amr-charger.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AmrCharger } from './entities/amr-charger.entity';
 
 @Controller('amr-charger')
@@ -38,7 +38,7 @@ export class AmrChargerController {
   @Get()
   findAll(
     @Query()
-    query: AmrCharger & BasicqueryparamDto,
+    query: AmrCharger & BasicQueryParamDto,
   ) {
     return this.amrChargerService.findAll(query);
   }

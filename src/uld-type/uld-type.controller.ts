@@ -12,7 +12,7 @@ import { UldTypeService } from './uld-type.service';
 import { CreateUldTypeDto } from './dto/create-uld-type.dto';
 import { UpdateUldTypeDto } from './dto/update-uld-type.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { UldType } from './entities/uld-type.entity';
 
 @Controller('uld-type')
@@ -33,7 +33,7 @@ export class UldTypeController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: UldType & BasicqueryparamDto) {
+  findAll(@Query() query: UldType & BasicQueryParamDto) {
     return this.uldTypeService.findAll(query);
   }
 

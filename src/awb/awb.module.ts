@@ -8,10 +8,12 @@ import { MulterModule } from '@nestjs/platform-express';
 import { Scc } from '../scc/entities/scc.entity';
 import { MqttModule } from '../mqtt.module';
 import { FileService } from '../file/file.service';
+import { Vms } from '../vms/entities/vms.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Awb, AwbSccJoin, Scc]),
+    TypeOrmModule.forFeature([Vms], 'mssqlDB'),
     MulterModule.register({ dest: './upload' }),
     // mqtt 모듈설정
     MqttModule,

@@ -60,7 +60,7 @@ export class CreateAwbDto extends PickType(Awb, [
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
-  name: string;
+  aircraftName: string;
 
   @ApiProperty({
     example: new Date().toISOString(),
@@ -69,13 +69,13 @@ export class CreateAwbDto extends PickType(Awb, [
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
-  code: string;
+  aircraftCode: string;
 
   @ApiProperty({
     example: '{ "test": "test" }',
     description: '항공기 정보',
   })
-  info: unknown;
+  aircraftInfo: unknown;
 
   // 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({
@@ -93,13 +93,13 @@ export class CreateAwbDto extends PickType(Awb, [
   /*
   aircraftSchedule 요소
    */
-  @ApiProperty({
-    example: 'GEN',
-    description: '현지출발시간',
-  })
-  @IsString()
-  @MaxLength(5)
-  source: string;
+  // @ApiProperty({
+  //   example: 'GEN',
+  //   description: '원산지',
+  // })
+  // @IsString()
+  // @MaxLength(5)
+  // source: string;
 
   // 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({

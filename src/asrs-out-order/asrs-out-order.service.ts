@@ -14,7 +14,7 @@ import { UpdateAsrsOutOrderDto } from './dto/update-asrs-out-order.dto';
 import { AsrsAttribute } from '../asrs/entities/asrs.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 
@@ -43,7 +43,7 @@ export class AsrsOutOrderService {
     return asrs;
   }
 
-  async findAll(query: AsrsOutOrder & BasicqueryparamDto) {
+  async findAll(query: AsrsOutOrder & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;

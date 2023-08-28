@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { AmrChargeHistory } from './entities/amr-charge-history.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 
 @Injectable()
 export class AmrChargeHistoryService {
@@ -25,7 +25,7 @@ export class AmrChargeHistoryService {
 
   findAll(
     query: AmrChargeHistory &
-      BasicqueryparamDto & {
+      BasicQueryParamDto & {
         chargeStartFrom: Date;
         chargeStartTo: Date;
         chargeEndFrom: Date;

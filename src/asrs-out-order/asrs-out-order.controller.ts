@@ -12,7 +12,7 @@ import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AsrsOutOrderService } from './asrs-out-order.service';
 import { CreateAsrsOutOrderDto } from './dto/create-asrs-out-order.dto';
 import { UpdateAsrsOutOrderDto } from './dto/update-asrs-out-order.dto';
-import { BasicqueryparamDto } from '../lib/dto/basicqueryparam.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AsrsOutOrder } from './entities/asrs-out-order.entity';
 
 @Controller('asrs-out-order')
@@ -34,7 +34,7 @@ export class AsrsOutOrderController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: AsrsOutOrder & BasicqueryparamDto) {
+  findAll(@Query() query: AsrsOutOrder & BasicQueryParamDto) {
     return this.asrsOutOrderService.findAll(query);
   }
 
