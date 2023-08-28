@@ -302,10 +302,10 @@ export class AwbController implements OnModuleInit {
     this.resetTimer();
   }
 
-  @Get('/test/prevent')
-  private async preventMissingData() {
-    // mssql과 postgres의 vms 정보 개수가 같다면
-
-    return await this.awbService.preventMissingData(206);
-  }
+  // @Get('/test/prevent')
+  // private async preventMissingData() {
+  //   // mssql과 postgres의 vms 정보 개수가 같다면
+  //
+  //   return await this.awbService.preventMissingData(206);
+  // }
 }
