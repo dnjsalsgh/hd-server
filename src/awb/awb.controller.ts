@@ -204,10 +204,15 @@ export class AwbController implements OnModuleInit {
     console.log(file);
   }
 
-  // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
+  // VMS 설비데이터 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
-  createByPlcMatt(@Payload() data) {
-    return this.awbService.create(data);
+  async createByPlcMatt(@Payload() data) {
+    // TODO: edge에서 데이터 형식이 정해지면 로직 변경
+    // 만약 누락된 데이터를 등록하기 위한 과정
+    if (data && data.count) {
+      await this.awbService.preventMissingData(data.count);
+    }
+    // return this.awbService.create(data);
   }
 
   // 3D 모델링파일 생성 완료 트리거
@@ -299,6 +304,8 @@ export class AwbController implements OnModuleInit {
 
   @Get('/test/prevent')
   private async preventMissingData() {
-    return await this.awbService.preventMissingData();
+    // mssql과 postgres의 vms 정보 개수가 같다면
+
+    return await this.awbService.preventMissingData(206);
   }
 }

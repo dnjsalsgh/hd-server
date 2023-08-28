@@ -74,7 +74,7 @@ const mssqlConfig: TypeOrmModuleOptions = {
   password: process.env.MSSQL_DATABASE_PASS,
   database: process.env.MSSQL_DATABASE_NAME,
   entities: [Vms, CommonCode],
-  synchronize: true, // 개발 환경에서만 사용하거나 자동 마이그레이션을 사용하지 않을 경우 false로 변경
+  synchronize: process.env.NODE_ENV === 'dev', // 개발 환경에서만 사용하거나 자동 마이그레이션을 사용하지 않을 경우 false로 변경
   options: { trustServerCertificate: true },
   logging: true,
 };
