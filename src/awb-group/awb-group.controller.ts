@@ -11,7 +11,7 @@ import {
 import { AwbGroupService } from './awb-group.service';
 import { CreateAwbGroupDto } from './dto/create-awb-group.dto';
 import { UpdateAwbGroupDto } from './dto/update-awb-group.dto';
-import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AwbGroup } from './entities/awb-group.entity';
 import { CreateAwbDto } from '../awb/dto/create-awb.dto';
@@ -21,7 +21,10 @@ import { CreateAwbDto } from '../awb/dto/create-awb.dto';
 export class AwbGroupController {
   constructor(private readonly awbGroupService: AwbGroupService) {}
 
-  // @ApiBody({ type: [CreateAwbDto] })
+  @ApiOperation({
+    summary: '화물 제네레이터',
+    description: '화물들을 그룹으로 생성합니다.',
+  })
   @Post()
   create(@Body() createAwbGroupDto: CreateAwbGroupDto) {
     return this.awbGroupService.create(createAwbGroupDto);
