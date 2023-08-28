@@ -374,10 +374,14 @@ export class AwbService {
     });
   }
 
+  /**
+   * 엣지에서 보내주는 vms 데이터 중 누락된 데이터를 다시 저장하기 위한 로직
+   * @param vmsCount edge에서 보내주는 지금까지 보내준 vms의 총 개수
+   */
   async preventMissingData(vmsCount: number) {
     try {
+      // vms와의 차이를 구하기 위해 awb의 총 개수를 구하기
       const awbAllCount = await this.awbRepository.count();
-      // console.log(count, awbAllCount, Math.floor(awbAllCount / 100));
 
       // 만약 엣지에서 들어온 숫자와 vms의 전체 숫자가 같지 않으면
       if (vmsCount !== awbAllCount) {
@@ -386,13 +390,14 @@ export class AwbService {
           take: 100 * Math.abs(vmsCount - awbAllCount), // awb테이블의 최소한만 가져오려고 함(개수차이*100)
           // skip: 100 * i,
         });
-        // 1 ~ 100 까지 누락된 데이터를 찾음
+        // 1 ~ 100 / 101 ~ 200 / 201 ~ 300 ... 누락된 데이터를 찾음
         for (let i = 0; i <= Math.floor(vmsCount / 100); i++) {
           const vmsResult = await this.vmsRepository.find({
             order: orderByUtil(null),
             take: 100,
             skip: 100 * i,
           });
+          // 누락된 데이터찾기 & 누락되었다면 입력
           for (const vms of vmsResult) {
             const existVms = awbResult.find((awb) => awb.name === vms.name);
             if (!existVms) {
