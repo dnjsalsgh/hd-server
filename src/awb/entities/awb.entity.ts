@@ -254,7 +254,7 @@ export class Awb {
   deletedAt: Date | null;
 
   @ManyToOne(() => AwbGroup, (awbGroup) => awbGroup.awbs)
-  AwbGroup: Relation<AwbGroup>;
+  AwbGroup?: Relation<AwbGroup> | number;
 
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Awb)
   BuildUpOrders: Relation<BuildUpOrder[]>;

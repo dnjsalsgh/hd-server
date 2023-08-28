@@ -1,10 +1,4 @@
-import {
-  HttpException,
-  Inject,
-  Injectable,
-  NotFoundException,
-  UploadedFile,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,12 +10,12 @@ import {
   In,
   LessThanOrEqual,
   MoreThanOrEqual,
+  QueryRunner,
   Repository,
   TypeORMError,
 } from 'typeorm';
 import { Awb } from './entities/awb.entity';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
-import { CreateAwbSccJoinDto } from '../awb-scc-join/dto/create-awb-scc-join.dto';
 import { Scc } from '../scc/entities/scc.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
@@ -33,18 +27,16 @@ import { CreateAircraftScheduleDto } from '../aircraft-schedule/dto/create-aircr
 import { CommonCode } from '../common-code/entities/common-code.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
-import { CreateCommonCodeDto } from '../common-code/dto/create-common-code.dto';
 import { FileService } from '../file/file.service';
 import { Vms } from '../vms/entities/vms.entity';
-import { IsString } from 'class-validator';
 
 @Injectable()
 export class AwbService {
   constructor(
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-    @InjectRepository(AwbSccJoin)
-    private readonly awbSccJoinRepository: Repository<AwbSccJoin>,
+    // @InjectRepository(AwbSccJoin)
+    // private readonly awbSccJoinRepository: Repository<AwbSccJoin>,
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
     private dataSource: DataSource,
@@ -54,10 +46,13 @@ export class AwbService {
     private readonly vmsRepository: Repository<Vms>,
   ) {}
 
-  async create(createAwbDto: CreateAwbDto) {
+  async create(
+    createAwbDto: CreateAwbDto,
+    transaction: QueryRunner = this.dataSource.createQueryRunner(),
+  ) {
     const { scc, ...awbDto } = createAwbDto;
 
-    const queryRunner = await this.dataSource.createQueryRunner();
+    const queryRunner = transaction;
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
@@ -141,6 +136,99 @@ export class AwbService {
     }
   }
 
+  async createWithOtherTransaction(
+    createAwbDto: CreateAwbDto,
+    transaction: QueryRunner = this.dataSource.createQueryRunner(),
+  ) {
+    const { scc, ...awbDto } = createAwbDto;
+
+    const queryRunner = transaction;
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // 1. aircraft 입력하기 있다면 update
+      const aircraftBody: CreateAircraftDto = {
+        name: createAwbDto.aircraftName,
+        code: createAwbDto.aircraftCode,
+        info: createAwbDto.aircraftInfo,
+        allow: createAwbDto.allow,
+        allowDryIce: createAwbDto.allowDryIce,
+      };
+      const aircraftResult = await queryRunner.manager
+        .getRepository(Aircraft)
+        .upsert(aircraftBody, ['code']);
+
+      // 출발지, 도착지를 찾기위해 공통코드 검색
+      const routeResult = await queryRunner.manager
+        .getRepository(CommonCode)
+        .find({ where: { masterCode: 'route' } });
+
+      // 2. awb를 입력하기
+      const awbResult = await queryRunner.manager
+        .getRepository(Awb)
+        .save(awbDto);
+
+      // 3. aircraftSchedule 입력하기
+      const aircraftScheduleBody: CreateAircraftScheduleDto = {
+        source: createAwbDto.source,
+        localDepartureTime: createAwbDto.localDepartureTime,
+        koreaArrivalTime: createAwbDto.koreaArrivalTime,
+        workStartTime: createAwbDto.workStartTime,
+        workCompleteTargetTime: createAwbDto.workCompleteTargetTime,
+        koreaDepartureTime: createAwbDto.koreaDepartureTime,
+        localArrivalTime: createAwbDto.localArrivalTime,
+        waypoint: createAwbDto.waypoint,
+        Aircraft: aircraftResult.identifiers[0].id,
+        CcIdDestination:
+          routeResult.find((item) => item.code === createAwbDto.destination)
+            ?.id || 0,
+        CcIdDeparture:
+          routeResult.find((item) => item.code === createAwbDto.departure)
+            ?.id || 0,
+        Awb: awbResult.id,
+      };
+      await queryRunner.manager
+        .getRepository(AircraftSchedule)
+        .save(aircraftScheduleBody);
+
+      // scc 정보, awb이 입력되어야 동작하게끔
+      if (scc && awbResult) {
+        // 4. 입력된 scc찾기
+        const sccResult = await this.sccRepository.find({
+          where: { code: In(scc.map((s) => s.code)) },
+        });
+
+        // 5. awb와 scc를 연결해주기 위한 작업
+        const joinParam = sccResult.map((item) => {
+          return {
+            Awb: awbResult.id,
+            Scc: item.id,
+          };
+        });
+        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+      }
+
+      // 외부 트랜젝션으로 commit을 결정
+      await queryRunner.commitTransaction();
+      // awb실시간 데이터 mqtt로 publish 하기 위함
+      this.client
+        .send(`hyundai/vms1/readCompl`, {
+          amr: awbResult,
+          time: new Date().toISOString(),
+        })
+        .pipe(take(1))
+        .subscribe();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    }
+    // 외부 트랜젝션으로 release를 결정
+    // finally {
+    //   await queryRunner.release();
+    // }
+  }
+
   async findAll(query: Awb & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
@@ -217,13 +305,13 @@ export class AwbService {
     return searchResult;
   }
 
-  update(id: number, updateCargoDto: UpdateAwbDto) {
-    return this.awbRepository.update(id, updateCargoDto);
+  update(id: number, updateAwbDto: UpdateAwbDto) {
+    return this.awbRepository.update(id, updateAwbDto);
   }
 
-  updateState(id: number, state: string, updateCargoDto?: UpdateAwbDto) {
-    if (state) updateCargoDto.state = state;
-    return this.awbRepository.update(id, updateCargoDto);
+  updateState(id: number, state: string, updateAwbDto?: UpdateAwbDto) {
+    if (state) updateAwbDto.state = state;
+    return this.awbRepository.update(id, updateAwbDto);
   }
 
   async breakDown(parentName: string, createAwbDtos: CreateAwbDto[]) {

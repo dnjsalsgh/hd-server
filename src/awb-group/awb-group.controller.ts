@@ -11,19 +11,22 @@ import {
 import { AwbGroupService } from './awb-group.service';
 import { CreateAwbGroupDto } from './dto/create-awb-group.dto';
 import { UpdateAwbGroupDto } from './dto/update-awb-group.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AwbGroup } from './entities/awb-group.entity';
+import { CreateAwbDto } from '../awb/dto/create-awb.dto';
 
 @Controller('Awb-group')
 @ApiTags('[화물그룹]Awb-group')
 export class AwbGroupController {
   constructor(private readonly awbGroupService: AwbGroupService) {}
 
+  // @ApiBody({ type: [CreateAwbDto] })
   @Post()
   create(@Body() createAwbGroupDto: CreateAwbGroupDto) {
     return this.awbGroupService.create(createAwbGroupDto);
   }
+
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'code', required: false })
   @ApiQuery({ name: 'createdAtFrom', required: false })

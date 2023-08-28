@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import {
@@ -36,7 +31,6 @@ import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-ord
 import { CreateBuildUpOrderDto } from '../build-up-order/dto/create-build-up-order.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
-import { Asrs } from '../asrs/entities/asrs.entity';
 
 @Injectable()
 export class SimulatorResultService {
