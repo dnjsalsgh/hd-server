@@ -34,6 +34,8 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { CreateCommonCodeDto } from '../common-code/dto/create-common-code.dto';
 import { FileService } from '../file/file.service';
+import { Vms } from '../vms/entities/vms.entity';
+import { IsString } from 'class-validator';
 
 @Injectable()
 export class AwbService {
@@ -47,6 +49,8 @@ export class AwbService {
     private dataSource: DataSource,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
     private readonly fileService: FileService,
+    @InjectRepository(Vms, 'mssqlDB')
+    private readonly vmsRepository: Repository<Vms>,
   ) {}
 
   async create(createAwbDto: CreateAwbDto) {
@@ -59,9 +63,9 @@ export class AwbService {
     try {
       // 1. aircraft 입력하기 있다면 update
       const aircraftBody: CreateAircraftDto = {
-        name: createAwbDto.name,
-        code: createAwbDto.code,
-        info: createAwbDto.info,
+        name: createAwbDto.aircraftName,
+        code: createAwbDto.aircraftCode,
+        info: createAwbDto.aircraftInfo,
         allow: createAwbDto.allow,
         allowDryIce: createAwbDto.allowDryIce,
       };
@@ -368,5 +372,86 @@ export class AwbService {
         { modelPath: null }, // modelPath가 null인 경우
       ],
     });
+  }
+
+  async preventMissingData() {
+    try {
+      const awbResult = await this.awbRepository.find({
+        // order: orderByUtil(null),
+        // take: 100,
+        // skip: 0,
+      });
+      const vmsResult = await this.vmsRepository.find({
+        // order: orderByUtil(null),
+        // take: 100,
+        // skip: 0,
+      });
+      console.log(
+        'awbResult.map((v) => v.name) = ',
+        awbResult.map((v) => v.name),
+      );
+      console.log(
+        'vmsResult.map((v) => v.name) = ',
+        vmsResult.map((v) => v.name),
+      );
+
+      for (const vms of vmsResult) {
+        const existVms = awbResult.find((awb) => awb.name === vms.name);
+        if (!existVms) {
+          const createAwbDto: CreateAwbDto = {
+            // awb
+            name: vms.name,
+            prefab: vms.prefab,
+            waterVolume: vms.waterVolume,
+            squareVolume: vms.squareVolume,
+            width: vms.width,
+            length: vms.length,
+            depth: vms.depth,
+            weight: vms.weight,
+            isStructure: vms.isStructure,
+            barcode: vms.barcode,
+            // destination: vms.destination,
+            // source: vms.source,
+            breakDown: vms.breakDown,
+            piece: vms.piece,
+            state: vms.state,
+            parent: vms.parent,
+            modelPath: vms.modelPath,
+            simulation: vms.simulation,
+            dataCapacity: vms.dataCapacity,
+            flight: vms.flight,
+            from: vms.from,
+            airportArrival: vms.airportArrival,
+            path: vms.path,
+            spawnRatio: vms.spawnRatio,
+            description: vms.description,
+            rmComment: vms.rmComment,
+            localTime: vms.localTime,
+            localInTerminal: vms.localInTerminal,
+            //
+            scc: [],
+            aircraftName: vms.aircraftName,
+            aircraftCode: vms.aircraftCode,
+            aircraftInfo: vms.aircraftInfo,
+            allow: vms.allow,
+            allowDryIce: vms.allowDryIce,
+            source: vms.source,
+            localDepartureTime: vms.localDepartureTime,
+            koreaArrivalTime: vms.koreaArrivalTime,
+            workStartTime: vms.workStartTime,
+            workCompleteTargetTime: vms.workCompleteTargetTime,
+            koreaDepartureTime: vms.koreaDepartureTime,
+            localArrivalTime: vms.localArrivalTime,
+            waypoint: [vms.waypoint],
+            destination: vms.destination,
+            departure: vms.departure,
+          };
+
+          await this.create(createAwbDto);
+        }
+      }
+    } catch (e) {
+      throw new TypeORMError(`rollback Working - ${e}`);
+    }
   }
 }

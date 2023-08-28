@@ -18,14 +18,14 @@ export class Vms {
     example: '화물-001',
     description: '화물의 이름',
   })
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
   name: string;
 
   @ApiProperty({
     example: '3d Model Name',
     description: '생성된 3D 모델링명',
   })
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
   prefab: string;
 
   @ApiProperty({
@@ -81,21 +81,21 @@ export class Vms {
     example: '010101',
     description: '바코드',
   })
-  @Column({ type: 'nvarchar', length: 500, nullable: true })
+  @Column({ type: 'nvarchar', length: 1000, nullable: true })
   barcode: string;
 
   @ApiProperty({
     example: '미국',
     description: '목적지',
   })
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
   destination: string;
 
   @ApiProperty({
     example: '한국',
     description: '생성출처',
   })
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
   source: string;
 
   @ApiProperty({
@@ -127,7 +127,7 @@ export class Vms {
     'inskidplatform',
     'inuld',
   ])
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
   state: string;
 
   @ApiProperty({
@@ -141,7 +141,7 @@ export class Vms {
     example: '',
     description: '모델파일 경로',
   })
-  @Column({ type: 'nvarchar', length: 500, nullable: true })
+  @Column({ type: 'nvarchar', length: 1000, nullable: true })
   modelPath: string;
 
   @ApiProperty({
@@ -163,21 +163,21 @@ export class Vms {
     example: 'fly',
     description: '항공편',
   })
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
   flight: string;
 
   @ApiProperty({
     example: '출발지',
     description: '출발지',
   })
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
   from: string;
 
   @ApiProperty({
     example: '공항도착',
     description: '공항도착',
   })
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
   airportArrival: string;
   // ========= v1 피드백 반영 후 새로생긴 칼럼 끝 =========
 
@@ -186,7 +186,7 @@ export class Vms {
     example: '/c/file/xxx',
     description: '이미지 경로',
   })
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
   path: string;
 
   @ApiProperty({
@@ -200,14 +200,14 @@ export class Vms {
     example: '배송설명',
     description: '배송설명',
   })
-  @Column({ type: 'nvarchar', length: 500, nullable: true })
+  @Column({ type: 'nvarchar', length: 1000, nullable: true })
   description: string;
 
   @ApiProperty({
     example: 'RM 코멘트',
     description: 'RM 코멘트',
   })
-  @Column({ type: 'nvarchar', length: 500, nullable: true })
+  @Column({ type: 'nvarchar', length: 1000, nullable: true })
   rmComment: string;
 
   @ApiProperty({
@@ -221,9 +221,40 @@ export class Vms {
     example: 'AIR-001',
     description: '터미널 내에 화물이 현재 위치하고 있는 사항',
   })
-  @Column({ type: 'nvarchar', length: 500, nullable: true })
+  @Column({ type: 'nvarchar', length: 1000, nullable: true })
   localInTerminal: string;
   // ============v0.2 추가 끝=================
+
+  @Column({ type: 'nvarchar' })
+  scc: string;
+  @Column({ type: 'nvarchar' })
+  aircraftName: string;
+  @Column({ type: 'nvarchar' })
+  aircraftCode: string;
+  @Column({ type: 'nvarchar' })
+  aircraftInfo: string;
+  @Column({ type: 'bit' })
+  allow: boolean;
+  @Column({ type: 'bit' })
+  allowDryIce: boolean;
+
+  @Column({ type: 'datetime' })
+  localDepartureTime: string;
+  @Column({ type: 'datetime' })
+  koreaArrivalTime: string;
+  @Column({ type: 'datetime' })
+  workStartTime: string;
+  @Column({ type: 'datetime' })
+  workCompleteTargetTime: string;
+  @Column({ type: 'datetime' })
+  koreaDepartureTime: string;
+  @Column({ type: 'datetime' })
+  localArrivalTime: string;
+  @Column({ type: 'nvarchar' })
+  waypoint: string;
+
+  @Column({ type: 'nvarchar' })
+  departure: string;
 
   @CreateDateColumn()
   createdAt: Date;

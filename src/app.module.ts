@@ -34,8 +34,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { FileModule } from './file/file.module';
 import { mssqlConfig, postgresConfig } from './config/db.config';
 import { VmsModule } from './vms/vms.module';
-import { Vms } from './vms/entities/vms.entity';
-import { CommonCode } from './common-code/entities/common-code.entity';
 
 @Module({
   imports: [

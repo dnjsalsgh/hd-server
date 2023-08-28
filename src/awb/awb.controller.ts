@@ -296,4 +296,9 @@ export class AwbController implements OnModuleInit {
     console.log('Performing the action...');
     this.resetTimer();
   }
+
+  @Get('/test/prevent')
+  private async preventMissingData() {
+    return await this.awbService.preventMissingData();
+  }
 }

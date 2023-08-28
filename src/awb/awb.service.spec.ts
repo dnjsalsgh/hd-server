@@ -116,10 +116,10 @@ describe('AwbService', () => {
           path: '',
         },
       ],
-      code: '2023-08-22T07:17:41.694Z',
-      info: {
-        test: 'test',
-      },
+      // code: '2023-08-22T07:17:41.694Z',
+      // info: {
+      //   test: 'test',
+      // },
       allow: true,
       allowDryIce: true,
       localDepartureTime: '2023-07-10:15:00:00',
@@ -186,10 +186,10 @@ describe('AwbService', () => {
           path: '',
         },
       ],
-      code: '2023-08-22T07:17:41.694Z',
-      info: {
-        test: 'test',
-      },
+      // code: '2023-08-22T07:17:41.694Z',
+      // info: {
+      //   test: 'test',
+      // },
       allow: true,
       allowDryIce: true,
       localDepartureTime: '2023-07-10:15:00:00',
