@@ -383,7 +383,7 @@ export class SimulatorResultService {
         endDate: new Date(),
         loadRate: +bodyResult.waterVolumeRatio, // 적재율
         version: bodyResult.version,
-        Uld: bodyResult.Uld,
+        Uld: bodyResult.UldId,
       };
       const simulatorResultResult = await queryRunner.manager
         .getRepository(SimulatorResult)
@@ -406,7 +406,7 @@ export class SimulatorResultService {
         for (let j = 1; j <= coordinate.length; j++) {
           // 2-2. 어떤 Uld, 각각의 화물의 좌표 값, 시뮬레이터를 썼는지 이력저장
           const historyParam: CreateSimulatorHistoryDto = {
-            Uld: bodyResult.Uld,
+            Uld: bodyResult.UldId,
             Awb: bodyResult.AWBInfoList[i].id,
             SimulatorResult: simulatorResultResult.id,
             x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
@@ -423,7 +423,7 @@ export class SimulatorResultService {
             y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
             z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
             SkidPlatform: bodyResult.AWBInfoList[i].order,
-            Uld: bodyResult.Uld,
+            Uld: bodyResult.UldId,
             Awb: bodyResult.AWBInfoList[i].id,
           };
           buildUpOrderParamArray.push(buildUpOrderBody);

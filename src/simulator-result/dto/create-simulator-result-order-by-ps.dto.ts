@@ -49,7 +49,7 @@ class AWBGroupResult {
   uldVolume: string;
   waterVolumeRatio: string;
   version: number;
-  Uld: number;
+  UldId: number;
 }
 
 export class PsApiResponse {
