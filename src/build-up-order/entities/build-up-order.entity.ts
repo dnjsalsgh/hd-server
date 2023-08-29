@@ -17,7 +17,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity';
 
 @Entity()
-@Unique(['Uld', 'Awb'])
+// @Unique(['Uld', 'Awb'])
 export class BuildUpOrder {
   @PrimaryGeneratedColumn()
   id: number;

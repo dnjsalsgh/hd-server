@@ -409,9 +409,9 @@ export class SimulatorResultService {
             Uld: bodyResult.Uld,
             Awb: bodyResult.AWBInfoList[i].id,
             SimulatorResult: simulatorResultResult.id,
-            x: +bodyResult.AWBInfoList[i].coordinate[`p${j}x`],
-            y: +bodyResult.AWBInfoList[i].coordinate[`p${j}y`],
-            z: +bodyResult.AWBInfoList[i].coordinate[`p${j}z`],
+            x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
+            y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
+            z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
           };
 
           historyParamArray.push(historyParam);
@@ -419,9 +419,9 @@ export class SimulatorResultService {
           // 2-3. 작업자 작업지시를 만들기
           const buildUpOrderBody: CreateBuildUpOrderDto = {
             order: bodyResult.AWBInfoList[i].order,
-            x: +bodyResult.AWBInfoList[i].coordinate[`p${j}x`],
-            y: +bodyResult.AWBInfoList[i].coordinate[`p${j}y`],
-            z: +bodyResult.AWBInfoList[i].coordinate[`p${j}z`],
+            x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
+            y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
+            z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
             SkidPlatform: bodyResult.AWBInfoList[i].order,
             Uld: bodyResult.Uld,
             Awb: bodyResult.AWBInfoList[i].id,
