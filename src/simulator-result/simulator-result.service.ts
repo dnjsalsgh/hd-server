@@ -32,6 +32,7 @@ import { CreateBuildUpOrderDto } from '../build-up-order/dto/create-build-up-ord
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { PsApiResponse } from './dto/create-simulator-result-order-by-ps.dto';
+import { BuildUpOrderService } from '../build-up-order/build-up-order.service';
 
 @Injectable()
 export class SimulatorResultService {
@@ -48,6 +49,7 @@ export class SimulatorResultService {
     private readonly buildUpOrderRepository: Repository<BuildUpOrder>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
     private dataSource: DataSource,
+    private readonly buildUpOrderService: BuildUpOrderService,
   ) {}
 
   async create(createSimulatorResultDto: CreateSimulatorResultDto) {
@@ -266,9 +268,13 @@ export class SimulatorResultService {
       const historyResult = queryRunner.manager
         .getRepository(SimulatorHistory)
         .save(historyParamArray);
-      const buildUpOrderResult = queryRunner.manager
-        .getRepository(BuildUpOrder)
-        .save(buildUpOrderParamArray);
+      const buildUpOrderResult = this.buildUpOrderService.createList(
+        buildUpOrderParamArray,
+        queryRunner,
+      );
+      // const buildUpOrderResult = queryRunner.manager
+      //   .getRepository(BuildUpOrder)
+      //   .save(buildUpOrderParamArray);
 
       // 3. awbjoin 테이블, 이력 테이블 함께 저장
       await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳
@@ -339,7 +345,7 @@ export class SimulatorResultService {
         const asrsOutOrderParam: CreateAsrsOutOrderDto = {
           order: index,
           Asrs: element.storageId,
-          Awb: element.id,
+          Awb: element.AwbId,
           SkidPlatform: element.order, // TODO: 임시로 불출순서를 안착대 id로 넣어둠, 수정필요
         };
         asrsOutOrderParamArray.push(asrsOutOrderParam);
@@ -398,7 +404,7 @@ export class SimulatorResultService {
         const coordinate = bodyResult.AWBInfoList[i].coordinate;
         // 2-1. 어떤 Awb를 썼는지 등록
         const joinParam: CreateSimulatorResultAwbJoinDto = {
-          Awb: bodyResult.AWBInfoList[i].id, // awbId연결
+          Awb: bodyResult.AWBInfoList[i].AwbId, // awbId연결
           SimulatorResult: simulatorResultResult.id,
         };
         joinParamArray.push(joinParam);
@@ -407,7 +413,7 @@ export class SimulatorResultService {
           // 2-2. 어떤 Uld, 각각의 화물의 좌표 값, 시뮬레이터를 썼는지 이력저장
           const historyParam: CreateSimulatorHistoryDto = {
             Uld: bodyResult.UldId,
-            Awb: bodyResult.AWBInfoList[i].id,
+            Awb: bodyResult.AWBInfoList[i].AwbId,
             SimulatorResult: simulatorResultResult.id,
             x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
             y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
@@ -424,7 +430,7 @@ export class SimulatorResultService {
             z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
             SkidPlatform: bodyResult.AWBInfoList[i].order,
             Uld: bodyResult.UldId,
-            Awb: bodyResult.AWBInfoList[i].id,
+            Awb: bodyResult.AWBInfoList[i].AwbId,
           };
           buildUpOrderParamArray.push(buildUpOrderBody);
         }
@@ -436,9 +442,11 @@ export class SimulatorResultService {
       const historyResult = queryRunner.manager
         .getRepository(SimulatorHistory)
         .save(historyParamArray);
-      const buildUpOrderResult = queryRunner.manager
-        .getRepository(BuildUpOrder)
-        .save(buildUpOrderParamArray);
+      //  등록된 buildupOrder를 처리하기 위한 service 처리
+      const buildUpOrderResult = this.buildUpOrderService.createList(
+        buildUpOrderParamArray,
+        queryRunner,
+      );
 
       // 3. awbjoin 테이블, 이력 테이블 함께 저장
       await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳

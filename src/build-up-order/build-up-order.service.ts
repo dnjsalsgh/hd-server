@@ -35,7 +35,10 @@ export class BuildUpOrderService {
     return result;
   }
 
-  async createList(createBuildUpOrderDto: CreateBuildUpOrderDto[]) {
+  async createList(
+    createBuildUpOrderDto: CreateBuildUpOrderDto[],
+    transaction = this.dataSource.createQueryRunner(),
+  ) {
     // 등록된 Awb, buildUpOrder는 삭제하지 않기 위해서 uld의 이력을 가져옵니다.
     const uldHistoryResult = await this.uldHistoryRepository.find({
       where: { Uld: createBuildUpOrderDto[0].Uld },
@@ -58,7 +61,7 @@ export class BuildUpOrderService {
     );
 
     // 작업지시의 삭제, 재등록을 위해 transaction 처리합니다.
-    const queryRunner = await this.dataSource.createQueryRunner();
+    const queryRunner = transaction;
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
@@ -72,15 +75,16 @@ export class BuildUpOrderService {
       // 새로운 작업지시를 등록합니다.
       const result = await this.dataSource
         .getRepository(BuildUpOrder)
-        .upsert(filteredBuildUpOrderBody, ['Awb', 'Uld']);
+        .upsert(filteredBuildUpOrderBody, ['Uld', 'Awb', 'x', 'y', 'z']);
       await queryRunner.commitTransaction();
       return result;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
     }
+    // finally {
+    //   await queryRunner.release();
+    // }
   }
 
   async findAll(query: BuildUpOrder & BasicQueryParamDto) {

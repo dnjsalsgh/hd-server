@@ -30,7 +30,7 @@ class AWBInfo {
   coordinate: CoordinatePoint[];
   depth: string;
   length: string;
-  id?: number;
+  AwbId?: number;
   name: string;
   order: number;
   squareVolume: string;
