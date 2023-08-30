@@ -64,4 +64,13 @@ export class UldTypeService {
   remove(id: number) {
     return this.uldTypeRepository.delete(id);
   }
+
+  async upload(id: number, file: Express.Multer.File) {
+    try {
+      // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
+      await this.uldTypeRepository.update(id, { modelPath: file.path });
+    } catch (e) {
+      console.error(e);
+    }
+  }
 }

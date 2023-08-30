@@ -1,24 +1,27 @@
-import { Controller, Get, Inject, Post } from '@nestjs/common';
-import { AppService } from './app.service';
-import { ClientProxy } from '@nestjs/microservices';
-import { take } from 'rxjs';
-import { RedisCacheService } from './cache/redis.service';
+import { Controller, Get, Inject, OnModuleInit } from '@nestjs/common';
+import { ClientProxy, MessagePattern } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 
 @Controller()
-export class AppController {
-  constructor(
-    @Inject('MQTT_SERVICE') private client: ClientProxy,
-    private readonly appService: AppService,
-    private cacheManager: RedisCacheService,
-  ) {}
+export class AppController implements OnModuleInit {
+  constructor(@Inject('MQTT_SERVICE') private mqttClient: ClientProxy) {}
+
+  onModuleInit() {
+    this.connectToMqttBroker();
+  }
+
+  private connectToMqttBroker() {
+    return this.mqttClient.connect();
+  }
 
   @Get()
   async getHello(): Promise<string> {
-    // await this.client
-    //   .send('test', { data: 'test', time: new Date().toISOString() })
-    //   .pipe(take(1))
-    //   .subscribe();
+    return 'Hello from NestJS!';
+  }
 
-    return this.appService.getHello();
+  @Get('/check-mqtt')
+  async checkMqtt() {
+    const checkObject = await this.mqttClient.connect();
+    return checkObject;
   }
 }
