@@ -17,7 +17,8 @@ import { Asrs } from '../asrs/entities/asrs.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import { CreateSimulatorResultOrderDto } from './dto/create-simulator-result-order.dto';
-import { PsApiResponse } from './dto/create-simulator-result-order-by-ps.dto';
+import { PsApiResponse } from './dto/ps-output.dto';
+import { PsApiRequest } from './dto/ps-input.dto';
 
 @Controller('simulator-result')
 @ApiTags('[시뮬레이터 결과]simulator-result')
@@ -48,7 +49,7 @@ export class SimulatorResultController {
     summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
   })
   @Post('/make-order/with/ps')
-  createOrderByPs(@Body() body: PsApiResponse) {
+  createOrderByPs(@Body() body: PsApiRequest) {
     return this.simulatorResultService.createOrderByResult(body);
   }
 

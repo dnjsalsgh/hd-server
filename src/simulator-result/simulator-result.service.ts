@@ -6,6 +6,7 @@ import {
   DataSource,
   Equal,
   FindOperator,
+  ILike,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
@@ -13,7 +14,7 @@ import {
 } from 'typeorm';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
-import { UldAttribute } from '../uld/entities/uld.entity';
+import { Uld, UldAttribute } from '../uld/entities/uld.entity';
 import { CreateSimulatorResultWithAwbAndHistoryDto } from './dto/create-simulator-result-with-awb';
 import { SimulatorResultAwbJoin } from '../simulator-result-awb-join/entities/simulator-result-awb-join.entity';
 import { SimulatorHistory } from '../simulator-history/entities/simulator-history.entity';
@@ -31,8 +32,15 @@ import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-ord
 import { CreateBuildUpOrderDto } from '../build-up-order/dto/create-build-up-order.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
-import { PsApiResponse } from './dto/create-simulator-result-order-by-ps.dto';
+import { PsApiResponse } from './dto/ps-output.dto';
 import { BuildUpOrderService } from '../build-up-order/build-up-order.service';
+import { pakageSimulatorCallResultData } from '../lib/util/pakageSimulatorCallResultData.json';
+
+import { PsApiRequest } from './dto/ps-input.dto';
+import {
+  UldType,
+  UldTypeAttribute,
+} from '../uld-type/entities/uld-type.entity';
 
 @Injectable()
 export class SimulatorResultService {
@@ -50,6 +58,8 @@ export class SimulatorResultService {
     @Inject('MQTT_SERVICE') private client: ClientProxy,
     private dataSource: DataSource,
     private readonly buildUpOrderService: BuildUpOrderService,
+    @InjectRepository(Uld)
+    private readonly uldRepository: Repository<Uld>,
   ) {}
 
   async create(createSimulatorResultDto: CreateSimulatorResultDto) {
@@ -122,6 +132,7 @@ export class SimulatorResultService {
     }
   }
 
+  // 초기버전
   async createOrder(body: CreateSimulatorResultOrderDto) {
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -168,7 +179,6 @@ export class SimulatorResultService {
      *
      *
      * */
-
     // 패키시 시뮬레이터에서 자동창고 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
 
     try {
@@ -288,7 +298,8 @@ export class SimulatorResultService {
     }
   }
 
-  async createOrderByResult(body: PsApiResponse) {
+  // 패키지 시뮬레이터와 소통 후 만든 버전
+  async createOrderByResult(apiRequest: PsApiRequest) {
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -334,11 +345,27 @@ export class SimulatorResultService {
      *
      *
      * */
+    // const uldResult = await this.uldRepository.findOne({
+    //   select: {
+    //     UldType: UldTypeAttribute,
+    //   },
+    //   relations: {
+    //     UldType: true,
+    //   },
+    //   where: {
+    //     UldType: apiRequest.ULDs[0].id
+    //       ? Equal(+apiRequest.ULDs[0].id)
+    //       : undefined,
+    //   },
+    // });
+    // const uldTypeResult = uldResult.UldType as UldType;
+    // // uldType에 uld에 있는 type 주입
+    // apiRequest.ULDs[0].uldType = uldTypeResult.code;
 
     // 패키시 시뮬레이터에서 자동창고 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
 
     try {
-      const bodyResult = body.result[0];
+      const bodyResult = pakageSimulatorCallResultData.result[0];
       // 1. 자동창고 작업지시를 만들기
       const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
       for (const [index, element] of bodyResult.AWBInfoList.entries()) {

@@ -135,6 +135,8 @@ export class AmrController {
    */
   @Cron('30 * * * * *')
   createByInterval() {
-    return this.amrService.createAmrByMssql();
+    let count = 1;
+    console.log(count);
+    // return this.amrService.createAmrByMssql();
   }
 }

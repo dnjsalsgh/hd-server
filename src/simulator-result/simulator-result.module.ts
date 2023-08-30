@@ -11,6 +11,7 @@ import { BuildUpOrder } from '../build-up-order/entities/build-up-order.entity';
 import { MqttModule } from '../mqtt.module';
 import { BuildUpOrderService } from '../build-up-order/build-up-order.service';
 import { UldHistory } from '../uld-history/entities/uld-history.entity';
+import { Uld } from '../uld/entities/uld.entity';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UldHistory } from '../uld-history/entities/uld-history.entity';
       // 작업자 작업지시 만들기위함
       BuildUpOrder,
       UldHistory,
+      Uld,
     ]),
     // mqtt 모듈설정
     MqttModule,
