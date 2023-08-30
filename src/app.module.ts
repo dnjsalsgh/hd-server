@@ -34,6 +34,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { FileModule } from './file/file.module';
 import { mssqlConfig, postgresConfig } from './config/db.config';
 import { VmsModule } from './vms/vms.module';
+import { HacsModule } from './hacs/hacs.module';
 
 @Module({
   imports: [
@@ -93,6 +94,8 @@ import { VmsModule } from './vms/vms.module';
 
     // file 모듈 설정
     FileModule,
+
+    HacsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,16 +3,17 @@ import { ClientProxy, MessagePattern } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 
 @Controller()
-export class AppController implements OnModuleInit {
+// implements OnModuleInit
+export class AppController {
   constructor(@Inject('MQTT_SERVICE') private mqttClient: ClientProxy) {}
 
-  onModuleInit() {
-    this.connectToMqttBroker();
-  }
-
-  private connectToMqttBroker() {
-    return this.mqttClient.connect();
-  }
+  // onModuleInit() {
+  //   this.connectToMqttBroker();
+  // }
+  //
+  // private connectToMqttBroker() {
+  //   return this.mqttClient.connect();
+  // }
 
   @Get()
   async getHello(): Promise<string> {
