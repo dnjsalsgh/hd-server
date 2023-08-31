@@ -1,5 +1,5 @@
 import { Controller, Get, Inject, OnModuleInit } from '@nestjs/common';
-import { ClientProxy, MessagePattern } from '@nestjs/microservices';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 
 @Controller()
@@ -20,9 +20,8 @@ export class AppController {
     return 'Hello from NestJS!';
   }
 
-  @Get('/check-mqtt')
-  async checkMqtt() {
-    const checkObject = await this.mqttClient.connect();
-    return checkObject;
+  @MessagePattern('hyundai/vms1/createFile') //구독하는 주제
+  async checkMqtt(@Payload() data) {
+    console.log('data = ', data);
   }
 }

@@ -13,7 +13,7 @@ import { CreateAmrDto } from './dto/create-amr.dto';
 import { UpdateAmrDto } from './dto/update-amr.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AmrRawDto } from './dto/amr-raw.dto';
-import { Cron } from '@nestjs/schedule';
+import { Cron, Interval } from '@nestjs/schedule';
 
 @Controller('amr')
 @ApiTags('[Amr]amr')
@@ -133,10 +133,10 @@ export class AmrController {
   /**
    * 30초마다 amr의 데이터를 mssql에서 찾아오기
    */
-  @Cron('30 * * * * *')
+  // @Cron('* * * * * *')
   createByInterval() {
     let count = 1;
-    console.log(count);
+    console.log(count, 'amr 컨트롤러에서 동작함');
     // return this.amrService.createAmrByMssql();
   }
 }

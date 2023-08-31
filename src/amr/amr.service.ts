@@ -23,6 +23,8 @@ import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Hacs } from '../hacs/entities/hacs.entity';
+import { Cron } from '@nestjs/schedule';
+import { print } from '../lib/util/consolelogConvert.util';
 
 @Injectable()
 export class AmrService {
