@@ -11,7 +11,7 @@ import {
 import { SimulatorResultService } from './simulator-result.service';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateSimulatorResultWithAwbAndHistoryDto } from './dto/create-simulator-result-with-awb';
 import { Asrs } from '../asrs/entities/asrs.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
@@ -45,12 +45,24 @@ export class SimulatorResultController {
   createOrder(@Body() body: CreateSimulatorResultOrderDto) {
     return this.simulatorResultService.createOrder(body);
   }
+
   @ApiOperation({
     summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
   })
   @Post('/make-order/with/ps')
   createOrderByPs(@Body() body: PsApiRequest) {
     return this.simulatorResultService.createOrderByResult(body);
+  }
+
+  @ApiOperation({
+    summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
+  })
+  @ApiBody({})
+  @Post('/make-build-up-order-order/with/ps')
+  createBuildUpOrderBySimulatorResult(@Body() body: PsApiRequest) {
+    return this.simulatorResultService.createBuildUpOrderBySimulatorResult(
+      body,
+    );
   }
 
   @ApiQuery({ name: 'Uld', required: false, type: 'number' })

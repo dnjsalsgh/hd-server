@@ -196,7 +196,10 @@ export class AmrService {
    * @param body
    */
   async createAmrByMssql() {
-    const bodys: AmrRawDto[] = await this.hacsRepository.find();
+    const bodys: AmrRawDto[] = await this.hacsRepository.find({
+      order: orderByUtil(null),
+      take: 100, // 최소한만 가져오려고 함(100)
+    });
     for (const body of bodys) {
       // 충전중 판단을 위한 findOne
       // const lastAmrByName = await this.amrRepository.findOne({
