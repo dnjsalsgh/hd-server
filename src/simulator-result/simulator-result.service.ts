@@ -7,6 +7,7 @@ import {
   Equal,
   FindOperator,
   ILike,
+  In,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
@@ -41,6 +42,8 @@ import {
   UldType,
   UldTypeAttribute,
 } from '../uld-type/entities/uld-type.entity';
+import { Asrs, AsrsAttribute } from '../asrs/entities/asrs.entity';
+import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
 
 @Injectable()
 export class SimulatorResultService {
@@ -384,10 +387,28 @@ export class SimulatorResultService {
       // 1-1. 자동창고 작업지시 데이터 mqtt로 publish 하기
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
       if (asrsOutOrderResult) {
+        // 자동창고 작업지시를 객체형태로 mqtt에 publish하기 위한 find 과정
+        const asrsResult = await queryRunner.manager
+          .getRepository(AsrsOutOrder)
+          .find({
+            relations: {
+              Asrs: true,
+              SkidPlatform: true,
+              Awb: true,
+            },
+            select: {
+              Asrs: AsrsAttribute,
+              SkidPlatform: SkidPlatformAttribute,
+              Awb: AwbAttribute,
+            },
+            where: {
+              id: In(asrsOutOrderResult.identifiers.map((v) => v.id)),
+            },
+          });
         // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
         this.client
           .send(`hyundai/asrs1/outOrder`, {
-            asrsOurOrderResult: asrsOutOrderResult,
+            asrsOutOrderResult: asrsResult,
             time: new Date().toISOString(),
           })
           .pipe(take(1))
@@ -396,7 +417,7 @@ export class SimulatorResultService {
         // 1-3. 최적 불출순서를 자동창고(ASRS) PLC에 write 완료했다는 신호
         this.client
           .send(`hyundai/asrs1/writeCompl`, {
-            asrsOurOrderResult: asrsOutOrderResult,
+            // asrsOutOrderResult: asrsOutOrderResult,
             time: new Date().toISOString(),
           })
           .pipe(take(1))

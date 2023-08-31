@@ -13,7 +13,7 @@ export class WorkerService {
     const min = 5;
     const max = 10;
     const randomInRange = Math.random() * (max - min) + min; // min 이상 max 미만의 난수를 반환
-    this.amrService.createAmrByMssql();
+    // this.amrService.createAmrByMssql();
     // return this.amrService.createAmrByMssql();
   }
 }
