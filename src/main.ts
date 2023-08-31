@@ -27,6 +27,7 @@ async function bootstrap() {
     },
   );
 
+  // 스케줄러 프로세스 생성
   const sheduler = await NestFactory.create(WorkerModule);
 
   // 3. redis서버로 사용
@@ -64,7 +65,7 @@ async function bootstrap() {
   await mqttApp.listen();
   // await redisApp.listen();
   await app.listen(port);
-  await sheduler.init();
+  await sheduler.init(); // 스케줄러 프로세스 적용
 }
 
 bootstrap();

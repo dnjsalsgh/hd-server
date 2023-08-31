@@ -7,7 +7,6 @@ import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-history.entity';
 import { MqttModule } from '../mqtt.module';
 import { Hacs } from '../hacs/entities/hacs.entity';
-import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
