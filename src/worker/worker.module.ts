@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { WorkerService } from './worker.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Amr } from '../amr/entities/amr.entity';
@@ -11,6 +11,7 @@ import { mssqlConfig, postgresConfig } from '../config/db.config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HacsModule } from '../hacs/hacs.module';
 import { AmrService } from '../amr/amr.service';
+import { LoggerService } from '../lib/logger/logger.service';
 
 @Module({
   imports: [
@@ -47,6 +48,14 @@ import { AmrService } from '../amr/amr.service';
     TypeOrmModule.forFeature([Amr, AmrCharger, AmrChargeHistory]),
     TypeOrmModule.forFeature([Hacs], 'mssqlDB'),
   ],
-  providers: [WorkerService, AmrService],
+  providers: [
+    WorkerService,
+    AmrService,
+    LoggerService,
+    {
+      provide: 'SERVICE_NAME', // 여기에서 프로바이더 이름을 지정합니다.
+      useValue: 'WorkerService', // 원하는 값을 useValue로 지정합니다.
+    },
+  ],
 })
 export class WorkerModule {}

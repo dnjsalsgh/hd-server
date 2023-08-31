@@ -7,6 +7,7 @@ import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-history.entity';
 import { MqttModule } from '../mqtt.module';
 import { Hacs } from '../hacs/entities/hacs.entity';
+import { LoggerService } from '../lib/logger/logger.service';
 
 @Module({
   imports: [
@@ -16,6 +17,13 @@ import { Hacs } from '../hacs/entities/hacs.entity';
     MqttModule,
   ],
   controllers: [AmrController],
-  providers: [AmrService],
+  providers: [
+    AmrService,
+    LoggerService,
+    {
+      provide: 'SERVICE_NAME', // 여기에서 프로바이더 이름을 지정합니다.
+      useValue: 'AmrService', // 원하는 값을 useValue로 지정합니다.
+    },
+  ],
 })
 export class AmrModule {}

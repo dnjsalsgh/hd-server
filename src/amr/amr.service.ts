@@ -25,6 +25,7 @@ import { orderByUtil } from '../lib/util/orderBy.util';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { Cron } from '@nestjs/schedule';
 import { print } from '../lib/util/consolelogConvert.util';
+import { LoggerService } from '../lib/logger/logger.service';
 
 @Injectable()
 export class AmrService {
@@ -38,6 +39,7 @@ export class AmrService {
     @Inject('MQTT_SERVICE') private client: ClientProxy,
     @InjectRepository(Hacs, 'mssqlDB')
     private readonly hacsRepository: Repository<Hacs>,
+    private readonly loggerService: LoggerService,
   ) {}
 
   create(createAmrDto: CreateAmrDto) {
@@ -326,6 +328,15 @@ export class AmrService {
           })
           .pipe(take(1))
           .subscribe();
+
+        // timeTalbe log 남기기
+        this.loggerService.log({
+          amrBody: amrBody,
+          amrChargerBody: amrChargerBody,
+          amrChargeHistoryBody: amrChargeHistoryBody,
+          timeTableBody: timeTableBody,
+          time: new Date().toISOString(),
+        });
 
         await queryRunner.commitTransaction();
       } catch (error) {
