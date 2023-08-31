@@ -55,12 +55,22 @@ export class SimulatorResultController {
   }
 
   @ApiOperation({
-    summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
+    summary: '패키지 시뮬레이터를 사용해서 uld 작업지시 만들기',
   })
   @ApiBody({})
   @Post('/make-build-up-order-order/with/ps')
   createBuildUpOrderBySimulatorResult(@Body() body: PsApiRequest) {
     return this.simulatorResultService.createBuildUpOrderBySimulatorResult(
+      body,
+    );
+  }
+  @ApiOperation({
+    summary: '패키지 시뮬레이터를 사용해서 asrs작업지시 만들기',
+  })
+  @ApiBody({})
+  @Post('/make-asrs-out-order/with/ps')
+  createAsrsOutOrderBySimulatorResult(@Body() body: PsApiRequest) {
+    return this.simulatorResultService.createAsrsOutOrderBySimulatorResult(
       body,
     );
   }

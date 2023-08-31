@@ -58,6 +58,7 @@ import { WorkerModule } from './worker/worker.module';
         return mssqlConfig;
       },
     }),
+
     AmrModule,
     AmrChargerModule,
     AmrChargeHistoryModule,

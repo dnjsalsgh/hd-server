@@ -8,6 +8,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as process from 'process';
 import { WorkerModule } from './worker/worker.module';
+import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
 
 declare const module: any;
 
@@ -20,7 +21,6 @@ async function bootstrap() {
     AppModule,
     {
       transport: Transport.MQTT,
-      // options: { host: 'localhost', port: 1833, url: 'mqtt://localhost:1883' },
       options: {
         url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
       },
