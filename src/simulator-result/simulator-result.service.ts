@@ -663,10 +663,7 @@ export class SimulatorResultService {
 
         // 1-3. 최적 불출순서를 자동창고(ASRS) PLC에 write 완료했다는 신호
         this.client
-          .send(`hyundai/asrs1/writeCompl`, {
-            // asrsOutOrderResult: asrsOutOrderResult,
-            time: new Date().toISOString(),
-          })
+          .send(`hyundai/asrs1/writeCompl`, { writeOrder: true })
           .pipe(take(1))
           .subscribe();
       }
