@@ -3,6 +3,7 @@ import { MqttController } from './mqtt.controller';
 import { MqttService } from './mqtt.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import * as dotenv from 'dotenv';
+import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
 dotenv.config();
 
 console.log(`mqttmddule에서의 콘솔${process.env.MQTT_HOST}`);
@@ -13,6 +14,7 @@ const clients = ClientsModule.register([
     options: {
       host: process.env.MQTT_HOST,
       port: +process.env.MQTT_PORT,
+      serializer: new OutboundResponseSerializer(),
     },
   },
 ]);

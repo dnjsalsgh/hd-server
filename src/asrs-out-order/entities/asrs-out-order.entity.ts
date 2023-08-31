@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   Relation,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Awb } from '../../awb/entities/awb.entity';
@@ -16,6 +17,7 @@ import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity'
 import { SkidPlatformHistory } from '../../skid-platform-history/entities/skid-platform-history.entity';
 
 @Entity()
+@Unique(['Asrs', 'SkidPlatform', 'Awb'])
 export class AsrsOutOrder {
   @PrimaryGeneratedColumn()
   id: number;

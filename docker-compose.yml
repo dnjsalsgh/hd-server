@@ -35,32 +35,31 @@ services:
       - overlay
     restart: always
 
-  # 서버 로깅 테스트 때문에 주석처리
-#  back:
-#    container_name: main-server
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    environment:
-#      DATABASE_HOST: host.docker.internal  # Use host.docker.internal to refer to the host machine's IP
-#      DATABASE_PORT: ${DATABASE_PORT}
-#      DATABASE_USER: ${DATABASE_USER}
-#      DATABASE_PASS: ${DATABASE_PASS}
-#      DATABASE_NAME: ${DATABASE_NAME}
-#      REDIS_HOST: host.docker.internal
-#      REDIS_PORT: ${REDIS_PORT}
-#      MQTT_HOST: host.docker.internal
-#      MQTT_PORT: ${MQTT_PORT}
-#    ports:
-#      - "3000:3000"
-#    volumes:
-#      - ./logs:/app/logs
-#    networks:
-#      - overlay
-#    links:
-#      - postgres:postgres
-#      - mqtt:mqtt
-#      - redis:redis
+  back:
+    container_name: main-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_HOST: host.docker.internal  # Use host.docker.internal to refer to the host machine's IP
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DATABASE_NAME: ${DATABASE_NAME}
+      REDIS_HOST: host.docker.internal
+      REDIS_PORT: ${REDIS_PORT}
+      MQTT_HOST: host.docker.internal
+      MQTT_PORT: ${MQTT_PORT}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - overlay
+    links:
+      - postgres:postgres
+      - mqtt:mqtt
+      - redis:redis
 
 networks:
   overlay:

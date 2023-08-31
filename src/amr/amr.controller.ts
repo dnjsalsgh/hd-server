@@ -13,6 +13,7 @@ import { CreateAmrDto } from './dto/create-amr.dto';
 import { UpdateAmrDto } from './dto/update-amr.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AmrRawDto } from './dto/amr-raw.dto';
+import { Cron, Interval } from '@nestjs/schedule';
 
 @Controller('amr')
 @ApiTags('[Amr]amr')
@@ -24,6 +25,7 @@ export class AmrController {
     return this.amrService.create(createAmrDto);
   }
 
+  // mssql이 연결 안됬을 때 태스트용도로 만들었던 api
   @ApiOperation({
     summary: 'amr의 움직임 데이터 입력',
     description:
@@ -31,7 +33,6 @@ export class AmrController {
   })
   @Post('/moving-data')
   createByPlc(@Body() body: AmrRawDto) {
-    // return this.amrService.createAmrByData(body); 충전기의 위치 데이터까지 가져오려 했지만 ms-sql에 데이터가 없어서 실패
     return this.amrService.createAmrByData(body);
   }
 
@@ -127,5 +128,15 @@ export class AmrController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.amrService.remove(+id);
+  }
+
+  /**
+   * 30초마다 amr의 데이터를 mssql에서 찾아오기
+   */
+  // @Cron('* * * * * *')
+  createByInterval() {
+    let count = 1;
+    console.log(count, 'amr 컨트롤러에서 동작함');
+    // return this.amrService.createAmrByMssql();
   }
 }

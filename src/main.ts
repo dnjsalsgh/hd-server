@@ -7,6 +7,8 @@ import { TypeOrmExceptionFilter } from './lib/filter/typeOrmException.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as process from 'process';
+import { WorkerModule } from './worker/worker.module';
+import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
 
 declare const module: any;
 
@@ -19,12 +21,14 @@ async function bootstrap() {
     AppModule,
     {
       transport: Transport.MQTT,
-      // options: { host: 'localhost', port: 1833, url: 'mqtt://localhost:1883' },
       options: {
         url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
       },
     },
   );
+
+  // 스케줄러 프로세스 생성
+  const sheduler = await NestFactory.create(WorkerModule);
 
   // 3. redis서버로 사용
   const redisApp = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -44,7 +48,6 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor()); // 반환값 객체화 처리
 
   const port = process.env.PORT || 3000;
-  const mqttHost = process.env.MQTT_HOST;
   console.log(`listening on port ${port}`);
 
   // swagger 생성
@@ -60,14 +63,9 @@ async function bootstrap() {
   // cors 설정
   app.enableCors();
   await mqttApp.listen();
-  await redisApp.listen();
+  // await redisApp.listen();
   await app.listen(port);
-
-  // 핫 리로딩 적용
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
+  await sheduler.init(); // 스케줄러 프로세스 적용
 }
 
 bootstrap();

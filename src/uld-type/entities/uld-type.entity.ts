@@ -19,14 +19,14 @@ export class UldType {
     example: 'uldType-001',
     description: '고유code',
   })
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 500, nullable: false })
   code: string;
 
   @ApiProperty({
     example: 'Uld-A',
     description: 'Uld 이름',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   name: string;
 
   @ApiProperty({

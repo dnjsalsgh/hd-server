@@ -13,7 +13,6 @@ import {
 } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
 import { SimulatorHistory } from '../../simulator-history/entities/simulator-history.entity';
-import { SimulatorResultAwbJoin } from '../../simulator-result-awb-join/entities/simulator-result-awb-join.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { Awb } from '../../awb/entities/awb.entity';
@@ -67,12 +66,6 @@ export class SimulatorResult {
   @IsNotEmpty()
   @ManyToOne(() => Uld, (uld) => uld.simulatorResult, { nullable: false })
   Uld: Relation<Uld> | number;
-
-  // @OneToMany(
-  //   () => SimulatorResultAwbJoin,
-  //   (simulatorResultAwbJoin) => simulatorResultAwbJoin.SimulatorResult,
-  // )
-  // simulatorResultAwbJoin: Relation<SimulatorResultAwbJoin[]>;
 
   @ManyToMany(() => Awb, (awb) => awb.SimulatorResult)
   @JoinColumn({ name: 'awb_id' })

@@ -3,6 +3,7 @@ import { Awb } from '../entities/awb.entity';
 import { Scc } from '../../scc/entities/scc.entity';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { Column } from 'typeorm';
+import { AwbGroup } from '../../awb-group/entities/awb-group.entity';
 
 export class CreateAwbDto extends PickType(Awb, [
   'name',
@@ -33,19 +34,10 @@ export class CreateAwbDto extends PickType(Awb, [
   'rmComment',
   'localTime',
   'localInTerminal',
+  'AwbGroup',
 ]) {
   @ApiProperty({
-    example:
-      '[{"code": "Scc-001",\n' +
-      '"name": "드라이아이스",\n' +
-      '"score": "1",\n' +
-      '"description": "",\n' +
-      '"path": ""},\n' +
-      '{"code": "Scc-002",\n' +
-      '"name": "위험물질",\n' +
-      '"score": "2",\n' +
-      '"description": "",\n' +
-      '"path": ""}]',
+    example: '["GEN","EAT"]',
     description: 'SCCFK',
   })
   scc: Partial<Scc>[];
@@ -103,37 +95,37 @@ export class CreateAwbDto extends PickType(Awb, [
 
   // 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({
-    example: '2023-07-10:15:00:00',
+    example: new Date(),
     description: '현지출발시간',
   })
   localDepartureTime: string;
 
   @ApiProperty({
-    example: '2023-07-14:15:00:00',
+    example: new Date(),
     description: '한국도착시간',
   })
   koreaArrivalTime: string;
 
   @ApiProperty({
-    example: '2023-07-14:13:00:00',
+    example: new Date(),
     description: '작업시작시간',
   })
   workStartTime: string;
 
   @ApiProperty({
-    example: '2023-07-15:13:00:00',
+    example: new Date(),
     description: '작업완료목표시간',
   })
   workCompleteTargetTime: string;
 
   @ApiProperty({
-    example: '2023-07-15:13:00:00',
+    example: new Date(),
     description: '한국출항시간',
   })
   koreaDepartureTime: string;
 
   @ApiProperty({
-    example: '2023-07-15:13:00:00',
+    example: new Date(),
     description: '현지도착시간',
   })
   localArrivalTime: string;
@@ -155,4 +147,6 @@ export class CreateAwbDto extends PickType(Awb, [
     description: '출발지',
   })
   departure: string;
+
+  // AwbGroup?: AwbGroup | number;
 }
