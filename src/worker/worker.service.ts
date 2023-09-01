@@ -14,11 +14,7 @@ export class WorkerService {
     timeZone: 'Asia/Seoul',
   })
   InitialScheduler() {
-    const min = 5;
-    const max = 10;
-    const randomInRange = Math.random() * (max - min) + min; // min 이상 max 미만의 난수를 반환
-    // this.loggerService.log(randomInRange.toString());
+    //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
     // this.amrService.createAmrByMssql();
-    // return this.amrService.createAmrByMssql();
   }
 }

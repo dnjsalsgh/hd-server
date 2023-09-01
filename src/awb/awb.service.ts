@@ -35,8 +35,6 @@ export class AwbService {
   constructor(
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-    // @InjectRepository(AwbSccJoin)
-    // private readonly awbSccJoinRepository: Repository<AwbSccJoin>,
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
     private dataSource: DataSource,

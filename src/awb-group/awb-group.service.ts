@@ -1,11 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
   DataSource,
   FindOperator,
   ILike,
-  In,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
@@ -16,14 +15,6 @@ import { CreateAwbGroupDto } from './dto/create-awb-group.dto';
 import { UpdateAwbGroupDto } from './dto/update-awb-group.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
-import { Aircraft } from '../aircraft/entities/aircraft.entity';
-import { CommonCode } from '../common-code/entities/common-code.entity';
-import { Awb } from '../awb/entities/awb.entity';
-import { CreateAircraftScheduleDto } from '../aircraft-schedule/dto/create-aircraft-schedule.dto';
-import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
-import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
-import { take } from 'rxjs';
 import { CreateAwbDto } from '../awb/dto/create-awb.dto';
 import { AwbService } from '../awb/awb.service';
 
@@ -56,7 +47,6 @@ export class AwbGroupService {
       for (const awb of awbs) {
         const createAwbBody: CreateAwbDto = awb as unknown as CreateAwbDto;
         createAwbBody.AwbGroup = awbGroupResult;
-        // await queryRunner.manager.getRepository(Awb).save(createAwbBody);
         await this.AwbService.createWithOtherTransaction(
           createAwbBody,
           queryRunner,

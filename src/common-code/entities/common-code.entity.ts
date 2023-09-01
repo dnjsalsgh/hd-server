@@ -70,12 +70,6 @@ export class CommonCode {
 
   @DeleteDateColumn()
   deletedAt: Date | null;
-
-  // @OneToMany(
-  //   () => AircraftSchedule,
-  //   (aircraftSchedule) => aircraftSchedule.commonCode,
-  // )
-  // aircraftSchedules: AircraftSchedule[];
 }
 
 export const CcIdDestinationAttribute = {

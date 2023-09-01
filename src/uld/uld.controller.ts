@@ -57,7 +57,7 @@ export class UldController {
   }
 
   @ApiOperation({
-    summary: '[이건 테스트용입니다]기존에 있는 uld에 scc 주입하기',
+    summary: '기존에 있는 uld에 scc 주입하기',
     description:
       '[사용법] param에는 uld id를 넣고 body에 scc의 id를 배열로 넣어야 합니다.\n' +
       '[목표] uld에 화물이 들어가면 화물안에 있는 scc로 uld의 scc를 바로 주입하는 것을 목표로합니다.',
