@@ -12,12 +12,9 @@ import { SimulatorResultService } from './simulator-result.service';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { CreateSimulatorResultWithAwbAndHistoryDto } from './dto/create-simulator-result-with-awb';
-import { Asrs } from '../asrs/entities/asrs.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import { CreateSimulatorResultOrderDto } from './dto/create-simulator-result-order.dto';
-import { PsApiResponse } from './dto/ps-output.dto';
 import { PsApiRequest } from './dto/ps-input.dto';
 
 @Controller('simulator-result')
@@ -30,12 +27,6 @@ export class SimulatorResultController {
   @Post()
   create(@Body() createSimulatorResultDto: CreateSimulatorResultDto) {
     return this.simulatorResultService.create(createSimulatorResultDto);
-  }
-
-  @ApiOperation({ summary: 'history까지 함께 입력' })
-  @Post('/with-Awb-history')
-  createWithAwb(@Body() body: CreateSimulatorResultWithAwbAndHistoryDto) {
-    return this.simulatorResultService.createWithAwb(body);
   }
 
   @ApiOperation({
