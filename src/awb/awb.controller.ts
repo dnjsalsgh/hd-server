@@ -248,6 +248,9 @@ export class AwbController implements OnModuleInit {
       }
       console.log('File uploaded to:', fileResult);
     }
+    if (data && data.count && data.count > 1) {
+      await this.awbService.preventMissingData(data.count);
+    }
   }
 
   onModuleInit() {

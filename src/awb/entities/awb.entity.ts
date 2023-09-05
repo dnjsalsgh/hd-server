@@ -146,7 +146,7 @@ export class Awb {
     'inskidplatform',
     'inuld',
   ])
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true, default: 'saved' })
   state: string;
 
   @ApiProperty({
