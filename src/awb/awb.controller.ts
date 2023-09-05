@@ -212,7 +212,7 @@ export class AwbController implements OnModuleInit {
     if (data && data.count) {
       await this.awbService.preventMissingData(data.count);
     }
-    // return this.awbService.create(data);
+    return this.awbService.create(data);
   }
 
   // 3D 모델링파일 생성 완료 트리거
@@ -247,6 +247,9 @@ export class AwbController implements OnModuleInit {
         this.resetTimer();
       }
       console.log('File uploaded to:', fileResult);
+    }
+    if (data && data.count && data.count > 1) {
+      await this.awbService.preventMissingData(data.count);
     }
   }
 

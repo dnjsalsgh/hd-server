@@ -1,14 +1,13 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ResponseInterceptor } from './lib/interceptor/response.interceptor';
 import { HttpExceptionFilter } from './lib/filter/httpExceptionFilter';
+import { ResponseInterceptor } from './lib/interceptor/response.interceptor';
 import { TypeOrmExceptionFilter } from './lib/filter/typeOrmException.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as process from 'process';
 import { WorkerModule } from './worker/worker.module';
-import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
+import { AppModule } from './app.module';
 
 declare const module: any;
 
@@ -48,7 +47,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor()); // 반환값 객체화 처리
 
   const port = process.env.PORT || 3000;
-  console.log(`listening on port ${port}`);
+  console.log(`main server start port : ${port}`);
 
   // swagger 생성
   const config = new DocumentBuilder()

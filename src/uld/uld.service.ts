@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUldDto } from './dto/create-uld.dto';
 import { UpdateUldDto } from './dto/update-uld.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,7 +13,10 @@ import {
 } from 'typeorm';
 import { Uld } from './entities/uld.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
-import { UldTypeAttribute } from '../uld-type/entities/uld-type.entity';
+import {
+  UldType,
+  UldTypeAttribute,
+} from '../uld-type/entities/uld-type.entity';
 import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
 import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
@@ -23,14 +26,26 @@ export class UldService {
   constructor(
     @InjectRepository(Uld)
     private readonly uldRepository: Repository<Uld>,
+    @InjectRepository(UldType)
+    private readonly UldTypeRepository: Repository<UldType>,
     @InjectRepository(UldSccJoin)
     private readonly uldSccJoinRepository: Repository<UldSccJoin>,
   ) {}
-  async create(createUldDto: CreateUldDto) {
-    const result = await this.uldRepository.create(createUldDto);
 
-    await this.uldRepository.save(result);
-    return result;
+  async create(createUldDto: CreateUldDto) {
+    // uldType 주입
+    try {
+      const uldTypeCode = createUldDto.UldType as unknown as string;
+      const uldTypeResult = await this.UldTypeRepository.findOne({
+        where: { code: uldTypeCode },
+      });
+      console.log('uldTypeResult = ', uldTypeResult);
+      createUldDto.UldType = uldTypeResult.id;
+    } catch (e) {
+      new NotFoundException();
+    }
+
+    return await this.uldRepository.save(createUldDto);
   }
 
   async findAll(query: Uld & BasicQueryParamDto) {

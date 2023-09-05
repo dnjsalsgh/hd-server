@@ -27,6 +27,7 @@ import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
+import { take } from 'rxjs';
 
 @Controller('asrs')
 @ApiTags('[자동창고]Asrs')
@@ -97,18 +98,22 @@ export class AsrsController {
   }
 
   // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
-  @MessagePattern('hyundai/asrs1/eqData') //구독하는 주제
+  @MessagePattern('hyundai/asrs1/eqData2') //구독하는 주제
   createByPlcMatt(@Payload() data) {
-    if (
-      data.Pallet_Rack1_Part_On ||
-      data.Pallet_Rack2_Part_On ||
-      data.Pallet_Rack3_Part_On ||
-      data.Pallet_Rack4_Part_On
-    ) {
-      this.asrsService.createByPlcIn(data);
-      return this.skidPlatformHistoryService.checkSkidPlatformChange(data);
-    }
+    // if (
+    //   data.Pallet_Rack1_Part_On ||
+    //   data.Pallet_Rack2_Part_On ||
+    //   data.Pallet_Rack3_Part_On ||
+    //   data.Pallet_Rack4_Part_On
+    // ) {
+    //   this.asrsService.createByPlcIn(data);
+    //   return this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+    // }
+    //
+    // return this.asrsService.createByPlcIn(data);
 
-    return this.asrsService.createByPlcIn(data);
+    // 원준님과 이야기 후 data 그대로 넘겨주면 된다는거 파악
+    // 자동창고&스태커크레인&안착대 데이터를 발산하는 mqtt
+    this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 }

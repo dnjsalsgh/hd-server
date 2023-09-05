@@ -11,10 +11,9 @@ import {
 import { AwbGroupService } from './awb-group.service';
 import { CreateAwbGroupDto } from './dto/create-awb-group.dto';
 import { UpdateAwbGroupDto } from './dto/update-awb-group.dto';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AwbGroup } from './entities/awb-group.entity';
-import { CreateAwbDto } from '../awb/dto/create-awb.dto';
 
 @Controller('Awb-group')
 @ApiTags('[화물그룹]Awb-group')

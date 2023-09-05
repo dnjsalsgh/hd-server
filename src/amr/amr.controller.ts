@@ -129,14 +129,4 @@ export class AmrController {
   remove(@Param('id') id: string) {
     return this.amrService.remove(+id);
   }
-
-  /**
-   * 30초마다 amr의 데이터를 mssql에서 찾아오기
-   */
-  // @Cron('* * * * * *')
-  createByInterval() {
-    let count = 1;
-    console.log(count, 'amr 컨트롤러에서 동작함');
-    // return this.amrService.createAmrByMssql();
-  }
 }

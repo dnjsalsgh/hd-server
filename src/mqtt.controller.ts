@@ -19,7 +19,7 @@ export class MqttController {
 
   @MessagePattern('World') //구독하는 주제1
   getAll(@Payload() data) {
-    // console.log(data);
+    console.log(data);
   }
 
   @MessagePattern('American') //구독하는 주제2

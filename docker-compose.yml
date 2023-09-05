@@ -1,9 +1,22 @@
 version: '3.9' # Docker Compose 버전 (필요에 따라 변경 가능)
 
 services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql-server2
+    environment:
+      SA_PASSWORD: ${MSSQL_DATABASE_PASS}
+      ACCEPT_EULA: Y
+    ports:
+      - '${MSSQL_DATABASE_PORT}:1433'
+    networks:
+      - overlay
+    volumes:
+      - mssql-data:/var/opt/mssql
+
   postgres:
     image: postgres:latest
-    container_name: my_postgres
+    container_name: my_postgres2
     ports:
       - '5432:5432'
     environment:
@@ -13,14 +26,14 @@ services:
     networks:
       - overlay
     volumes:
-      - pgdata:/var/lib/postgresql/data  # 데이터 볼륨 설정
+      - pgdata:/var/lib/postgresql/data # 데이터 볼륨 설정
     restart: always
 
   mqtt:
     image: eclipse-mosquitto:2.0
-    container_name: mosquitto
+    container_name: mosquitto2
     ports:
-      - "1883:1883"
+      - '1883:1883'
     command: mosquitto -c /mosquitto-no-auth.conf
     networks:
       - overlay
@@ -28,7 +41,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: my_redis
+    container_name: my_redis2
     ports:
       - '6379:6379'
     networks:
@@ -36,12 +49,12 @@ services:
     restart: always
 
   back:
-    container_name: main-server
+    container_name: main-server2
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      DATABASE_HOST: host.docker.internal  # Use host.docker.internal to refer to the host machine's IP
+      DATABASE_HOST: host.docker.internal # Use host.docker.internal to refer to the host machine's IP
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASS: ${DATABASE_PASS}
@@ -50,19 +63,27 @@ services:
       REDIS_PORT: ${REDIS_PORT}
       MQTT_HOST: host.docker.internal
       MQTT_PORT: ${MQTT_PORT}
+      MSSQL_DATABASE_USER: ${MSSQL_DATABASE_USER}
+      MSSQL_DATABASE_PASS: ${MSSQL_DATABASE_PASS}
+      MSSQL_DATABASE_HOST: host.docker.internal
+      MSSQL_DATABASE_NAME: ${MSSQL_DATABASE_NAME}
+      MSSQL_DATABASE_PORT: ${MSSQL_DATABASE_PORT}
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
-      - ./logs:/app/logs
+      - logs-volume:/var/app/logs
     networks:
       - overlay
     links:
       - postgres:postgres
       - mqtt:mqtt
       - redis:redis
+      - mssql:mssql
 
 networks:
   overlay:
 
 volumes:
   pgdata:
+  mssql-data:
+  logs-volume:

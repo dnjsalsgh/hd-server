@@ -1,6 +1,5 @@
-import { Controller, Get, Inject, OnModuleInit } from '@nestjs/common';
-import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { Controller, Get, Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Controller()
 // implements OnModuleInit
@@ -20,8 +19,13 @@ export class AppController {
     return 'Hello from NestJS!';
   }
 
-  @MessagePattern('hyundai/vms1/createFile') //구독하는 주제
-  async checkMqtt(@Payload() data) {
-    console.log('data = ', data);
-  }
+  // @Get('/check/mqtt')
+  // async checkMqtt(): Promise<string> {
+  //   const mqttResult = await this.mqttClient.connect();
+  //   return mqttResult ? 'mqttConnected' : 'not Found mqtt';
+  // }
+  // @Get('/check/mssql')
+  // async checkMssql() {
+  //   return this.secondaryDataSource.metadataTableName;
+  // }
 }

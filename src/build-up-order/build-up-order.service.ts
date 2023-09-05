@@ -83,6 +83,7 @@ export class BuildUpOrderService {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
     // finally {
+    //   // 다른 곳에서 트랙잭션이 이루어 지면 그곳에서 release를 실행
     //   await queryRunner.release();
     // }
   }

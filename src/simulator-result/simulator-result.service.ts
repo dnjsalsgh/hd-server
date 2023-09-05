@@ -65,69 +65,6 @@ export class SimulatorResultService {
     return result;
   }
 
-  async createWithAwb(body: CreateSimulatorResultWithAwbAndHistoryDto) {
-    const queryRunner = await this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      // Awb의 정보 validation 체크
-      if (
-        !body.AwbWithXYZ.every(
-          (obj) => 'Awb' in obj && 'x' in obj && 'y' in obj && 'z' in obj,
-        )
-      ) {
-        throw new NotFoundException('Awb 상세 정보가 없습니다.');
-      }
-
-      // 1. simulatorResult 입력
-      const simulatorResultResult = await queryRunner.manager
-        .getRepository(SimulatorResult)
-        .save(body);
-
-      const joinParamArray: CreateSimulatorResultAwbJoinDto[] = [];
-      const historyParamArray: CreateSimulatorHistoryDto[] = [];
-
-      // 2. 입력되는 화물과 좌표를 이력에 입력
-      for (let i = 0; i < body.AwbWithXYZ.length; i++) {
-        // 2-1. Awb 이력 입력
-        const joinParam: CreateSimulatorResultAwbJoinDto = {
-          Awb: body.AwbWithXYZ[i].Awb,
-          SimulatorResult: simulatorResultResult.id,
-        };
-        joinParamArray.push(joinParam);
-
-        // 2-2. SimulatorHistory 입력
-        const historyParam: CreateSimulatorHistoryDto = {
-          Uld: body.Uld,
-          Awb: body.AwbWithXYZ[i].Awb,
-          SimulatorResult: simulatorResultResult.id,
-          x: body.AwbWithXYZ[i].x,
-          y: body.AwbWithXYZ[i].y,
-          z: body.AwbWithXYZ[i].z,
-        };
-        historyParamArray.push(historyParam);
-      }
-
-      const joinResult = queryRunner.manager
-        .getRepository(SimulatorResultAwbJoin)
-        .save(joinParamArray);
-      const historyResult = queryRunner.manager
-        .getRepository(SimulatorHistory)
-        .save(historyParamArray);
-
-      // awbjoin 테이블, 이력 테이블 함께 저장
-      await Promise.all([joinResult, historyResult]);
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
   // 초기버전
   async createOrder(body: CreateSimulatorResultOrderDto) {
     const queryRunner = await this.dataSource.createQueryRunner();
