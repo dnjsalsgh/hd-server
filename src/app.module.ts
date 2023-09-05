@@ -36,6 +36,7 @@ import { mssqlConfig, postgresConfig } from './config/db.config';
 import { VmsModule } from './vms/vms.module';
 import { HacsModule } from './hacs/hacs.module';
 import { WorkerModule } from './worker/worker.module';
+import { CheckModule } from './check/check.module';
 
 @Module({
   imports: [
@@ -98,7 +99,7 @@ import { WorkerModule } from './worker/worker.module';
     FileModule,
 
     HacsModule,
-
+    CheckModule,
     // WorkerModule,
   ],
   controllers: [AppController],

@@ -6,7 +6,11 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisController } from './redis.controller';
 dotenv.config();
 
-console.log('redis에서', process.env.REDIS_HOST, process.env.REDIS_PORT);
+console.log(
+  'redis start port : ',
+  process.env.REDIS_HOST,
+  process.env.REDIS_PORT,
+);
 const cacheModule = CacheModule.register({
   useFactory: async () => ({
     store: redisStore,

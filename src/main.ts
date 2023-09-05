@@ -47,7 +47,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor()); // 반환값 객체화 처리
 
   const port = process.env.PORT || 3000;
-  console.log(`listening on port ${port}`);
+  console.log(`main server start port : ${port}`);
 
   // swagger 생성
   const config = new DocumentBuilder()
