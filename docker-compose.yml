@@ -71,7 +71,7 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - ./logs:/var/app/logs
+      - logs-volume:/var/app/logs
     networks:
       - overlay
     links:
@@ -86,3 +86,4 @@ networks:
 volumes:
   pgdata:
   mssql-data:
+  logs-volume:
