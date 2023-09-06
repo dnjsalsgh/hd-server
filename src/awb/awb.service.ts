@@ -29,7 +29,7 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
 import { Vms } from '../vms/entities/vms.entity';
-import { CreateAwbWithAircraftDto } from '@/awb/dto/create-awb-with-aircraft.dto';
+import { CreateAwbWithAircraftDto } from '../awb/dto/create-awb-with-aircraft.dto';
 
 @Injectable()
 export class AwbService {
