@@ -308,7 +308,6 @@ export class SimulatorResultService {
           order: index,
           Asrs: element.storageId,
           Awb: element.AwbId,
-          SkidPlatform: element.order, // TODO: 임시로 불출순서를 안착대 id로 넣어둠, 수정필요
         };
         asrsOutOrderParamArray.push(asrsOutOrderParam);
       }
@@ -556,7 +555,7 @@ export class SimulatorResultService {
           order: index,
           Asrs: element.storageId,
           Awb: element.AwbId,
-          SkidPlatform: element.order, // TODO: 임시로 불출순서를 안착대 id로 넣어둠, 수정필요
+          // SkidPlatform: element.order, // TODO: 임시로 불출순서를 안착대 id로 넣어둠, 수정필요
         };
         asrsOutOrderParamArray.push(asrsOutOrderParam);
       }

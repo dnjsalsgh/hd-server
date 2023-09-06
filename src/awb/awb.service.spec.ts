@@ -120,16 +120,16 @@ describe('AwbService', () => {
       // info: {
       //   test: 'test',
       // },
-      allow: true,
-      allowDryIce: true,
-      localDepartureTime: '2023-07-10:15:00:00',
-      koreaArrivalTime: '2023-07-14:15:00:00',
-      workStartTime: '2023-07-14:13:00:00',
-      workCompleteTargetTime: '2023-07-15:13:00:00',
-      koreaDepartureTime: '2023-07-15:13:00:00',
-      localArrivalTime: '2023-07-15:13:00:00',
-      waypoint: ['GEN', 'TEL', 'QRL'],
-      departure: 'KOR',
+      // allow: true,
+      // allowDryIce: true,
+      // localDepartureTime: '2023-07-10:15:00:00',
+      // koreaArrivalTime: '2023-07-14:15:00:00',
+      // workStartTime: '2023-07-14:13:00:00',
+      // workCompleteTargetTime: '2023-07-15:13:00:00',
+      // koreaDepartureTime: '2023-07-15:13:00:00',
+      // localArrivalTime: '2023-07-15:13:00:00',
+      // waypoint: ['GEN', 'TEL', 'QRL'],
+      // departure: 'KOR',
     };
 
     const awbInsertResult = await awbRepository.save(awbTestData);
@@ -190,16 +190,16 @@ describe('AwbService', () => {
       // info: {
       //   test: 'test',
       // },
-      allow: true,
-      allowDryIce: true,
-      localDepartureTime: '2023-07-10:15:00:00',
-      koreaArrivalTime: '2023-07-14:15:00:00',
-      workStartTime: '2023-07-14:13:00:00',
-      workCompleteTargetTime: '2023-07-15:13:00:00',
-      koreaDepartureTime: '2023-07-15:13:00:00',
-      localArrivalTime: '2023-07-15:13:00:00',
-      waypoint: ['GEN', 'TEL', 'QRL'],
-      departure: 'KOR',
+      // allow: true,
+      // allowDryIce: true,
+      // localDepartureTime: '2023-07-10:15:00:00',
+      // koreaArrivalTime: '2023-07-14:15:00:00',
+      // workStartTime: '2023-07-14:13:00:00',
+      // workCompleteTargetTime: '2023-07-15:13:00:00',
+      // koreaDepartureTime: '2023-07-15:13:00:00',
+      // localArrivalTime: '2023-07-15:13:00:00',
+      // waypoint: ['GEN', 'TEL', 'QRL'],
+      // departure: 'KOR',
     };
 
     // 3. Awb db에 저장합니다.

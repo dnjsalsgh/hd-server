@@ -550,6 +550,13 @@ export class AwbService {
     });
   }
 
+  async getAwbByVmsAndMssql() {
+    return await this.vmsRepository.find({
+      order: orderByUtil(null),
+      take: 1,
+    });
+  }
+
   /**
    * 엣지에서 보내주는 vms 데이터 중 누락된 데이터를 다시 저장하기 위한 로직
    * @param vmsMissCount edge에서 보내주는 지금까지 보내준 vms의 총 개수
