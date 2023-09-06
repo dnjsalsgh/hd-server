@@ -28,15 +28,6 @@ export class SimulatorResultController {
     return this.simulatorResultService.create(createSimulatorResultDto);
   }
 
-  // 개발 초기에 패키지 시뮬레이터 가정하고 만든 api라 안쓰일거 같아서 주석처리
-  // @ApiOperation({
-  //   summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
-  // })
-  // @Post('/make-order')
-  // createOrder(@Body() body: CreateSimulatorResultOrderDto) {
-  //   return this.simulatorResultService.createOrder(body);
-  // }
-
   @ApiOperation({
     summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
   })
