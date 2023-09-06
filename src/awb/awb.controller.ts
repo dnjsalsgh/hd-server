@@ -226,11 +226,6 @@ export class AwbController implements OnModuleInit {
         );
         // upload된 파일의 경로를 awb정보에 update
         await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
-        if (this.dTimer === 0) {
-          this.performAction();
-        } else {
-          this.resetTimer();
-        }
       }
     } else {
       new NotFoundException('vms 테이블에 연결할 수 없습니다.');
@@ -248,6 +243,11 @@ export class AwbController implements OnModuleInit {
     if (!this.timer) {
       this.timer = setInterval(() => {
         this.dTimer -= 1;
+        if (this.dTimer === 0) {
+          this.performAction();
+        } else {
+          this.resetTimer();
+        }
       }, 1000);
     }
   }

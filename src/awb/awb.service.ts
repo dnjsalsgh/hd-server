@@ -3,6 +3,7 @@ import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  Any,
   Between,
   DataSource,
   FindOperator,
@@ -532,10 +533,10 @@ export class AwbService {
 
   async getAwbNotCombineModelPath() {
     return await this.awbRepository.find({
-      where: [
-        { modelPath: '' }, // modelPath가 빈 문자열인 경우
-        { modelPath: null }, // modelPath가 null인 경우
-      ],
+      where: {
+        modelPath: null, // modelPath가 null인 경우, modelPath가 빈 문자열인 경우
+      },
+      order: { id: 'desc' },
     });
   }
 

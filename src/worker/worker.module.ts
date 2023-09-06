@@ -12,6 +12,13 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { HacsModule } from '../hacs/hacs.module';
 import { AmrService } from '../amr/amr.service';
 import { LoggerService } from '../lib/logger/logger.service';
+import { Awb } from '../awb/entities/awb.entity';
+import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
+import { Scc } from '../scc/entities/scc.entity';
+import { MulterModule } from '@nestjs/platform-express';
+import { FileService } from '../file/file.service';
+import { AwbService } from '../awb/awb.service';
+import { Vms } from '../vms/entities/vms.entity';
 
 @Module({
   imports: [
@@ -45,8 +52,16 @@ import { LoggerService } from '../lib/logger/logger.service';
 
     HacsModule,
     WorkerModule,
-    TypeOrmModule.forFeature([Amr, AmrCharger, AmrChargeHistory]),
-    TypeOrmModule.forFeature([Hacs], 'mssqlDB'),
+    TypeOrmModule.forFeature([
+      Amr,
+      AmrCharger,
+      AmrChargeHistory,
+      Awb,
+      AwbSccJoin,
+      Scc,
+    ]),
+    TypeOrmModule.forFeature([Hacs, Vms], 'mssqlDB'),
+    MulterModule.register({ dest: './upload' }),
   ],
   providers: [
     WorkerService,
@@ -56,6 +71,8 @@ import { LoggerService } from '../lib/logger/logger.service';
       provide: 'SERVICE_NAME', // 여기에서 프로바이더 이름을 지정합니다.
       useValue: 'WorkerService', // 원하는 값을 useValue로 지정합니다.
     },
+    FileService,
+    AwbService,
   ],
 })
 export class WorkerModule {}
