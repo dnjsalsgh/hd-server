@@ -200,8 +200,8 @@ export class AwbController implements OnModuleInit {
   @MessagePattern('hyundai/vms1/createFile') //구독하는 주제
   async updateFileByMqttSignal(@Payload() data) {
     // mssql의 vms 테이블에서
-    // const oneVmsData = await this.awbService.getAwbByVmsAndMssql()[0];
-    const oneVmsData = { name: 'test' };
+    const oneVmsData = await this.awbService.getAwbByVmsAndMssql()[0];
+    // const oneVmsData = { name: 'test' };
 
     // nas 서버 접속해서 이미지 파일을 다운 받고 upload 진행하기
     if (oneVmsData && oneVmsData.name) {
@@ -211,6 +211,9 @@ export class AwbController implements OnModuleInit {
       const filename = `${name}.png`;
       const directory = path.join('C:', 'Users', user, documentsFolder);
       const filePath = path.join(directory, filename);
+
+      // mssql에서 가져온 1개의 데이터를 저장하기 위함
+      await this.awbService.createWithMssql();
 
       // vms데이터를 받았다는 신호를전송합니다
       await this.awbService.modelingCompleteWithNAS(name);

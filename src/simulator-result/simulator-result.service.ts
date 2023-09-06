@@ -581,6 +581,7 @@ export class SimulatorResultService {
             where: {
               id: In(asrsOutOrderResult.identifiers.map((v) => v.id)),
             },
+            order: { order: 'asc' },
           });
 
         // 불출순서 배열로 보내기 ver2

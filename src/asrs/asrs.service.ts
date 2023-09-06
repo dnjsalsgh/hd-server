@@ -243,7 +243,8 @@ export class AsrsService {
 
     try {
       // timeTable에 스태커 크레인 데이터 입력
-      await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
+      // timeTable은 server에서 관여 하지 않는다.
+      // await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
 
       // 이전의 이력 가져오기
       const topLevelHistory = await this.asrsHistoryRepository.findOne({
