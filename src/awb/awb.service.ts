@@ -239,41 +239,70 @@ export class AwbService {
   }
 
   async createWithMssql() {
+    // vms와의 차이를 구하기 위해 awb의 총 개수를 구하기
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    const vmsResult = await this.vmsRepository.find({
+      order: orderByUtil(null),
+      take: 30, // mssql에서 30개만 가져옴
+      // skip: 100 * i,
+    });
+    // 누락된 데이터찾기 & 누락되었다면 입력
     try {
-      // vms와의 차이를 구하기 위해 awb의 총 개수를 구하기
-      const awbAllCount = await this.awbRepository.count();
-
-      // 1 ~ 100 / 101 ~ 200 / 201 ~ 300 ... 누락된 데이터를 찾음
-      const vmsResult = await this.vmsRepository.find({
-        order: orderByUtil(null),
-        take: 30,
-        // skip: 100 * i,
-      });
-      // 누락된 데이터찾기 & 누락되었다면 입력
       for (const vms of vmsResult) {
+        await queryRunner.startTransaction();
         // vms에 등록된 scc 정보 찾기
-        const sccResult = await this.sccRepository.find({
-          where: { code: In(vms.Sccs.split(',')) },
-        });
+        if (vms.Sccs) {
+          // awb 등록하는 부분
+          const createAwbDto: Partial<CreateAwbDto> = {
+            name: vms.name,
+            waterVolume: vms.waterVolume,
+            width: vms.width,
+            length: vms.length,
+            depth: vms.depth,
+            weight: vms.weight,
+            state: vms.state,
+            modelPath: vms.modelPath,
+            // scc: sccResult,
+          };
 
-        // awb 등록하는 부분
-        const createAwbDto: Partial<CreateAwbDto> = {
-          name: vms.name,
-          waterVolume: vms.waterVolume,
-          width: vms.width,
-          length: vms.length,
-          depth: vms.depth,
-          weight: vms.weight,
-          state: vms.state,
-          modelPath: vms.modelPath,
-          scc: sccResult,
-        };
+          // 2. awb를 입력하기
+          const awbResult = await queryRunner.manager
+            .getRepository(Awb)
+            .save(createAwbDto);
 
-        await this.awbRepository.create(createAwbDto);
+          // scc 정보, awb이 입력되어야 동작하게끔
+          // 4. 입력된 scc찾기
+          const sccResult = await this.sccRepository.find({
+            where: { code: In(vms.Sccs.split(',')) },
+          });
+
+          // 5. awb와 scc를 연결해주기 위한 작업
+          const joinParam = sccResult.map((item) => {
+            return {
+              Awb: awbResult.id,
+              Scc: item.id,
+            };
+          });
+          await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+        }
+
+        // awb실시간 데이터 mqtt로 publish 하기 위함
+        this.client
+          .send(`hyundai/vms1/readCompl`, {
+            // awb: awbResult,
+            time: new Date().toISOString(),
+          })
+          .pipe(take(1))
+          .subscribe();
+        await queryRunner.commitTransaction();
       }
-      // }
-    } catch (e) {
-      throw new TypeORMError(`rollback Working - ${e}`);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -543,8 +572,8 @@ export class AwbService {
         // 누락된 데이터찾기 & 누락되었다면 입력
         for (const vms of vmsResult) {
           const existVms = awbResult.find((awb) => awb.name === vms.name);
-          if (!existVms) {
-            // vms에 등록된 scc 정보 찾기
+          if (!existVms && vms.Sccs) {
+            // vms가 존재하고 Sccs가 존재한다면 vms에 등록된 scc 정보 찾기
             const sccResult = await this.sccRepository.find({
               where: { code: In(vms.Sccs.split(',')) },
             });
