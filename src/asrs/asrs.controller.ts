@@ -98,7 +98,7 @@ export class AsrsController {
   }
 
   // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
-  @MessagePattern('hyundai/asrs1/eqData2') //구독하는 주제
+  @MessagePattern('hyundai/asrs1/eqData') //구독하는 주제
   createByPlcMatt(@Payload() data) {
     // if (
     //   data.Pallet_Rack1_Part_On ||
