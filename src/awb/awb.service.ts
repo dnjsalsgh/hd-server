@@ -254,31 +254,31 @@ export class AwbService {
       for (const vms of vmsResult) {
         await queryRunner.startTransaction();
         // vms에 등록된 scc 정보 찾기
+
+        // awb 등록하는 부분
+        const createAwbDto: Partial<CreateAwbDto> = {
+          name: vms.name,
+          waterVolume: vms.waterVolume,
+          width: vms.width,
+          length: vms.length,
+          depth: vms.depth,
+          weight: vms.weight,
+          state: vms.state,
+          modelPath: vms.modelPath,
+          // scc: sccResult,
+        };
+
+        // 2. awb를 입력하기
+        const awbResult = await queryRunner.manager
+          .getRepository(Awb)
+          .save(createAwbDto);
+
+        // scc 정보, awb이 입력되어야 동작하게끔
+        // 4. 입력된 scc찾기
         if (vms.Sccs) {
-          // awb 등록하는 부분
-          const createAwbDto: Partial<CreateAwbDto> = {
-            name: vms.name,
-            waterVolume: vms.waterVolume,
-            width: vms.width,
-            length: vms.length,
-            depth: vms.depth,
-            weight: vms.weight,
-            state: vms.state,
-            modelPath: vms.modelPath,
-            // scc: sccResult,
-          };
-
-          // 2. awb를 입력하기
-          const awbResult = await queryRunner.manager
-            .getRepository(Awb)
-            .save(createAwbDto);
-
-          // scc 정보, awb이 입력되어야 동작하게끔
-          // 4. 입력된 scc찾기
           const sccResult = await this.sccRepository.find({
             where: { code: In(vms.Sccs.split(',')) },
           });
-
           // 5. awb와 scc를 연결해주기 위한 작업
           const joinParam = sccResult.map((item) => {
             return {
@@ -292,7 +292,6 @@ export class AwbService {
         // awb실시간 데이터 mqtt로 publish 하기 위함
         this.client
           .send(`hyundai/vms1/readCompl`, {
-            // awb: awbResult,
             time: new Date().toISOString(),
           })
           .pipe(take(1))

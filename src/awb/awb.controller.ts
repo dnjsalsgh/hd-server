@@ -196,12 +196,12 @@ export class AwbController implements OnModuleInit {
     this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
-  // 3D 모델링파일 생성 완료 트리거
+  // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
   @MessagePattern('hyundai/vms1/createFile') //구독하는 주제
   async updateFileByMqttSignal(@Payload() data) {
     // mssql의 vms 테이블에서
     const oneVmsData = await this.awbService.getAwbByVmsAndMssql();
-    // const oneVmsData = { name: 'test' };
+
     // nas 서버 접속해서 이미지 파일을 다운 받고 upload 진행하기
     if (oneVmsData && oneVmsData[0].name) {
       const name = oneVmsData[0].name as string;

@@ -6,6 +6,7 @@ import {
   DataSource,
   Equal,
   FindOperator,
+  ILike,
   In,
   LessThanOrEqual,
   MoreThanOrEqual,
@@ -37,6 +38,11 @@ import { pakageSimulatorCallResultData } from '../lib/util/pakageSimulatorCallRe
 
 import { PsApiRequest } from './dto/ps-input.dto';
 import { Asrs } from '../asrs/entities/asrs.entity';
+import {
+  UldType,
+  UldTypeAttribute,
+} from '../uld-type/entities/uld-type.entity';
+import { getOrderDischarge } from '../lib/util/axios.util';
 
 @Injectable()
 export class SimulatorResultService {
@@ -478,76 +484,103 @@ export class SimulatorResultService {
     }
   }
 
-  // 패키지 시뮬레이터와 소통 후 자동창고 불출 만드는 버전
+  // 패키지 시뮬레이터와 소통 후 [자동창고 불출 만드는 버전]
   async createAsrsOutOrderBySimulatorResult(apiRequest: PsApiRequest) {
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     // 자동창고의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
-    const asrsHistorySubQueryBuilder = this.asrsHistoryRepository
-      .createQueryBuilder('sub_asrsHistory')
-      .select('awb_id, MAX(id) AS max_id')
-      .groupBy('awb_id');
-    const asrsHistoryResult = await this.asrsHistoryRepository
-      .createQueryBuilder('asrsHistory')
-      .leftJoinAndSelect('asrsHistory.Awb', 'Awb')
-      .leftJoinAndSelect('asrsHistory.Asrs', 'Asrs')
-      .where(
-        `(asrsHistory.awb_id, asrsHistory.id) IN (${asrsHistorySubQueryBuilder.getQuery()})`,
-      )
-      .andWhere('asrsHistory.deleted_at IS NULL')
-      .orderBy('asrsHistory.id', 'DESC')
-      .getMany();
+    // 샐마다 어떤 물품이 있는지 최신 이력을 가져온다.(18셀만 가져옴)
+    const asrsLasted = await this.asrsHistoryRepository.find({
+      where: {
+        Asrs: Between(1, 18),
+        inOutType: 'in',
+      },
+      relations: {
+        Asrs: true,
+        Awb: { Scc: true },
+      },
+      select: {
+        Asrs: { id: true },
+        Awb: {
+          id: true,
+          name: true,
+          width: true,
+          length: true,
+          depth: true,
+          waterVolume: true,
+          weight: true,
+          Scc: true,
+        },
+      },
+      order: orderByUtil(null),
+    });
 
-    // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
-    const skidPlatformHistorySubQueryBuilder =
-      this.skidPlatformHistoryRepository
-        .createQueryBuilder('sub_skidPlatformHistory')
-        .select('skid_platform_id, MAX(id) AS max_id')
-        .groupBy('skid_platform_id');
-    const skidPlatformHistoryResult = await this.skidPlatformHistoryRepository
-      .createQueryBuilder('skidPlatformHistory')
-      .leftJoinAndSelect('skidPlatformHistory.Awb', 'Awb')
-      .leftJoinAndSelect('skidPlatformHistory.Asrs', 'Asrs')
-      .where(
-        `(skidPlatformHistory.skid_platform_id, skidPlatformHistory.id) IN (${skidPlatformHistorySubQueryBuilder.getQuery()})`,
-      )
-      .andWhere('skidPlatformHistory.deleted_at IS NULL')
-      .orderBy('skidPlatformHistory.id', 'DESC')
-      .getMany();
+    const Awbs = [];
+    for (const asrsHistory of asrsLasted) {
+      const AwbInfo = asrsHistory.Awb as Awb;
+      const AsrsInfo = asrsHistory.Asrs as Asrs;
+      const targetAwb = {
+        id: AwbInfo.id,
+        storageId: AsrsInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        color: 'yellow',
+        SCCs: AwbInfo.Scc.map((v) => v.code),
+        iceWeight: 0,
+      };
 
-    // TODO 패키지 시뮬레이터에 자동창고 정보, 안착대 정보, uld 정보를 같이 묶어서 api 호출하기
-    // TODO 나중에 패키지 시뮬레이터에 값을 주고 받는 데이터 format을 맞춰야 함
-    // 호출하는 부분
-    /*
-     *
-     *
-     *
-     * */
+      Awbs.push(targetAwb);
+    }
 
-    // TODO 패키지 시뮬레이터에 보낼 UldType 주입하는 부분
-    // const uldResult = await this.uldRepository.findOne({
-    //   select: {
-    //     UldType: UldTypeAttribute,
-    //   },
-    //   relations: {
-    //     UldType: true,
-    //   },
-    //   where: {
-    //     UldType: apiRequest.ULDs[0].id
-    //       ? Equal(+apiRequest.ULDs[0].id)
-    //       : undefined,
-    //   },
-    // });
-    // const uldTypeResult = uldResult.UldType as UldType;
-    // // uldType에 uld에 있는 type 주입
-    // apiRequest.ULDs[0].uldType = uldTypeResult.code;
+    // body에서 가져온 uld의 이름으로 목표 uld를 주입
+    const Ulds = [];
+    const uldResult = await this.uldRepository.findOne({
+      select: {
+        UldType: UldTypeAttribute,
+      },
+      relations: {
+        UldType: true,
+      },
+      where: {
+        code: apiRequest.UldCode ? ILike(`%${apiRequest.UldCode}%`) : undefined,
+      },
+    });
+    // Uld주입하기
+    if (uldResult) {
+      const { id, code, UldType } = uldResult;
+      const { width, length, depth, vertexCord } = UldType as UldType;
+      Ulds.push({
+        id,
+        code,
+        width,
+        length,
+        depth,
+        // maxWeight: uldTypeResult.maxWeight,준규님이랑 최대 문개 어떻게 넣을지 논의하기
+        uldType: typeof UldType === 'object' ? UldType.code : null,
+        maxWeight: 10000,
+        vertexCord,
+      });
+    }
 
-    // 패키시 시뮬레이터에서 자동창고 작업자시정보가 이렇게 온다고 가정한 테스트용 객체
+    const packageSimulatorCallRequestObject = {
+      mode: false,
+      Awbs: Awbs,
+      Ulds: Ulds,
+    };
+    console.log(JSON.stringify(packageSimulatorCallRequestObject));
+    const psResultObject = await getOrderDischarge(
+      packageSimulatorCallRequestObject,
+    );
+    console.log('psResultObject = ', psResultObject);
 
     try {
-      const bodyResult = pakageSimulatorCallResultData.result[0];
+      const bodyResult = psResultObject.result[0];
       // 1. 자동창고 작업지시를 만들기
       const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
       for (const [index, element] of bodyResult.AWBInfoList.entries()) {

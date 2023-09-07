@@ -24,7 +24,8 @@ export class WorkerService {
     // this.amrService.createAmrByMssql();
   }
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
-  @Cron('*/10 * * * * *', {
+  // * 10 * * * *
+  @Cron('* * 10 * * *', {
     name: 'amrCronJobTest',
     timeZone: 'Asia/Seoul',
   })

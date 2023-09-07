@@ -51,7 +51,7 @@ export class SimulatorResultController {
   @ApiOperation({
     summary: '패키지 시뮬레이터를 사용해서 asrs작업지시 만들기',
   })
-  @ApiBody({})
+  @ApiBody({ type: PsApiRequest })
   @Post('/make-asrs-out-order/with/ps')
   createAsrsOutOrderBySimulatorResult(@Body() body: PsApiRequest) {
     return this.simulatorResultService.createAsrsOutOrderBySimulatorResult(
