@@ -19,8 +19,7 @@ import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { TimeTable } from '../time-table/entities/time-table.entity';
-import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
+import { Awb } from '../awb/entities/awb.entity';
 
 @Injectable()
 export class AsrsService {
@@ -29,6 +28,9 @@ export class AsrsService {
     private readonly asrsRepository: Repository<Asrs>,
     @InjectRepository(AsrsHistory)
     private readonly asrsHistoryRepository: Repository<AsrsHistory>,
+    @InjectRepository(Awb)
+    private readonly awbRepository: Repository<Awb>,
+
     private dataSource: DataSource,
   ) {}
 
@@ -174,67 +176,51 @@ export class AsrsService {
   async createByPlcIn(body: CreateAsrsPlcDto) {
     // TODO: 가정된 데이터들 어떤 화물정보가 들어있을줄 모르니 다 분기처리할 것
 
+    // 만약 랙에 대한 정보가 db에 없다면 추가하기
+
     const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
 
-    const awbInfo =
-      (body.ASRS_LH_Rack1_Part_Info as unknown as {
-        awbId: number;
-        count: number;
-      }) ||
-      (body.ASRS_LH_Rack2_Part_Info as unknown as {
-        awbId: number;
-        count: number;
-      }) ||
-      (body.ASRS_LH_Rack3_Part_Info as unknown as {
-        awbId: number;
-        count: number;
-      }) ||
-      (body.ASRS_LH_Rack4_Part_Info as unknown as {
-        awbId: number;
-        count: number;
-      }) ||
-      (body.ASRS_LH_Rack5_Part_Info as unknown as {
-        awbId: number;
-        count: number;
-      }) ||
-      (body.ASRS_LH_Rack6_Part_Info as unknown as {
-        awbId: number;
-        count: number;
-      }) ||
-      (body.ASRS_LH_Rack7_Part_Info as unknown as {
-        awbId: number;
-        count: number;
-      }) ||
-      (body.ASRS_LH_Rack8_Part_Info as unknown as {
-        awbId: number;
-        count: number;
-      }) ||
-      (body.ASRS_LH_Rack9_Part_Info as unknown as {
-        awbId: number;
-        count: number;
-      });
+    const LH_ASRS_ID = body.LH_ASRS_ID;
+    const RH_ASRS_ID = body.RH_ASRS_ID;
+    const LH_Rack_ID = [];
+    const RH_Rack_ID = [];
+    const LH_Rack_Part_On: string[] = [];
+    const RH_Rack_Part_On: string[] = [];
+    const ASRS_LH_Rack_Part_Info: string[] = [];
+    const ASRS_RH_Rack_Part_Info: string[] = [];
 
-    // 화물정보 안에 화물Id 들어왔다고 가정
-    const awbId = awbInfo.awbId;
-    // 화물정보 안에 화물수량 들어왔다고 가정
-    const count = awbInfo.count;
-    // 화물이 인입인지 인출인지 확인
-    let inOutType = '';
-    if (body.In_Conveyor_Start) {
-      inOutType = 'in';
-    } else if (body.Out_Conveyor_Start) {
-      inOutType = 'out';
+    for (let i = 1; i <= 9; i++) {
+      LH_Rack_Part_On.push(body[`LH_Rack${i}_Part_On`]);
+      RH_Rack_Part_On.push(body[`RH_Rack${i}_Part_On`]);
+      LH_Rack_ID.push(body[`LH_Rack${i}_ID`]);
+      RH_Rack_ID.push(body[`RH_Rack${i}_ID`]);
+      ASRS_LH_Rack_Part_Info.push(body[`ASRS_LH_Rack${i}_Part_Info`]);
+      ASRS_RH_Rack_Part_Info.push(body[`ASRS_RH_Rack${i}_Part_Info`]);
+      const asrsBodyLH: CreateAsrsDto = {
+        name: body[`LH_Rack${i}_ID`],
+        parent: 0,
+      };
+      const asrsBodyRH: CreateAsrsDto = {
+        name: body[`RH_Rack${i}_ID`],
+        parent: 0,
+      };
+      // Rack_ID를 name으로 asrs table에 저장
+      await this.asrsRepository.save(asrsBodyLH);
+      await this.asrsRepository.save(asrsBodyRH);
     }
+
+    // 화물정보 안에 화물Id(화물이름) 들어왔다고 가정
+    // await this.awbRepository.findOne({
+    //   where: { name: awbInfo.awbId as unknown as string },
+    // });
+    // const awbId = awbInfo.awbId;
 
     const asrsHistoryBody: CreateAsrsHistoryDto = {
       Asrs: asrsId,
-      Awb: awbId,
-      inOutType: inOutType,
-      count: count,
-    };
-    const timeTableBody: CreateTimeTableDto = {
-      Awb: awbId,
-      data: body,
+      // Awb: awbId,
+      Awb: 1,
+      inOutType: 'in',
+      count: 1,
     };
 
     const queryRunner = await this.dataSource.createQueryRunner();
@@ -242,25 +228,10 @@ export class AsrsService {
     await queryRunner.startTransaction();
 
     try {
-      // timeTable에 스태커 크레인 데이터 입력
-      // timeTable은 server에서 관여 하지 않는다.
-      // await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
-
-      // 이전의 이력 가져오기
-      const topLevelHistory = await this.asrsHistoryRepository.findOne({
-        where: { Awb: asrsHistoryBody.Awb, Asrs: asrsHistoryBody.Asrs },
-        order: { createdAt: 'desc' },
-      });
-      // 입고, 출고에 따른 값 계산
-      if (asrsHistoryBody.inOutType === 'in')
-        asrsHistoryBody.count += topLevelHistory.count;
-      else if (asrsHistoryBody.inOutType === 'out')
-        asrsHistoryBody.count = topLevelHistory.count - asrsHistoryBody.count;
-
       // asrs에서 동작한 data를 이력 등록
-      await queryRunner.manager
-        .getRepository(AsrsHistory)
-        .save(asrsHistoryBody);
+      // await queryRunner.manager
+      //   .getRepository(AsrsHistory)
+      //   .save(asrsHistoryBody);
 
       await queryRunner.commitTransaction();
     } catch (error) {

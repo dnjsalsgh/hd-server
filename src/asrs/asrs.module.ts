@@ -9,6 +9,7 @@ import { TimeTable } from '../time-table/entities/time-table.entity';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
+import { Awb } from '../awb/entities/awb.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
       TimeTable,
       SkidPlatformHistory,
       AsrsOutOrder,
+      Awb,
     ]),
     // mqtt 모듈설정
     MqttModule,

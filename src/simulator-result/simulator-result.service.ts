@@ -575,9 +575,14 @@ export class SimulatorResultService {
       Awbs: Awbs,
       Ulds: Ulds,
     };
+    console.log(
+      'packageSimulatorCallRequestObject = ',
+      packageSimulatorCallRequestObject,
+    );
+    const psResult = await getOrderDischarge(packageSimulatorCallRequestObject);
 
     try {
-      const bodyResult = pakageSimulatorCallResultData.result[0];
+      const bodyResult = psResult.result[0];
       // 1. 자동창고 작업지시를 만들기
       const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
       for (const [index, element] of bodyResult.AWBInfoList.entries()) {
@@ -591,7 +596,7 @@ export class SimulatorResultService {
       }
       const asrsOutOrderResult = await queryRunner.manager
         .getRepository(AsrsOutOrder)
-        .upsert(asrsOutOrderParamArray, ['Asrs', 'SkidPlatform', 'Awb']);
+        .upsert(asrsOutOrderParamArray, ['Asrs', 'Awb']);
 
       // 1-1. 자동창고 작업지시 데이터 mqtt로 publish 하기
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
