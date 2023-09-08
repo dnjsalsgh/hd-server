@@ -43,6 +43,7 @@ import {
   UldTypeAttribute,
 } from '../uld-type/entities/uld-type.entity';
 import { getOrderDischarge } from '../lib/util/axios.util';
+import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 
 @Injectable()
 export class SimulatorResultService {
@@ -517,6 +518,7 @@ export class SimulatorResultService {
       order: orderByUtil(null),
     });
 
+    // ps에 보낼 Awb 정보들 모아두는 배열
     const Awbs = [];
     for (const asrsHistory of asrsLasted) {
       const AwbInfo = asrsHistory.Awb as Awb;
@@ -538,7 +540,7 @@ export class SimulatorResultService {
       Awbs.push(targetAwb);
     }
 
-    // body에서 가져온 uld의 이름으로 목표 uld를 주입
+    // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
     const uldResult = await this.uldRepository.findOne({
       select: {
@@ -573,14 +575,9 @@ export class SimulatorResultService {
       Awbs: Awbs,
       Ulds: Ulds,
     };
-    console.log(JSON.stringify(packageSimulatorCallRequestObject));
-    const psResultObject = await getOrderDischarge(
-      packageSimulatorCallRequestObject,
-    );
-    console.log('psResultObject = ', psResultObject);
 
     try {
-      const bodyResult = psResultObject.result[0];
+      const bodyResult = pakageSimulatorCallResultData.result[0];
       // 1. 자동창고 작업지시를 만들기
       const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
       for (const [index, element] of bodyResult.AWBInfoList.entries()) {
@@ -617,7 +614,7 @@ export class SimulatorResultService {
             order: { order: 'asc' },
           });
 
-        // 불출순서 배열로 보내기 ver2
+        // 불출순서를 mqtt에 배열로 보내기위해 전처리 과정
         const asrsOutOrder = asrsResult.map((asrsOutOrderElement) => {
           const Awb = asrsOutOrderElement.Awb as Awb;
           const Asrs = asrsOutOrderElement.Asrs as Asrs;
@@ -627,6 +624,18 @@ export class SimulatorResultService {
             awb: Awb.id,
           };
         });
+
+        // asrs의 출고이력을 저장하기 위함
+        const releaseAwb = asrsOutOrder[0];
+        const asrsHistoryBody: CreateAsrsHistoryDto = {
+          Asrs: releaseAwb.asrs,
+          Awb: releaseAwb.awb,
+          inOutType: 'out',
+          count: 1,
+        };
+        await queryRunner.manager
+          .getRepository(AsrsHistory)
+          .save(asrsHistoryBody);
 
         // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
         this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();

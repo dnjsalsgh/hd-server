@@ -40,7 +40,7 @@ export class AsrsHistory {
     description: '창고안의 개수',
   })
   @IsNumber()
-  @Column({ type: 'int', nullable: false, default: 0 })
+  @Column({ type: 'int', nullable: true, default: 0 })
   count: number;
 
   @CreateDateColumn()
