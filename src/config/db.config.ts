@@ -77,7 +77,7 @@ const mssqlConfig: TypeOrmModuleOptions = {
   entities: [Vms, CommonCode, Hacs],
   synchronize: process.env.NODE_ENV === 'dev', // 개발 환경에서만 사용하거나 자동 마이그레이션을 사용하지 않을 경우 false로 변경
   options: { trustServerCertificate: true },
-  logging: true,
+  logging: false,
 };
 
 export { postgresConfig, mssqlConfig };

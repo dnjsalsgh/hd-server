@@ -20,6 +20,7 @@ import {
 } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -112,6 +113,20 @@ export class SkidPlatformHistoryService {
       },
     });
     return result;
+  }
+
+  /**
+   * 안착대 이력에서 skid_platform_id를 기준으로 최신 안착대의 상태만 가져옴
+   */
+  async nowState() {
+    return this.skidPlatformHistoryRepository
+      .createQueryBuilder('sph')
+      .distinctOn(['sph.skid_platform_id'])
+      .leftJoinAndSelect('sph.Asrs', 'Asrs')
+      .leftJoinAndSelect('sph.Awb', 'Awb')
+      .orderBy('sph.skid_platform_id')
+      .addOrderBy('sph.id', 'DESC')
+      .getMany();
   }
 
   update(

@@ -25,8 +25,8 @@ export class WorkerService {
   }
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
   // * 10 * * * *
-  @Cron('* * 10 * * *', {
-    name: 'amrCronJobTest',
+  @Cron('* 10 * * * *', {
+    name: 'missingAWBModelingFileHandlingLogic',
     timeZone: 'Asia/Seoul',
   })
   async missingAWBModelingFileHandlingLogic() {
@@ -37,7 +37,9 @@ export class WorkerService {
         const user = 'wmh';
         const documentsFolder = 'Documents';
         const filename = `${name}.png`;
-        const directory = path.join('C:', 'Users', user, documentsFolder);
+        // const directory = path.join('C:', 'Users', user, documentsFolder);
+        const directory = path.join('G:', '내 드라이브');
+
         const filePath = path.join(directory, filename);
 
         // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정

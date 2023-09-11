@@ -270,7 +270,8 @@ export class AwbController implements OnModuleInit {
         const user = 'wmh';
         const documentsFolder = 'Documents';
         const filename = `${name}.png`;
-        const directory = path.join('C:', 'Users', user, documentsFolder);
+        // const directory = path.join('C:', 'Users', user, documentsFolder);
+        const directory = path.join('G:', '내 드라이브');
         const filePath = path.join(directory, filename);
 
         // vms데이터를 받았다는 신호를전송합니다
