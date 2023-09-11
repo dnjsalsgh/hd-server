@@ -44,6 +44,8 @@ import {
 } from '../uld-type/entities/uld-type.entity';
 import { getOrderDischarge } from '../lib/util/axios.util';
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
+import { AsrsHistoryService } from '../asrs-history/asrs-history.service';
+import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
 @Injectable()
 export class SimulatorResultService {
@@ -63,6 +65,8 @@ export class SimulatorResultService {
     private readonly buildUpOrderService: BuildUpOrderService,
     @InjectRepository(Uld)
     private readonly uldRepository: Repository<Uld>,
+    private readonly asrsHistoryService: AsrsHistoryService,
+    private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
   ) {}
 
   async create(createSimulatorResultDto: CreateSimulatorResultDto) {
@@ -485,7 +489,7 @@ export class SimulatorResultService {
     }
   }
 
-  // 패키지 시뮬레이터와 소통 후 [자동창고 불출 만드는 버전]
+  // 패키지 시뮬레이터와 소통 후 [자동창고 불출] 만드는 곳
   async createAsrsOutOrderBySimulatorResult(apiRequest: PsApiRequest) {
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -493,34 +497,13 @@ export class SimulatorResultService {
 
     // 자동창고의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     // 샐마다 어떤 물품이 있는지 최신 이력을 가져온다.(18셀만 가져옴)
-    const asrsLasted = await this.asrsHistoryRepository.find({
-      where: {
-        Asrs: Between(1, 18),
-        inOutType: 'in',
-      },
-      relations: {
-        Asrs: true,
-        Awb: { Scc: true },
-      },
-      select: {
-        Asrs: { id: true },
-        Awb: {
-          id: true,
-          name: true,
-          width: true,
-          length: true,
-          depth: true,
-          waterVolume: true,
-          weight: true,
-          Scc: true,
-        },
-      },
-      order: orderByUtil(null),
-    });
 
+    const asrsStateArray = await this.asrsHistoryService.nowState();
+
+    console.log('asrsStateArray = ', asrsStateArray);
     // ps에 보낼 Awb 정보들 모아두는 배열
     const Awbs = [];
-    for (const asrsHistory of asrsLasted) {
+    for (const asrsHistory of asrsStateArray) {
       const AwbInfo = asrsHistory.Awb as Awb;
       const AsrsInfo = asrsHistory.Asrs as Asrs;
       const targetAwb = {
@@ -533,10 +516,9 @@ export class SimulatorResultService {
         waterVolume: AwbInfo.waterVolume,
         weight: AwbInfo.weight,
         color: 'yellow',
-        SCCs: AwbInfo.Scc.map((v) => v.code),
+        // SCCs: AwbInfo.Scc.map((v) => v.code),
         iceWeight: 0,
       };
-
       Awbs.push(targetAwb);
     }
 
@@ -575,10 +557,6 @@ export class SimulatorResultService {
       Awbs: Awbs,
       Ulds: Ulds,
     };
-    console.log(
-      'packageSimulatorCallRequestObject = ',
-      packageSimulatorCallRequestObject,
-    );
     const psResult = await getOrderDischarge(packageSimulatorCallRequestObject);
 
     try {
@@ -667,23 +645,11 @@ export class SimulatorResultService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
+    // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
+    const asrsStateArray = await this.asrsHistoryService.nowState();
     // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
-    const skidPlatformHistorySubQueryBuilder =
-      this.skidPlatformHistoryRepository
-        .createQueryBuilder('sub_skidPlatformHistory')
-        .select('skid_platform_id, MAX(id) AS max_id')
-        .groupBy('skid_platform_id');
-    const skidPlatformHistoryResult = await this.skidPlatformHistoryRepository
-      .createQueryBuilder('skidPlatformHistory')
-      .leftJoinAndSelect('skidPlatformHistory.Awb', 'Awb')
-      .leftJoinAndSelect('skidPlatformHistory.Asrs', 'Asrs')
-      .where(
-        `(skidPlatformHistory.skid_platform_id, skidPlatformHistory.id) IN (${skidPlatformHistorySubQueryBuilder.getQuery()})`,
-      )
-      .andWhere('skidPlatformHistory.deleted_at IS NULL')
-      .orderBy('skidPlatformHistory.id', 'DESC')
-      .getMany();
-
+    const skidPlatformStateArray =
+      await this.skidPlatformHistoryService.nowState();
     // TODO 패키지 시뮬레이터에 자동창고 정보, 안착대 정보, uld 정보를 같이 묶어서 api 호출하기
     // TODO 나중에 패키지 시뮬레이터에 값을 주고 받는 데이터 format을 맞춰야 함
     // 호출하는 부분

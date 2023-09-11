@@ -28,10 +28,6 @@ export class SkidPlatformHistoryController {
     return this.skidPlatformHistoryService.create(createSkidPlatformHistoryDto);
   }
 
-  @ApiOperation({
-    summary: '안착대의 현재 상태를 가져오기',
-    description: '안착대id로 이력의 최신본만 가져오기',
-  })
   @ApiQuery({ name: 'Awb', required: false, type: 'number' })
   @ApiQuery({ name: 'Asrs', required: false, type: 'number' })
   @ApiQuery({ name: 'SkidPlatform', required: false, type: 'number' })
@@ -46,6 +42,10 @@ export class SkidPlatformHistoryController {
     return this.skidPlatformHistoryService.findAll(query);
   }
 
+  @ApiOperation({
+    summary: '안착대의 현재 상태를 가져오기',
+    description: '안착대id로 이력의 최신본만 가져오기',
+  })
   @Get('/now')
   StatusOfSkidplatform() {
     return this.skidPlatformHistoryService.nowState();

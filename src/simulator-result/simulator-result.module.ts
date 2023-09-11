@@ -12,6 +12,8 @@ import { MqttModule } from '../mqtt.module';
 import { BuildUpOrderService } from '../build-up-order/build-up-order.service';
 import { UldHistory } from '../uld-history/entities/uld-history.entity';
 import { Uld } from '../uld/entities/uld.entity';
+import { AsrsHistoryService } from '../asrs-history/asrs-history.service';
+import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
 @Module({
   imports: [
@@ -33,6 +35,11 @@ import { Uld } from '../uld/entities/uld.entity';
     MqttModule,
   ],
   controllers: [SimulatorResultController],
-  providers: [SimulatorResultService, BuildUpOrderService],
+  providers: [
+    SimulatorResultService,
+    BuildUpOrderService,
+    AsrsHistoryService,
+    SkidPlatformHistoryService,
+  ],
 })
 export class SimulatorResultModule {}
