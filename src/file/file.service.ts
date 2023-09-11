@@ -13,8 +13,12 @@ import console from 'console'; // Node.js v14 이상에서 사용 가능
 @Injectable()
 export class FileService {
   async readFile(filePath: string): Promise<Buffer> {
-    const fileContent = await fs.readFile(filePath);
-    return fileContent;
+    try {
+      const fileContent = await fs.readFile(filePath);
+      return fileContent;
+    } catch (error) {
+      throw new Error(`Error reading file: ${error.message}`);
+    }
   }
 
   async uploadFileToLocalServer(

@@ -122,11 +122,12 @@ export class SkidPlatformHistoryService {
     return this.skidPlatformHistoryRepository
       .createQueryBuilder('sph')
       .distinctOn(['sph.skid_platform_id'])
+      .leftJoinAndSelect('sph.SkidPlatform', 'SkidPlatform')
       .leftJoinAndSelect('sph.Asrs', 'Asrs')
       .leftJoinAndSelect('sph.Awb', 'Awb')
       .orderBy('sph.skid_platform_id')
       .addOrderBy('sph.id', 'DESC')
-      .getMany();
+      .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
   }
 
   update(
