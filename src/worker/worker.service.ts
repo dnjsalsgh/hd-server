@@ -25,7 +25,7 @@ export class WorkerService {
   }
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
   // * 10 * * * *
-  @Cron('* 10 * * * *', {
+  @Cron('* * 10 * * *', {
     name: 'missingAWBModelingFileHandlingLogic',
     timeZone: 'Asia/Seoul',
   })
@@ -44,14 +44,20 @@ export class WorkerService {
 
         // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정
         const fileContent = await this.fileService.readFile(filePath);
-
+        if (!fileContent) {
+          continue;
+        }
         const fileResult = await this.fileService.uploadFileToLocalServer(
           fileContent,
           `${name}.png`,
         );
 
         // upload된 파일의 경로를 awb정보에 update
-        await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
+        await this.awbService.modelingCompleteToHandlingPath(
+          name,
+          awb.id,
+          fileResult,
+        );
       }
     }
     console.log('Performing the action...');

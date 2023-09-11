@@ -10,12 +10,16 @@ import { WorkerModule } from './worker/worker.module';
 import { AppModule } from './app.module';
 import path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { winstonLogger } from './lib/logger/winston.util';
 
 declare const module: any;
 
 async function bootstrap() {
   // 1. http서버로 사용
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: true,
+    logger: winstonLogger,
+  });
   // 2. mqtt서버로 사용
   console.log(process.env.MQTT_HOST, process.env.MQTT_PORT);
   const mqttApp = await NestFactory.createMicroservice<MicroserviceOptions>(

@@ -661,7 +661,7 @@ export class SimulatorResultService {
     }
   }
 
-  // 패키지 시뮬레이터의 결과로 빌드업 작업지시만 만드는 곳
+  // 패키지 시뮬레이터의 결과로 [빌드업 작업지시]만 만드는 곳
   async createBuildUpOrderBySimulatorResult(apiRequest: PsApiRequest) {
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();

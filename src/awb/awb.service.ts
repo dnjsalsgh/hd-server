@@ -9,8 +9,10 @@ import {
   FindOperator,
   ILike,
   In,
+  IsNull,
   LessThanOrEqual,
   MoreThanOrEqual,
+  Not,
   QueryRunner,
   Repository,
   TypeORMError,
@@ -239,6 +241,9 @@ export class AwbService {
     // }
   }
 
+  /**
+   * mssql에서 vms 정보를 가져와서 등록하기 위한 로직
+   */
   async createWithMssql() {
     // vms와의 차이를 구하기 위해 awb의 총 개수를 구하기
     const queryRunner = this.dataSource.createQueryRunner();
@@ -290,6 +295,7 @@ export class AwbService {
         }
 
         // awb실시간 데이터 mqtt로 publish 하기 위함
+        // TODO: vms에서 데이터만 읽어왔는데 신호 보내는거 맞는건지 확인, 모델링까지 끝나야 신호보내는 상황과 비교
         this.client
           .send(`hyundai/vms1/readCompl`, {
             time: new Date().toISOString(),
@@ -506,13 +512,17 @@ export class AwbService {
     }
   }
 
-  async modelingCompleteToHandlingPath(name: string, filePath: string) {
+  async modelingCompleteToHandlingPath(
+    name: string,
+    awbId: number,
+    filePath: string,
+  ) {
     try {
-      const targetAwb = await this.awbRepository.findOne({
-        where: { name: name },
-      });
+      // const targetAwb = await this.awbRepository.findOne({
+      //   where: { name: name, modelPath: null },
+      // });
       // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
-      await this.awbRepository.update(targetAwb.id, { modelPath: filePath });
+      await this.awbRepository.update(awbId, { modelPath: filePath });
     } catch (e) {
       console.error(e);
     }
@@ -533,7 +543,7 @@ export class AwbService {
   async getAwbNotCombineModelPath() {
     return await this.awbRepository.find({
       where: {
-        modelPath: null, // modelPath가 null인 경우, modelPath가 빈 문자열인 경우
+        modelPath: IsNull(), // modelPath가 null인 경우, modelPath가 빈 문자열인 경우
       },
       order: { id: 'desc' },
     });
