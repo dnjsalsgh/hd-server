@@ -8,12 +8,14 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as process from 'process';
 import { WorkerModule } from './worker/worker.module';
 import { AppModule } from './app.module';
+import path from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 declare const module: any;
 
 async function bootstrap() {
   // 1. http서버로 사용
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // 2. mqtt서버로 사용
   console.log(process.env.MQTT_HOST, process.env.MQTT_PORT);
   const mqttApp = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -48,6 +50,10 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   console.log(`main server start port : ${port}`);
+
+  app.useStaticAssets(path.join(__dirname, '..', 'upload'), {
+    prefix: '/upload',
+  });
 
   // swagger 생성
   const config = new DocumentBuilder()
