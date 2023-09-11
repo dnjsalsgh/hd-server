@@ -17,7 +17,7 @@ import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity'
 import { SkidPlatformHistory } from '../../skid-platform-history/entities/skid-platform-history.entity';
 
 @Entity()
-@Unique(['Asrs', 'SkidPlatform', 'Awb'])
+@Unique(['Asrs', 'Awb']) // 어떤 안착대로 가는지 모르기 때문에 skidplatform 유니크 제거
 export class AsrsOutOrder {
   @PrimaryGeneratedColumn()
   id: number;
