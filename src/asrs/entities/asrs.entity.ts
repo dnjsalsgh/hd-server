@@ -23,7 +23,7 @@ export class Asrs {
     description: '창고 위치 이름',
   })
   @IsNotEmpty()
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 50, nullable: true, unique: true })
   name: string;
 
   @ApiProperty({
@@ -34,56 +34,56 @@ export class Asrs {
   @IsOptional()
   @Min(-1, { message: 'Value must be greater than -1' })
   @Column({ type: 'int', nullable: false, default: 0 })
-  parent: number;
+  parent?: number;
 
   @ApiProperty({
     example: 0,
     description: '창고 level',
   })
   @Column({ type: 'int', nullable: false, default: 0 })
-  level: number;
+  level?: number;
 
   @ApiProperty({
     example: 'fullPath',
     description: '창고의 위치',
   })
   @Column({ type: 'varchar', length: 500, nullable: true })
-  fullPath: string;
+  fullPath?: string;
 
   @ApiProperty({
     example: 0,
     description: '넣은 순서',
   })
   @Column({ type: 'int', nullable: true })
-  orderby: number;
+  orderby?: number;
 
   @ApiProperty({
     example: 0,
     description: 'x좌표',
   })
   @Column({ type: 'double precision', nullable: true })
-  x: number;
+  x?: number;
 
   @ApiProperty({
     example: 0,
     description: 'y좌표',
   })
   @Column({ type: 'double precision', nullable: true })
-  y: number;
+  y?: number;
 
   @ApiProperty({
     example: 0,
     description: 'z좌표',
   })
   @Column({ type: 'double precision', nullable: true })
-  z: number;
+  z?: number;
 
   @ApiProperty({
     example: true,
     description: '시뮬레이션 모드 확인',
   })
   @Column({ type: 'boolean', nullable: false, default: true })
-  simulation: boolean;
+  simulation?: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

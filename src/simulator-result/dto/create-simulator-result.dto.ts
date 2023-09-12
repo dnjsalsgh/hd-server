@@ -8,6 +8,7 @@ export class CreateSimulatorResultDto extends PickType(SimulatorResult, [
   'endDate',
   'loadRate',
   'version',
+  'simulation',
   'Uld',
 ]) {
   @ApiProperty({

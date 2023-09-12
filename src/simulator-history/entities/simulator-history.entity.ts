@@ -39,6 +39,13 @@ export class SimulatorHistory {
   @Column({ type: 'double precision', nullable: true })
   z: number;
 
+  @ApiProperty({
+    example: true,
+    description: '시뮬레이션 모드',
+  })
+  @Column({ nullable: true })
+  simulation: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

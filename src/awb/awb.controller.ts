@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
+  NotFoundException,
   OnModuleInit,
   Param,
   ParseIntPipe,
@@ -25,12 +27,13 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Awb } from './entities/awb.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
 import path from 'path';
 import console from 'console';
 import { ConfigService } from '@nestjs/config';
+import { take } from 'rxjs';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -39,6 +42,7 @@ export class AwbController implements OnModuleInit {
     private readonly awbService: AwbService,
     private readonly fileService: FileService,
     private readonly configService: ConfigService,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
   private dTimer = +this.configService.getOrThrow('TIMER');
@@ -185,72 +189,54 @@ export class AwbController implements OnModuleInit {
     return this.awbService.remove(+id);
   }
 
-  @ApiOperation({ summary: '파일 업로드 하기' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-  }
-
   // VMS 설비데이터 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
   async createByPlcMatt(@Payload() data) {
-    // TODO: edge에서 데이터 형식이 정해지면 로직 변경
-    // 만약 누락된 데이터를 등록하기 위한 과정
-    if (data && data.count) {
-      await this.awbService.preventMissingData(data.count);
-    }
-    return this.awbService.create(data);
+    // vms 데이터 mqtt로 publish 하기 위함
+    this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
-  // 3D 모델링파일 생성 완료 트리거
+  // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
   @MessagePattern('hyundai/vms1/createFile') //구독하는 주제
   async updateFileByMqttSignal(@Payload() data) {
+    // mssql의 vms 테이블에서
+    const oneVmsData = await this.awbService.getAwbByVmsAndMssql();
+
     // nas 서버 접속해서 이미지 파일을 다운 받고 upload 진행하기
-    if (data.name) {
-      const name = data.name as string;
+    if (oneVmsData && oneVmsData[0].name) {
+      const name = oneVmsData[0].name as string;
       const user = 'wmh';
       const documentsFolder = 'Documents';
       const filename = `${name}.png`;
       const directory = path.join('C:', 'Users', user, documentsFolder);
       const filePath = path.join(directory, filename);
 
+      // mssql에서 가져온 10개의 데이터를 저장하기 위함
+      await this.awbService.createWithMssql();
+
       // vms데이터를 받았다는 신호를전송합니다
       await this.awbService.modelingCompleteWithNAS(name);
 
       // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정
       const fileContent = await this.fileService.readFile(filePath);
-
-      const fileResult = await this.fileService.uploadFileToLocalServer(
-        fileContent,
-        `${name}.png`,
-      );
-
-      // upload된 파일의 경로를 awb정보에 update
-      await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
-
-      if (this.dTimer === 0) {
-        this.performAction();
-      } else {
-        this.resetTimer();
+      if (fileContent) {
+        const fileResult = await this.fileService.uploadFileToLocalServer(
+          fileContent,
+          `${name}.png`,
+        );
+        // upload된 파일의 경로를 awb정보에 update
+        await this.awbService.modelingCompleteToHandlingPath(
+          name,
+          oneVmsData[0].id,
+          fileResult,
+        );
       }
-      console.log('File uploaded to:', fileResult);
+    } else {
+      new NotFoundException('vms 테이블에 연결할 수 없습니다.');
     }
-    if (data && data.count && data.count > 1) {
-      await this.awbService.preventMissingData(data.count);
-    }
+    // if (data && data.count && data.count > 1) {
+    //   await this.awbService.preventMissingData(data.count);
+    // }
   }
 
   onModuleInit() {
@@ -261,6 +247,11 @@ export class AwbController implements OnModuleInit {
     if (!this.timer) {
       this.timer = setInterval(() => {
         this.dTimer -= 1;
+        if (this.dTimer === 0) {
+          this.performAction();
+        } else {
+          this.resetTimer();
+        }
       }, 1000);
     }
   }
@@ -283,7 +274,8 @@ export class AwbController implements OnModuleInit {
         const user = 'wmh';
         const documentsFolder = 'Documents';
         const filename = `${name}.png`;
-        const directory = path.join('C:', 'Users', user, documentsFolder);
+        // const directory = path.join('C:', 'Users', user, documentsFolder);
+        const directory = path.join('G:', '내 드라이브');
         const filePath = path.join(directory, filename);
 
         // vms데이터를 받았다는 신호를전송합니다
@@ -298,7 +290,11 @@ export class AwbController implements OnModuleInit {
         );
 
         // upload된 파일의 경로를 awb정보에 update
-        await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
+        await this.awbService.modelingCompleteToHandlingPath(
+          name,
+          awb.id,
+          fileResult,
+        );
       }
     }
     console.log('Performing the action...');

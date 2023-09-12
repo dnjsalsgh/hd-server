@@ -5,6 +5,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Relation,
   UpdateDateColumn,
@@ -14,6 +15,7 @@ import { CommonCode } from '../../common-code/entities/common-code.entity';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Awb } from '../../awb/entities/awb.entity';
+import { TimeTable } from '../../time-table/entities/time-table.entity';
 
 @Entity()
 export class AircraftSchedule {
@@ -133,6 +135,14 @@ export class AircraftSchedule {
   })
   @JoinColumn({ name: 'cc_id_departure' }) // 원하는 컬럼 이름을 지정합니다.
   CcIdDeparture: Relation<CommonCode> | number;
+
+  @ApiProperty({
+    example: 1,
+    description: '타임 테이블 FK',
+    type: () => TimeTable,
+  })
+  @OneToMany(() => TimeTable, (timeTable) => timeTable.AircraftSchedule)
+  TimeTables: Relation<TimeTable[]>;
 }
 
 export const AircraftScheduleAttributes = {

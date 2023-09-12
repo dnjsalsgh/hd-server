@@ -11,7 +11,7 @@ import {
 import { AsrsHistoryService } from './asrs-history.service';
 import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AsrsHistory } from './entities/asrs-history.entity';
 
@@ -35,6 +35,15 @@ export class AsrsHistoryController {
   @Get()
   findAll(@Query() query: AsrsHistory & BasicQueryParamDto) {
     return this.asrsHistoryService.findAll(query);
+  }
+
+  @ApiOperation({
+    summary: '창고의 현재 상태를 가져오기',
+    description: '창고id로 이력의 최신본만 가져오기',
+  })
+  @Get('/now')
+  StatusOfAsrs() {
+    return this.asrsHistoryService.nowState();
   }
 
   @Get(':id')

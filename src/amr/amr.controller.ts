@@ -13,7 +13,6 @@ import { CreateAmrDto } from './dto/create-amr.dto';
 import { UpdateAmrDto } from './dto/update-amr.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AmrRawDto } from './dto/amr-raw.dto';
-import { Cron, Interval } from '@nestjs/schedule';
 
 @Controller('amr')
 @ApiTags('[Amr]amr')

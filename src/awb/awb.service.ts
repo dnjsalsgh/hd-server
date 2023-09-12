@@ -3,13 +3,16 @@ import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  Any,
   Between,
   DataSource,
   FindOperator,
   ILike,
   In,
+  IsNull,
   LessThanOrEqual,
   MoreThanOrEqual,
+  Not,
   QueryRunner,
   Repository,
   TypeORMError,
@@ -29,7 +32,7 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
 import { Vms } from '../vms/entities/vms.entity';
-import { CreateAwbWithAircraftDto } from '@/awb/dto/create-awb-with-aircraft.dto';
+import { CreateAwbWithAircraftDto } from '../awb/dto/create-awb-with-aircraft.dto';
 
 @Injectable()
 export class AwbService {
@@ -238,82 +241,74 @@ export class AwbService {
     // }
   }
 
+  /**
+   * mssql에서 vms 정보를 가져와서 등록하기 위한 로직
+   */
   async createWithMssql() {
-    try {
-      // vms와의 차이를 구하기 위해 awb의 총 개수를 구하기
-      const awbAllCount = await this.awbRepository.count();
+    // vms와의 차이를 구하기 위해 awb의 총 개수를 구하기
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
 
-      // 1 ~ 100 / 101 ~ 200 / 201 ~ 300 ... 누락된 데이터를 찾음
-      // for (let i = 0; i <= Math.floor(vmsMissCount / 100); i++) {
-      const vmsResult = await this.vmsRepository.find({
-        order: orderByUtil(null),
-        take: 100,
-        // skip: 100 * i,
-      });
-      // 누락된 데이터찾기 & 누락되었다면 입력
+    const vmsResult = await this.vmsRepository.find({
+      order: orderByUtil(null),
+      take: 30, // mssql에서 30개만 가져옴
+      // skip: 100 * i,
+    });
+    // 누락된 데이터찾기 & 누락되었다면 입력
+    try {
       for (const vms of vmsResult) {
-        // const existVms = awbResult.find((awb) => awb.name === vms.name);
-        // if (!existVms) {
+        await queryRunner.startTransaction();
         // vms에 등록된 scc 정보 찾기
-        const sccResult = await this.sccRepository.find({
-          where: { code: In(vms.scc.split(',')) },
-        });
-        const createAwbDto: CreateAwbWithAircraftDto = {
-          // awb
+
+        // awb 등록하는 부분
+        const createAwbDto: Partial<CreateAwbDto> = {
           name: vms.name,
-          prefab: vms.prefab,
           waterVolume: vms.waterVolume,
-          squareVolume: vms.squareVolume,
           width: vms.width,
           length: vms.length,
           depth: vms.depth,
           weight: vms.weight,
-          isStructure: vms.isStructure,
-          barcode: vms.barcode,
-          // destination: vms.destination,
-          // source: vms.source,
-          breakDown: vms.breakDown,
-          piece: vms.piece,
           state: vms.state,
-          parent: vms.parent,
           modelPath: vms.modelPath,
-          simulation: vms.simulation,
-          dataCapacity: vms.dataCapacity,
-          flight: vms.flight,
-          from: vms.from,
-          airportArrival: vms.airportArrival,
-          path: vms.path,
-          spawnRatio: vms.spawnRatio,
-          description: vms.description,
-          rmComment: vms.rmComment,
-          localTime: vms.localTime,
-          localInTerminal: vms.localInTerminal,
-          //
-          scc: sccResult,
-          aircraftName: vms.aircraftName,
-          aircraftCode: vms.aircraftCode,
-          aircraftInfo: vms.aircraftInfo,
-          allow: vms.allow,
-          allowDryIce: vms.allowDryIce,
-          source: vms.source,
-          localDepartureTime: vms.localDepartureTime,
-          koreaArrivalTime: vms.koreaArrivalTime,
-          workStartTime: vms.workStartTime,
-          workCompleteTargetTime: vms.workCompleteTargetTime,
-          koreaDepartureTime: vms.koreaDepartureTime,
-          localArrivalTime: vms.localArrivalTime,
-          waypoint: [vms.waypoint],
-          destination: vms.destination,
-          departure: vms.departure,
+          // scc: sccResult,
         };
 
-        await this.create(createAwbDto);
-        // }
-        // }
+        // 2. awb를 입력하기
+        const awbResult = await queryRunner.manager
+          .getRepository(Awb)
+          .save(createAwbDto);
+
+        // scc 정보, awb이 입력되어야 동작하게끔
+        // 4. 입력된 scc찾기
+        if (vms.Sccs) {
+          const sccResult = await this.sccRepository.find({
+            where: { code: In(vms.Sccs.split(',')) },
+          });
+          // 5. awb와 scc를 연결해주기 위한 작업
+          const joinParam = sccResult.map((item) => {
+            return {
+              Awb: awbResult.id,
+              Scc: item.id,
+            };
+          });
+          await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+        }
+
+        // awb실시간 데이터 mqtt로 publish 하기 위함
+        // TODO: vms에서 데이터만 읽어왔는데 신호 보내는거 맞는건지 확인, 모델링까지 끝나야 신호보내는 상황과 비교
+        this.client
+          .send(`hyundai/vms1/readCompl`, {
+            time: new Date().toISOString(),
+          })
+          .pipe(take(1))
+          .subscribe();
+        await queryRunner.commitTransaction();
       }
-      // }
-    } catch (e) {
-      throw new TypeORMError(`rollback Working - ${e}`);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -517,13 +512,17 @@ export class AwbService {
     }
   }
 
-  async modelingCompleteToHandlingPath(name: string, filePath: string) {
+  async modelingCompleteToHandlingPath(
+    name: string,
+    awbId: number,
+    filePath: string,
+  ) {
     try {
-      const targetAwb = await this.awbRepository.findOne({
-        where: { name: name },
-      });
+      // const targetAwb = await this.awbRepository.findOne({
+      //   where: { name: name, modelPath: null },
+      // });
       // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
-      await this.awbRepository.update(targetAwb.id, { modelPath: filePath });
+      await this.awbRepository.update(awbId, { modelPath: filePath });
     } catch (e) {
       console.error(e);
     }
@@ -543,10 +542,17 @@ export class AwbService {
 
   async getAwbNotCombineModelPath() {
     return await this.awbRepository.find({
-      where: [
-        { modelPath: '' }, // modelPath가 빈 문자열인 경우
-        { modelPath: null }, // modelPath가 null인 경우
-      ],
+      where: {
+        modelPath: IsNull(), // modelPath가 null인 경우, modelPath가 빈 문자열인 경우
+      },
+      order: { id: 'desc' },
+    });
+  }
+
+  async getAwbByVmsAndMssql() {
+    return await this.vmsRepository.find({
+      order: orderByUtil(null),
+      take: 1,
     });
   }
 
@@ -576,61 +582,26 @@ export class AwbService {
         // 누락된 데이터찾기 & 누락되었다면 입력
         for (const vms of vmsResult) {
           const existVms = awbResult.find((awb) => awb.name === vms.name);
-          if (!existVms) {
-            // vms에 등록된 scc 정보 찾기
+          if (!existVms && vms.Sccs) {
+            // vms가 존재하고 Sccs가 존재한다면 vms에 등록된 scc 정보 찾기
             const sccResult = await this.sccRepository.find({
-              where: { code: In(vms.scc.split(',')) },
+              where: { code: In(vms.Sccs.split(',')) },
             });
-            const createAwbDto: CreateAwbWithAircraftDto = {
-              // awb
+
+            // awb 등록하는 부분
+            const createAwbDto: Partial<CreateAwbDto> = {
               name: vms.name,
-              prefab: vms.prefab,
               waterVolume: vms.waterVolume,
-              squareVolume: vms.squareVolume,
               width: vms.width,
               length: vms.length,
               depth: vms.depth,
               weight: vms.weight,
-              isStructure: vms.isStructure,
-              barcode: vms.barcode,
-              // destination: vms.destination,
-              // source: vms.source,
-              breakDown: vms.breakDown,
-              piece: vms.piece,
               state: vms.state,
-              parent: vms.parent,
               modelPath: vms.modelPath,
-              simulation: vms.simulation,
-              dataCapacity: vms.dataCapacity,
-              flight: vms.flight,
-              from: vms.from,
-              airportArrival: vms.airportArrival,
-              path: vms.path,
-              spawnRatio: vms.spawnRatio,
-              description: vms.description,
-              rmComment: vms.rmComment,
-              localTime: vms.localTime,
-              localInTerminal: vms.localInTerminal,
-              //
               scc: sccResult,
-              aircraftName: vms.aircraftName,
-              aircraftCode: vms.aircraftCode,
-              aircraftInfo: vms.aircraftInfo,
-              allow: vms.allow,
-              allowDryIce: vms.allowDryIce,
-              source: vms.source,
-              localDepartureTime: vms.localDepartureTime,
-              koreaArrivalTime: vms.koreaArrivalTime,
-              workStartTime: vms.workStartTime,
-              workCompleteTargetTime: vms.workCompleteTargetTime,
-              koreaDepartureTime: vms.koreaDepartureTime,
-              localArrivalTime: vms.localArrivalTime,
-              waypoint: [vms.waypoint],
-              destination: vms.destination,
-              departure: vms.departure,
             };
 
-            await this.create(createAwbDto);
+            await this.awbRepository.create(createAwbDto);
           }
         }
       }

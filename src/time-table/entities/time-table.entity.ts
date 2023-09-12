@@ -12,6 +12,7 @@ import { Uld } from '../../uld/entities/uld.entity';
 import { Amr } from '../../amr/entities/amr.entity';
 import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Entity()
 export class TimeTable {
@@ -56,4 +57,14 @@ export class TimeTable {
   })
   @ManyToOne(() => Awb, (awb) => awb.TimeTables)
   Awb: Relation<Awb> | number;
+
+  @ApiProperty({
+    example: 1,
+    description: '항공편 FK',
+  })
+  @ManyToOne(
+    () => AircraftSchedule,
+    (aircraftSchedule) => aircraftSchedule.TimeTables,
+  )
+  AircraftSchedule: Relation<AircraftSchedule> | number;
 }

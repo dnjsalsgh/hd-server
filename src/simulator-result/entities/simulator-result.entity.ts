@@ -50,6 +50,13 @@ export class SimulatorResult {
   @Column({ type: 'varchar', length: 5, nullable: true })
   version: number;
 
+  @ApiProperty({
+    example: true,
+    description: '시뮬레이션 모드',
+  })
+  @Column({ nullable: true })
+  simulation: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

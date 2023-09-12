@@ -5,4 +5,5 @@ export class CreateTimeTableDto extends PickType(TimeTable, ['data']) {
   Uld?: number;
   Amr?: number;
   Awb?: number;
+  AircraftSchedule?: number;
 }

@@ -1,9 +1,5 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import { Aircraft } from '../../aircraft/entities/aircraft.entity';
-import { CommonCode } from '../../common-code/entities/common-code.entity';
+import { PickType } from '@nestjs/swagger';
 import { AircraftSchedule } from '../entities/aircraft-schedule.entity';
-import { DeepPartial } from 'typeorm/common/DeepPartial';
-import { Column } from 'typeorm';
 
 export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
   'source',

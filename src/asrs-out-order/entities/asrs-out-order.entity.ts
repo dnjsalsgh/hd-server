@@ -17,7 +17,7 @@ import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity'
 import { SkidPlatformHistory } from '../../skid-platform-history/entities/skid-platform-history.entity';
 
 @Entity()
-@Unique(['Asrs', 'SkidPlatform', 'Awb'])
+@Unique(['Asrs', 'Awb']) // 어떤 안착대로 가는지 모르기 때문에 skidplatform 유니크 제거
 export class AsrsOutOrder {
   @PrimaryGeneratedColumn()
   id: number;
@@ -54,7 +54,7 @@ export class AsrsOutOrder {
   @ManyToOne(() => SkidPlatform, (skidPlatform) => skidPlatform.asrsOutOrders, {
     nullable: true,
   })
-  SkidPlatform: Relation<SkidPlatform> | number; // 어떤 안착대로 가는지 정해지지 않았기 때문에 null 허용
+  SkidPlatform: Relation<SkidPlatform> | number | null; // 어떤 안착대로 가는지 정해지지 않았기 때문에 null 허용
 
   @ApiProperty({
     example: 1,

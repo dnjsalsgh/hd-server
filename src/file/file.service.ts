@@ -1,6 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import * as fs from 'fs/promises';
-import path from 'path'; // Node.js v14 이상에서 사용 가능
+import path from 'path';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import console from 'console'; // Node.js v14 이상에서 사용 가능
 
 @Injectable()
 export class FileService {
@@ -11,6 +19,9 @@ export class FileService {
     } catch (error) {
       throw new Error(`Error reading file: ${error.message}`);
     }
+    // // 첫 번재 파일이 없어도 다른 파일을 찾아볼 수 있게 에러처리 안해보기
+    // const fileContent = await fs.readFile(filePath);
+    // return fileContent;
   }
 
   async uploadFileToLocalServer(
@@ -39,3 +50,23 @@ export class FileService {
     }
   }
 }
+
+// controller에서 file 업로드 기본 형태
+// @ApiOperation({ summary: '파일 업로드 하기' })
+// @ApiConsumes('multipart/form-data')
+// @ApiBody({
+//   schema: {
+//     type: 'object',
+//     properties: {
+//       file: {
+//         type: 'string',
+//         format: 'binary',
+//       },
+//     },
+//   },
+// })
+// @Post('upload')
+// @UseInterceptors(FileInterceptor('file'))
+// uploadFile(@UploadedFile() file: Express.Multer.File) {
+//   console.log(file);
+// }

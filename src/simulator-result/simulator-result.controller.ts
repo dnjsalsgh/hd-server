@@ -23,31 +23,23 @@ export class SimulatorResultController {
     private readonly simulatorResultService: SimulatorResultService,
   ) {}
 
-  @Post()
-  create(@Body() createSimulatorResultDto: CreateSimulatorResultDto) {
-    return this.simulatorResultService.create(createSimulatorResultDto);
-  }
+  // @Post()
+  // create(@Body() createSimulatorResultDto: CreateSimulatorResultDto) {
+  //   return this.simulatorResultService.create(createSimulatorResultDto);
+  // }
 
-  // 개발 초기에 패키지 시뮬레이터 가정하고 만든 api라 안쓰일거 같아서 주석처리
   // @ApiOperation({
   //   summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
   // })
-  // @Post('/make-order')
-  // createOrder(@Body() body: CreateSimulatorResultOrderDto) {
-  //   return this.simulatorResultService.createOrder(body);
+  // @Post('/make-order/with/ps')
+  // createOrderByPs(@Body() body: PsApiRequest) {
+  //   return this.simulatorResultService.createOrderByResult(body);
   // }
 
   @ApiOperation({
-    summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
-  })
-  @Post('/make-order/with/ps')
-  createOrderByPs(@Body() body: PsApiRequest) {
-    return this.simulatorResultService.createOrderByResult(body);
-  }
-
-  @ApiOperation({
     summary: '패키지 시뮬레이터를 사용해서 uld 작업지시 만들기',
-    description: '',
+    description:
+      'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
   @ApiBody({})
   @Post('/make-build-up-order-order/with/ps')
@@ -59,8 +51,10 @@ export class SimulatorResultController {
 
   @ApiOperation({
     summary: '패키지 시뮬레이터를 사용해서 asrs작업지시 만들기',
+    description:
+      'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
-  @ApiBody({})
+  @ApiBody({ type: PsApiRequest })
   @Post('/make-asrs-out-order/with/ps')
   createAsrsOutOrderBySimulatorResult(@Body() body: PsApiRequest) {
     return this.simulatorResultService.createAsrsOutOrderBySimulatorResult(

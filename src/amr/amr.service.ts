@@ -172,11 +172,13 @@ export class AmrService {
       // amr실시간 데이터 mqtt로 publish 하기 위함
       this.client
         .send(`${body.Amrld.toString()}`, {
-          amrBody: amrBody,
-          amrChargerBody: amrChargerBody,
-          amrChargeHistoryBody: amrChargeHistoryBody,
-          timeTableBody: timeTableBody,
-          time: new Date().toISOString(),
+          // amrBody: amrBody,
+          // amrChargerBody: amrChargerBody,
+          // amrChargeHistoryBody: amrChargeHistoryBody,
+          // timeTableBody: timeTableBody,
+          // time: new Date().toISOString(),
+          ...amrBody,
+          ...timeTableBody,
         })
         .pipe(take(1))
         .subscribe();
@@ -198,8 +200,17 @@ export class AmrService {
   async createAmrByMssql() {
     const bodys: AmrRawDto[] = await this.hacsRepository.find({
       order: orderByUtil(null),
-      take: 100, // 최소한만 가져오려고 함(100)
+      take: 50, // 최소한만 가져오려고 함(100 개)
     });
+
+    // amr실시간 데이터 mqtt로 publish 하기 위함
+    this.client
+      .send(`/hyundai/amr/realData`, {
+        bodys,
+      })
+      .pipe(take(1))
+      .subscribe();
+
     for (const body of bodys) {
       // 충전중 판단을 위한 findOne
       // const lastAmrByName = await this.amrRepository.findOne({
@@ -228,15 +239,15 @@ export class AmrService {
 
       const amrChargerBody: CreateAmrChargerDto = {
         name: body.Amrld.toString(),
-        working: body.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
-        x: body.ChargeX, // 유니티에서 보여지는 amr의 x좌표
-        y: body.ChargeY, // 유니티에서 보여지는 amr의 y좌표
-        z: body.ChargeZ, // 유니티에서 보여지는 amr의 z좌표
+        working: body?.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
+        // x: body?.ChargeX, // 유니티에서 보여지는 amr의 x좌표
+        // y: body?.ChargeY, // 유니티에서 보여지는 amr의 y좌표
+        // z: body?.ChargeZ, // 유니티에서 보여지는 amr의 z좌표
       };
 
       const amrChargeHistoryBody: CreateAmrChargeHistoryDto = {
-        chargeStart: body.StartTime,
-        chargeEnd: body.EndTime,
+        chargeStart: body?.StartTime,
+        chargeEnd: body?.EndTime,
         soc: body.SOC?.toString(),
         soh: body.SOH?.toString(),
         // 밑쪽 로직에서 값 주입되어서 기본값 null
@@ -318,19 +329,8 @@ export class AmrService {
           Amr: amrResult.identifiers[0].id,
         };
 
-        await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
+        // await queryRunner.manager.getRepository(TimeTable).save(timeTableBody);
 
-        // amr실시간 데이터 mqtt로 publish 하기 위함
-        // this.client
-        //   .send(`${body.Amrld.toString()}`, {
-        //     amrBody: amrBody,
-        //     amrChargerBody: amrChargerBody,
-        //     amrChargeHistoryBody: amrChargeHistoryBody,
-        //     timeTableBody: timeTableBody,
-        //     time: new Date().toISOString(),
-        //   })
-        //   .pipe(take(1))
-        //   .subscribe();
         //
         // // timeTalbe log 남기기
         // this.loggerService.log({

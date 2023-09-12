@@ -2,38 +2,36 @@ import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { LoggerService } from './logger.service';
+import { winstonLogger } from './winston.util';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
   constructor(private readonly configService: ConfigService) {}
+
   private logger = new Logger('HTTP');
+  use(req: Request, res: Response, next: NextFunction) {
+    const { ip, method, originalUrl } = req;
+    const userAgent = req.get('user-agent');
 
-  use(request: Request, response: Response, next: NextFunction): void {
-    const { ip, method, originalUrl } = request;
-    const userAgent = request.get('user-agent');
-    const env = this.configService.get('NODE_ENV');
-    response.on('finish', () => {
-      const { statusCode } = response;
-      const contentLength = response.get('content-length');
-      const logMessage =
-        env === 'dev'
-          ? `${method} ${originalUrl} ${statusCode}`
-          : `${method} ${originalUrl} ${statusCode} ${env} ${contentLength} - ${userAgent} ${ip}`;
-      this.logger.log(logMessage);
+    res.on('finish', () => {
+      const { statusCode } = res;
+
+      if (statusCode >= 400 && statusCode < 500)
+        winstonLogger.warn(
+          `[${method}]${originalUrl}(${statusCode}) ${ip} ${userAgent}`,
+        );
+      else if (statusCode >= 500)
+        winstonLogger.error(
+          `[${method}]${originalUrl}(${statusCode}) ${ip} ${userAgent}`,
+        );
     });
-
-    const loggerService = new LoggerService(
-      request.url.slice(1).split('/')[
-        request.url.slice(1).split('/').length - 1
-      ],
-    );
-    const tempUrl = request.method + ' ' + request.url.split('?')[0];
-    const _headers = request.headers ? request.headers : {};
-    const _query = request.query ? request.query : {};
-    const _body = request.body ? request.body : {};
+    const tempUrl = req.method + ' ' + req.baseUrl.split('?')[0];
+    const _headers = req.headers ? req.headers : {};
+    const _query = req.query ? req.query : {};
+    const _body = req.body ? req.body : {};
     const _url = tempUrl ? tempUrl : {};
 
-    loggerService.info(
+    winstonLogger.log(
       JSON.stringify({
         url: _url,
         headers: _headers,
@@ -41,7 +39,6 @@ export class LoggerMiddleware implements NestMiddleware {
         body: _body,
       }),
     );
-
     next();
   }
 }

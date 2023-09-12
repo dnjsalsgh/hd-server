@@ -42,6 +42,15 @@ export class SkidPlatformHistoryController {
     return this.skidPlatformHistoryService.findAll(query);
   }
 
+  @ApiOperation({
+    summary: '안착대의 현재 상태를 가져오기',
+    description: '안착대id로 이력의 최신본만 가져오기',
+  })
+  @Get('/now')
+  StatusOfSkidplatform() {
+    return this.skidPlatformHistoryService.nowState();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.skidPlatformHistoryService.findOne(+id);
