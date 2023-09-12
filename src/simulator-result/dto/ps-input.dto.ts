@@ -46,5 +46,10 @@ export class PsApiRequest {
     description: 'Uld의 code',
   })
   UldCode: string;
+  @ApiProperty({
+    example: true,
+    description: '시뮬레이션 모드 확인',
+  })
+  simulation: boolean;
   prohibitionListSCCs: string[][];
 }

@@ -225,7 +225,11 @@ export class AwbController implements OnModuleInit {
           `${name}.png`,
         );
         // upload된 파일의 경로를 awb정보에 update
-        await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
+        await this.awbService.modelingCompleteToHandlingPath(
+          name,
+          oneVmsData[0].id,
+          fileResult,
+        );
       }
     } else {
       new NotFoundException('vms 테이블에 연결할 수 없습니다.');
@@ -286,7 +290,11 @@ export class AwbController implements OnModuleInit {
         );
 
         // upload된 파일의 경로를 awb정보에 update
-        await this.awbService.modelingCompleteToHandlingPath(name, fileResult);
+        await this.awbService.modelingCompleteToHandlingPath(
+          name,
+          awb.id,
+          fileResult,
+        );
       }
     }
     console.log('Performing the action...');

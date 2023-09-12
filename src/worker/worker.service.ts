@@ -30,36 +30,36 @@ export class WorkerService {
     timeZone: 'Asia/Seoul',
   })
   async missingAWBModelingFileHandlingLogic() {
-    const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
-    if (missModelAwbList && missModelAwbList.length > 0) {
-      for (const awb of missModelAwbList) {
-        const name = awb.name;
-        const user = 'wmh';
-        const documentsFolder = 'Documents';
-        const filename = `${name}.png`;
-        // const directory = path.join('C:', 'Users', user, documentsFolder);
-        const directory = path.join('G:', '내 드라이브');
-
-        const filePath = path.join(directory, filename);
-
-        // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정
-        const fileContent = await this.fileService.readFile(filePath);
-        if (!fileContent) {
-          continue;
-        }
-        const fileResult = await this.fileService.uploadFileToLocalServer(
-          fileContent,
-          `${name}.png`,
-        );
-
-        // upload된 파일의 경로를 awb정보에 update
-        await this.awbService.modelingCompleteToHandlingPath(
-          name,
-          awb.id,
-          fileResult,
-        );
-      }
-    }
-    console.log('Performing the action...');
+    // const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
+    // if (missModelAwbList && missModelAwbList.length > 0) {
+    //   for (const awb of missModelAwbList) {
+    //     const name = awb.name;
+    //     const user = 'wmh';
+    //     const documentsFolder = 'Documents';
+    //     const filename = `${name}.png`;
+    //     // const directory = path.join('C:', 'Users', user, documentsFolder);
+    //     const directory = path.join('G:', '내 드라이브');
+    //
+    //     const filePath = path.join(directory, filename);
+    //
+    //     // nas 서버에 있는 폴더의 경로, 현재는 테스트용도로 서버 로컬 컴퓨터에 지정
+    //     const fileContent = await this.fileService.readFile(filePath);
+    //     if (!fileContent) {
+    //       continue;
+    //     }
+    //     const fileResult = await this.fileService.uploadFileToLocalServer(
+    //       fileContent,
+    //       `${name}.png`,
+    //     );
+    //
+    //     // upload된 파일의 경로를 awb정보에 update
+    //     await this.awbService.modelingCompleteToHandlingPath(
+    //       name,
+    //       awb.id,
+    //       fileResult,
+    //     );
+    //   }
+    // }
+    // console.log('Performing the action...');
   }
 }

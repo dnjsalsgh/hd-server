@@ -38,7 +38,8 @@ export class SimulatorResultController {
 
   @ApiOperation({
     summary: '패키지 시뮬레이터를 사용해서 uld 작업지시 만들기',
-    description: '',
+    description:
+      'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
   @ApiBody({})
   @Post('/make-build-up-order-order/with/ps')
@@ -49,26 +50,14 @@ export class SimulatorResultController {
   }
 
   @ApiOperation({
-    summary: '[커넥티드 모드] 패키지 시뮬레이터를 사용해서 asrs작업지시 만들기',
+    summary: '패키지 시뮬레이터를 사용해서 asrs작업지시 만들기',
+    description:
+      'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
   @ApiBody({ type: PsApiRequest })
   @Post('/make-asrs-out-order/with/ps')
   createAsrsOutOrderBySimulatorResult(@Body() body: PsApiRequest) {
     return this.simulatorResultService.createAsrsOutOrderBySimulatorResult(
-      body,
-    );
-  }
-
-  @ApiOperation({
-    summary:
-      '[시뮬레이션 모드] 패키지 시뮬레이터를 사용해서 asrs작업지시 만들기',
-  })
-  @ApiBody({ type: PsApiRequest })
-  @Post('/make-asrs-out-order/with/ps/simulation')
-  createAsrsOutOrderBySimulatorResultWhenSimulation(
-    @Body() body: PsApiRequest,
-  ) {
-    return this.simulatorResultService.createAsrsOutOrderBySimulatorResultWhenSimulation(
       body,
     );
   }

@@ -126,7 +126,7 @@ export class Amr {
 
   @ApiProperty({
     example: true,
-    description: '시뮬레아션 모드',
+    description: '시뮬레이션 모드',
   })
   @Column({ nullable: false })
   simulation: boolean;
