@@ -32,7 +32,7 @@ export class WorkerService {
 
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
   // * 10 * * * *
-  @Cron('*/10 * * * * *', {
+  @Cron('* 10 * * * *', {
     name: 'missingAWBModelingFileHandlingLogic',
     timeZone: 'Asia/Seoul',
   })
@@ -74,6 +74,6 @@ export class WorkerService {
         }
       }
     }
-    console.log('Performing the action...');
+    console.log('modeling complete');
   }
 }

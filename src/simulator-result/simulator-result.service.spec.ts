@@ -3,7 +3,7 @@ import { SimulatorResultService } from './simulator-result.service';
 import {
   setDataSourceForTest,
   setTypeOrmForTest,
-} from '../lib/util/testSetTypeorm.util';
+} from '../lib/util/testSettingTypeorm.util';
 import { SimulatorResultModule } from './simulator-result.module';
 import { DataSource, Repository, TypeORMError } from 'typeorm';
 import { SimulatorResult } from './entities/simulator-result.entity';
