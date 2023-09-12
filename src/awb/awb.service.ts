@@ -513,16 +513,21 @@ export class AwbService {
   }
 
   async modelingCompleteToHandlingPath(
-    name: string,
-    awbId: number,
+    fileName: string,
+    awbName: string,
     filePath: string,
   ) {
     try {
-      // const targetAwb = await this.awbRepository.findOne({
-      //   where: { name: name, modelPath: null },
-      // });
+      const targetAwb = await this.awbRepository.findOne({
+        where: { name: awbName, modelPath: null },
+      });
       // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
-      await this.awbRepository.update(awbId, { modelPath: filePath });
+
+      if (fileName.includes('png')) {
+        await this.awbRepository.update(targetAwb.id, { path: filePath }); // png면 path column에 저장
+      } else if (fileName.includes('obj')) {
+        await this.awbRepository.update(targetAwb.id, { modelPath: filePath }); // obj면 modelPath column에 저장
+      }
     } catch (e) {
       console.error(e);
     }
