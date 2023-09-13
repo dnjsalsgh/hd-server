@@ -11,9 +11,10 @@ import { AppModule } from './app.module';
 import path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { winstonLogger } from './lib/logger/winston.util';
-
+import * as dotenv from 'dotenv';
 declare const module: any;
 
+dotenv.config();
 async function bootstrap() {
   // 1. http서버로 사용
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -21,7 +22,6 @@ async function bootstrap() {
     logger: winstonLogger,
   });
   // 2. mqtt서버로 사용
-  console.log(process.env.MQTT_HOST, process.env.MQTT_PORT);
   const mqttApp = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
@@ -53,7 +53,9 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor()); // 반환값 객체화 처리
 
   const port = process.env.PORT || 3000;
-  console.log(`main server start port : ${port}`);
+  console.log(
+    `main server start port : ${port} mqtt: ${process.env.MQTT_HOST}`,
+  );
 
   app.useStaticAssets(path.join(__dirname, '..', 'upload'), {
     prefix: '/upload',

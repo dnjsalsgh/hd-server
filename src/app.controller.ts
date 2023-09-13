@@ -1,22 +1,29 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { take } from 'rxjs';
 
 @Controller()
 // implements OnModuleInit
 export class AppController {
-  constructor(@Inject('MQTT_SERVICE') private mqttClient: ClientProxy) {}
+  constructor(
+    @Inject('MQTT_SERVICE') private mqttClient: ClientProxy, // @Inject('MATH_SERVICE') private client: ClientProxy,
+  ) {}
 
   // onModuleInit() {
-  //   this.connectToMqttBroker();
+  //   this.client.connect();
   // }
   //
   // private connectToMqttBroker() {
   //   return this.mqttClient.connect();
   // }
 
+  // @Get()
+  // async getHello(): Promise<string> {
+  //   return 'Hello from NestJS!';
+  // }
   @Get()
-  async getHello(): Promise<string> {
-    return 'Hello from NestJS!';
+  async getHello() {
+    this.mqttClient.send('hyundai/test', 1234).pipe(take(1)).subscribe();
   }
 
   // @Get('/check/mqtt')

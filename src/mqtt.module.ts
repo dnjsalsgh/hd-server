@@ -4,6 +4,8 @@ import { MqttService } from './mqtt.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import * as dotenv from 'dotenv';
 import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
+import process from 'process';
+
 dotenv.config();
 
 console.log(`mqtt connect port : ${process.env.MQTT_HOST}`);
@@ -12,8 +14,7 @@ const clients = ClientsModule.register([
     name: 'MQTT_SERVICE', //* MY_MQTT_SERVICE : 의존성 이름
     transport: Transport.MQTT,
     options: {
-      host: process.env.MQTT_HOST,
-      port: +process.env.MQTT_PORT,
+      url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
       serializer: new OutboundResponseSerializer(),
     },
   },
