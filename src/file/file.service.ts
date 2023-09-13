@@ -30,7 +30,7 @@ export class FileService {
       const dir = await fs.readdir(filePath);
       return dir;
     } catch (error) {
-      throw new NotFoundException(`can not found folder`);
+      throw new NotFoundException(`can not found folder${filePath}`);
     }
   }
 

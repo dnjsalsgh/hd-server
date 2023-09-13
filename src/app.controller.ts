@@ -17,14 +17,14 @@ export class AppController {
   //   return this.mqttClient.connect();
   // }
 
-  // @Get()
-  // async getHello(): Promise<string> {
-  //   return 'Hello from NestJS!';
-  // }
   @Get()
-  async getHello() {
-    this.mqttClient.send('hyundai/test', 1234).pipe(take(1)).subscribe();
+  async getHello(): Promise<string> {
+    return 'Hello from NestJS!';
   }
+  // @Get()
+  // async getHello() {
+  //   this.mqttClient.send('hyundai/test', 1234).pipe(take(1)).subscribe();
+  // }
 
   // @Get('/check/mqtt')
   // async checkMqtt(): Promise<string> {

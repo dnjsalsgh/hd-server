@@ -18,7 +18,7 @@ services:
     image: postgres:latest
     container_name: my_postgres2
     ports:
-      - '5432:5432'
+      - '${DATABASE_PORT}:5432'
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASS}
@@ -72,6 +72,7 @@ services:
       - '3000:3000'
     volumes:
       - logs-volume:/var/app/logs
+      - volume_name_1:/var/nas
     networks:
       - overlay
     links:
@@ -87,3 +88,9 @@ volumes:
   pgdata:
   mssql-data:
   logs-volume:
+  volume_name_1:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: G:/내 드라이브

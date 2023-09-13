@@ -7,6 +7,7 @@ import path from 'path';
 import console from 'console';
 import { FileService } from '../file/file.service';
 import { Awb } from '../awb/entities/awb.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class WorkerService {
@@ -15,7 +16,9 @@ export class WorkerService {
     private readonly loggerService: LoggerService,
     private readonly awbService: AwbService,
     private readonly fileService: FileService,
+    private readonly configService: ConfigService,
   ) {}
+
   @Cron('*/10 * * * * *', {
     name: 'amrCronJobTest',
     timeZone: 'Asia/Seoul',
@@ -32,14 +35,18 @@ export class WorkerService {
 
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
   // * 10 * * * *
-  @Cron('* 10 * * * *', {
+  @Cron('*/10 * * * * *', {
     name: 'missingAWBModelingFileHandlingLogic',
     timeZone: 'Asia/Seoul',
   })
   async missingAWBModelingFileHandlingLogic() {
     const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
     if (missModelAwbList && missModelAwbList.length > 0) {
-      const directory = path.join('G:', '내 드라이브'); // 목표 디랙토리(nas)
+      console.log(this.configService.get('NODE_ENV'));
+      const directory = '/var/nas';
+      // this.configService.get('NODE_ENV') === 'pro'
+      //   ? '/var/nas'
+      //   : path.join('G:', '내 드라이브'); // 목표 디랙토리(nas)
 
       // 폴더 안에 파일 모두 가져오기
       const currentFolder = await this.fileService.readFolder(directory);
@@ -47,7 +54,7 @@ export class WorkerService {
       const awbNamesInFolder = currentFolder.map((v) => v.split('.')[0]); // 파일 안에 awb 이름들
       const awbNamesInDB = missModelAwbList.map((v) => v.name); // db 안에 awb 이름들
       const targetAwbs = this.findDuplicates(awbNamesInFolder, awbNamesInDB); // 누락된 awb 를 찾습니다.
-
+      console.log('targetAwbs = ', targetAwbs);
       for (const awbName of targetAwbs) {
         const missingFiles = currentFolder.filter((file) =>
           file.includes(awbName),
