@@ -35,6 +35,7 @@ import console from 'console';
 import { ConfigService } from '@nestjs/config';
 import { take } from 'rxjs';
 import { findDuplicates } from '../lib/util/usefull.util';
+import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -53,6 +54,14 @@ export class AwbController implements OnModuleInit {
   @Post()
   create(@Body() createAwbDto: CreateAwbDto) {
     return this.awbService.create(createAwbDto);
+  }
+
+  @ApiOperation({
+    summary: 'vms 입력데이터 저장하기(scc와 항공편 스케줄 함께)',
+  })
+  @Post('/aircraft')
+  createWithAircraftInfo(@Body() createAwbDto: CreateAwbWithAircraftDto) {
+    return this.awbService.createWithAircraft(createAwbDto);
   }
 
   @ApiOperation({
