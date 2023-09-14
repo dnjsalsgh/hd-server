@@ -4,6 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
 import { Vms } from '../vms/entities/vms.entity';
+import mqtt from 'mqtt';
+import process from 'process';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Controller('check')
 export class CheckController {
@@ -21,7 +25,14 @@ export class CheckController {
   @Get('mqtt')
   async checkMqtt(): Promise<string> {
     const mqttResult = await this.mqttClient.connect();
-    return mqttResult ? 'mqtt Connected' : 'not Found mqtt';
+    const mqttClient = mqtt.connect(
+      `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
+    );
+    if (mqttClient.connected) {
+      return 'MQTT 연결이 활성화되어 있습니다.';
+    } else {
+      return 'MQTT 연결이 비활성화되어 있습니다.';
+    }
   }
 
   @Get('mssql')

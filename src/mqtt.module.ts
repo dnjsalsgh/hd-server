@@ -16,6 +16,8 @@ const clients = ClientsModule.register([
     options: {
       url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
       serializer: new OutboundResponseSerializer(),
+      keepalive: 30000,
+      reconnectPeriod: 10,
     },
   },
 ]);

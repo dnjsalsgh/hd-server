@@ -205,7 +205,7 @@ export class AmrService {
 
     // amr실시간 데이터 mqtt로 publish 하기 위함
     this.client
-      .send(`/hyundai/amr/realData`, {
+      .send(`hyundai/amr/realData`, {
         bodys,
       })
       .pipe(take(1))

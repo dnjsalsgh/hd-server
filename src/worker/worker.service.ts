@@ -24,6 +24,7 @@ export class WorkerService {
     timeZone: 'Asia/Seoul',
   })
   InitialScheduler() {
+    console.log('이거 동작함');
     //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
     this.amrService.createAmrByMssql();
   }

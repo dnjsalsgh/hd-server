@@ -600,7 +600,6 @@ export class SimulatorResultService {
 
         const joinParamArray: CreateSimulatorResultAwbJoinDto[] = [];
         const historyParamArray: CreateSimulatorHistoryDto[] = [];
-        const buildUpOrderParamArray: CreateBuildUpOrderDto[] = []; // 작업자 작업지시(빌드업) 작업지시 만들기
 
         // 2-3. 입력되는 화물과 좌표를 이력에 입력
         for (let i = 0; i < bodyResult.AWBInfoList.length; i++) {
@@ -624,18 +623,6 @@ export class SimulatorResultService {
               z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
             };
             historyParamArray.push(historyParam);
-
-            // 2-3. 작업자 작업지시(빌드업)를 만들기
-            const buildUpOrderBody: CreateBuildUpOrderDto = {
-              order: bodyResult.AWBInfoList[i].order,
-              x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
-              y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
-              z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
-              SkidPlatform: bodyResult.AWBInfoList[i].order,
-              Uld: bodyResult.UldId,
-              Awb: bodyResult.AWBInfoList[i].AwbId,
-            };
-            buildUpOrderParamArray.push(buildUpOrderBody);
           }
         }
 
@@ -645,14 +632,9 @@ export class SimulatorResultService {
         const historyResult = queryRunner.manager
           .getRepository(SimulatorHistory)
           .save(historyParamArray);
-        //  등록된 buildupOrder를 처리하기 위한 service 처리
-        const buildUpOrderResult = this.buildUpOrderService.createList(
-          buildUpOrderParamArray,
-          queryRunner,
-        );
 
         // 3. awbjoin 테이블, 이력 테이블 함께 저장
-        await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳
+        await Promise.all([joinResult, historyResult]); // 실제로 쿼리 날아가는곳
         /**
          * 시뮬레이션 결과,이력을 저장하기 위한 부분 end
          */

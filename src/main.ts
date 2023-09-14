@@ -13,6 +13,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { winstonLogger } from './lib/logger/winston.util';
 import * as dotenv from 'dotenv';
 declare const module: any;
+import mqtt from 'mqtt';
 
 dotenv.config();
 async function bootstrap() {
@@ -22,15 +23,6 @@ async function bootstrap() {
     logger: winstonLogger,
   });
   // 2. mqtt서버로 사용
-  const mqttApp = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.MQTT,
-      options: {
-        url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
-      },
-    },
-  );
 
   // 스케줄러 프로세스 생성
   const sheduler = await NestFactory.create(WorkerModule);
@@ -73,9 +65,22 @@ async function bootstrap() {
 
   // cors 설정
   app.enableCors();
-  await mqttApp.listen();
   // await redisApp.listen();
   await app.listen(port);
+
+  // nest app 먼저 구동하고 mqtt 연결(mqtt 연결 안됬을 시 nest 구동 불가를 막기 위함)
+  const mqttApp = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.MQTT,
+      options: {
+        url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
+        keepalive: 30000,
+        reconnectPeriod: 30,
+      },
+    },
+  );
+  await mqttApp.listen();
   await sheduler.init(); // 스케줄러 프로세스 적용
 }
 
