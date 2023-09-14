@@ -63,6 +63,26 @@ export class SimulatorResultController {
     );
   }
 
+  @ApiOperation({
+    summary: 'uld를 새롭게 설정하는 reboot',
+    description: 'uld를 새롭게 설정하는 reboot',
+  })
+  @ApiBody({ type: PsApiRequest })
+  @Post('/reboot')
+  reboot(@Body() body: PsApiRequest) {
+    return this.simulatorResultService.reboot(body);
+  }
+
+  @ApiOperation({
+    summary: '현재 안착대에 추천도를 보여주는 것',
+    description: '현재 안착대에 추천도를 보여주는 것',
+  })
+  @ApiBody({ type: userSelectInput })
+  @Post('/getAWBinPalletRack')
+  getAWBinPalletRack(@Body() body: userSelectInput) {
+    return this.simulatorResultService.getAWBinPalletRack(body);
+  }
+
   @ApiQuery({ name: 'Uld', required: false, type: 'number' })
   @ApiQuery({ name: 'loadRate', required: false })
   @ApiQuery({ name: 'version', required: false })
