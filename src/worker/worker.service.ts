@@ -19,13 +19,13 @@ export class WorkerService {
     private readonly configService: ConfigService,
   ) {}
 
-  @Cron('*/10 * * * * *', {
+  @Cron('*/1 * * * * *', {
     name: 'amrCronJobTest',
     timeZone: 'Asia/Seoul',
   })
   InitialScheduler() {
     //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
-    // this.amrService.createAmrByMssql();
+    this.amrService.createAmrByMssql();
   }
 
   // 폴더와 db와 차이가 나는 파일이름 찾기
@@ -42,11 +42,10 @@ export class WorkerService {
   async missingAWBModelingFileHandlingLogic() {
     const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
     if (missModelAwbList && missModelAwbList.length > 0) {
-      console.log(this.configService.get('NODE_ENV'));
-      const directory = '/var/nas';
-      // this.configService.get('NODE_ENV') === 'pro'
-      //   ? '/var/nas'
-      //   : path.join('G:', '내 드라이브'); // 목표 디랙토리(nas)
+      const directory =
+        this.configService.get<string>('NODE_ENV') === 'pro'
+          ? '/var/nas'
+          : path.join('G:', '내 드라이브'); // 목표 디랙토리(nas)
 
       // 폴더 안에 파일 모두 가져오기
       const currentFolder = await this.fileService.readFolder(directory);
@@ -54,7 +53,7 @@ export class WorkerService {
       const awbNamesInFolder = currentFolder.map((v) => v.split('.')[0]); // 파일 안에 awb 이름들
       const awbNamesInDB = missModelAwbList.map((v) => v.name); // db 안에 awb 이름들
       const targetAwbs = this.findDuplicates(awbNamesInFolder, awbNamesInDB); // 누락된 awb 를 찾습니다.
-      console.log('targetAwbs = ', targetAwbs);
+
       for (const awbName of targetAwbs) {
         const missingFiles = currentFolder.filter((file) =>
           file.includes(awbName),

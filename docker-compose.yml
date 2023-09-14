@@ -54,6 +54,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
+      NODE_ENV: ${NODE_ENV}
       DATABASE_HOST: host.docker.internal # Use host.docker.internal to refer to the host machine's IP
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USER: ${DATABASE_USER}
