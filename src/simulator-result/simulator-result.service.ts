@@ -737,8 +737,8 @@ export class SimulatorResultService {
       const AwbInfo = skidPlatformHistory.Awb as Awb;
       const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
       const targetSkidPlatform = {
-        id: SkidPlatformInfo.id,
-        name: SkidPlatformInfo.name,
+        id: AwbInfo.id,
+        name: AwbInfo.name,
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -788,12 +788,21 @@ export class SimulatorResultService {
       inputAWB: inputAWB,
     };
 
-    console.log(JSON.stringify(packageSimulatorCallRequestObject));
     const psResult = await getUserSelect(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
     try {
       const bodyResult = psResult.result[0];
+
+      // mqtt에 보낼 불출 서열
+      const mqttOutOrderArray = [];
+      const mqttReuslt = {
+        order: 0,
+        awb: bodyResult.moveAwbId,
+        asrs: bodyResult.moveASRSId,
+        skidPlatform: bodyResult.palletRackId,
+      };
+      mqttOutOrderArray.push(mqttReuslt);
       // 패키시 시뮬레이터에서 작업자 작업자시(build-up-order)정보
       // 2. 작업자 작업지시 만들기
       // 2-1. Awb의 정보 validation 체크
@@ -810,7 +819,6 @@ export class SimulatorResultService {
         simulation: mode,
         Uld: bodyResult.UldId,
       };
-      console.log('simulatorResultBody = ', simulatorResultBody);
       const simulatorResultResult = await queryRunner.manager
         .getRepository(SimulatorResult)
         .save(simulatorResultBody);
@@ -819,20 +827,11 @@ export class SimulatorResultService {
       const historyParamArray: CreateSimulatorHistoryDto[] = [];
       const buildUpOrderParamArray: CreateBuildUpOrderDto[] = [];
 
-      const mqttOutOrderArray = [];
-
       // 2-3. 입력되는 화물과 좌표를 이력에 입력
       for (let i = 0; i < bodyResult.predictionResult.length; i++) {
         /**
          * mqtt에 보낼 화물Id + 창고(랙)Id 를 만드는 곳
          */
-        const mqttReuslt = {
-          order: bodyResult.predictionResult[i].order,
-          awb: bodyResult.predictionResult[i].AwbId,
-          asrs: bodyResult.predictionResult[i].storageId,
-        };
-        mqttOutOrderArray.push(mqttReuslt);
-
         const coordinate = bodyResult.predictionResult[i].coordinate;
         // 2-1. 어떤 Awb를 썼는지 등록
         const joinParam: CreateSimulatorResultAwbJoinDto = {
@@ -861,7 +860,7 @@ export class SimulatorResultService {
             x: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}x`],
             y: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}y`],
             z: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}z`],
-            SkidPlatform: bodyResult.predictionResult[i].order,
+            SkidPlatform: i === 0 ? bodyResult.palletRackId : null, // 어느 안착대로 가는지 첫 번재 화물만 특정되니 나머지는 null 처리
             Uld: bodyResult.UldId,
             Awb: bodyResult.predictionResult[i].AwbId,
           };

@@ -47,6 +47,7 @@ interface Result {
   AWBsWeight: number;
   UldId: number;
   moveASRSId: number;
+  moveAwbId: number;
   palletRackId: number;
   palletRackStackRatio: string;
   squareVolumeRatio: string;

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, Interval } from '@nestjs/schedule';
 import { AmrService } from '../amr/amr.service';
 import { LoggerService } from '../lib/logger/logger.service';
 import { AwbService } from '../awb/awb.service';
@@ -19,13 +19,14 @@ export class WorkerService {
     private readonly configService: ConfigService,
   ) {}
 
-  @Cron('*/1 * * * * *', {
-    name: 'amrCronJobTest',
-    timeZone: 'Asia/Seoul',
-  })
+  // @Cron('*/0.3 * * * * *', {
+  //   name: 'amrCronJobTest',
+  //   timeZone: 'Asia/Seoul',
+  // })
+  // @Interval(300) 0.3 초마다 mssql 에서 amr 데이터를 가져옴
   InitialScheduler() {
     //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
-    // this.amrService.createAmrByMssql();
+    this.amrService.createAmrByMssql();
   }
 
   // 폴더와 db와 차이가 나는 파일이름 찾기
