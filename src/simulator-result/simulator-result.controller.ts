@@ -24,10 +24,10 @@ export class SimulatorResultController {
     private readonly simulatorResultService: SimulatorResultService,
   ) {}
 
-  // @Post()
-  // create(@Body() createSimulatorResultDto: CreateSimulatorResultDto) {
-  //   return this.simulatorResultService.create(createSimulatorResultDto);
-  // }
+  @Post()
+  create(@Body() createSimulatorResultDto: CreateSimulatorResultDto) {
+    return this.simulatorResultService.create(createSimulatorResultDto);
+  }
 
   // @ApiOperation({
   //   summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',

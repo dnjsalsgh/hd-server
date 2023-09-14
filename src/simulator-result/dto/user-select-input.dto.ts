@@ -60,7 +60,7 @@ interface palletRack {
   SCCs: string[];
 }
 
-interface ASRS {
+interface Awbs {
   id: number;
   name: string;
   storageId: number;
@@ -78,13 +78,18 @@ export class userSelectInput {
   Ulds: Uld[];
   currentAWBsInULD: CurrentAWB[];
   palletRack: palletRack[];
-  ASRS: ASRS[];
-  simulation: boolean; // 시뮬레이션, 커넥티드 분기
+  Awb: Awbs[];
   @ApiProperty({
     example: 'A-Type2',
     description: 'Uld의 code',
   })
   UldCode: string;
+
+  @ApiProperty({
+    example: true,
+    description: '시뮬레이션, 커넥티드 모드 분기',
+  })
+  simulation: boolean;
 
   @ApiProperty({
     example: 1653,

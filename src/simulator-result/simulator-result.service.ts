@@ -682,7 +682,7 @@ export class SimulatorResultService {
 
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
     // 현재 ASRS의 정보들
-    const ASRS = [];
+    const Awbs = [];
     for (const asrsHistory of asrsStateArray) {
       const AwbInfo = asrsHistory.Awb as Awb;
       const AsrsInfo = asrsHistory.Asrs as Asrs;
@@ -697,7 +697,7 @@ export class SimulatorResultService {
         weight: AwbInfo.weight,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
       };
-      ASRS.push(targetAwb);
+      Awbs.push(targetAwb);
     }
 
     // ps에 보낼 Uld정보를 모아두는
@@ -710,9 +710,10 @@ export class SimulatorResultService {
         UldType: true,
       },
       where: {
-        code: apiRequest.UldCode ? ILike(`%${apiRequest.UldCode}%`) : undefined,
+        code: apiRequest.UldCode,
       },
     });
+
     // Uld주입하기
     if (uldResult) {
       const { id, code, UldType } = uldResult;
@@ -780,22 +781,23 @@ export class SimulatorResultService {
 
     const packageSimulatorCallRequestObject = {
       mode: false,
-      ASRS: ASRS,
+      Awbs: Awbs,
       Ulds: Ulds,
       currentAWBsInULD: currentAWBsInULD,
       palletRack: palletRack,
       inputAWB: inputAWB,
     };
+
+    console.log(JSON.stringify(packageSimulatorCallRequestObject));
     const psResult = await getUserSelect(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
     try {
       const bodyResult = psResult.result[0];
-
       // 패키시 시뮬레이터에서 작업자 작업자시(build-up-order)정보
       // 2. 작업자 작업지시 만들기
       // 2-1. Awb의 정보 validation 체크
-      if (!bodyResult.AWBInfoList.every((item) => item.coordinate)) {
+      if (!bodyResult.predictionResult.every((item) => item.coordinate)) {
         throw new NotFoundException('Awb 상세 정보가 없습니다.');
       }
 
@@ -803,11 +805,12 @@ export class SimulatorResultService {
       const simulatorResultBody: CreateSimulatorResultDto = {
         startDate: new Date(),
         endDate: new Date(),
-        loadRate: +bodyResult.waterVolumeRatio, // 적재율
-        version: bodyResult.version,
+        loadRate: +bodyResult.squareVolumeRatio, // 적재율
+        version: bodyResult?.version,
         simulation: mode,
         Uld: bodyResult.UldId,
       };
+      console.log('simulatorResultBody = ', simulatorResultBody);
       const simulatorResultResult = await queryRunner.manager
         .getRepository(SimulatorResult)
         .save(simulatorResultBody);
@@ -819,21 +822,21 @@ export class SimulatorResultService {
       const mqttOutOrderArray = [];
 
       // 2-3. 입력되는 화물과 좌표를 이력에 입력
-      for (let i = 0; i < bodyResult.AWBInfoList.length; i++) {
+      for (let i = 0; i < bodyResult.predictionResult.length; i++) {
         /**
          * mqtt에 보낼 화물Id + 창고(랙)Id 를 만드는 곳
          */
         const mqttReuslt = {
-          order: bodyResult.AWBInfoList[i].order,
-          awb: bodyResult.AWBInfoList[i].AwbId,
-          asrs: bodyResult.AWBInfoList[i].storageId,
+          order: bodyResult.predictionResult[i].order,
+          awb: bodyResult.predictionResult[i].AwbId,
+          asrs: bodyResult.predictionResult[i].storageId,
         };
         mqttOutOrderArray.push(mqttReuslt);
 
-        const coordinate = bodyResult.AWBInfoList[i].coordinate;
+        const coordinate = bodyResult.predictionResult[i].coordinate;
         // 2-1. 어떤 Awb를 썼는지 등록
         const joinParam: CreateSimulatorResultAwbJoinDto = {
-          Awb: bodyResult.AWBInfoList[i].AwbId, // awbId연결
+          Awb: bodyResult.predictionResult[i].AwbId, // awbId연결
           SimulatorResult: simulatorResultResult.id,
         };
         joinParamArray.push(joinParam);
@@ -842,38 +845,36 @@ export class SimulatorResultService {
           // 2-2. 어떤 Uld, 각각의 화물의 좌표 값, 시뮬레이터를 썼는지 이력저장
           const historyParam: CreateSimulatorHistoryDto = {
             Uld: bodyResult.UldId,
-            Awb: bodyResult.AWBInfoList[i].AwbId,
+            Awb: bodyResult.predictionResult[i].AwbId,
             SimulatorResult: simulatorResultResult.id,
             simulation: mode,
-            x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
-            y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
-            z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
+            x: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}x`],
+            y: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}y`],
+            z: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}z`],
           };
 
           historyParamArray.push(historyParam);
 
           // 2-3. 작업자 작업지시를 만들기
           const buildUpOrderBody: CreateBuildUpOrderDto = {
-            order: bodyResult.AWBInfoList[i].order,
-            x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
-            y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
-            z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
-            SkidPlatform: bodyResult.AWBInfoList[i].order,
+            order: bodyResult.predictionResult[i].order,
+            x: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}x`],
+            y: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}y`],
+            z: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}z`],
+            SkidPlatform: bodyResult.predictionResult[i].order,
             Uld: bodyResult.UldId,
-            Awb: bodyResult.AWBInfoList[i].AwbId,
+            Awb: bodyResult.predictionResult[i].AwbId,
           };
           buildUpOrderParamArray.push(buildUpOrderBody);
         }
       }
 
-      console.log('buildUpOrderParamArray = ', buildUpOrderParamArray);
       const joinResult = queryRunner.manager
         .getRepository(SimulatorResultAwbJoin)
         .save(joinParamArray);
       const historyResult = queryRunner.manager
         .getRepository(SimulatorHistory)
         .save(historyParamArray);
-      //  등록된 buildupOrder를 처리하기 위한 service 처리
       const buildUpOrderResult = this.buildUpOrderService.createList(
         buildUpOrderParamArray,
         queryRunner,

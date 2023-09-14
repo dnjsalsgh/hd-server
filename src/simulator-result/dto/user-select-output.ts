@@ -52,6 +52,7 @@ interface Result {
   squareVolumeRatio: string;
   uldVolume: string;
   unpackItems: any[]; // 이 부분을 적절한 타입으로 수정해야 합니다.
+  predictionResult: AWBInfo[];
   waterVolumeRatio: string;
   version: number;
 }
