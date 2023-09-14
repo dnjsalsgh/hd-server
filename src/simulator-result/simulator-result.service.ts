@@ -42,10 +42,13 @@ import {
   UldType,
   UldTypeAttribute,
 } from '../uld-type/entities/uld-type.entity';
-import { getOrderDischarge } from '../lib/util/axios.util';
+import { getOrderDischarge, getUserSelect } from '../lib/util/axios.util';
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { AsrsHistoryService } from '../asrs-history/asrs-history.service';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
+import { userSelectInput } from './dto/user-select-input.dto';
+import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
+import { UldHistoryService } from '../uld-history/uld-history.service';
 
 @Injectable()
 export class SimulatorResultService {
@@ -67,6 +70,7 @@ export class SimulatorResultService {
     private readonly uldRepository: Repository<Uld>,
     private readonly asrsHistoryService: AsrsHistoryService,
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
+    private readonly uldHistoryService: UldHistoryService,
   ) {}
 
   async create(createSimulatorResultDto: CreateSimulatorResultDto) {
@@ -659,7 +663,7 @@ export class SimulatorResultService {
   }
 
   // 패키지 시뮬레이터의 결과로 [빌드업 작업지시]만 만드는 곳
-  async createBuildUpOrderBySimulatorResult(apiRequest: PsApiRequest) {
+  async createBuildUpOrderBySimulatorResult(apiRequest: userSelectInput) {
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -671,10 +675,14 @@ export class SimulatorResultService {
     // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const skidPlatformStateArray =
       await this.skidPlatformHistoryService.nowState();
+    // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const uldStateArray = await this.uldHistoryService.nowState(
+      apiRequest.UldCode,
+    );
 
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
-    // ps에 보낼 Awb 정보들 모아두는 배열
-    const Awbs = [];
+    // 현재 ASRS의 정보들
+    const ASRS = [];
     for (const asrsHistory of asrsStateArray) {
       const AwbInfo = asrsHistory.Awb as Awb;
       const AsrsInfo = asrsHistory.Asrs as Asrs;
@@ -687,11 +695,9 @@ export class SimulatorResultService {
         depth: AwbInfo.depth,
         waterVolume: AwbInfo.waterVolume,
         weight: AwbInfo.weight,
-        color: 'yellow',
         SCCs: AwbInfo.Scc?.map((v) => v.code),
-        iceWeight: 0,
       };
-      Awbs.push(targetAwb);
+      ASRS.push(targetAwb);
     }
 
     // ps에 보낼 Uld정보를 모아두는
@@ -724,12 +730,63 @@ export class SimulatorResultService {
       });
     }
 
+    // 안착대 현재 상황 묶음
+    const palletRack = [];
+    for (const skidPlatformHistory of skidPlatformStateArray) {
+      const AwbInfo = skidPlatformHistory.Awb as Awb;
+      const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
+      const targetSkidPlatform = {
+        id: SkidPlatformInfo.id,
+        name: SkidPlatformInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      palletRack.push(targetSkidPlatform);
+    }
+
+    // uld의 현재 상황 묶음
+    const currentAWBsInULD = [];
+    for (const uldHistory of uldStateArray) {
+      const AwbInfo = uldHistory.Awb as Awb;
+      const targetUld = {
+        id: AwbInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      currentAWBsInULD.push(targetUld);
+    }
+
+    // 사용자가 넣는 화물
+    const inputAWB = {
+      id: apiRequest.id,
+      palletRackId: apiRequest.palletRackId,
+      name: apiRequest.name,
+      width: apiRequest.width,
+      length: apiRequest.length,
+      depth: apiRequest.depth,
+      waterVolume: apiRequest.waterVolume,
+      weight: apiRequest.weight,
+      SCCs: apiRequest.SCCs,
+    };
+
     const packageSimulatorCallRequestObject = {
       mode: false,
-      Awbs: Awbs,
+      ASRS: ASRS,
       Ulds: Ulds,
+      currentAWBsInULD: currentAWBsInULD,
+      palletRack: palletRack,
+      inputAWB: inputAWB,
     };
-    const psResult = await getOrderDischarge(packageSimulatorCallRequestObject);
+    const psResult = await getUserSelect(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
     try {
@@ -759,8 +816,20 @@ export class SimulatorResultService {
       const historyParamArray: CreateSimulatorHistoryDto[] = [];
       const buildUpOrderParamArray: CreateBuildUpOrderDto[] = [];
 
+      const mqttOutOrderArray = [];
+
       // 2-3. 입력되는 화물과 좌표를 이력에 입력
       for (let i = 0; i < bodyResult.AWBInfoList.length; i++) {
+        /**
+         * mqtt에 보낼 화물Id + 창고(랙)Id 를 만드는 곳
+         */
+        const mqttReuslt = {
+          order: bodyResult.AWBInfoList[i].order,
+          awb: bodyResult.AWBInfoList[i].AwbId,
+          asrs: bodyResult.AWBInfoList[i].storageId,
+        };
+        mqttOutOrderArray.push(mqttReuslt);
+
         const coordinate = bodyResult.AWBInfoList[i].coordinate;
         // 2-1. 어떤 Awb를 썼는지 등록
         const joinParam: CreateSimulatorResultAwbJoinDto = {
@@ -797,6 +866,7 @@ export class SimulatorResultService {
         }
       }
 
+      console.log('buildUpOrderParamArray = ', buildUpOrderParamArray);
       const joinResult = queryRunner.manager
         .getRepository(SimulatorResultAwbJoin)
         .save(joinParamArray);
@@ -810,7 +880,17 @@ export class SimulatorResultService {
       );
 
       // 3. awbjoin 테이블, 이력 테이블 함께 저장
-      await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳
+      const [, , buildUpOrder] = await Promise.all([
+        joinResult,
+        historyResult,
+        buildUpOrderResult,
+      ]); // 실제로 쿼리 날아가는곳
+
+      // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
+      if (mqttOutOrderArray)
+        this.client
+          .send(`hyundai/asrs1/outOrder`, mqttOutOrderArray)
+          .subscribe();
 
       await queryRunner.commitTransaction();
     } catch (error) {

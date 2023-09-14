@@ -15,7 +15,7 @@ import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AsrsAttribute } from '../asrs/entities/asrs.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
-import { UldAttribute } from '../uld/entities/uld.entity';
+import { Uld, UldAttribute } from '../uld/entities/uld.entity';
 import { BuildUpOrderAttribute } from '../build-up-order/entities/build-up-order.entity';
 
 @Injectable()
@@ -23,6 +23,8 @@ export class UldHistoryService {
   constructor(
     @InjectRepository(UldHistory)
     private readonly uldHistoryRepository: Repository<UldHistory>,
+    @InjectRepository(Uld)
+    private readonly uldRepository: Repository<Uld>,
   ) {}
   async create(createUldHistoryDto: CreateUldHistoryDto) {
     const result = await this.uldHistoryRepository.create(createUldHistoryDto);
@@ -83,6 +85,22 @@ export class UldHistoryService {
       where: { id: id },
     });
     return result;
+  }
+
+  /**
+   * uld 이력에서 uld_id를 기준으로 최신 안착대의 상태만 가져옴
+   */
+  async nowState(uldCode: string) {
+    const tartgetUld = await this.uldRepository.findOne({
+      where: { code: uldCode },
+    });
+
+    return await this.uldHistoryRepository.find({
+      where: {
+        Uld: tartgetUld.id,
+      },
+      relations: { Awb: { Scc: true } },
+    });
   }
 
   update(id: number, updateUldHistoryDto: UpdateUldHistoryDto) {

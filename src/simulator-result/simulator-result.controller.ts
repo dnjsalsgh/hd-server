@@ -15,6 +15,7 @@ import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import { PsApiRequest } from './dto/ps-input.dto';
+import { userSelectInput } from './dto/user-select-input.dto';
 
 @Controller('simulator-result')
 @ApiTags('[시뮬레이터 결과]simulator-result')
@@ -41,9 +42,9 @@ export class SimulatorResultController {
     description:
       'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
-  @ApiBody({})
+  @ApiBody({ type: userSelectInput })
   @Post('/make-build-up-order-order/with/ps')
-  createBuildUpOrderBySimulatorResult(@Body() body: PsApiRequest) {
+  createBuildUpOrderBySimulatorResult(@Body() body: userSelectInput) {
     return this.simulatorResultService.createBuildUpOrderBySimulatorResult(
       body,
     );

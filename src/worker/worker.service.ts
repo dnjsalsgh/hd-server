@@ -24,9 +24,8 @@ export class WorkerService {
     timeZone: 'Asia/Seoul',
   })
   InitialScheduler() {
-    console.log('이거 동작함');
     //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
-    this.amrService.createAmrByMssql();
+    // this.amrService.createAmrByMssql();
   }
 
   // 폴더와 db와 차이가 나는 파일이름 찾기
@@ -36,7 +35,7 @@ export class WorkerService {
 
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
   // * 10 * * * *
-  @Cron('*/10 * * * * *', {
+  @Cron('* 10 * * * *', {
     name: 'missingAWBModelingFileHandlingLogic',
     timeZone: 'Asia/Seoul',
   })
