@@ -63,7 +63,7 @@ export class UldTypeController {
   }
 
   @ApiOperation({
-    summary: 'uld-type에 file을 upload 하기',
+    summary: 'uld-type에 file(png)을 upload 하기',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
