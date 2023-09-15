@@ -26,9 +26,9 @@ export class AmrController {
 
   // mssql이 연결 안됬을 때 태스트용도로 만들었던 api
   @ApiOperation({
-    summary: 'amr의 움직임 데이터 입력',
-    description:
-      'amr, amrCharge, amrChargeHistory, timeTable를 모두 등록함 / name',
+    summary:
+      '[사용x] amr의 움직임 데이터 확인 테스트용 api, mssql에서 amr 데이터 스케줄러로 0.3초마다 동작됨, mssql이 연결 안됬을 때 태스트용도로 만들었던 api',
+    description: 'amr, amrCharge, amrChargeHistory 모두 등록함',
   })
   @Post('/moving-data')
   createByPlc(@Body() body: AmrRawDto) {
