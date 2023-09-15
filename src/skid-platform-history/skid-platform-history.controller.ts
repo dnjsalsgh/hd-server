@@ -23,6 +23,11 @@ export class SkidPlatformHistoryController {
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
   ) {}
 
+  @ApiOperation({
+    summary: '안착대에 화물의 입,출고를 저장하기 위한 api',
+    description:
+      '[사용법] Asrs: 불출된 창고ID, SkidPlatform: 목표 안착대ID, Awb: 목표 화물, inOutType: 입고(in), 출고(out) 판단',
+  })
   @Post()
   create(@Body() createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto) {
     return this.skidPlatformHistoryService.create(createSkidPlatformHistoryDto);
@@ -43,7 +48,7 @@ export class SkidPlatformHistoryController {
   }
 
   @ApiOperation({
-    summary: '안착대의 현재 상태를 가져오기',
+    summary: '안착대의 현재 상태를 가져오기(inOutType이 out 이면 빈 안착대)',
     description: '안착대id로 이력의 최신본만 가져오기',
   })
   @Get('/now')
