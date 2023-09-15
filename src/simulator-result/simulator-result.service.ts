@@ -1279,6 +1279,11 @@ export class SimulatorResultService {
     );
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
+    // 안착대 추천도 결과를 mqtt에 전송
+    this.client
+      .send('hyundai/ps/recommend', psResult)
+      .pipe(take(1))
+      .subscribe();
     return psResult;
   }
 
