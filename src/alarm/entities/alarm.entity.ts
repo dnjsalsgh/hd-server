@@ -1,0 +1,50 @@
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
+
+@Entity()
+export class Alarm {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @ApiProperty({
+    example: '123497985',
+    description: '설비명',
+  })
+  @Column({ nullable: true })
+  equipmentName: string;
+
+  @ApiProperty({
+    example: new Date(),
+    description: '조치시간',
+  })
+  @Column({ nullable: true })
+  responseTime: Date;
+
+  @ApiProperty({
+    example: new Date(),
+    description: '중단 시간',
+  })
+  @Column({ nullable: true })
+  stopTime: string;
+
+  @ApiProperty({
+    example: 1,
+    description: '발생횟수',
+  })
+  @Column({ nullable: true })
+  count: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date | null;
+}
