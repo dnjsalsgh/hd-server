@@ -24,7 +24,6 @@ import {
 import { Asrs } from './entities/asrs.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
-import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { take } from 'rxjs';
@@ -38,13 +37,13 @@ export class AsrsController {
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
-  @Post()
   @ApiOperation({
     summary: 'Asrs(자동창고) 생성 API',
     description: 'Asrs(자동창고) 생성 한다',
   })
   @ApiBody({ type: CreateAsrsDto })
   @ApiCreatedResponse({ description: '창고를 생성한다.', type: Asrs })
+  @Post()
   async create(@Body() body: CreateAsrsDto) {
     // parent 정보 확인
     if (typeof body.parent === 'number' && body.parent < 0) {
@@ -89,7 +88,8 @@ export class AsrsController {
   }
 
   @ApiOperation({
-    summary: 'plc를 활용한 창고에 화물 이력(이력등록)',
+    summary:
+      '[사용x] plc를 활용한 창고에 화물 이력(이력등록), plc 데이터를 가정한 테스트용 api',
     description: '창고로 일어나는 작업이기 때문에 asrs로 넣음',
   })
   @Post('/plc/asrs')

@@ -16,7 +16,7 @@ import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AwbSccJoin } from './entities/awb-scc-join.entity';
 
 @Controller('Awb-Scc-join')
-@ApiTags('Awb-Scc-join')
+@ApiTags('[사용x] Awb-Scc-join')
 export class AwbSccJoinController {
   constructor(private readonly awbSccJoinService: AwbSccJoinService) {}
 

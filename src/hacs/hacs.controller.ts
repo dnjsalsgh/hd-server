@@ -6,8 +6,8 @@ import { CreateHacsDto } from './dto/create-hacs.dto';
 export class HacsController {
   constructor(private readonly hacsService: HacsService) {}
 
-  @Post()
-  create(@Body() createHacDto: CreateHacsDto) {
-    return this.hacsService.create(createHacDto);
-  }
+  // @Post()
+  // create(@Body() createHacDto: CreateHacsDto) {
+  //   return this.hacsService.create(createHacDto);
+  // }
 }

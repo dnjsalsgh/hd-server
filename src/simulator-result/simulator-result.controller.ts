@@ -24,6 +24,11 @@ export class SimulatorResultController {
     private readonly simulatorResultService: SimulatorResultService,
   ) {}
 
+  @ApiOperation({
+    summary: '[사용x] 이 api는 ps의 호출을 하지 않음',
+    description:
+      'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
+  })
   @Post()
   create(@Body() createSimulatorResultDto: CreateSimulatorResultDto) {
     return this.simulatorResultService.create(createSimulatorResultDto);
@@ -38,7 +43,7 @@ export class SimulatorResultController {
   // }
 
   @ApiOperation({
-    summary: '패키지 시뮬레이터를 사용해서 uld 작업지시 만들기',
+    summary: '[4개가 채워진 후 1개 뽑고 싶을 때] uld 작업지시 만들기',
     description:
       'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
@@ -51,7 +56,7 @@ export class SimulatorResultController {
   }
 
   @ApiOperation({
-    summary: '패키지 시뮬레이터를 사용해서 asrs작업지시 만들기',
+    summary: '[최초에 안착대 4개 다 비어있을 시] asrs작업지시 만들기 ',
     description:
       'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })

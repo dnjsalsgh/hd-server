@@ -27,7 +27,8 @@ export class BuildUpOrderController {
   }
 
   @ApiOperation({
-    summary: 'uld에 어떤 화물이 들어가는지 넣기위한 불출서열(ps에서 계산됨)',
+    summary:
+      '[사용x] uld에 어떤 화물이 들어가는지 넣기위한 불출서열(ps에서 계산되므로 사용할 필요 없음),',
   })
   @ApiBody({ type: [CreateBuildUpOrderDto] })
   @Post()

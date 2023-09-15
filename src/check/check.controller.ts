@@ -5,6 +5,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { Vms } from '../vms/entities/vms.entity';
 import * as dotenv from 'dotenv';
 import { MqttService } from '../mqtt.service';
+import { ApiOperation } from '@nestjs/swagger';
 
 dotenv.config();
 
@@ -17,11 +18,19 @@ export class CheckController {
     private readonly mqttService: MqttService,
   ) {}
 
+  @ApiOperation({
+    summary: '[서버의 구동여부를 확인하기 위함]',
+    description: '',
+  })
   @Get()
   async getHello(): Promise<string> {
     return 'Server On!';
   }
 
+  @ApiOperation({
+    summary: '[mqtt 통신 확인]',
+    description: '',
+  })
   @Get('mqtt')
   async checkMqtt() {
     try {
@@ -36,6 +45,10 @@ export class CheckController {
     }
   }
 
+  @ApiOperation({
+    summary: '[mssql 통신 확인]',
+    description: '',
+  })
   @Get('mssql')
   async checkMssql() {
     const repositoryExist = this.vmsRepository;
