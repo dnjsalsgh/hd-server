@@ -13,7 +13,7 @@ import { UpdateSimulatorResultAwbJoinDto } from './dto/update-simulator-result-a
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('simulator-result-Awb-join')
-@ApiTags('simulator-result-Awb-join')
+@ApiTags('[사용x]simulator-result-Awb-join')
 export class SimulatorResultAwbJoinController {
   constructor(
     private readonly simulatorResultAwbJoinService: SimulatorResultAwbJoinService,
