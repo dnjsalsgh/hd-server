@@ -71,12 +71,13 @@ export class WorkerService {
               fileContent,
               missingFile,
             );
-
+          const localUploadPath =
+            this.configService.getOrThrow('LOCAL_UPLOAD_PATH') + missingFile;
           // upload된 파일의 경로를 awb정보에 update
           await this.awbService.modelingCompleteToHandlingPath(
             missingFile,
             awbName,
-            pathOfUploadedFile,
+            localUploadPath,
           );
         }
       }

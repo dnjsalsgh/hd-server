@@ -75,6 +75,7 @@ services:
     volumes:
       - logs-volume:/var/app/logs
       - volume_name_1:/var/nas
+      - volume_name_2:/var/app/src/upload
     networks:
       - overlay
     links:
@@ -96,3 +97,9 @@ volumes:
       type: none
       o: bind
       device: C:/nas
+  volume_name_2:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: C:/Users/wmh/Desktop/hd-auto-logistic-server/upload
