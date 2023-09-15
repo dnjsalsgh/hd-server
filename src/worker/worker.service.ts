@@ -19,11 +19,14 @@ export class WorkerService {
     private readonly configService: ConfigService,
   ) {}
 
-  // @Interval(300) 0.3 초마다 mssql 에서 amr 데이터를 가져옴
+  @Interval(300)
+  // 0.3 초마다 mssql 에서 amr 데이터를 가져옴
   InitialScheduler() {
     //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
-    this.amrService.createAmrByMssql();
-    console.log('amr 데이터 수집 스케줄러 동작');
+    if (this.configService.get<string>('SCHEDULE') === 'true') {
+      this.amrService.createAmrByMssql();
+      console.log('amr 데이터 수집 스케줄러 동작');
+    }
   }
 
   // 폴더와 db와 차이가 나는 파일이름 찾기
@@ -43,7 +46,7 @@ export class WorkerService {
       const directory =
         this.configService.get<string>('NODE_ENV') === 'pro'
           ? '/var/nas'
-          : path.join('G:', '내 드라이브'); // 목표 디랙토리(nas)
+          : this.configService.getOrThrow('NAS_PATH'); // 목표 디랙토리(nas)
 
       // 폴더 안에 파일 모두 가져오기
       const currentFolder = await this.fileService.readFolder(directory);
