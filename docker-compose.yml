@@ -70,6 +70,8 @@ services:
       MSSQL_DATABASE_HOST: host.docker.internal
       MSSQL_DATABASE_NAME: ${MSSQL_DATABASE_NAME}
       MSSQL_DATABASE_PORT: ${MSSQL_DATABASE_PORT}
+      NAS_PATH: ${NAS_PATH}
+      LOCAL_UPLOAD_PATH: ${LOCAL_UPLOAD_PATH}
     ports:
       - '3000:3000'
     volumes:
