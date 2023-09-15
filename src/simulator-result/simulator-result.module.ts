@@ -15,6 +15,9 @@ import { Uld } from '../uld/entities/uld.entity';
 import { AsrsHistoryService } from '../asrs-history/asrs-history.service';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { UldHistoryService } from '../uld-history/uld-history.service';
+import { Awb } from '../awb/entities/awb.entity';
+import { Asrs } from '../asrs/entities/asrs.entity';
+import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
 
 @Module({
   imports: [
@@ -31,6 +34,9 @@ import { UldHistoryService } from '../uld-history/uld-history.service';
       BuildUpOrder,
       UldHistory,
       Uld,
+      Awb,
+      Asrs,
+      SkidPlatform,
     ]),
     // mqtt 모듈설정
     MqttModule,

@@ -95,4 +95,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: G:/내 드라이브
+      device: C:/nas

@@ -215,7 +215,7 @@ export class AwbController implements OnModuleInit {
     // nas 서버 접속해서 이미지 파일을 다운 받고 upload 진행하기
     if (oneVmsData && oneVmsData[0].name) {
       const name = oneVmsData[0].name as string;
-      const directory = path.join('G:', '내 드라이브'); // 목표 디랙토리(nas)
+      const directory = this.configService.getOrThrow('NAS_PATH'); // 목표 디랙토리(nas)
 
       // mssql에서 가져온 10개의 데이터를 저장하기 위함
       await this.awbService.createWithMssql();
@@ -294,7 +294,7 @@ export class AwbController implements OnModuleInit {
   private async performAction() {
     const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
     if (missModelAwbList && missModelAwbList.length > 0) {
-      const directory = path.join('G:', '내 드라이브'); // 목표 디랙토리(nas)
+      const directory = this.configService.getOrThrow('NAS_PATH'); // 목표 디랙토리(nas)
 
       // 폴더 안에 파일 모두 가져오기
       const currentFolder = await this.fileService.readFolder(directory);
