@@ -1266,7 +1266,6 @@ export class SimulatorResultService {
       // inputAWB: inputAWB,
     };
 
-    console.log(JSON.stringify(packageSimulatorCallRequestObject));
     const psResult = await getAWBinPalletRack(
       packageSimulatorCallRequestObject,
     );

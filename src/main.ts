@@ -75,8 +75,8 @@ async function bootstrap() {
       transport: Transport.MQTT,
       options: {
         url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
-        keepalive: 30000,
-        reconnectPeriod: 30,
+        // keepalive: 30000,
+        reconnectPeriod: 3000,
       },
     },
   );

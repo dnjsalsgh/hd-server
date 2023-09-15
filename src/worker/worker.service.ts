@@ -19,14 +19,11 @@ export class WorkerService {
     private readonly configService: ConfigService,
   ) {}
 
-  // @Cron('*/0.3 * * * * *', {
-  //   name: 'amrCronJobTest',
-  //   timeZone: 'Asia/Seoul',
-  // })
   // @Interval(300) 0.3 초마다 mssql 에서 amr 데이터를 가져옴
   InitialScheduler() {
     //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
     this.amrService.createAmrByMssql();
+    console.log('amr 데이터 수집 스케줄러 동작');
   }
 
   // 폴더와 db와 차이가 나는 파일이름 찾기
@@ -81,6 +78,6 @@ export class WorkerService {
         }
       }
     }
-    console.log('modeling complete');
+    console.log('누락된 awb 모델링 파일 연결 스케줄러 동작');
   }
 }
