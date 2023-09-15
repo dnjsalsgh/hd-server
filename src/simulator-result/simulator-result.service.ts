@@ -1153,6 +1153,7 @@ export class SimulatorResultService {
     const skidPlatformStateArray =
       await this.skidPlatformHistoryService.nowState();
     // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    console.log('apiRequest = ', apiRequest);
     const uldStateArray = await this.uldHistoryService.nowState(
       apiRequest.UldCode,
     );

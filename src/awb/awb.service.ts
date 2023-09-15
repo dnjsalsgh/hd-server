@@ -538,8 +538,7 @@ export class AwbService {
     // awb실시간 데이터 mqtt로 publish 하기 위함
     this.client
       .send(`hyundai/vms1/readCompl`, {
-        awbId: name,
-        time: new Date().toISOString(),
+        fileRead: true,
       })
       .pipe(take(1))
       .subscribe();
