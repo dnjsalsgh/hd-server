@@ -11,7 +11,7 @@ import {
 import { SimulatorHistoryService } from './simulator-history.service';
 import { CreateSimulatorHistoryDto } from './dto/create-simulator-history.dto';
 import { UpdateSimulatorHistoryDto } from './dto/update-simulator-history.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SimulatorHistory } from './entities/simulator-history.entity';
 
@@ -22,6 +22,11 @@ export class SimulatorHistoryController {
     private readonly simulatorHistoryService: SimulatorHistoryService,
   ) {}
 
+  @ApiOperation({
+    summary:
+      '[사용x] 시뮬레이션 이력은 시뮬레이션결과(simulation-result)를 생성하면 자동으로 생성됨',
+    description: '',
+  })
   @Post()
   create(@Body() createSimulatorHistoryDto: CreateSimulatorHistoryDto) {
     return this.simulatorHistoryService.create(createSimulatorHistoryDto);
