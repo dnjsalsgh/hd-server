@@ -72,6 +72,7 @@ export const getAWBinPalletRack = async (
         },
       },
     );
+
     const data = response.data; // 응답 데이터 가져오기
     return data;
   } catch (error) {

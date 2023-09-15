@@ -1215,6 +1215,7 @@ export class SimulatorResultService {
       const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
       const targetSkidPlatform = {
         id: AwbInfo.id,
+        palletRackId: SkidPlatformInfo.id,
         name: AwbInfo.name,
         width: AwbInfo.width,
         length: AwbInfo.length,
@@ -1244,17 +1245,17 @@ export class SimulatorResultService {
     }
 
     // 사용자가 넣는 화물
-    const inputAWB = {
-      id: apiRequest.id,
-      palletRackId: apiRequest.palletRackId,
-      name: apiRequest.name,
-      width: apiRequest.width,
-      length: apiRequest.length,
-      depth: apiRequest.depth,
-      waterVolume: apiRequest.waterVolume,
-      weight: apiRequest.weight,
-      SCCs: apiRequest.SCCs,
-    };
+    // const inputAWB = {
+    //   id: apiRequest.id,
+    //   palletRackId: apiRequest.palletRackId,
+    //   name: apiRequest.name,
+    //   width: apiRequest.width,
+    //   length: apiRequest.length,
+    //   depth: apiRequest.depth,
+    //   waterVolume: apiRequest.waterVolume,
+    //   weight: apiRequest.weight,
+    //   SCCs: apiRequest.SCCs,
+    // };
 
     const packageSimulatorCallRequestObject = {
       mode: false,
@@ -1262,7 +1263,7 @@ export class SimulatorResultService {
       Ulds: Ulds,
       currentAWBsInULD: currentAWBsInULD,
       palletRack: palletRack,
-      inputAWB: inputAWB,
+      // inputAWB: inputAWB,
     };
 
     console.log(JSON.stringify(packageSimulatorCallRequestObject));
