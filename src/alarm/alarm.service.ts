@@ -27,7 +27,7 @@ export class AlarmService {
   ) {}
   async create(createAlarmDto: CreateAlarmDto) {
     const result = await this.alarmRepository.save(createAlarmDto);
-    this.client.send(`hyundai/alarm`, result).pipe(take(1)).subscribe();
+    this.client.send(`hyundai/alarm/insert`, result).pipe(take(1)).subscribe();
     return result;
   }
 
@@ -42,7 +42,7 @@ export class AlarmService {
     } else if (createdAtTo) {
       findDate = LessThanOrEqual(createdAtTo);
     }
-    return await this.alarmRepository.find({
+    const findResult = await this.alarmRepository.find({
       where: {
         createdAt: findDate,
       },
@@ -50,6 +50,13 @@ export class AlarmService {
       take: query.limit,
       skip: query.offset,
     });
+
+    this.client
+      .send(`hyundai/alarm/find`, findResult)
+      .pipe(take(1))
+      .subscribe();
+
+    return findResult;
   }
 
   async findOne(id: number) {
