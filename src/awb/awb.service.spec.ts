@@ -3,7 +3,7 @@ import { AwbService } from './awb.service';
 import {
   setDataSourceForTest,
   setTypeOrmForTest,
-} from '../lib/util/testSetTypeorm.util';
+} from '../lib/util/testSettingTypeorm.util';
 import { Awb } from './entities/awb.entity';
 import { DataSource, Repository } from 'typeorm';
 import { INestApplication } from '@nestjs/common';

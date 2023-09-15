@@ -200,12 +200,12 @@ export class AmrService {
   async createAmrByMssql() {
     const bodys: AmrRawDto[] = await this.hacsRepository.find({
       order: orderByUtil(null),
-      take: 50, // 최소한만 가져오려고 함(100 개)
+      take: 1, // 최소한만 가져오려고 함(100 개)
     });
 
     // amr실시간 데이터 mqtt로 publish 하기 위함
     this.client
-      .send(`/hyundai/amr/realData`, {
+      .send(`hyundai/amr/realData`, {
         bodys,
       })
       .pipe(take(1))

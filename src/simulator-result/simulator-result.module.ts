@@ -14,6 +14,7 @@ import { UldHistory } from '../uld-history/entities/uld-history.entity';
 import { Uld } from '../uld/entities/uld.entity';
 import { AsrsHistoryService } from '../asrs-history/asrs-history.service';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
+import { UldHistoryService } from '../uld-history/uld-history.service';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platfo
     BuildUpOrderService,
     AsrsHistoryService,
     SkidPlatformHistoryService,
+    UldHistoryService,
   ],
 })
 export class SimulatorResultModule {}

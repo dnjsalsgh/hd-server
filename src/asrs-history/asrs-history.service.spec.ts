@@ -3,7 +3,7 @@ import { AsrsHistoryService } from './asrs-history.service';
 import {
   setDataSourceForTest,
   setTypeOrmForTest,
-} from '../lib/util/testSetTypeorm.util';
+} from '../lib/util/testSettingTypeorm.util';
 import { AsrsHistoryModule } from './asrs-history.module';
 import { INestApplication } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';

@@ -37,6 +37,8 @@ import { VmsModule } from './vms/vms.module';
 import { HacsModule } from './hacs/hacs.module';
 import { WorkerModule } from './worker/worker.module';
 import { CheckModule } from './check/check.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
 
 @Module({
   imports: [

@@ -7,6 +7,9 @@ WORKDIR /var/app
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
+# pm2설치
+RUN npm install --global pm2
+
 # Install application dependencies
 RUN npm install
 
@@ -54,7 +57,11 @@ ENV MQTT_PORT=$MQTT_PORT
 RUN npm run build
 
 # Run the application
-CMD ["node", "dist/main.js"]
+#CMD ["node", "dist/main.js"]
+
+# 앱 실행 명령
+CMD ["pm2-runtime", "dist/main.js"]
+
 
 #docker build \
 #  --build-arg NODE_ENV=dev \

@@ -98,95 +98,95 @@ export class AwbService {
     }
   }
 
-  // async createWithAircraft(
-  //   createAwbDto: CreateAwbDto,
-  //   transaction: QueryRunner = this.dataSource.createQueryRunner(),
-  // ) {
-  //   const { scc, ...awbDto } = createAwbDto;
-  //
-  //   const queryRunner = transaction;
-  //   await queryRunner.connect();
-  //   await queryRunner.startTransaction();
-  //
-  //   try {
-  //     // 1. aircraft 입력하기 있다면 update
-  //     const aircraftBody: CreateAircraftDto = {
-  //       name: createAwbDto.aircraftName,
-  //       code: createAwbDto.aircraftCode,
-  //       info: createAwbDto.aircraftInfo,
-  //       allow: createAwbDto.allow,
-  //       allowDryIce: createAwbDto.allowDryIce,
-  //     };
-  //     const aircraftResult = await queryRunner.manager
-  //       .getRepository(Aircraft)
-  //       .upsert(aircraftBody, ['code']);
-  //
-  //     // 출발지, 도착지를 찾기위해 공통코드 검색
-  //     const routeResult = await queryRunner.manager
-  //       .getRepository(CommonCode)
-  //       .find({ where: { masterCode: 'route' } });
-  //
-  //     // 2. awb를 입력하기
-  //     const awbResult = await queryRunner.manager
-  //       .getRepository(Awb)
-  //       .save(awbDto);
-  //
-  //     // 3. aircraftSchedule 입력하기
-  //     const aircraftScheduleBody: CreateAircraftScheduleDto = {
-  //       source: createAwbDto.source,
-  //       localDepartureTime: createAwbDto.localDepartureTime,
-  //       koreaArrivalTime: createAwbDto.koreaArrivalTime,
-  //       workStartTime: createAwbDto.workStartTime,
-  //       workCompleteTargetTime: createAwbDto.workCompleteTargetTime,
-  //       koreaDepartureTime: createAwbDto.koreaDepartureTime,
-  //       localArrivalTime: createAwbDto.localArrivalTime,
-  //       waypoint: createAwbDto.waypoint,
-  //       Aircraft: aircraftResult.identifiers[0].id,
-  //       CcIdDestination:
-  //         routeResult.find((item) => item.code === createAwbDto.destination)
-  //           ?.id || 0,
-  //       CcIdDeparture:
-  //         routeResult.find((item) => item.code === createAwbDto.departure)
-  //           ?.id || 0,
-  //       Awb: awbResult.id,
-  //     };
-  //     await queryRunner.manager
-  //       .getRepository(AircraftSchedule)
-  //       .save(aircraftScheduleBody);
-  //
-  //     // scc 정보, awb이 입력되어야 동작하게끔
-  //     if (scc && awbResult) {
-  //       // 4. 입력된 scc찾기
-  //       const sccResult = await this.sccRepository.find({
-  //         where: { code: In(scc.map((s) => s.code)) },
-  //       });
-  //
-  //       // 5. awb와 scc를 연결해주기 위한 작업
-  //       const joinParam = sccResult.map((item) => {
-  //         return {
-  //           Awb: awbResult.id,
-  //           Scc: item.id,
-  //         };
-  //       });
-  //       await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
-  //     }
-  //
-  //     await queryRunner.commitTransaction();
-  //     // awb실시간 데이터 mqtt로 publish 하기 위함
-  //     this.client
-  //       .send(`hyundai/vms1/readCompl`, {
-  //         amr: awbResult,
-  //         time: new Date().toISOString(),
-  //       })
-  //       .pipe(take(1))
-  //       .subscribe();
-  //   } catch (error) {
-  //     await queryRunner.rollbackTransaction();
-  //     throw new TypeORMError(`rollback Working - ${error}`);
-  //   } finally {
-  //     await queryRunner.release();
-  //   }
-  // }
+  async createWithAircraft(
+    createAwbDto: CreateAwbWithAircraftDto,
+    transaction: QueryRunner = this.dataSource.createQueryRunner(),
+  ) {
+    const { scc, ...awbDto } = createAwbDto;
+
+    const queryRunner = transaction;
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // 1. aircraft 입력하기 있다면 update
+      const aircraftBody: CreateAircraftDto = {
+        name: createAwbDto.aircraftName,
+        code: createAwbDto.aircraftCode,
+        info: createAwbDto.aircraftInfo,
+        allow: createAwbDto.allow,
+        allowDryIce: createAwbDto.allowDryIce,
+      };
+      const aircraftResult = await queryRunner.manager
+        .getRepository(Aircraft)
+        .upsert(aircraftBody, ['code']);
+
+      // 출발지, 도착지를 찾기위해 공통코드 검색
+      const routeResult = await queryRunner.manager
+        .getRepository(CommonCode)
+        .find({ where: { masterCode: 'route' } });
+
+      // 2. awb를 입력하기
+      const awbResult = await queryRunner.manager
+        .getRepository(Awb)
+        .save(awbDto);
+
+      // 3. aircraftSchedule 입력하기
+      const aircraftScheduleBody: CreateAircraftScheduleDto = {
+        source: createAwbDto.source,
+        localDepartureTime: createAwbDto.localDepartureTime,
+        koreaArrivalTime: createAwbDto.koreaArrivalTime,
+        workStartTime: createAwbDto.workStartTime,
+        workCompleteTargetTime: createAwbDto.workCompleteTargetTime,
+        koreaDepartureTime: createAwbDto.koreaDepartureTime,
+        localArrivalTime: createAwbDto.localArrivalTime,
+        waypoint: createAwbDto.waypoint,
+        Aircraft: aircraftResult.identifiers[0].id,
+        CcIdDestination:
+          routeResult.find((item) => item.code === createAwbDto.destination)
+            ?.id || 0,
+        CcIdDeparture:
+          routeResult.find((item) => item.code === createAwbDto.departure)
+            ?.id || 0,
+        Awb: awbResult.id,
+      };
+      await queryRunner.manager
+        .getRepository(AircraftSchedule)
+        .save(aircraftScheduleBody);
+
+      // scc 정보, awb이 입력되어야 동작하게끔
+      if (scc && awbResult) {
+        // 4. 입력된 scc찾기
+        const sccResult = await this.sccRepository.find({
+          where: { code: In(scc.map((s) => s.code)) },
+        });
+
+        // 5. awb와 scc를 연결해주기 위한 작업
+        const joinParam = sccResult.map((item) => {
+          return {
+            Awb: awbResult.id,
+            Scc: item.id,
+          };
+        });
+        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+      }
+
+      await queryRunner.commitTransaction();
+      // awb실시간 데이터 mqtt로 publish 하기 위함
+      this.client
+        .send(`hyundai/vms1/readCompl`, {
+          amr: awbResult,
+          time: new Date().toISOString(),
+        })
+        .pipe(take(1))
+        .subscribe();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
+  }
 
   async createWithOtherTransaction(
     createAwbDto: CreateAwbDto,
@@ -513,16 +513,21 @@ export class AwbService {
   }
 
   async modelingCompleteToHandlingPath(
-    name: string,
-    awbId: number,
+    fileName: string,
+    awbName: string,
     filePath: string,
   ) {
     try {
-      // const targetAwb = await this.awbRepository.findOne({
-      //   where: { name: name, modelPath: null },
-      // });
+      const targetAwb = await this.awbRepository.findOne({
+        where: { name: awbName, modelPath: null },
+      });
       // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
-      await this.awbRepository.update(awbId, { modelPath: filePath });
+
+      if (fileName.includes('png')) {
+        await this.awbRepository.update(targetAwb.id, { path: filePath }); // png면 path column에 저장
+      } else if (fileName.includes('obj')) {
+        await this.awbRepository.update(targetAwb.id, { modelPath: filePath }); // obj면 modelPath column에 저장
+      }
     } catch (e) {
       console.error(e);
     }

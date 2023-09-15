@@ -27,7 +27,7 @@ export class BuildUpOrderController {
   }
 
   @ApiOperation({
-    summary: '패키지 시뮬레이터의 실행을 위한 컨트롤러',
+    summary: 'uld에 어떤 화물이 들어가는지 넣기위한 불출서열(ps에서 계산됨)',
   })
   @ApiBody({ type: [CreateBuildUpOrderDto] })
   @Post()

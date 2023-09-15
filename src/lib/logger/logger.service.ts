@@ -17,19 +17,19 @@ export class LoggerService implements LS {
     this.logger = winston.createLogger({
       format: combine(timestamp(), prettyPrint()),
       transports: [
-        new transports.File({
-          level: 'error',
-          filename: `error-${dayjs().format('YYYY-MM-DD')}.log`,
-          dirname: 'logs',
-          maxsize: 5000000,
-          format: combine(
-            errors({ stack: true }),
-            timestamp({ format: 'isoDateTime' }),
-            printf((info) => {
-              return `${info.message}`;
-            }),
-          ),
-        }),
+        // new transports.File({
+        //   level: 'error',
+        //   filename: `error-${dayjs().format('YYYY-MM-DD')}.log`,
+        //   dirname: 'logs',
+        //   maxsize: 5000000,
+        //   format: combine(
+        //     errors({ stack: true }),
+        //     timestamp({ format: 'isoDateTime' }),
+        //     printf((info) => {
+        //       return `${info.message}`;
+        //     }),
+        //   ),
+        // }),
 
         new transports.Console({
           level: 'debug',
@@ -41,18 +41,18 @@ export class LoggerService implements LS {
           ),
         }),
 
-        new transports.File({
-          filename: `application-${dayjs().format('YYYY-MM-DD')}.log`,
-          dirname: 'logs',
-          maxsize: 5000000,
-          format: combine(
-            timestamp({ format: 'isoDateTime' }),
-            // printf((info) => {
-            //   return `${dayjs().format("YYYY-MM-DD-HH-HH")}${info.message}`;
-            // })
-            prettyPrint(),
-          ),
-        }),
+        // new transports.File({
+        //   filename: `application-${dayjs().format('YYYY-MM-DD')}.log`,
+        //   dirname: 'logs',
+        //   maxsize: 5000000,
+        //   format: combine(
+        //     timestamp({ format: 'isoDateTime' }),
+        //     // printf((info) => {
+        //     //   return `${dayjs().format("YYYY-MM-DD-HH-HH")}${info.message}`;
+        //     // })
+        //     prettyPrint(),
+        //   ),
+        // }),
       ],
     });
   }

@@ -11,7 +11,7 @@ import {
 import { UldHistoryService } from './uld-history.service';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
 import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { UldHistory } from './entities/uld-history.entity';
 
@@ -26,9 +26,9 @@ export class UldHistoryController {
   }
 
   @ApiQuery({ name: 'BuildUpOrder', required: false, type: 'number' })
-  // @ApiQuery({ name: 'SkidPlatform', required: false, type: 'number' })
-  // @ApiQuery({ name: 'Uld', required: false, type: 'number' })
-  // @ApiQuery({ name: 'Awb', required: false, type: 'number' })
+  @ApiQuery({ name: 'SkidPlatform', required: false, type: 'number' })
+  @ApiQuery({ name: 'Uld', required: false, type: 'number' })
+  @ApiQuery({ name: 'Awb', required: false, type: 'number' })
   @ApiQuery({ name: 'recommend', required: false, type: 'boolean' })
   @ApiQuery({ name: 'worker', required: false })
   @ApiQuery({ name: 'createdAtFrom', required: false })
@@ -39,6 +39,15 @@ export class UldHistoryController {
   @Get()
   findAll(@Query() query: UldHistory & BasicQueryParamDto) {
     return this.uldHistoryService.findAll(query);
+  }
+
+  @ApiOperation({
+    summary: '안착대의 현재 상태를 가져오기',
+    description: '안착대id로 이력의 최신본만 가져오기',
+  })
+  @Get('/now')
+  StatusOfUld(@Param('uldCode') uldCode: string) {
+    return this.uldHistoryService.nowState(uldCode);
   }
 
   @Get(':id')

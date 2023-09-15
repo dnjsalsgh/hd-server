@@ -18,7 +18,7 @@ services:
     image: postgres:latest
     container_name: my_postgres2
     ports:
-      - '5432:5432'
+      - '${DATABASE_PORT}:5432'
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASS}
@@ -48,37 +48,39 @@ services:
       - overlay
     restart: always
 
-#  back:
-#    container_name: main-server2
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    environment:
-#      DATABASE_HOST: host.docker.internal # Use host.docker.internal to refer to the host machine's IP
-#      DATABASE_PORT: ${DATABASE_PORT}
-#      DATABASE_USER: ${DATABASE_USER}
-#      DATABASE_PASS: ${DATABASE_PASS}
-#      DATABASE_NAME: ${DATABASE_NAME}
-#      REDIS_HOST: host.docker.internal
-#      REDIS_PORT: ${REDIS_PORT}
-#      MQTT_HOST: host.docker.internal
-#      MQTT_PORT: ${MQTT_PORT}
-#      MSSQL_DATABASE_USER: ${MSSQL_DATABASE_USER}
-#      MSSQL_DATABASE_PASS: ${MSSQL_DATABASE_PASS}
-#      MSSQL_DATABASE_HOST: host.docker.internal
-#      MSSQL_DATABASE_NAME: ${MSSQL_DATABASE_NAME}
-#      MSSQL_DATABASE_PORT: ${MSSQL_DATABASE_PORT}
-#    ports:
-#      - '3000:3000'
-#    volumes:
-#      - logs-volume:/var/app/logs
-#    networks:
-#      - overlay
-#    links:
-#      - postgres:postgres
-#      - mqtt:mqtt
-#      - redis:redis
-#      - mssql:mssql
+  back:
+    container_name: main-server2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DATABASE_HOST: host.docker.internal # Use host.docker.internal to refer to the host machine's IP
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DATABASE_NAME: ${DATABASE_NAME}
+      REDIS_HOST: host.docker.internal
+      REDIS_PORT: ${REDIS_PORT}
+      MQTT_HOST: host.docker.internal
+      MQTT_PORT: ${MQTT_PORT}
+      MSSQL_DATABASE_USER: ${MSSQL_DATABASE_USER}
+      MSSQL_DATABASE_PASS: ${MSSQL_DATABASE_PASS}
+      MSSQL_DATABASE_HOST: host.docker.internal
+      MSSQL_DATABASE_NAME: ${MSSQL_DATABASE_NAME}
+      MSSQL_DATABASE_PORT: ${MSSQL_DATABASE_PORT}
+    ports:
+      - '3000:3000'
+    volumes:
+      - logs-volume:/var/app/logs
+      - volume_name_1:/var/nas
+    networks:
+      - overlay
+    links:
+      - postgres:postgres
+      - mqtt:mqtt
+      - redis:redis
+      - mssql:mssql
 
 networks:
   overlay:
@@ -87,3 +89,9 @@ volumes:
   pgdata:
   mssql-data:
   logs-volume:
+  volume_name_1:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: G:/내 드라이브

@@ -15,6 +15,7 @@ import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import { PsApiRequest } from './dto/ps-input.dto';
+import { userSelectInput } from './dto/user-select-input.dto';
 
 @Controller('simulator-result')
 @ApiTags('[시뮬레이터 결과]simulator-result')
@@ -23,10 +24,10 @@ export class SimulatorResultController {
     private readonly simulatorResultService: SimulatorResultService,
   ) {}
 
-  // @Post()
-  // create(@Body() createSimulatorResultDto: CreateSimulatorResultDto) {
-  //   return this.simulatorResultService.create(createSimulatorResultDto);
-  // }
+  @Post()
+  create(@Body() createSimulatorResultDto: CreateSimulatorResultDto) {
+    return this.simulatorResultService.create(createSimulatorResultDto);
+  }
 
   // @ApiOperation({
   //   summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
@@ -41,9 +42,9 @@ export class SimulatorResultController {
     description:
       'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
-  @ApiBody({})
+  @ApiBody({ type: userSelectInput })
   @Post('/make-build-up-order-order/with/ps')
-  createBuildUpOrderBySimulatorResult(@Body() body: PsApiRequest) {
+  createBuildUpOrderBySimulatorResult(@Body() body: userSelectInput) {
     return this.simulatorResultService.createBuildUpOrderBySimulatorResult(
       body,
     );
@@ -60,6 +61,26 @@ export class SimulatorResultController {
     return this.simulatorResultService.createAsrsOutOrderBySimulatorResult(
       body,
     );
+  }
+
+  @ApiOperation({
+    summary: 'uld를 새롭게 설정하는 reboot',
+    description: 'uld를 새롭게 설정하는 reboot',
+  })
+  @ApiBody({ type: PsApiRequest })
+  @Post('/reboot')
+  reboot(@Body() body: PsApiRequest) {
+    return this.simulatorResultService.reboot(body);
+  }
+
+  @ApiOperation({
+    summary: '현재 안착대에 추천도를 보여주는 것',
+    description: '현재 안착대에 추천도를 보여주는 것',
+  })
+  @ApiBody({ type: userSelectInput })
+  @Post('/getAWBinPalletRack')
+  getAWBinPalletRack(@Body() body: userSelectInput) {
+    return this.simulatorResultService.getAWBinPalletRack(body);
   }
 
   @ApiQuery({ name: 'Uld', required: false, type: 'number' })

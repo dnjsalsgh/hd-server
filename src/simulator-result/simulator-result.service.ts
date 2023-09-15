@@ -32,7 +32,7 @@ import { BuildUpOrder } from '../build-up-order/entities/build-up-order.entity';
 import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-order.dto';
 import { CreateBuildUpOrderDto } from '../build-up-order/dto/create-build-up-order.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { take } from 'rxjs';
+import { elementAt, take } from 'rxjs';
 import { BuildUpOrderService } from '../build-up-order/build-up-order.service';
 import { pakageSimulatorCallResultData } from '../lib/util/pakageSimulatorCallResultData.json';
 
@@ -42,10 +42,19 @@ import {
   UldType,
   UldTypeAttribute,
 } from '../uld-type/entities/uld-type.entity';
-import { getOrderDischarge } from '../lib/util/axios.util';
+import {
+  getAWBinPalletRack,
+  getOrderDischarge,
+  getUserSelect,
+  reboot,
+} from '../lib/util/axios.util';
 import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { AsrsHistoryService } from '../asrs-history/asrs-history.service';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
+import { userSelectInput } from './dto/user-select-input.dto';
+import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
+import { UldHistoryService } from '../uld-history/uld-history.service';
+import { awbInPalletRackResult } from './dto/get-Awb-in-palletPack.dto';
 
 @Injectable()
 export class SimulatorResultService {
@@ -67,6 +76,7 @@ export class SimulatorResultService {
     private readonly uldRepository: Repository<Uld>,
     private readonly asrsHistoryService: AsrsHistoryService,
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
+    private readonly uldHistoryService: UldHistoryService,
   ) {}
 
   async create(createSimulatorResultDto: CreateSimulatorResultDto) {
@@ -600,7 +610,6 @@ export class SimulatorResultService {
 
         const joinParamArray: CreateSimulatorResultAwbJoinDto[] = [];
         const historyParamArray: CreateSimulatorHistoryDto[] = [];
-        const buildUpOrderParamArray: CreateBuildUpOrderDto[] = []; // 작업자 작업지시(빌드업) 작업지시 만들기
 
         // 2-3. 입력되는 화물과 좌표를 이력에 입력
         for (let i = 0; i < bodyResult.AWBInfoList.length; i++) {
@@ -624,18 +633,6 @@ export class SimulatorResultService {
               z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
             };
             historyParamArray.push(historyParam);
-
-            // 2-3. 작업자 작업지시(빌드업)를 만들기
-            const buildUpOrderBody: CreateBuildUpOrderDto = {
-              order: bodyResult.AWBInfoList[i].order,
-              x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
-              y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
-              z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
-              SkidPlatform: bodyResult.AWBInfoList[i].order,
-              Uld: bodyResult.UldId,
-              Awb: bodyResult.AWBInfoList[i].AwbId,
-            };
-            buildUpOrderParamArray.push(buildUpOrderBody);
           }
         }
 
@@ -645,14 +642,9 @@ export class SimulatorResultService {
         const historyResult = queryRunner.manager
           .getRepository(SimulatorHistory)
           .save(historyParamArray);
-        //  등록된 buildupOrder를 처리하기 위한 service 처리
-        const buildUpOrderResult = this.buildUpOrderService.createList(
-          buildUpOrderParamArray,
-          queryRunner,
-        );
 
         // 3. awbjoin 테이블, 이력 테이블 함께 저장
-        await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳
+        await Promise.all([joinResult, historyResult]); // 실제로 쿼리 날아가는곳
         /**
          * 시뮬레이션 결과,이력을 저장하기 위한 부분 end
          */
@@ -677,7 +669,7 @@ export class SimulatorResultService {
   }
 
   // 패키지 시뮬레이터의 결과로 [빌드업 작업지시]만 만드는 곳
-  async createBuildUpOrderBySimulatorResult(apiRequest: PsApiRequest) {
+  async createBuildUpOrderBySimulatorResult(apiRequest: userSelectInput) {
     const queryRunner = await this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -686,6 +678,245 @@ export class SimulatorResultService {
 
     // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
     const asrsStateArray = await this.asrsHistoryService.nowState();
+    // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const skidPlatformStateArray =
+      await this.skidPlatformHistoryService.nowState();
+    // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const uldStateArray = await this.uldHistoryService.nowState(
+      apiRequest.UldCode,
+    );
+
+    // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
+    // 현재 ASRS의 정보들
+    const Awbs = [];
+    for (const asrsHistory of asrsStateArray) {
+      const AwbInfo = asrsHistory.Awb as Awb;
+      const AsrsInfo = asrsHistory.Asrs as Asrs;
+      const targetAwb = {
+        id: AwbInfo.id,
+        storageId: AsrsInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      Awbs.push(targetAwb);
+    }
+
+    // ps에 보낼 Uld정보를 모아두는
+    const Ulds = [];
+    const uldResult = await this.uldRepository.findOne({
+      select: {
+        UldType: UldTypeAttribute,
+      },
+      relations: {
+        UldType: true,
+      },
+      where: {
+        code: apiRequest.UldCode,
+      },
+    });
+
+    // Uld주입하기
+    if (uldResult) {
+      const { id, code, UldType } = uldResult;
+      const { width, length, depth, vertexCord } = UldType as UldType;
+      Ulds.push({
+        id,
+        code,
+        width,
+        length,
+        depth,
+        // maxWeight: uldTypeResult.maxWeight,준규님이랑 최대 문개 어떻게 넣을지 논의하기
+        uldType: typeof UldType === 'object' ? UldType.code : null,
+        maxWeight: 10000,
+        vertexCord,
+      });
+    }
+
+    // 안착대 현재 상황 묶음
+    const palletRack = [];
+    for (const skidPlatformHistory of skidPlatformStateArray) {
+      const AwbInfo = skidPlatformHistory.Awb as Awb;
+      const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
+      const targetSkidPlatform = {
+        id: AwbInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      palletRack.push(targetSkidPlatform);
+    }
+
+    // uld의 현재 상황 묶음
+    const currentAWBsInULD = [];
+    for (const uldHistory of uldStateArray) {
+      const AwbInfo = uldHistory.Awb as Awb;
+      const targetUld = {
+        id: AwbInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      currentAWBsInULD.push(targetUld);
+    }
+
+    // 사용자가 넣는 화물
+    const inputAWB = {
+      id: apiRequest.id,
+      palletRackId: apiRequest.palletRackId,
+      name: apiRequest.name,
+      width: apiRequest.width,
+      length: apiRequest.length,
+      depth: apiRequest.depth,
+      waterVolume: apiRequest.waterVolume,
+      weight: apiRequest.weight,
+      SCCs: apiRequest.SCCs,
+    };
+
+    const packageSimulatorCallRequestObject = {
+      mode: false,
+      Awbs: Awbs,
+      Ulds: Ulds,
+      currentAWBsInULD: currentAWBsInULD,
+      palletRack: palletRack,
+      inputAWB: inputAWB,
+    };
+
+    const psResult = await getUserSelect(packageSimulatorCallRequestObject);
+    // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
+
+    try {
+      const bodyResult = psResult.result[0];
+
+      // mqtt에 보낼 불출 서열
+      const mqttOutOrderArray = [];
+      const mqttReuslt = {
+        order: 0,
+        awb: bodyResult.moveAwbId,
+        asrs: bodyResult.moveASRSId,
+        skidPlatform: bodyResult.palletRackId,
+      };
+      mqttOutOrderArray.push(mqttReuslt);
+      // 패키시 시뮬레이터에서 작업자 작업자시(build-up-order)정보
+      // 2. 작업자 작업지시 만들기
+      // 2-1. Awb의 정보 validation 체크
+      if (!bodyResult.predictionResult.every((item) => item.coordinate)) {
+        throw new NotFoundException('Awb 상세 정보가 없습니다.');
+      }
+
+      // 2-2. simulatorResult 입력
+      const simulatorResultBody: CreateSimulatorResultDto = {
+        startDate: new Date(),
+        endDate: new Date(),
+        loadRate: +bodyResult.squareVolumeRatio, // 적재율
+        version: bodyResult?.version,
+        simulation: mode,
+        Uld: bodyResult.UldId,
+      };
+      const simulatorResultResult = await queryRunner.manager
+        .getRepository(SimulatorResult)
+        .save(simulatorResultBody);
+
+      const joinParamArray: CreateSimulatorResultAwbJoinDto[] = [];
+      const historyParamArray: CreateSimulatorHistoryDto[] = [];
+      const buildUpOrderParamArray: CreateBuildUpOrderDto[] = [];
+
+      // 2-3. 입력되는 화물과 좌표를 이력에 입력
+      for (let i = 0; i < bodyResult.predictionResult.length; i++) {
+        /**
+         * mqtt에 보낼 화물Id + 창고(랙)Id 를 만드는 곳
+         */
+        const coordinate = bodyResult.predictionResult[i].coordinate;
+        // 2-1. 어떤 Awb를 썼는지 등록
+        const joinParam: CreateSimulatorResultAwbJoinDto = {
+          Awb: bodyResult.predictionResult[i].AwbId, // awbId연결
+          SimulatorResult: simulatorResultResult.id,
+        };
+        joinParamArray.push(joinParam);
+
+        for (let j = 1; j <= coordinate.length; j++) {
+          // 2-2. 어떤 Uld, 각각의 화물의 좌표 값, 시뮬레이터를 썼는지 이력저장
+          const historyParam: CreateSimulatorHistoryDto = {
+            Uld: bodyResult.UldId,
+            Awb: bodyResult.predictionResult[i].AwbId,
+            SimulatorResult: simulatorResultResult.id,
+            simulation: mode,
+            x: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}x`],
+            y: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}y`],
+            z: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}z`],
+          };
+
+          historyParamArray.push(historyParam);
+
+          // 2-3. 작업자 작업지시를 만들기
+          const buildUpOrderBody: CreateBuildUpOrderDto = {
+            order: bodyResult.predictionResult[i].order,
+            x: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}x`],
+            y: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}y`],
+            z: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}z`],
+            SkidPlatform: i === 0 ? bodyResult.palletRackId : null, // 어느 안착대로 가는지 첫 번재 화물만 특정되니 나머지는 null 처리
+            Uld: bodyResult.UldId,
+            Awb: bodyResult.predictionResult[i].AwbId,
+          };
+          buildUpOrderParamArray.push(buildUpOrderBody);
+        }
+      }
+
+      const joinResult = queryRunner.manager
+        .getRepository(SimulatorResultAwbJoin)
+        .save(joinParamArray);
+      const historyResult = queryRunner.manager
+        .getRepository(SimulatorHistory)
+        .save(historyParamArray);
+      const buildUpOrderResult = this.buildUpOrderService.createList(
+        buildUpOrderParamArray,
+        queryRunner,
+      );
+
+      // 3. awbjoin 테이블, 이력 테이블 함께 저장
+      const [, , buildUpOrder] = await Promise.all([
+        joinResult,
+        historyResult,
+        buildUpOrderResult,
+      ]); // 실제로 쿼리 날아가는곳
+
+      // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
+      if (mqttOutOrderArray)
+        this.client
+          .send(`hyundai/asrs1/outOrder`, mqttOutOrderArray)
+          .subscribe();
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  // 패키지 시뮬레이터에서 자동창고, 안착대 정보로만 [자동창고 불출] 만드는 곳
+  async reboot(apiRequest: PsApiRequest) {
+    const queryRunner = await this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
+
+    // 자동창고의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const asrsStateArray = await this.asrsHistoryService.nowState();
+
     // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const skidPlatformStateArray =
       await this.skidPlatformHistoryService.nowState();
@@ -742,93 +973,162 @@ export class SimulatorResultService {
       });
     }
 
+    // 안착대 현재 상황 묶음
+    const palletRack = [];
+    for (const skidPlatformHistory of skidPlatformStateArray) {
+      const AwbInfo = skidPlatformHistory.Awb as Awb;
+      const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
+      const targetSkidPlatform = {
+        id: AwbInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      palletRack.push(targetSkidPlatform);
+    }
+
     const packageSimulatorCallRequestObject = {
       mode: false,
       Awbs: Awbs,
       Ulds: Ulds,
+      palletRack: palletRack,
     };
-    const psResult = await getOrderDischarge(packageSimulatorCallRequestObject);
+
+    const psResult = await reboot(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
     try {
       const bodyResult = psResult.result[0];
-
-      // 패키시 시뮬레이터에서 작업자 작업자시(build-up-order)정보
-      // 2. 작업자 작업지시 만들기
-      // 2-1. Awb의 정보 validation 체크
-      if (!bodyResult.AWBInfoList.every((item) => item.coordinate)) {
-        throw new NotFoundException('Awb 상세 정보가 없습니다.');
-      }
-
-      // 2-2. simulatorResult 입력
-      const simulatorResultBody: CreateSimulatorResultDto = {
-        startDate: new Date(),
-        endDate: new Date(),
-        loadRate: +bodyResult.waterVolumeRatio, // 적재율
-        version: bodyResult.version,
-        simulation: mode,
-        Uld: bodyResult.UldId,
-      };
-      const simulatorResultResult = await queryRunner.manager
-        .getRepository(SimulatorResult)
-        .save(simulatorResultBody);
-
-      const joinParamArray: CreateSimulatorResultAwbJoinDto[] = [];
-      const historyParamArray: CreateSimulatorHistoryDto[] = [];
-      const buildUpOrderParamArray: CreateBuildUpOrderDto[] = [];
-
-      // 2-3. 입력되는 화물과 좌표를 이력에 입력
-      for (let i = 0; i < bodyResult.AWBInfoList.length; i++) {
-        const coordinate = bodyResult.AWBInfoList[i].coordinate;
-        // 2-1. 어떤 Awb를 썼는지 등록
-        const joinParam: CreateSimulatorResultAwbJoinDto = {
-          Awb: bodyResult.AWBInfoList[i].AwbId, // awbId연결
-          SimulatorResult: simulatorResultResult.id,
-        };
-        joinParamArray.push(joinParam);
-
-        for (let j = 1; j <= coordinate.length; j++) {
-          // 2-2. 어떤 Uld, 각각의 화물의 좌표 값, 시뮬레이터를 썼는지 이력저장
-          const historyParam: CreateSimulatorHistoryDto = {
-            Uld: bodyResult.UldId,
-            Awb: bodyResult.AWBInfoList[i].AwbId,
-            SimulatorResult: simulatorResultResult.id,
-            simulation: mode,
-            x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
-            y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
-            z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
+      // 1. 자동창고 작업지시를 만들기
+      const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
+      for (const [index, element] of bodyResult.AWBInfoList.entries()) {
+        // storageId가 0이면 안착대에 있는 화물이라는 뜻 즉, 창고에서 불출될 일이 없기 때문에 작업지시를 못내리기 때문에 0 예외처리
+        if (element.storageId !== 0) {
+          const asrsOutOrderParam: CreateAsrsOutOrderDto = {
+            order: index,
+            Asrs: element.storageId,
+            Awb: element.AwbId,
           };
-
-          historyParamArray.push(historyParam);
-
-          // 2-3. 작업자 작업지시를 만들기
-          const buildUpOrderBody: CreateBuildUpOrderDto = {
-            order: bodyResult.AWBInfoList[i].order,
-            x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
-            y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
-            z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
-            SkidPlatform: bodyResult.AWBInfoList[i].order,
-            Uld: bodyResult.UldId,
-            Awb: bodyResult.AWBInfoList[i].AwbId,
-          };
-          buildUpOrderParamArray.push(buildUpOrderBody);
+          asrsOutOrderParamArray.push(asrsOutOrderParam);
         }
       }
+      const asrsOutOrderResult = await queryRunner.manager
+        .getRepository(AsrsOutOrder)
+        .upsert(asrsOutOrderParamArray, ['Asrs', 'Awb']);
 
-      const joinResult = queryRunner.manager
-        .getRepository(SimulatorResultAwbJoin)
-        .save(joinParamArray);
-      const historyResult = queryRunner.manager
-        .getRepository(SimulatorHistory)
-        .save(historyParamArray);
-      //  등록된 buildupOrder를 처리하기 위한 service 처리
-      const buildUpOrderResult = this.buildUpOrderService.createList(
-        buildUpOrderParamArray,
-        queryRunner,
-      );
+      // 1-1. 자동창고 작업지시 데이터 mqtt로 publish 하기
+      // 자동창고 작업지시가 생성되었을 때만 동작합니다.
+      if (asrsOutOrderResult) {
+        // 자동창고 작업지시를 객체형태로 mqtt에 publish하기 위한 find 과정
+        const asrsResult = await queryRunner.manager
+          .getRepository(AsrsOutOrder)
+          .find({
+            relations: {
+              Asrs: true,
+              Awb: true,
+            },
+            select: {
+              Asrs: { id: true },
+              Awb: { id: true },
+            },
+            where: {
+              id: In(asrsOutOrderResult.identifiers.map((v) => v.id)),
+            },
+            order: { order: 'asc' },
+          });
 
-      // 3. awbjoin 테이블, 이력 테이블 함께 저장
-      await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳
+        // 불출순서를 mqtt에 배열로 보내기위해 전처리 과정
+        const asrsOutOrder = asrsResult.map((asrsOutOrderElement) => {
+          const Awb = asrsOutOrderElement.Awb as Awb;
+          const Asrs = asrsOutOrderElement.Asrs as Asrs;
+          return {
+            order: asrsOutOrderElement.order,
+            asrs: Asrs.id,
+            awb: Awb.id,
+          };
+        });
+
+        // asrs의 출고이력을 저장하기 위함 (작업지시가 만들어짐과 동시에 출고된다고 생각)
+        const releaseAwb = asrsOutOrder[0];
+        const asrsHistoryBody: CreateAsrsHistoryDto = {
+          Asrs: releaseAwb.asrs,
+          Awb: releaseAwb.awb,
+          inOutType: 'out',
+          count: 1,
+        };
+        await queryRunner.manager
+          .getRepository(AsrsHistory)
+          .save(asrsHistoryBody);
+
+        /**
+         * 시뮬레이션 결과,이력을 저장하기 위한 부분 start
+         */
+        const simulatorResultBody: CreateSimulatorResultDto = {
+          startDate: new Date(),
+          endDate: new Date(),
+          loadRate: +bodyResult.squareVolumeRatio, // 적재율
+          version: bodyResult.version,
+          simulation: mode, // [시뮬레이션, 커넥티드 분기]
+          Uld: bodyResult.UldId,
+        };
+        const simulatorResultResult = await queryRunner.manager
+          .getRepository(SimulatorResult)
+          .save(simulatorResultBody);
+
+        const joinParamArray: CreateSimulatorResultAwbJoinDto[] = [];
+        const historyParamArray: CreateSimulatorHistoryDto[] = [];
+
+        // 2-3. 입력되는 화물과 좌표를 이력에 입력
+        for (let i = 0; i < bodyResult.AWBInfoList.length; i++) {
+          const coordinate = bodyResult.AWBInfoList[i].coordinate;
+          // 2-1. 어떤 Awb를 썼는지 등록
+          const joinParam: CreateSimulatorResultAwbJoinDto = {
+            Awb: bodyResult.AWBInfoList[i].AwbId, // awbId연결
+            SimulatorResult: simulatorResultResult.id,
+          };
+          joinParamArray.push(joinParam);
+
+          for (let j = 1; j <= coordinate.length; j++) {
+            // 2-2. 어떤 Uld, 각각의 화물의 좌표 값, 시뮬레이터를 썼는지 이력저장
+            const historyParam: CreateSimulatorHistoryDto = {
+              Uld: bodyResult.UldId,
+              Awb: bodyResult.AWBInfoList[i].AwbId,
+              SimulatorResult: simulatorResultResult.id,
+              simulation: mode,
+              x: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}x`],
+              y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
+              z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
+            };
+            historyParamArray.push(historyParam);
+          }
+        }
+
+        const joinResult = queryRunner.manager
+          .getRepository(SimulatorResultAwbJoin)
+          .save(joinParamArray);
+        const historyResult = queryRunner.manager
+          .getRepository(SimulatorHistory)
+          .save(historyParamArray);
+
+        // 3. awbjoin 테이블, 이력 테이블 함께 저장
+        await Promise.all([joinResult, historyResult]); // 실제로 쿼리 날아가는곳
+        /**
+         * 시뮬레이션 결과,이력을 저장하기 위한 부분 end
+         */
+
+        // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
+        this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
+
+        // 1-3. 최적 불출순서를 자동창고(ASRS) PLC에 write 완료했다는 신호
+        this.client
+          .send(`hyundai/asrs1/writeCompl`, { writeOrder: true })
+          .pipe(take(1))
+          .subscribe();
+      }
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -837,6 +1137,141 @@ export class SimulatorResultService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  // 패키지 시뮬레이터의 결과로 [안착대 추천도] 반환하는 곳
+  async getAWBinPalletRack(apiRequest: userSelectInput) {
+    const queryRunner = await this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
+
+    // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
+    const asrsStateArray = await this.asrsHistoryService.nowState();
+    // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const skidPlatformStateArray =
+      await this.skidPlatformHistoryService.nowState();
+    // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const uldStateArray = await this.uldHistoryService.nowState(
+      apiRequest.UldCode,
+    );
+
+    // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
+    // 현재 ASRS의 정보들
+    const Awbs = [];
+    for (const asrsHistory of asrsStateArray) {
+      const AwbInfo = asrsHistory.Awb as Awb;
+      const AsrsInfo = asrsHistory.Asrs as Asrs;
+      const targetAwb = {
+        id: AwbInfo.id,
+        storageId: AsrsInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      Awbs.push(targetAwb);
+    }
+
+    // ps에 보낼 Uld정보를 모아두는
+    const Ulds = [];
+    const uldResult = await this.uldRepository.findOne({
+      select: {
+        UldType: UldTypeAttribute,
+      },
+      relations: {
+        UldType: true,
+      },
+      where: {
+        code: apiRequest.UldCode,
+      },
+    });
+
+    // Uld주입하기
+    if (uldResult) {
+      const { id, code, UldType } = uldResult;
+      const { width, length, depth, vertexCord } = UldType as UldType;
+      Ulds.push({
+        id,
+        code,
+        width,
+        length,
+        depth,
+        // maxWeight: uldTypeResult.maxWeight,준규님이랑 최대 문개 어떻게 넣을지 논의하기
+        uldType: typeof UldType === 'object' ? UldType.code : null,
+        maxWeight: 10000,
+        vertexCord,
+      });
+    }
+
+    // 안착대 현재 상황 묶음
+    const palletRack = [];
+    for (const skidPlatformHistory of skidPlatformStateArray) {
+      const AwbInfo = skidPlatformHistory.Awb as Awb;
+      const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
+      const targetSkidPlatform = {
+        id: AwbInfo.id,
+        palletRackId: SkidPlatformInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      palletRack.push(targetSkidPlatform);
+    }
+
+    // uld의 현재 상황 묶음
+    const currentAWBsInULD = [];
+    for (const uldHistory of uldStateArray) {
+      const AwbInfo = uldHistory.Awb as Awb;
+      const targetUld = {
+        id: AwbInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      currentAWBsInULD.push(targetUld);
+    }
+
+    // 사용자가 넣는 화물
+    // const inputAWB = {
+    //   id: apiRequest.id,
+    //   palletRackId: apiRequest.palletRackId,
+    //   name: apiRequest.name,
+    //   width: apiRequest.width,
+    //   length: apiRequest.length,
+    //   depth: apiRequest.depth,
+    //   waterVolume: apiRequest.waterVolume,
+    //   weight: apiRequest.weight,
+    //   SCCs: apiRequest.SCCs,
+    // };
+
+    const packageSimulatorCallRequestObject = {
+      mode: false,
+      Awbs: Awbs,
+      Ulds: Ulds,
+      currentAWBsInULD: currentAWBsInULD,
+      palletRack: palletRack,
+      // inputAWB: inputAWB,
+    };
+
+    const psResult = await getAWBinPalletRack(
+      packageSimulatorCallRequestObject,
+    );
+    // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
+
+    return psResult;
   }
 
   async findAll(query: SimulatorResult & BasicQueryParamDto) {

@@ -205,7 +205,7 @@ export class Awb {
     example: '/c/file/xxx',
     description: '이미지 경로',
   })
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 5000, nullable: true })
   path: string;
 
   @ApiProperty({
