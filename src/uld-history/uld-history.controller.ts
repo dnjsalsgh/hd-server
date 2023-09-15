@@ -20,6 +20,10 @@ import { UldHistory } from './entities/uld-history.entity';
 export class UldHistoryController {
   constructor(private readonly uldHistoryService: UldHistoryService) {}
 
+  @ApiOperation({
+    summary: 'uld 안에 화물이 입력되면 호출하는 api',
+    description: '[사용법] Uld: 목표 uldId, Awb: 사용된 awbId',
+  })
   @Post()
   create(@Body() createUldHistoryDto: CreateUldHistoryDto) {
     return this.uldHistoryService.create(createUldHistoryDto);
