@@ -11,7 +11,7 @@ import {
 import { AmrChargerService } from './amr-charger.service';
 import { CreateAmrChargerDto } from './dto/create-amr-charger.dto';
 import { UpdateAmrChargerDto } from './dto/update-amr-charger.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AmrCharger } from './entities/amr-charger.entity';
 
@@ -20,6 +20,10 @@ import { AmrCharger } from './entities/amr-charger.entity';
 export class AmrChargerController {
   constructor(private readonly amrChargerService: AmrChargerService) {}
 
+  @ApiOperation({
+    summary: '[사용x] amr 데이터 입력시 자동으로 등록됨',
+    description: 'amr, amrCharge, amrChargeHistory 모두 등록함',
+  })
   @Post()
   create(@Body() createAmrChargerDto: CreateAmrChargerDto) {
     return this.amrChargerService.create(createAmrChargerDto);
