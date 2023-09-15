@@ -145,7 +145,8 @@ export class AwbController implements OnModuleInit {
   }
 
   @ApiOperation({
-    summary: '모델링 완료 신호를 받으면 awb에 model파일 경로 결합해주기',
+    summary:
+      '[사용x] 모델링 완료 신호를 받으면 awb에 model파일 경로 결합해주는 태스트 api',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
