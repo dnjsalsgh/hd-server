@@ -15,16 +15,33 @@ import {
 import { AircraftAttribute } from '../aircraft/entities/aircraft.entity';
 import { CcIdDestinationAttribute } from '../common-code/entities/common-code.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { AwbAttribute } from '../awb/entities/awb.entity';
+import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 
 @Injectable()
 export class AircraftScheduleService {
   constructor(
     @InjectRepository(AircraftSchedule)
     private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
+    @InjectRepository(Awb)
+    private readonly awbRepository: Repository<Awb>,
   ) {}
 
   create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
+    return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
+  }
+
+  async createWithAwbs(createAircraftScheduleDto: CreateAircraftScheduleDto) {
+    const { Awbs, ...aircraftSchedule } = createAircraftScheduleDto;
+
+    const aircraftScheduleResult = await this.aircraftScheduleRepository.save(
+      createAircraftScheduleDto,
+    );
+
+    for (const awb of Awbs) {
+      awb.AirCraftSchedule = aircraftScheduleResult.id;
+      const awbsResult = this.awbRepository.save(awb);
+    }
+
     return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
   }
 

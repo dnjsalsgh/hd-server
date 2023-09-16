@@ -26,6 +26,15 @@ export class AircraftScheduleController {
     return await this.aircraftScheduleService.create(createAircraftScheduleDto);
   }
 
+  @Post('/with/awbs')
+  async createWithAwbs(
+    @Body() createAircraftScheduleDto: CreateAircraftScheduleDto,
+  ) {
+    return await this.aircraftScheduleService.createWithAwbs(
+      createAircraftScheduleDto,
+    );
+  }
+
   @ApiQuery({ name: 'Aircraft', required: false, type: 'number' })
   @ApiQuery({ name: 'CcIdDestination', required: false, type: 'number' })
   @ApiQuery({ name: 'CcIdDeparture', required: false, type: 'number' })

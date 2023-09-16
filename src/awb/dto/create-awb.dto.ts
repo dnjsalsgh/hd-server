@@ -35,6 +35,7 @@ export class CreateAwbDto extends PickType(Awb, [
   'localTime',
   'localInTerminal',
   'AwbGroup',
+  'AirCraftSchedule',
 ]) {
   @ApiProperty({
     example: '["GEN","EAT"]',
