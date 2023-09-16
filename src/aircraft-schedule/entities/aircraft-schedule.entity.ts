@@ -95,8 +95,8 @@ export class AircraftSchedule {
     description: '화물FK',
     type: () => Awb,
   })
-  @ManyToOne(() => Awb, (awb) => awb.AirCraftSchedules)
-  Awb: Relation<Awb> | number;
+  @OneToMany(() => Awb, (awb) => awb.AirCraftSchedule)
+  Awbs: Relation<Awb[]> | number;
 
   @ApiProperty({
     example: 1,

@@ -256,6 +256,12 @@ export class Awb {
   @ManyToOne(() => AwbGroup, (awbGroup) => awbGroup.awbs)
   AwbGroup?: Relation<AwbGroup> | number;
 
+  @ManyToOne(
+    () => AircraftSchedule,
+    (aircraftSchedule) => aircraftSchedule.Awbs,
+  )
+  AirCraftSchedule?: Relation<AircraftSchedule> | number;
+
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Awb)
   BuildUpOrders: Relation<BuildUpOrder[]>;
 
@@ -282,9 +288,6 @@ export class Awb {
     (simulatorResultAwbJoin) => simulatorResultAwbJoin.Awb,
   )
   srJoin: Relation<SimulatorResultAwbJoin[]>;
-
-  @OneToMany(() => AircraftSchedule, (aircraftSchedule) => aircraftSchedule.Awb)
-  AirCraftSchedules: Relation<AircraftSchedule[]>;
 
   @ManyToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.Awb, {
     cascade: true,

@@ -147,7 +147,7 @@ export class AwbService {
         CcIdDeparture:
           routeResult.find((item) => item.code === createAwbDto.departure)
             ?.id || 0,
-        Awb: awbResult.id,
+        // Awb: awbResult.id,
       };
       await queryRunner.manager
         .getRepository(AircraftSchedule)
@@ -358,7 +358,7 @@ export class AwbService {
       skip: query.offset,
       relations: {
         Scc: true,
-        AirCraftSchedules: true,
+        // AirCraftSchedules: true,
       },
     });
     return searchResult;
@@ -369,7 +369,7 @@ export class AwbService {
       where: [{ id: id }, { parent: id }],
       relations: {
         Scc: true,
-        AirCraftSchedules: true,
+        // AirCraftSchedules: true,
       },
     });
   }
@@ -379,7 +379,7 @@ export class AwbService {
       where: { id: id },
       relations: {
         Scc: true,
-        AirCraftSchedules: true,
+        // AirCraftSchedules: true,
       },
     });
     return searchResult;
