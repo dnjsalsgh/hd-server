@@ -15,6 +15,7 @@ import {
 import { AircraftAttribute } from '../aircraft/entities/aircraft.entity';
 import { CcIdDestinationAttribute } from '../common-code/entities/common-code.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import { AwbAttribute } from '../awb/entities/awb.entity';
 
 @Injectable()
 export class AircraftScheduleService {
@@ -52,11 +53,13 @@ export class AircraftScheduleService {
         Aircraft: true,
         CcIdDestination: true,
         CcIdDeparture: true,
+        Awbs: true,
       },
       select: {
         Aircraft: AircraftAttribute,
         CcIdDestination: CcIdDestinationAttribute,
         CcIdDeparture: CcIdDestinationAttribute,
+        Awbs: AwbAttribute,
       },
       where: {
         source: source ? ILike(`%${source}%`) : undefined,
@@ -81,11 +84,13 @@ export class AircraftScheduleService {
         Aircraft: true,
         CcIdDestination: true,
         CcIdDeparture: true,
+        Awbs: true,
       },
       select: {
         Aircraft: AircraftAttribute,
         CcIdDestination: CcIdDestinationAttribute,
         CcIdDeparture: CcIdDestinationAttribute,
+        Awbs: AwbAttribute,
       },
     });
   }
