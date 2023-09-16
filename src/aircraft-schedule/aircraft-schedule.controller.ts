@@ -12,7 +12,7 @@ import {
 import { AircraftScheduleService } from './aircraft-schedule.service';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @Controller('aircraft-schedule')
 @ApiTags('[항공기 스케줄]aircraft-schedule')
@@ -26,6 +26,9 @@ export class AircraftScheduleController {
     return await this.aircraftScheduleService.create(createAircraftScheduleDto);
   }
 
+  @ApiOperation({
+    summary: '항공편 안에 화물 정보를 넣어서 입력하기 위한 api',
+  })
   @Post('/with/awbs')
   async createWithAwbs(
     @Body() createAircraftScheduleDto: CreateAircraftScheduleDto,

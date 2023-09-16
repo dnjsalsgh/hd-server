@@ -57,7 +57,8 @@ export class AwbController implements OnModuleInit {
   }
 
   @ApiOperation({
-    summary: 'vms 입력데이터 저장하기(scc와 항공편 스케줄 함께)',
+    summary:
+      '[사용x] vms 입력데이터 저장하기(scc와 항공편 스케줄 함께) /airschedule/awb를 사용하세요',
   })
   @Post('/aircraft')
   createWithAircraftInfo(@Body() createAwbDto: CreateAwbWithAircraftDto) {
