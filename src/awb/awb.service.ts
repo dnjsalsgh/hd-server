@@ -545,9 +545,12 @@ export class AwbService {
 
   async getAwbNotCombineModelPath() {
     return await this.awbRepository.find({
-      where: {
-        modelPath: IsNull(), // modelPath가 null인 경우, modelPath가 빈 문자열인 경우
-      },
+      where: [
+        {
+          modelPath: IsNull(), // modelPath가 null인 경우, modelPath가 빈 문자열인 경우
+          path: IsNull(),
+        },
+      ],
       order: { id: 'desc' },
     });
   }
