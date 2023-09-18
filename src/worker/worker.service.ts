@@ -36,12 +36,15 @@ export class WorkerService {
 
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
   // * 10 * * * *
-  @Cron('* 10 * * * *', {
+  // every 10minute between 8am and 7pm
+  // @Cron('* */10 8-19 * * *', {
+  @Cron('*/10 * * * * *', {
     name: 'missingAWBModelingFileHandlingLogic',
     timeZone: 'Asia/Seoul',
   })
   async missingAWBModelingFileHandlingLogic() {
     const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
+    console.log(missModelAwbList);
     if (missModelAwbList && missModelAwbList.length > 0) {
       const directory =
         this.configService.get<string>('NODE_ENV') === 'pro'
