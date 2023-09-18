@@ -26,6 +26,7 @@ import { AwbGroup } from '../awb-group/entities/awb-group.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Vms } from '../vms/entities/vms.entity';
 import { Hacs } from '../hacs/entities/hacs.entity';
+import { Alarm } from '../alarm/entities/alarm.entity';
 
 const postgresConfig: TypeOrmModuleOptions = {
   // PostgreSQL 연결 설정...
@@ -60,6 +61,7 @@ const postgresConfig: TypeOrmModuleOptions = {
     AircraftSchedule,
     CommonCode,
     AwbGroup,
+    Alarm,
   ],
   // autoLoadEntities: true,  [버그있어서 사용 지양]
   logging: true, // 쿼리 보여주는 옵션

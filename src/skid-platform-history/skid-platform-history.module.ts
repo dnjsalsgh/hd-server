@@ -4,9 +4,13 @@ import { SkidPlatformHistoryController } from './skid-platform-history.controlle
 import { SkidPlatformHistory } from './entities/skid-platform-history.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
+import { MqttModule } from '../mqtt.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SkidPlatformHistory, AsrsOutOrder])],
+  imports: [
+    TypeOrmModule.forFeature([SkidPlatformHistory, AsrsOutOrder]),
+    MqttModule,
+  ],
   controllers: [SkidPlatformHistoryController],
   providers: [SkidPlatformHistoryService],
 })

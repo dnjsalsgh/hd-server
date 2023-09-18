@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
 import { UpdateSkidPlatformHistoryDto } from './dto/update-skid-platform-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,6 +21,8 @@ import {
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import { ClientProxy } from '@nestjs/microservices';
+import { take } from 'rxjs';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -29,14 +31,32 @@ export class SkidPlatformHistoryService {
     private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
     @InjectRepository(AsrsOutOrder)
     private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
   async create(createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto) {
-    const asrs = await this.skidPlatformHistoryRepository.create(
+    const historyResult = await this.skidPlatformHistoryRepository.save(
       createSkidPlatformHistoryDto,
     );
 
-    await this.skidPlatformHistoryRepository.save(asrs);
-    return asrs;
+    const historyResultObject = await this.skidPlatformHistoryRepository.find({
+      select: {
+        Awb: AwbAttribute,
+        Asrs: AsrsAttribute,
+        SkidPlatform: SkidPlatformAttribute,
+      },
+      relations: {
+        Awb: true,
+        Asrs: true,
+        SkidPlatform: true,
+      },
+    });
+
+    // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송
+    this.client
+      .send(`hyundai/skidPlatform/insert`, historyResultObject)
+      .pipe(take(1))
+      .subscribe();
+    return historyResult;
   }
 
   async findAll(query: SkidPlatformHistory & BasicQueryParamDto) {

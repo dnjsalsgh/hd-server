@@ -125,11 +125,6 @@ export class AwbService {
         .getRepository(CommonCode)
         .find({ where: { masterCode: 'route' } });
 
-      // 2. awb를 입력하기
-      const awbResult = await queryRunner.manager
-        .getRepository(Awb)
-        .save(awbDto);
-
       // 3. aircraftSchedule 입력하기
       const aircraftScheduleBody: CreateAircraftScheduleDto = {
         source: createAwbDto.source,
@@ -147,11 +142,18 @@ export class AwbService {
         CcIdDeparture:
           routeResult.find((item) => item.code === createAwbDto.departure)
             ?.id || 0,
-        Awb: awbResult.id,
+        // Awb: awbResult.id,
       };
-      await queryRunner.manager
+      const aircraftScheduleResult = await queryRunner.manager
         .getRepository(AircraftSchedule)
         .save(aircraftScheduleBody);
+
+      // 화물이 어떤 항공편으로 왔는지 추적하는 작업
+      awbDto.AirCraftSchedule = aircraftScheduleResult.id;
+      // 2. awb를 입력하기
+      const awbResult = await queryRunner.manager
+        .getRepository(Awb)
+        .save(awbDto);
 
       // scc 정보, awb이 입력되어야 동작하게끔
       if (scc && awbResult) {
@@ -358,7 +360,7 @@ export class AwbService {
       skip: query.offset,
       relations: {
         Scc: true,
-        AirCraftSchedules: true,
+        // AirCraftSchedules: true,
       },
     });
     return searchResult;
@@ -369,7 +371,7 @@ export class AwbService {
       where: [{ id: id }, { parent: id }],
       relations: {
         Scc: true,
-        AirCraftSchedules: true,
+        // AirCraftSchedules: true,
       },
     });
   }
@@ -379,7 +381,7 @@ export class AwbService {
       where: { id: id },
       relations: {
         Scc: true,
-        AirCraftSchedules: true,
+        // AirCraftSchedules: true,
       },
     });
     return searchResult;

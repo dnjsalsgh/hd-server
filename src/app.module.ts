@@ -39,6 +39,7 @@ import { WorkerModule } from './worker/worker.module';
 import { CheckModule } from './check/check.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
+import { AlarmModule } from './alarm/alarm.module';
 
 @Module({
   imports: [
@@ -102,6 +103,7 @@ import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializ
 
     HacsModule,
     CheckModule,
+    AlarmModule,
     // WorkerModule,
   ],
   controllers: [AppController],

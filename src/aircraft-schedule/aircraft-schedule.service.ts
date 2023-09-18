@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,16 +15,42 @@ import {
 import { AircraftAttribute } from '../aircraft/entities/aircraft.entity';
 import { CcIdDestinationAttribute } from '../common-code/entities/common-code.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
+import { ClientProxy } from '@nestjs/microservices';
+import { take } from 'rxjs';
 
 @Injectable()
 export class AircraftScheduleService {
   constructor(
     @InjectRepository(AircraftSchedule)
     private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
+    @InjectRepository(Awb)
+    private readonly awbRepository: Repository<Awb>,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
   create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
     return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
+  }
+
+  async createWithAwbs(createAircraftScheduleDto: CreateAircraftScheduleDto) {
+    const { Awbs, ...aircraftSchedule } = createAircraftScheduleDto;
+
+    const aircraftScheduleResult = await this.aircraftScheduleRepository.save(
+      createAircraftScheduleDto,
+    );
+
+    for (const awb of Awbs) {
+      awb.AirCraftSchedule = aircraftScheduleResult.id;
+      const awbsResult = this.awbRepository.save(awb);
+    }
+    const insertResult = await this.aircraftScheduleRepository.save(
+      createAircraftScheduleDto,
+    );
+    this.client
+      .send(`hyundai/aircraftSchedule/insert`, insertResult)
+      .subscribe();
+    return insertResult;
   }
 
   async findAll(
@@ -52,11 +78,13 @@ export class AircraftScheduleService {
         Aircraft: true,
         CcIdDestination: true,
         CcIdDeparture: true,
+        Awbs: true,
       },
       select: {
         Aircraft: AircraftAttribute,
         CcIdDestination: CcIdDestinationAttribute,
         CcIdDeparture: CcIdDestinationAttribute,
+        Awbs: AwbAttribute,
       },
       where: {
         source: source ? ILike(`%${source}%`) : undefined,
@@ -71,23 +99,29 @@ export class AircraftScheduleService {
       cache: 60000, // 1 minute caching
     });
 
+    this.client.send(`hyundai/aircraftSchedule/find`, result).subscribe();
+
     return result;
   }
 
   async findOne(id: number) {
-    return await this.aircraftScheduleRepository.find({
+    const result = await this.aircraftScheduleRepository.find({
       where: { id: id },
       relations: {
         Aircraft: true,
         CcIdDestination: true,
         CcIdDeparture: true,
+        Awbs: true,
       },
       select: {
         Aircraft: AircraftAttribute,
         CcIdDestination: CcIdDestinationAttribute,
         CcIdDeparture: CcIdDestinationAttribute,
+        Awbs: AwbAttribute,
       },
     });
+    this.client.send(`hyundai/aircraftSchedule/find`, result).subscribe();
+    return result;
   }
 
   async update(
