@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateAsrsHistoryDto } from './dto/create-asrs-history.dto';
 import { UpdateAsrsHistoryDto } from './dto/update-asrs-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AsrsAttribute } from '../asrs/entities/asrs.entity';
+import { Asrs, AsrsAttribute } from '../asrs/entities/asrs.entity';
 import {
   Between,
   DataSource,
@@ -13,7 +13,7 @@ import {
   Repository,
 } from 'typeorm';
 import { AsrsHistory } from './entities/asrs-history.entity';
-import { AwbAttribute } from '../awb/entities/awb.entity';
+import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 
 @Injectable()
@@ -26,10 +26,24 @@ export class AsrsHistoryService {
 
   async create(createAsrsHistoryDto: CreateAsrsHistoryDto) {
     if (
-      typeof createAsrsHistoryDto.Asrs === 'number' &&
-      typeof createAsrsHistoryDto.Awb === 'number'
+      typeof createAsrsHistoryDto.Asrs === 'string' &&
+      typeof createAsrsHistoryDto.Awb === 'string'
     ) {
-      return await this.asrsHistoryRepository.save(createAsrsHistoryDto);
+      const AsrsResult = await this.dataSource.manager
+        .getRepository(Asrs)
+        .findOne({ where: { name: createAsrsHistoryDto.Asrs } });
+
+      const AwbResult = await this.dataSource.manager
+        .getRepository(Awb)
+        .findOne({ where: { name: createAsrsHistoryDto.Awb } });
+
+      // 창고, 화물의 이름으로 찾은 것들 id로 변환작업
+      createAsrsHistoryDto.Asrs = AsrsResult.id;
+      createAsrsHistoryDto.Awb = AwbResult.id;
+
+      return await this.asrsHistoryRepository.save(
+        createAsrsHistoryDto as AsrsHistory,
+      );
     }
   }
 
@@ -94,7 +108,10 @@ export class AsrsHistoryService {
   }
 
   update(id: number, updateAsrsHistoryDto: UpdateAsrsHistoryDto) {
-    return this.asrsHistoryRepository.update(id, updateAsrsHistoryDto);
+    return this.asrsHistoryRepository.update(
+      id,
+      updateAsrsHistoryDto as AsrsHistory,
+    );
   }
 
   remove(id: number) {

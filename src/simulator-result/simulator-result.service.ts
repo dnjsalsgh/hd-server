@@ -594,7 +594,7 @@ export class SimulatorResultService {
         };
         await queryRunner.manager
           .getRepository(AsrsHistory)
-          .save(asrsHistoryBody);
+          .save(asrsHistoryBody as AsrsHistory);
 
         /**
          * 시뮬레이션 결과,이력을 저장하기 위한 부분 start
@@ -1071,7 +1071,7 @@ export class SimulatorResultService {
         };
         await queryRunner.manager
           .getRepository(AsrsHistory)
-          .save(asrsHistoryBody);
+          .save(asrsHistoryBody as AsrsHistory);
 
         /**
          * 시뮬레이션 결과,이력을 저장하기 위한 부분 start
