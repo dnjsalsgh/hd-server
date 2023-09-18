@@ -56,7 +56,8 @@ export class SimulatorResultController {
   }
 
   @ApiOperation({
-    summary: '[최초에 안착대 4개 다 비어있을 시] asrs작업지시 만들기 ',
+    summary:
+      '[최초에 안착대 4개 다 비어있을 시] asrs작업지시 만들기, build-up-order 같이만들기 ',
     description:
       'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
