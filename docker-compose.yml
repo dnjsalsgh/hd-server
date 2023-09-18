@@ -56,7 +56,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
       SCHEDULE: ${SCHEDULE}
-      DATABASE_HOST: host.docker.internal # Use host.docker.internal to refer to the host machine's IP
+      DATABASE_HOST: ${DATABASE_HOST} # Use host.docker.internal to refer to the host machine's IP
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASS: ${DATABASE_PASS}
@@ -67,7 +67,7 @@ services:
       MQTT_PORT: ${MQTT_PORT}
       MSSQL_DATABASE_USER: ${MSSQL_DATABASE_USER}
       MSSQL_DATABASE_PASS: ${MSSQL_DATABASE_PASS}
-      MSSQL_DATABASE_HOST: host.docker.internal
+      MSSQL_DATABASE_HOST: ${MSSQL_DATABASE_HOST}
       MSSQL_DATABASE_NAME: ${MSSQL_DATABASE_NAME}
       MSSQL_DATABASE_PORT: ${MSSQL_DATABASE_PORT}
       NAS_PATH: ${NAS_PATH}
