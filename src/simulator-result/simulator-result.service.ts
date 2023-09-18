@@ -663,6 +663,7 @@ export class SimulatorResultService {
       }
 
       await queryRunner.commitTransaction();
+      return psResult;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);

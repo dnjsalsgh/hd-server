@@ -27,7 +27,10 @@ export class AlarmService {
   ) {}
   async create(createAlarmDto: CreateAlarmDto) {
     const result = await this.alarmRepository.save(createAlarmDto);
-    this.client.send(`hyundai/alarm/insert`, result).pipe(take(1)).subscribe();
+    this.client
+      .send(`hyundai/alarm/insert`, result.id)
+      .pipe(take(1))
+      .subscribe();
     return result;
   }
 
