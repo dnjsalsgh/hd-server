@@ -202,7 +202,7 @@ export class AwbController implements OnModuleInit {
   }
 
   // VMS 설비데이터 데이터를 추적하는 mqtt
-  @MessagePattern('hyundai/vms1/epData') //구독하는 주제
+  @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
   async createByPlcMatt(@Payload() data) {
     // vms 데이터 mqtt로 publish 하기 위함
     this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
@@ -260,6 +260,7 @@ export class AwbController implements OnModuleInit {
             missingFile,
             awbName,
             localUploadPath,
+            fileContent,
           );
         }
       }
@@ -333,6 +334,7 @@ export class AwbController implements OnModuleInit {
             missingFile,
             awbName,
             pathOfUploadedFile,
+            fileContent,
           );
         }
       }
