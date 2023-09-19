@@ -46,7 +46,6 @@ export class WorkerService {
     if (this.configService.get<string>('SCHEDULE') === 'true') {
       const missModelAwbList =
         await this.awbService.getAwbNotCombineModelPath();
-      console.log(missModelAwbList);
       if (missModelAwbList && missModelAwbList.length > 0) {
         const directory =
           this.configService.get<string>('NODE_ENV') === 'pro'
@@ -83,6 +82,7 @@ export class WorkerService {
               missingFile,
               awbName,
               localUploadPath,
+              fileContent,
             );
           }
         }

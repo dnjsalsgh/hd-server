@@ -515,6 +515,7 @@ export class AwbService {
     fileName: string,
     awbName: string,
     filePath: string,
+    fileContent: Buffer,
   ) {
     try {
       const targetAwb = await this.awbRepository.findOne({
@@ -523,9 +524,21 @@ export class AwbService {
       // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
 
       if (fileName.includes('png')) {
-        await this.awbRepository.update(targetAwb.id, { path: filePath }); // png면 path column에 저장
+        // await this.awbRepository.update(targetAwb.id, { path: filePath }); // png면 path column에 저장
+        await this.awbRepository.update(targetAwb.id, {
+          path: filePath,
+          state: 'save',
+        }); // png면 path column에 저장
       } else if (fileName.includes('obj')) {
-        await this.awbRepository.update(targetAwb.id, { modelPath: filePath }); // obj면 modelPath column에 저장
+        // await this.awbRepository.update(targetAwb.id, { modelPath: filePath }); // obj면 modelPath column에 저장
+        console.log(
+          'fileContent.toString() = ',
+          fileContent.toString('binary'),
+        );
+        await this.awbRepository.update(targetAwb.id, {
+          modelPath: filePath,
+          state: 'save',
+        }); // obj면 modelPath column에 저장
       }
     } catch (e) {
       console.error(e);

@@ -260,6 +260,7 @@ export class AwbController implements OnModuleInit {
             missingFile,
             awbName,
             localUploadPath,
+            fileContent,
           );
         }
       }
@@ -333,6 +334,7 @@ export class AwbController implements OnModuleInit {
             missingFile,
             awbName,
             pathOfUploadedFile,
+            fileContent,
           );
         }
       }
