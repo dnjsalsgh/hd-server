@@ -821,7 +821,6 @@ export class SimulatorResultService {
 
     try {
       const bodyResult = psResult.result[0];
-
       // mqtt에 보낼 불출 서열
       const mqttOutOrderArray = [];
       const targetAwb = await this.awbRepository.findOne({
@@ -898,6 +897,11 @@ export class SimulatorResultService {
             Uld: bodyResult.UldId,
             Awb: bodyResult.predictionResult[i].AwbId,
           };
+          console.log(
+            'buildUpOrderBody.Uld, buildUpOrderBody.Awb = ',
+            buildUpOrderBody.Uld,
+            buildUpOrderBody.Awb,
+          );
           buildUpOrderParamArray.push(buildUpOrderBody);
         }
       }
