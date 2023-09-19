@@ -815,13 +815,12 @@ export class SimulatorResultService {
       palletRack: palletRack,
       inputAWB: inputAWB,
     };
-
+    console.log(JSON.stringify(packageSimulatorCallRequestObject));
     const psResult = await getUserSelect(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
     try {
       const bodyResult = psResult.result[0];
-
       // mqtt에 보낼 불출 서열
       const mqttOutOrderArray = [];
       const targetAwb = await this.awbRepository.findOne({
@@ -898,6 +897,7 @@ export class SimulatorResultService {
             Uld: bodyResult.UldId,
             Awb: bodyResult.predictionResult[i].AwbId,
           };
+
           buildUpOrderParamArray.push(buildUpOrderBody);
         }
       }

@@ -23,6 +23,7 @@ services:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASS}
       POSTGRES_DB: ${DATABASE_NAME}
+      TZ: 'Asia/Seoul' # 환경 변수 TZ에 시간대 설정 추가
     networks:
       - overlay
     volumes:
@@ -72,6 +73,7 @@ services:
       MSSQL_DATABASE_PORT: ${MSSQL_DATABASE_PORT}
       NAS_PATH: ${NAS_PATH}
       LOCAL_UPLOAD_PATH: ${LOCAL_UPLOAD_PATH}
+      TZ: 'Asia/Seoul'
     ports:
       - '3000:3000'
     volumes:
