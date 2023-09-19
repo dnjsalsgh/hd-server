@@ -57,10 +57,12 @@ export class AsrsHistoryService {
       .leftJoinAndSelect('ah.Asrs', 'Asrs')
       .leftJoinAndSelect('ah.Awb', 'Awb')
       .leftJoinAndSelect('Awb.Scc', 'Scc') // awb의 Scc를 반환합니다.
+      // .where('ah.inOutType = :inOutType', { inOutType: 'in' }) // inOutType이 'in'인 경우 필터링
       .orderBy('ah.asrs_id')
       .addOrderBy('ah.id', 'DESC')
       .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
-    return asrsState;
+
+    return asrsState.filter((v) => v.inOutType === 'in');
   }
 
   async findAll(query: AsrsHistory & BasicQueryParamDto) {

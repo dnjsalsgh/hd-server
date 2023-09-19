@@ -815,7 +815,7 @@ export class SimulatorResultService {
       palletRack: palletRack,
       inputAWB: inputAWB,
     };
-
+    console.log(JSON.stringify(packageSimulatorCallRequestObject));
     const psResult = await getUserSelect(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
@@ -897,11 +897,7 @@ export class SimulatorResultService {
             Uld: bodyResult.UldId,
             Awb: bodyResult.predictionResult[i].AwbId,
           };
-          console.log(
-            'buildUpOrderBody.Uld, buildUpOrderBody.Awb = ',
-            buildUpOrderBody.Uld,
-            buildUpOrderBody.Awb,
-          );
+
           buildUpOrderParamArray.push(buildUpOrderBody);
         }
       }
