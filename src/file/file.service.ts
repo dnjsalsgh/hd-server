@@ -4,7 +4,7 @@ import path from 'path';
 
 @Injectable()
 export class FileService {
-  async readFile(filePath: string): Promise<Buffer | any> {
+  async readFile(filePath: string): Promise<Buffer> {
     try {
       const fileContent = await fs.readFile(filePath);
       return fileContent;
