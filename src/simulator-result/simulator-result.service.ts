@@ -534,6 +534,7 @@ export class SimulatorResultService {
       Awbs: Awbs,
       Ulds: Ulds,
     };
+
     const psResult = await getOrderDischarge(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
