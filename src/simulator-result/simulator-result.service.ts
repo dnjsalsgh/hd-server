@@ -8,8 +8,10 @@ import {
   FindOperator,
   ILike,
   In,
+  InsertResult,
   LessThanOrEqual,
   MoreThanOrEqual,
+  QueryRunner,
   Repository,
   TypeORMError,
 } from 'typeorm';
@@ -55,6 +57,7 @@ import { userSelectInput } from './dto/user-select-input.dto';
 import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
 import { UldHistoryService } from '../uld-history/uld-history.service';
 import { awbInPalletRackResult } from './dto/get-Awb-in-palletPack.dto';
+import { UldHistory } from '../uld-history/entities/uld-history.entity';
 
 @Injectable()
 export class SimulatorResultService {
@@ -480,54 +483,11 @@ export class SimulatorResultService {
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
     // ps에 보낼 Awb 정보들 모아두는 배열
     const Awbs = [];
-    for (const asrsHistory of asrsStateArray) {
-      const AwbInfo = asrsHistory.Awb as Awb;
-      const AsrsInfo = asrsHistory.Asrs as Asrs;
-      const targetAwb = {
-        id: AwbInfo.id,
-        storageId: AsrsInfo.id,
-        name: AwbInfo.name,
-        width: AwbInfo.width,
-        length: AwbInfo.length,
-        depth: AwbInfo.depth,
-        waterVolume: AwbInfo.waterVolume,
-        weight: AwbInfo.weight,
-        color: 'yellow',
-        SCCs: AwbInfo.Scc?.map((v) => v.code),
-        iceWeight: 0,
-      };
-      Awbs.push(targetAwb);
-    }
+    this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
-    const uldResult = await this.uldRepository.findOne({
-      select: {
-        UldType: UldTypeAttribute,
-      },
-      relations: {
-        UldType: true,
-      },
-      where: {
-        code: apiRequest.UldCode ? ILike(`%${apiRequest.UldCode}%`) : undefined,
-      },
-    });
-    // Uld주입하기
-    if (uldResult) {
-      const { id, code, UldType } = uldResult;
-      const { width, length, depth, vertexCord } = UldType as UldType;
-      Ulds.push({
-        id,
-        code,
-        width,
-        length,
-        depth,
-        // maxWeight: uldTypeResult.maxWeight,준규님이랑 최대 문개 어떻게 넣을지 논의하기
-        uldType: typeof UldType === 'object' ? UldType.code : null,
-        maxWeight: 10000,
-        vertexCord,
-      });
-    }
+    await this.setUldStateByUldCode(apiRequest, Ulds);
 
     const packageSimulatorCallRequestObject = {
       mode: false,
@@ -558,22 +518,10 @@ export class SimulatorResultService {
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
       if (asrsOutOrderResult) {
         // 자동창고 작업지시를 객체형태로 mqtt에 publish하기 위한 find 과정
-        const asrsResult = await queryRunner.manager
-          .getRepository(AsrsOutOrder)
-          .find({
-            relations: {
-              Asrs: true,
-              Awb: true,
-            },
-            select: {
-              Asrs: { id: true, name: true },
-              Awb: { id: true, name: true },
-            },
-            where: {
-              id: In(asrsOutOrderResult.identifiers.map((v) => v.id)),
-            },
-            order: { order: 'asc' },
-          });
+        const asrsResult = await this.getAsrsResult(
+          queryRunner,
+          asrsOutOrderResult,
+        );
 
         // 불출순서를 mqtt에 배열로 보내기위해 전처리 과정
         const asrsOutOrder = asrsResult.map((asrsOutOrderElement) => {
@@ -587,6 +535,7 @@ export class SimulatorResultService {
         });
 
         // asrs의 출고이력을 저장하기 위함
+        // TODO. dt에서 출고 이력을 잘 넣어주는지 확인하기, 넣어준다면 이 로직 필요 없음
         const asrsHistoryBody: CreateAsrsHistoryDto = {
           Asrs: (asrsResult[0].Asrs as Asrs).id,
           Awb: (asrsResult[0].Awb as Awb).id,
@@ -712,88 +661,63 @@ export class SimulatorResultService {
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
     // 현재 ASRS의 정보들
     const Awbs = [];
-    for (const asrsHistory of asrsStateArray) {
-      const AwbInfo = asrsHistory.Awb as Awb;
-      const AsrsInfo = asrsHistory.Asrs as Asrs;
-      const targetAwb = {
-        id: AwbInfo.id,
-        storageId: AsrsInfo.id,
-        name: AwbInfo.name,
-        width: AwbInfo.width,
-        length: AwbInfo.length,
-        depth: AwbInfo.depth,
-        waterVolume: AwbInfo.waterVolume,
-        weight: AwbInfo.weight,
-        SCCs: AwbInfo.Scc?.map((v) => v.code),
-      };
-      Awbs.push(targetAwb);
-    }
+    this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
+    // for (const asrsHistory of asrsStateArray) {
+    //   const AwbInfo = asrsHistory.Awb as Awb;
+    //   const AsrsInfo = asrsHistory.Asrs as Asrs;
+    //   const targetAwb = {
+    //     id: AwbInfo.id,
+    //     storageId: AsrsInfo.id,
+    //     name: AwbInfo.name,
+    //     width: AwbInfo.width,
+    //     length: AwbInfo.length,
+    //     depth: AwbInfo.depth,
+    //     waterVolume: AwbInfo.waterVolume,
+    //     weight: AwbInfo.weight,
+    //     SCCs: AwbInfo.Scc?.map((v) => v.code),
+    //   };
+    //   Awbs.push(targetAwb);
+    // }
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
-    const uldResult = await this.uldRepository.findOne({
-      select: {
-        UldType: UldTypeAttribute,
-      },
-      relations: {
-        UldType: true,
-      },
-      where: {
-        code: apiRequest.UldCode,
-      },
-    });
-
-    // Uld주입하기
-    if (uldResult) {
-      const { id, code, UldType } = uldResult;
-      const { width, length, depth, vertexCord } = UldType as UldType;
-      Ulds.push({
-        id,
-        code,
-        width,
-        length,
-        depth,
-        // maxWeight: uldTypeResult.maxWeight,준규님이랑 최대 문개 어떻게 넣을지 논의하기
-        uldType: typeof UldType === 'object' ? UldType.code : null,
-        maxWeight: 10000,
-        vertexCord,
-      });
-    }
+    await this.setUldStateByUldCode(apiRequest, Ulds);
+    // const uldResult = await this.uldRepository.findOne({
+    //   select: {
+    //     UldType: UldTypeAttribute,
+    //   },
+    //   relations: {
+    //     UldType: true,
+    //   },
+    //   where: {
+    //     code: apiRequest.UldCode,
+    //   },
+    // });
+    //
+    // // Uld주입하기
+    // if (uldResult) {
+    //   const { id, code, UldType } = uldResult;
+    //   const { width, length, depth, vertexCord } = UldType as UldType;
+    //   Ulds.push({
+    //     id,
+    //     code,
+    //     width,
+    //     length,
+    //     depth,
+    //     // maxWeight: uldTypeResult.maxWeight,준규님이랑 최대 문개 어떻게 넣을지 논의하기
+    //     uldType: typeof UldType === 'object' ? UldType.code : null,
+    //     maxWeight: 10000,
+    //     vertexCord,
+    //   });
+    // }
 
     // 안착대 현재 상황 묶음
     const palletRack = [];
-    for (const skidPlatformHistory of skidPlatformStateArray) {
-      const AwbInfo = skidPlatformHistory.Awb as Awb;
-      const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
-      const targetSkidPlatform = {
-        id: AwbInfo.id,
-        name: AwbInfo.name,
-        width: AwbInfo.width,
-        length: AwbInfo.length,
-        depth: AwbInfo.depth,
-        waterVolume: AwbInfo.waterVolume,
-        weight: AwbInfo.weight,
-        SCCs: AwbInfo.Scc?.map((v) => v.code),
-      };
-      palletRack.push(targetSkidPlatform);
-    }
+    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
 
     // uld의 현재 상황 묶음
     const currentAWBsInULD = [];
-    for (const uldHistory of uldStateArray) {
-      const AwbInfo = uldHistory.Awb as Awb;
-      const targetUld = {
-        id: AwbInfo.id,
-        name: AwbInfo.name,
-        width: AwbInfo.width,
-        length: AwbInfo.length,
-        depth: AwbInfo.depth,
-        waterVolume: AwbInfo.waterVolume,
-        weight: AwbInfo.weight,
-        SCCs: AwbInfo.Scc?.map((v) => v.code),
-      };
-      currentAWBsInULD.push(targetUld);
-    }
+    this.setCurrentAwbInUld(uldStateArray, currentAWBsInULD);
 
     // 사용자가 넣는 화물
     const inputAWB = {
@@ -816,7 +740,6 @@ export class SimulatorResultService {
       palletRack: palletRack,
       inputAWB: inputAWB,
     };
-    console.log(JSON.stringify(packageSimulatorCallRequestObject));
     const psResult = await getUserSelect(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
@@ -1360,5 +1283,124 @@ export class SimulatorResultService {
 
   remove(id: number) {
     return this.simulatorResultRepository.delete(id);
+  }
+
+  // 작업지시(asrs-out-order)를 객체형태로 만들기 위한 method
+  private async getAsrsResult(
+    queryRunner: QueryRunner,
+    asrsOutOrderResult: InsertResult,
+  ) {
+    return await queryRunner.manager.getRepository(AsrsOutOrder).find({
+      relations: {
+        Asrs: true,
+        Awb: true,
+      },
+      select: {
+        Asrs: { id: true, name: true },
+        Awb: { id: true, name: true },
+      },
+      where: {
+        id: In(asrsOutOrderResult.identifiers.map((v) => v.id)),
+      },
+      order: { order: 'asc' },
+    });
+  }
+
+  // uld가 type인지, vertexCord를 계산하기 위한 method
+  private async setUldStateByUldCode(
+    apiRequest: PsApiRequest | userSelectInput,
+    Ulds: any[],
+  ) {
+    const uldResult = await this.uldRepository.findOne({
+      select: {
+        UldType: UldTypeAttribute,
+      },
+      relations: {
+        UldType: true,
+      },
+      where: {
+        code: apiRequest.UldCode ? ILike(`%${apiRequest.UldCode}%`) : undefined,
+      },
+    });
+    // Uld주입하기
+    if (uldResult) {
+      const { id, code, UldType } = uldResult;
+      const { width, length, depth, vertexCord } = UldType as UldType;
+      Ulds.push({
+        id,
+        code,
+        width,
+        length,
+        depth,
+        uldType: typeof UldType === 'object' ? UldType.code : null,
+        maxWeight: 10000,
+        vertexCord,
+      });
+    }
+  }
+
+  // 현재 asrs이력을 보고 ps에넘길 객체로 변환을 위한 method
+  private setCurrentAwbsInAsrs(asrsStateArray: AsrsHistory[], Awbs: any[]) {
+    for (const asrsHistory of asrsStateArray) {
+      const AwbInfo = asrsHistory.Awb as Awb;
+      const AsrsInfo = asrsHistory.Asrs as Asrs;
+      const targetAwb = {
+        id: AwbInfo.id,
+        storageId: AsrsInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        color: 'yellow',
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+        iceWeight: 0,
+      };
+      Awbs.push(targetAwb);
+    }
+  }
+
+  // 현재 uld에 어떤 화물이 있는지 확인을 위한 method
+  private setCurrentAwbInUld(
+    uldStateArray: UldHistory[],
+    currentAWBsInULD: any[],
+  ) {
+    for (const uldHistory of uldStateArray) {
+      const AwbInfo = uldHistory.Awb as Awb;
+      const targetUld = {
+        id: AwbInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      currentAWBsInULD.push(targetUld);
+    }
+  }
+
+  // 현재 안착대에 어떤 화물이 있는지 확인을 위한 method
+  private setCurrentSkidPlatform(
+    skidPlatformStateArray: SkidPlatformHistory[],
+    palletRack: any[],
+  ) {
+    for (const skidPlatformHistory of skidPlatformStateArray) {
+      const AwbInfo = skidPlatformHistory.Awb as Awb;
+      const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
+      const targetSkidPlatform = {
+        id: AwbInfo.id,
+        name: AwbInfo.name,
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+      palletRack.push(targetSkidPlatform);
+    }
   }
 }
