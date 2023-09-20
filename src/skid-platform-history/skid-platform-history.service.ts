@@ -208,15 +208,21 @@ export class SkidPlatformHistoryService {
     const awbIds = skidPlatfromState.map(
       (skidPlatformHistory) => (skidPlatformHistory.Awb as Awb).id,
     );
-
-    const deleteResult = await this.skidPlatformHistoryRepository
-      .createQueryBuilder()
-      .delete()
-      .where('SkidPlatform IN (:...skidPlatformIds)', { skidPlatformIds })
-      .andWhere('Awb IN (:...awbIds)', { awbIds })
-      .execute();
-
-    return deleteResult;
+    if (
+      skidPlatformIds &&
+      skidPlatformIds.length > 0 &&
+      awbIds &&
+      awbIds.length > 0
+    ) {
+      const deleteResult = await this.skidPlatformHistoryRepository
+        .createQueryBuilder()
+        .delete()
+        .where('SkidPlatform IN (:...skidPlatformIds)', { skidPlatformIds })
+        .andWhere('Awb IN (:...awbIds)', { awbIds })
+        .execute();
+      return deleteResult;
+    }
+    return '안착대가 비었습니다.';
   }
 
   update(
