@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Relation,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Asrs } from '../../asrs/entities/asrs.entity';
@@ -21,6 +22,7 @@ import {
 } from 'class-validator';
 
 @Entity()
+@Unique(['inOutType', 'Awb', 'Asrs'])
 export class AsrsHistory {
   @PrimaryGeneratedColumn()
   id: number;

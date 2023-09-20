@@ -1,5 +1,6 @@
 # Use the official Node.js runtime as the base image
 FROM node:18-alpine
+ENV TZ Asia/Seoul
 
 # Create and set the working directory
 WORKDIR /var/app

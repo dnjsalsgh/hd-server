@@ -40,7 +40,7 @@ class AWBInfo {
   storageId?: number;
 }
 
-class AWBGroupResult {
+export class AWBGroupResult {
   AWBInfoList: AWBInfo[];
   AWBsSquareVolume: number;
   AWBsWaterVolume: number;
