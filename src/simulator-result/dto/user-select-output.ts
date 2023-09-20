@@ -40,7 +40,7 @@ interface AWBInfo {
   width: string;
 }
 
-interface Result {
+export interface UserSelectResult {
   AWBInfoList: AWBInfo[];
   AWBsSquareVolume: number;
   AWBsWaterVolume: number;
@@ -61,6 +61,6 @@ interface Result {
 export interface userSelectOutput {
   code: number;
   inputState: string;
-  result: Result[];
+  result: UserSelectResult[];
   state: string;
 }
