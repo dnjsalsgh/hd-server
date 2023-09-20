@@ -6,8 +6,10 @@ import {
   Between,
   Equal,
   FindOperator,
+  IsNull,
   LessThanOrEqual,
   MoreThanOrEqual,
+  Not,
   Repository,
 } from 'typeorm';
 import { TimeTable } from './entities/time-table.entity';
@@ -64,6 +66,37 @@ export class TimeTableService {
           : undefined,
         createdAt: findDate,
       },
+    });
+  }
+
+  async findAllOnlyAircraftSchedule(query: TimeTable & BasicQueryParamDto) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+    return await this.timeTableRepository.find({
+      relations: {
+        AircraftSchedule: true,
+      },
+      select: {
+        AircraftSchedule: AircraftScheduleAttributes,
+      },
+      where:
+        query.AircraftSchedule !== undefined
+          ? {
+              AircraftSchedule: Equal(+query.AircraftSchedule),
+              createdAt: findDate,
+            }
+          : {
+              AircraftSchedule: Not(IsNull()),
+              createdAt: findDate,
+            },
     });
   }
 
