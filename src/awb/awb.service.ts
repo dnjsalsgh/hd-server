@@ -63,10 +63,10 @@ export class AwbService {
       // 2. awb를 입력하기
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
-        .save(awbDto);
+        .upsert(awbDto, ['name']);
 
       // scc 정보, awb이 입력되어야 동작하게끔
-      if (scc && awbResult) {
+      if (scc && awbResult.identifiers) {
         // 4. 입력된 scc찾기
         const sccResult = await this.sccRepository.find({
           where: { code: In(scc.map((s) => s.code)) },
@@ -75,7 +75,7 @@ export class AwbService {
         // 5. awb와 scc를 연결해주기 위한 작업
         const joinParam = sccResult.map((item) => {
           return {
-            Awb: awbResult.id,
+            Awb: awbResult.identifiers[0].id,
             Scc: item.id,
           };
         });
@@ -88,6 +88,17 @@ export class AwbService {
         .send(`hyundai/vms1/readCompl`, {
           fileRead: true,
         })
+        .pipe(take(1))
+        .subscribe();
+
+      // [통합 테스트용] dt에 vms create되었다고 알려주기
+      this.client
+        .send(
+          `hyundai/vms1/create`,
+          await this.awbRepository.findOne({
+            where: { id: awbResult.identifiers[0].id },
+          }),
+        )
         .pipe(take(1))
         .subscribe();
     } catch (error) {

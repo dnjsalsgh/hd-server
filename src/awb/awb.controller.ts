@@ -268,9 +268,6 @@ export class AwbController implements OnModuleInit {
     } else {
       new NotFoundException('vms 테이블에 연결할 수 없습니다.');
     }
-    // if (data && data.count && data.count > 1) {
-    //   await this.awbService.preventMissingData(data.count);
-    // }
   }
 
   onModuleInit() {
