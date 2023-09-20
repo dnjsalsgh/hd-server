@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Relation,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Awb } from '../../awb/entities/awb.entity';
@@ -16,6 +17,7 @@ import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity'
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 @Entity()
+@Unique(['inOutType', 'Awb', 'SkidPlatform'])
 export class SkidPlatformHistory {
   @PrimaryGeneratedColumn()
   id: number;
