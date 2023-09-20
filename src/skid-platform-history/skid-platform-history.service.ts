@@ -201,7 +201,6 @@ export class SkidPlatformHistoryService {
       .addOrderBy('sph.id', 'DESC')
       .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
 
-    const currentState = skidPlatfromState.filter((v) => v.inOutType === 'in');
     const skidPlatformIds = skidPlatfromState.map(
       (skidPlatformHistory) =>
         (skidPlatformHistory.SkidPlatform as SkidPlatform).id,

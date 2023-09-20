@@ -80,7 +80,6 @@ export class AsrsHistoryService {
       .addOrderBy('ah.id', 'DESC')
       .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
 
-    const currentState = asrsState.filter((v) => v.inOutType === 'in');
     const asrsIds = asrsState.map(
       (asrsHistory) => (asrsHistory.Asrs as Asrs).id,
     );
