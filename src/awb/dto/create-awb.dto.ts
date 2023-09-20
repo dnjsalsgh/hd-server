@@ -4,6 +4,7 @@ import { Scc } from '../../scc/entities/scc.entity';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { Column } from 'typeorm';
 import { AwbGroup } from '../../awb-group/entities/awb-group.entity';
+import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 
 export class CreateAwbDto extends PickType(Awb, [
   'name',
@@ -14,34 +15,40 @@ export class CreateAwbDto extends PickType(Awb, [
   'length',
   'depth',
   'weight',
-  'isStructure',
-  'barcode',
-  'destination',
-  'source',
-  'breakDown',
+  // 'isStructure',
+  // 'barcode',
+  // 'destination',
+  // 'source',
+  // 'breakDown',
   'piece',
   'state',
   'parent',
   'modelPath',
   'simulation',
-  'dataCapacity',
-  'flight',
-  'from',
-  'airportArrival',
+  // 'dataCapacity',
+  // 'flight',
+  // 'from',
+  // 'airportArrival',
   'path',
   'spawnRatio',
   'description',
-  'rmComment',
-  'localTime',
-  'localInTerminal',
+  // 'rmComment',
+  // 'localTime',
+  // 'localInTerminal',
   'AwbGroup',
-  'AirCraftSchedule',
+  // 'AirCraftSchedule',
 ]) {
   @ApiProperty({
     example: '["GEN","EAT"]',
     description: 'SCCFK',
   })
   scc: Partial<Scc>[];
+
+  @ApiProperty({
+    example: 1,
+    description: '항공편 FK',
+  })
+  AirCraftSchedule: Partial<AircraftSchedule>;
 
   // /*
   // aircraft 요소
