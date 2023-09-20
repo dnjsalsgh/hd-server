@@ -28,6 +28,7 @@ export class TimeTableController {
   @ApiQuery({ name: 'Uld', required: false, type: 'number' })
   @ApiQuery({ name: 'Amr', required: false, type: 'number' })
   @ApiQuery({ name: 'Awb', required: false, type: 'number' })
+  @ApiQuery({ name: 'AircraftSchedule', required: false, type: 'number' })
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })
   @ApiQuery({ name: 'order', required: false })

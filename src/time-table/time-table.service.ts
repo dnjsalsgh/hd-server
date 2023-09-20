@@ -15,6 +15,7 @@ import { UldAttribute } from '../uld/entities/uld.entity';
 import { AmrAttribute } from '../amr/entities/amr.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
+import { AircraftScheduleAttributes } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Injectable()
 export class TimeTableService {
@@ -45,17 +46,22 @@ export class TimeTableService {
         Uld: true,
         Amr: true,
         Awb: true,
+        AircraftSchedule: true,
       },
       select: {
         Uld: UldAttribute,
         Amr: AmrAttribute,
         Awb: AwbAttribute,
+        AircraftSchedule: AircraftScheduleAttributes,
       },
       where: {
         // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
         Uld: query.Uld ? Equal(+query.Uld) : undefined,
         Amr: query.Amr ? Equal(+query.Amr) : undefined,
         Awb: query.Awb ? Equal(+query.Awb) : undefined,
+        AircraftSchedule: query.AircraftSchedule
+          ? Equal(+query.AircraftSchedule)
+          : undefined,
         createdAt: findDate,
       },
     });
