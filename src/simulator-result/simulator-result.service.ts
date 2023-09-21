@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import {
@@ -935,59 +940,59 @@ export class SimulatorResultService {
 
   // 패키지 시뮬레이터의 결과로 [안착대 추천도] 반환하는 곳
   async getAWBinPalletRack(apiRequest: userSelectInput) {
-    // const queryRunner = await this.dataSource.createQueryRunner();
-    // await queryRunner.connect();
-    // await queryRunner.startTransaction();
+    try {
+      const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
 
-    const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
+      // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
+      const asrsStateArray = await this.asrsHistoryService.nowState();
+      // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+      const skidPlatformStateArray =
+        await this.skidPlatformHistoryService.nowState();
+      // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+      const uldStateArray = await this.uldHistoryService.nowState(
+        apiRequest.UldCode,
+      );
 
-    // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
-    const asrsStateArray = await this.asrsHistoryService.nowState();
-    // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
-    const skidPlatformStateArray =
-      await this.skidPlatformHistoryService.nowState();
-    // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
-    const uldStateArray = await this.uldHistoryService.nowState(
-      apiRequest.UldCode,
-    );
+      // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
+      // 현재 ASRS의 정보들
+      const Awbs = [];
+      this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
 
-    // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
-    // 현재 ASRS의 정보들
-    const Awbs = [];
-    this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
+      // ps에 보낼 Uld정보를 모아두는
+      const Ulds = [];
+      await this.setUldStateByUldCode(apiRequest, Ulds);
 
-    // ps에 보낼 Uld정보를 모아두는
-    const Ulds = [];
-    await this.setUldStateByUldCode(apiRequest, Ulds);
+      // 안착대 현재 상황 묶음
+      const palletRack = [];
+      this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
 
-    // 안착대 현재 상황 묶음
-    const palletRack = [];
-    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+      // uld의 현재 상황 묶음
+      const currentAWBsInULD = [];
+      this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
 
-    // uld의 현재 상황 묶음
-    const currentAWBsInULD = [];
-    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+      const packageSimulatorCallRequestObject = {
+        mode: false,
+        Awbs: Awbs,
+        Ulds: Ulds,
+        currentAWBsInULD: currentAWBsInULD,
+        palletRack: palletRack,
+        // inputAWB: inputAWB,
+      };
 
-    const packageSimulatorCallRequestObject = {
-      mode: false,
-      Awbs: Awbs,
-      Ulds: Ulds,
-      currentAWBsInULD: currentAWBsInULD,
-      palletRack: palletRack,
-      // inputAWB: inputAWB,
-    };
+      const psResult = await getAWBinPalletRack(
+        packageSimulatorCallRequestObject,
+      );
+      // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
-    const psResult = await getAWBinPalletRack(
-      packageSimulatorCallRequestObject,
-    );
-    // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
-
-    // 안착대 추천도 결과를 mqtt에 전송
-    this.client
-      .send('hyundai/ps/recommend', psResult)
-      .pipe(take(1))
-      .subscribe();
-    return psResult;
+      // 안착대 추천도 결과를 mqtt에 전송
+      this.client
+        .send('hyundai/ps/recommend', psResult)
+        .pipe(take(1))
+        .subscribe();
+      return psResult;
+    } catch (e) {
+      throw new HttpException(`정보를 정확히 입력해주세요 (ULD) ${e}`, 400);
+    }
   }
 
   async findAll(query: SimulatorResult & BasicQueryParamDto) {
@@ -1071,31 +1076,37 @@ export class SimulatorResultService {
     apiRequest: PsApiRequest | userSelectInput,
     Ulds: any[],
   ) {
-    const uldResult = await this.uldRepository.findOne({
-      select: {
-        UldType: UldTypeAttribute,
-      },
-      relations: {
-        UldType: true,
-      },
-      where: {
-        code: apiRequest.UldCode ? ILike(`%${apiRequest.UldCode}%`) : undefined,
-      },
-    });
-    // Uld주입하기
-    if (uldResult) {
-      const { id, code, UldType } = uldResult;
-      const { width, length, depth, vertexCord } = UldType as UldType;
-      Ulds.push({
-        id,
-        code,
-        width,
-        length,
-        depth,
-        uldType: typeof UldType === 'object' ? UldType.code : null,
-        maxWeight: 10000,
-        vertexCord,
+    try {
+      const uldResult = await this.uldRepository.findOne({
+        select: {
+          UldType: UldTypeAttribute,
+        },
+        relations: {
+          UldType: true,
+        },
+        where: {
+          code: apiRequest.UldCode
+            ? ILike(`%${apiRequest.UldCode}%`)
+            : undefined,
+        },
       });
+      // Uld주입하기
+      if (uldResult) {
+        const { id, code, UldType } = uldResult;
+        const { width, length, depth, vertexCord } = UldType as UldType;
+        Ulds.push({
+          id,
+          code,
+          width,
+          length,
+          depth,
+          uldType: typeof UldType === 'object' ? UldType.code : null,
+          maxWeight: 10000,
+          vertexCord,
+        });
+      }
+    } catch (e) {
+      throw new NotFoundException(e);
     }
   }
 

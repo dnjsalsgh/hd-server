@@ -262,7 +262,7 @@ export class AwbService {
 
     const vmsResult = await this.vmsRepository.find({
       order: orderByUtil(null),
-      take: 30, // mssql에서 30개만 가져옴
+      take: 10, // mssql에서 30개만 가져옴
       // skip: 100 * i,
     });
     // 누락된 데이터찾기 & 누락되었다면 입력
