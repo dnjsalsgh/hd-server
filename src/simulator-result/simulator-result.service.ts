@@ -935,9 +935,9 @@ export class SimulatorResultService {
 
   // 패키지 시뮬레이터의 결과로 [안착대 추천도] 반환하는 곳
   async getAWBinPalletRack(apiRequest: userSelectInput) {
-    const queryRunner = await this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    // const queryRunner = await this.dataSource.createQueryRunner();
+    // await queryRunner.connect();
+    // await queryRunner.startTransaction();
 
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
 
