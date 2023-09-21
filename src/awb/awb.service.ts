@@ -69,7 +69,7 @@ export class AwbService {
       if (scc && awbResult.identifiers) {
         // 4. 입력된 scc찾기
         const sccResult = await this.sccRepository.find({
-          where: { code: In(scc.map((s) => s.code)) },
+          where: { code: In(scc) },
         });
 
         // 5. awb와 scc를 연결해주기 위한 작업

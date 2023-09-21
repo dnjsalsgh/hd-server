@@ -497,6 +497,7 @@ export class SimulatorResultService {
       Awbs: Awbs,
       Ulds: Ulds,
     };
+    console.log(JSON.stringify(packageSimulatorCallRequestObject));
 
     const psResult = await getOrderDischarge(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
@@ -536,18 +537,18 @@ export class SimulatorResultService {
             awb: Awb.name,
           };
         });
-
+        console.log('asrsOutOrder = ', asrsOutOrder);
         // asrs의 출고이력을 저장하기 위함
         // TODO. dt에서 출고 이력을 잘 넣어주는지 확인하기, 넣어준다면 이 로직 필요 없음
-        const asrsHistoryBody: CreateAsrsHistoryDto = {
-          Asrs: (asrsResult[0].Asrs as Asrs).id,
-          Awb: (asrsResult[0].Awb as Awb).id,
-          inOutType: 'out',
-          count: 1,
-        };
-        await queryRunner.manager
-          .getRepository(AsrsHistory)
-          .save(asrsHistoryBody as AsrsHistory);
+        // const asrsHistoryBody: CreateAsrsHistoryDto = {
+        //   Asrs: (asrsResult[0].Asrs as Asrs).id,
+        //   Awb: (asrsResult[0].Awb as Awb).id,
+        //   inOutType: 'out',
+        //   count: 1,
+        // };
+        // await queryRunner.manager
+        //   .getRepository(AsrsHistory)
+        //   .save(asrsHistoryBody as AsrsHistory);
 
         /**
          * 시뮬레이션 결과,이력을 저장하기 위한 부분 start
