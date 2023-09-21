@@ -537,7 +537,7 @@ export class SimulatorResultService {
             awb: Awb.name,
           };
         });
-        console.log('asrsOutOrder = ', asrsOutOrder);
+
         // asrs의 출고이력을 저장하기 위함
         // TODO. dt에서 출고 이력을 잘 넣어주는지 확인하기, 넣어준다면 이 로직 필요 없음
         // const asrsHistoryBody: CreateAsrsHistoryDto = {
