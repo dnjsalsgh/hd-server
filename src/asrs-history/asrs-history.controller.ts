@@ -38,6 +38,15 @@ export class AsrsHistoryController {
   }
 
   @ApiOperation({
+    summary: '창고의 이력 최신본 삭제',
+    description: '창고의 이력 최신본 삭제',
+  })
+  @Post('/reset')
+  resetAsrs() {
+    return this.asrsHistoryService.resetAsrs();
+  }
+
+  @ApiOperation({
     summary: '창고의 현재 상태를 가져오기',
     description: '창고id로 이력의 최신본만 가져오기',
   })

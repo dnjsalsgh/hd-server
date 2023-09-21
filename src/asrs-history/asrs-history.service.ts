@@ -65,6 +65,36 @@ export class AsrsHistoryService {
     return asrsState.filter((v) => v.inOutType === 'in');
   }
 
+  /**
+   * 창고 이력에서 asrs_id를 기준으로 최신 안착대의 'in' 상태인거 모두 삭제
+   */
+  async resetAsrs() {
+    const asrsState = await this.asrsHistoryRepository
+      .createQueryBuilder('ah')
+      .distinctOn(['ah.asrs_id'])
+      .leftJoinAndSelect('ah.Asrs', 'Asrs')
+      .leftJoinAndSelect('ah.Awb', 'Awb')
+      .leftJoinAndSelect('Awb.Scc', 'Scc') // awb의 Scc를 반환합니다.
+      .orderBy('ah.asrs_id')
+      .addOrderBy('ah.id', 'DESC')
+      .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
+
+    const asrsIds = asrsState.map(
+      (asrsHistory) => (asrsHistory.Asrs as Asrs).id,
+    );
+    const awbIds = asrsState.map((asrsHistory) => (asrsHistory.Awb as Awb).id);
+    if (asrsIds && asrsIds.length > 0 && awbIds && awbIds.length > 0) {
+      const deleteResult = await this.asrsHistoryRepository
+        .createQueryBuilder()
+        .delete()
+        .where('Asrs IN (:...asrsIds)', { asrsIds })
+        .andWhere('Awb IN (:...awbIds)', { awbIds })
+        .execute();
+      return deleteResult;
+    }
+    return '창고가 비었습니다.';
+  }
+
   async findAll(query: AsrsHistory & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;

@@ -82,9 +82,9 @@ export class SkidPlatformHistoryService {
         },
       );
 
-      // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송
+      // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
       this.client
-        .send(`hyundai/skidPlatform/insert`, historyResultObject)
+        .send(`hyundai/skidPlatform/insert`, { data: historyResultObject })
         .pipe(take(1))
         .subscribe();
       return historyResult;
@@ -183,6 +183,46 @@ export class SkidPlatformHistoryService {
       .addOrderBy('sph.id', 'DESC')
       .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
     return skidPlatfromState.filter((v) => v.inOutType === 'in');
+  }
+
+  /**
+   * 안착대 이력에서 asrs_id를 기준으로 최신 안착대의 'in' 상태인거 모두 삭제
+   */
+  async resetAsrs() {
+    const skidPlatfromState = await this.skidPlatformHistoryRepository
+      .createQueryBuilder('sph')
+      .distinctOn(['sph.skid_platform_id'])
+      .leftJoinAndSelect('sph.SkidPlatform', 'SkidPlatform')
+      .leftJoinAndSelect('sph.Asrs', 'Asrs')
+      .leftJoinAndSelect('sph.Awb', 'Awb')
+      .leftJoinAndSelect('Awb.Scc', 'Scc') // awb의 Scc를 반환합니다.
+      // .where('sph.inOutType = :type', { type: 'in' })
+      .orderBy('sph.skid_platform_id')
+      .addOrderBy('sph.id', 'DESC')
+      .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
+
+    const skidPlatformIds = skidPlatfromState.map(
+      (skidPlatformHistory) =>
+        (skidPlatformHistory.SkidPlatform as SkidPlatform).id,
+    );
+    const awbIds = skidPlatfromState.map(
+      (skidPlatformHistory) => (skidPlatformHistory.Awb as Awb).id,
+    );
+    if (
+      skidPlatformIds &&
+      skidPlatformIds.length > 0 &&
+      awbIds &&
+      awbIds.length > 0
+    ) {
+      const deleteResult = await this.skidPlatformHistoryRepository
+        .createQueryBuilder()
+        .delete()
+        .where('SkidPlatform IN (:...skidPlatformIds)', { skidPlatformIds })
+        .andWhere('Awb IN (:...awbIds)', { awbIds })
+        .execute();
+      return deleteResult;
+    }
+    return '안착대가 비었습니다.';
   }
 
   update(

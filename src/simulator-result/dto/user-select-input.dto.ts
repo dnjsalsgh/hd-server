@@ -139,3 +139,11 @@ export class userSelectInput {
   })
   SCCs: [];
 }
+
+export class awbInPalletRackResultRequest {
+  @ApiProperty({
+    example: 'A-Type2',
+    description: 'Uld의 code',
+  })
+  UldCode: string;
+}

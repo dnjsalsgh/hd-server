@@ -1,5 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { SkidPlatformHistory } from '../entities/skid-platform-history.entity';
+import { IsString } from 'class-validator';
 
 export class CreateSkidPlatformHistoryDto extends PickType(
   SkidPlatformHistory,
@@ -18,6 +19,7 @@ export class CreateSkidPlatformHistoryDto extends PickType(
   })
   Asrs: string | number;
 
+  @IsString()
   @ApiProperty({
     example: '18037503115',
     description: '화물 이름',

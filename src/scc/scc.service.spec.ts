@@ -43,7 +43,7 @@ describe('SccService', () => {
     score: 1,
     description: '',
     path: '',
-    notTogetherList: [],
+    banList: [],
   };
 
   it('should fail on exception', async () => {

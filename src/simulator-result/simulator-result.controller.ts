@@ -15,7 +15,10 @@ import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SimulatorResult } from './entities/simulator-result.entity';
 import { PsApiRequest } from './dto/ps-input.dto';
-import { userSelectInput } from './dto/user-select-input.dto';
+import {
+  awbInPalletRackResultRequest,
+  userSelectInput,
+} from './dto/user-select-input.dto';
 
 @Controller('simulator-result')
 @ApiTags('[시뮬레이터 결과]simulator-result')
@@ -83,7 +86,7 @@ export class SimulatorResultController {
     summary: '현재 안착대에 추천도를 보여주는 것',
     description: '현재 안착대에 추천도를 보여주는 것',
   })
-  @ApiBody({ type: userSelectInput })
+  @ApiBody({ type: awbInPalletRackResultRequest })
   @Post('/getAWBinPalletRack')
   getAWBinPalletRack(@Body() body: userSelectInput) {
     return this.simulatorResultService.getAWBinPalletRack(body);

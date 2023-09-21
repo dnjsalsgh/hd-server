@@ -148,5 +148,12 @@ export class AircraftSchedule {
 export const AircraftScheduleAttributes = {
   id: true,
   source: true,
+  localDepartureTime: true,
+  koreaArrivalTime: true,
+  workStartTime: true,
+  workCompleteTargetTime: true,
+  koreaDepartureTime: true,
+  localArrivalTime: true,
+  waypoint: true,
   createdAt: true,
 };

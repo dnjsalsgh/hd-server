@@ -107,9 +107,7 @@ export class AsrsController {
     //   handlingAsrsInfoFromIf[asrsInfoFromIfElement.name] =
     //     asrsInfoFromIfElement.value;
     // }
-
     // 자동창고 이력을 등록하는 부분
-
     /**
      * 안착대의 상태를 감지해서 화물을 등록하기 위함
      */
@@ -128,9 +126,8 @@ export class AsrsController {
     //  * 자동창고의 in을 처리하기 위함
     //  */
     // this.asrsService.createByPlcIn(handlingAsrsInfoFromIf);
-
     // 원준님과 이야기 후 data 그대로 넘겨주면 된다는거 파악
     // 자동창고&스태커크레인&안착대 데이터를 발산하는 mqtt
-    this.client.send(`hyundai/asrs1/eqData2`, data).pipe(take(1)).subscribe();
+    // this.client.send(`hyundai/asrs1/eqData2`, data).pipe(take(1)).subscribe();
   }
 }
