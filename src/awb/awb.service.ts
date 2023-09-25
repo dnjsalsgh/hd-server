@@ -287,32 +287,24 @@ export class AwbService {
         // 2. awb를 입력하기
         const awbResult = await queryRunner.manager
           .getRepository(Awb)
-          .save(createAwbDto);
+          .upsert(createAwbDto, ['name']);
 
         // scc 정보, awb이 입력되어야 동작하게끔
         // 4. 입력된 scc찾기
-        if (vms.Sccs) {
+        if (vms.Sccs && awbResult.identifiers) {
           const sccResult = await this.sccRepository.find({
             where: { code: In(vms.Sccs.split(',')) },
           });
           // 5. awb와 scc를 연결해주기 위한 작업
           const joinParam = sccResult.map((item) => {
             return {
-              Awb: awbResult.id,
+              Awb: awbResult.identifiers[0].id,
               Scc: item.id,
             };
           });
           await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
         }
 
-        // awb실시간 데이터 mqtt로 publish 하기 위함
-        // TODO: vms에서 데이터만 읽어왔는데 신호 보내는거 맞는건지 확인, 모델링까지 끝나야 신호보내는 상황과 비교
-        this.client
-          .send(`hyundai/vms1/readCompl`, {
-            fileRead: true,
-          })
-          .pipe(take(1))
-          .subscribe();
         await queryRunner.commitTransaction();
       }
     } catch (error) {
@@ -551,20 +543,18 @@ export class AwbService {
       const targetAwb = await this.awbRepository.findOne({
         where: { name: awbName, modelPath: null },
       });
-      // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
 
+      // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
       if (fileName.includes('png')) {
-        // await this.awbRepository.update(targetAwb.id, { path: filePath }); // png면 path column에 저장
         await this.awbRepository.update(targetAwb.id, {
           path: filePath,
           state: 'save',
         }); // png면 path column에 저장
       } else if (fileName.includes('obj')) {
-        // await this.awbRepository.update(targetAwb.id, { modelPath: filePath }); // obj면 modelPath column에 저장
-        console.log(
-          'fileContent.toString() = ',
-          fileContent.toString('binary'),
-        );
+        const binaryFile = fileContent.toString('binary');
+        // vms에서 측정된 정보를 binary 바꾼 후 유니티에서 알도록 mqtt에 전송
+        this.client.send(`hyundai/vms1/model`, binaryFile).subscribe();
+
         await this.awbRepository.update(targetAwb.id, {
           modelPath: filePath,
           state: 'save',
@@ -575,14 +565,13 @@ export class AwbService {
     }
   }
 
-  async modelingCompleteWithNAS(name: string) {
+  async modelingCompleteWithNAS() {
     // vms데이터를 받았다는 신호를전송합니다
     // awb실시간 데이터 mqtt로 publish 하기 위함
     this.client
       .send(`hyundai/vms1/readCompl`, {
         fileRead: true,
       })
-      .pipe(take(1))
       .subscribe();
   }
 

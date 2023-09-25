@@ -985,8 +985,9 @@ export class SimulatorResultService {
       // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
       // 작업지시 파트에서 필요없는 정보라고 삭제 요청해서 palletRactResult 객체 삭제
-      delete psResult.result[0].palletRackResult;
+      // delete psResult.result[0].palletRackResult;
       // 안착대 추천도 결과를 mqtt에 전송
+      console.log('psResult = ', psResult);
       this.client
         .send('hyundai/ps/recommend', psResult)
         .pipe(take(1))
