@@ -226,8 +226,8 @@ export class AwbController implements OnModuleInit {
       // mssql에서 가져온 10개의 데이터를 저장하기 위함
       await this.awbService.createWithMssql();
 
-      // vms데이터를 받았다는 신호를전송합니다
-      await this.awbService.modelingCompleteWithNAS(name);
+      // vms데이터를 받았다는 신호를전송합니다(hyundai/vms1/readCompl)
+      await this.awbService.modelingCompleteWithNAS();
 
       // 폴더 안에 파일 모두 가져오기
       const currentFolder = await this.fileService.readFolder(directory);
