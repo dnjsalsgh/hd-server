@@ -39,7 +39,7 @@ import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
-export class AwbController implements OnModuleInit {
+export class AwbController {
   constructor(
     private readonly awbService: AwbService,
     private readonly fileService: FileService,
@@ -269,81 +269,4 @@ export class AwbController implements OnModuleInit {
       new NotFoundException('vms 테이블에 연결할 수 없습니다.');
     }
   }
-
-  onModuleInit() {
-    this.startTimer(); // 서버가 시작될 때 타이머를 시작하거나 초기화합니다.
-  }
-
-  private startTimer() {
-    if (!this.timer) {
-      this.timer = setInterval(() => {
-        this.dTimer -= 1;
-        if (this.dTimer === 0) {
-          this.performAction();
-        } else {
-          this.resetTimer();
-        }
-      }, 1000);
-    }
-  }
-
-  private resetTimer() {
-    this.dTimer = +this.configService.getOrThrow('TIMER');
-  }
-
-  /**
-   * 모델이 생성되었다는 신호가 10분동안 안왔을 때 model을 db와 연결시키기 위한 메서드
-   * db에 저장된 awb들 중 model_path가 없는 것들을 모두 선택
-   * nas서버에 awb name으로 파일을 찾는다.
-   * @private
-   */
-  private async performAction() {
-    const missModelAwbList = await this.awbService.getAwbNotCombineModelPath();
-    if (missModelAwbList && missModelAwbList.length > 0) {
-      const directory = this.configService.getOrThrow('NAS_PATH'); // 목표 디랙토리(nas)
-
-      // 폴더 안에 파일 모두 가져오기
-      const currentFolder = await this.fileService.readFolder(directory);
-
-      const awbNamesInFolder = currentFolder.map((v) => v.split('.')[0]); // 파일 안에 awb 이름들
-      const awbNamesInDB = missModelAwbList.map((v) => v.name); // db 안에 awb 이름들
-      const targetAwbs = findDuplicates(awbNamesInFolder, awbNamesInDB); // 누락된 awb 를 찾습니다.
-
-      for (const awbName of targetAwbs) {
-        const missingFiles = currentFolder.filter((file) =>
-          file.includes(awbName),
-        ); // 누락된 파일 원본이름으로 찾음 ex) test.png, test.obj
-
-        for (const missingFile of missingFiles) {
-          const savedFilePath = path.join(directory, missingFile); // 저장된 파일 경로
-          const awbName = missingFile.split('.')[0]; // 확장자를 땐 awb 이름
-
-          // nas에서 파일을 읽어오고 서버에 upload
-          const fileContent = await this.fileService.readFile(savedFilePath);
-          const pathOfUploadedFile =
-            await this.fileService.uploadFileToLocalServer(
-              fileContent,
-              missingFile,
-            );
-
-          // upload된 파일의 경로를 awb정보에 update
-          await this.awbService.modelingCompleteToHandlingPath(
-            missingFile,
-            awbName,
-            pathOfUploadedFile,
-            fileContent,
-          );
-        }
-      }
-    }
-    console.log('modeling complete');
-    this.resetTimer();
-  }
-
-  // @Get('/test/prevent')
-  // private async preventMissingData() {
-  //   // mssql과 postgres의 vms 정보 개수가 같다면
-  //
-  //   return await this.awbService.preventMissingData(206);
-  // }
 }
