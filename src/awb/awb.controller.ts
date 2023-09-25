@@ -47,9 +47,6 @@ export class AwbController {
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
-  private dTimer = +this.configService.getOrThrow('TIMER');
-  private timer: NodeJS.Timeout | null = null;
-
   @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
   @Post()
   create(@Body() createAwbDto: CreateAwbDto) {

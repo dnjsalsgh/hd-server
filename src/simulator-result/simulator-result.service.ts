@@ -955,7 +955,7 @@ export class SimulatorResultService {
 
       // uld의 현재 상황 묶음
       const currentAWBsInULD = [];
-      this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+      this.setCurrentAwbInUld(uldStateArray, currentAWBsInULD);
 
       const packageSimulatorCallRequestObject = {
         mode: false,
@@ -963,9 +963,7 @@ export class SimulatorResultService {
         Ulds: Ulds,
         currentAWBsInULD: currentAWBsInULD,
         palletRack: palletRack,
-        // inputAWB: inputAWB,
       };
-
       const psResult = await getAWBinPalletRack(
         packageSimulatorCallRequestObject,
       );
@@ -1145,6 +1143,7 @@ export class SimulatorResultService {
     skidPlatformStateArray: SkidPlatformHistory[],
     palletRack: any[],
   ) {
+    console.log(skidPlatformStateArray.length);
     for (const skidPlatformHistory of skidPlatformStateArray) {
       const AwbInfo = skidPlatformHistory.Awb as Awb;
       const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
