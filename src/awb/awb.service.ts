@@ -305,14 +305,6 @@ export class AwbService {
           await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
         }
 
-        // awb실시간 데이터 mqtt로 publish 하기 위함
-        // TODO: vms에서 데이터만 읽어왔는데 신호 보내는거 맞는건지 확인, 모델링까지 끝나야 신호보내는 상황과 비교
-        this.client
-          .send(`hyundai/vms1/readCompl`, {
-            fileRead: true,
-          })
-          .pipe(take(1))
-          .subscribe();
         await queryRunner.commitTransaction();
       }
     } catch (error) {
@@ -580,7 +572,6 @@ export class AwbService {
       .send(`hyundai/vms1/readCompl`, {
         fileRead: true,
       })
-      .pipe(take(1))
       .subscribe();
   }
 
