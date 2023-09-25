@@ -1143,7 +1143,6 @@ export class SimulatorResultService {
     skidPlatformStateArray: SkidPlatformHistory[],
     palletRack: any[],
   ) {
-    console.log(skidPlatformStateArray.length);
     for (const skidPlatformHistory of skidPlatformStateArray) {
       const AwbInfo = skidPlatformHistory.Awb as Awb;
       const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
@@ -1156,6 +1155,7 @@ export class SimulatorResultService {
         waterVolume: AwbInfo.waterVolume,
         weight: AwbInfo.weight,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
+        palletRackId: SkidPlatformInfo.id, // pallet의 id를 ps에 넘겨주기 위함
       };
       palletRack.push(targetSkidPlatform);
     }
