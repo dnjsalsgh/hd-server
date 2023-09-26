@@ -41,6 +41,13 @@ export class Alarm {
   @Column({ nullable: true })
   count: number;
 
+  @ApiProperty({
+    example: '알람 발생했습니다.',
+    description: '알람 메세지',
+  })
+  @Column({ type: 'text', nullable: true })
+  message: string;
+
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
