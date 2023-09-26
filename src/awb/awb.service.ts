@@ -552,16 +552,11 @@ export class AwbService {
           state: 'saved',
         }); // png면 path column에 저장
       } else if (pattern.test(fileName)) {
-        console.time('model convert test');
         await this.awbRepository.update(targetAwb.id, {
           modelPath: filePath,
           state: 'saved',
         }); // obj면 modelPath column에 저장
-        const binaryFile = fileContent.toString('binary');
-        // vms에서 측정된 정보를 binary 바꾼 후 유니티에서 알도록 mqtt에 전송
-        this.client.send(`hyundai/vms1/model`, binaryFile).subscribe();
-
-        console.timeEnd('model convert test');
+        // binary로 변환시켜서 mqtt publish 하는 로직 삭제 => 너무 오래걸림
       }
     } catch (e) {
       console.error(e);
