@@ -13,7 +13,6 @@ export class AircraftService {
     private readonly aircraftRepository: Repository<Aircraft>,
   ) {}
   async create(createAircraftDto: CreateAircraftDto) {
-    createAircraftDto.code = new Date().getTime().toString();
     const result = await this.aircraftRepository.save(createAircraftDto);
     return result;
   }

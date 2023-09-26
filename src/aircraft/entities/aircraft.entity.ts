@@ -28,7 +28,7 @@ export class Aircraft {
   name: string;
 
   @ApiProperty({
-    example: 'test',
+    example: new Date().getTime().toString(),
     description: '고유코드',
   })
   @IsString()
