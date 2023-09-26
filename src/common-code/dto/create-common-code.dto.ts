@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateCommonCodeDto {
   @ApiProperty({
     example: 'test',
-    description: '항공기 이름',
+    description: '공통코드 이름',
   })
   name: string;
   @ApiProperty({
@@ -22,23 +22,23 @@ export class CreateCommonCodeDto {
     example: '0',
     description: '트리의 레벨',
   })
-  level: number;
+  level?: number;
 
   @ApiProperty({
     example: '0',
     description: '트리의 정렬기준',
   })
-  orderby: number;
+  orderby?: number;
 
   @ApiProperty({
     example: 'test',
     description: '트리의 타입',
   })
-  type: string;
+  type?: string;
 
   @ApiProperty({
     example: 'test',
     description: '상세설명',
   })
-  description: string;
+  description?: string;
 }
