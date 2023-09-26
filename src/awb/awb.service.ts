@@ -544,21 +544,24 @@ export class AwbService {
         where: { name: awbName, modelPath: null },
       });
 
+      const pattern = /(obj|ply)/;
       // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
       if (fileName.includes('png')) {
         await this.awbRepository.update(targetAwb.id, {
           path: filePath,
-          state: 'save',
+          state: 'saved',
         }); // png면 path column에 저장
-      } else if (fileName.includes('obj')) {
+      } else if (pattern.test(fileName)) {
+        console.time('model convert test');
+        await this.awbRepository.update(targetAwb.id, {
+          modelPath: filePath,
+          state: 'saved',
+        }); // obj면 modelPath column에 저장
         const binaryFile = fileContent.toString('binary');
         // vms에서 측정된 정보를 binary 바꾼 후 유니티에서 알도록 mqtt에 전송
         this.client.send(`hyundai/vms1/model`, binaryFile).subscribe();
 
-        await this.awbRepository.update(targetAwb.id, {
-          modelPath: filePath,
-          state: 'save',
-        }); // obj면 modelPath column에 저장
+        console.timeEnd('model convert test');
       }
     } catch (e) {
       console.error(e);
