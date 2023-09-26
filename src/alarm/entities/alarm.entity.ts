@@ -32,7 +32,7 @@ export class Alarm {
     description: '중단 시간',
   })
   @Column({ nullable: true })
-  stopTime: string;
+  stopTime: Date;
 
   @ApiProperty({
     example: 1,
@@ -46,7 +46,7 @@ export class Alarm {
     description: '알람 메세지',
   })
   @Column({ type: 'text', nullable: true })
-  message: string;
+  alarmMessage: string;
 
   @CreateDateColumn()
   createdAt: Date;
