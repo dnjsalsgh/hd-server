@@ -498,7 +498,6 @@ export class SimulatorResultService {
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
     if (Awbs.length <= 0) {
-      // await queryRunner.release();
       throw new HttpException(`창고 이력이 없습니다.`, 400);
     }
 
@@ -506,7 +505,6 @@ export class SimulatorResultService {
     const Ulds = [];
     await this.setUldStateByUldCode(apiRequest, Ulds);
     if (Ulds.length <= 0) {
-      // await queryRunner.release();
       throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
     }
 
@@ -610,10 +608,10 @@ export class SimulatorResultService {
           .subscribe();
       }
 
-      await queryRunner.commitTransaction();
+      // await queryRunner.commitTransaction();
       return psResult;
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      // await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
     } finally {
       await queryRunner.release();
