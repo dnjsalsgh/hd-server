@@ -614,13 +614,16 @@ export class SimulatorResultService {
       // await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
     } finally {
-      await queryRunner.release();
+      // await queryRunner.release();
     }
   }
 
   // 패키지 시뮬레이터의 결과로 [빌드업 작업지시]만 만드는 곳
-  async createBuildUpOrderBySimulatorResult(apiRequest: userSelectInput) {
-    const queryRunner = await this.dataSource.createQueryRunner();
+  async createBuildUpOrderBySimulatorResult(
+    apiRequest: userSelectInput,
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
@@ -757,12 +760,12 @@ export class SimulatorResultService {
           .send(`hyundai/asrs1/outOrder`, mqttOutOrderArray)
           .subscribe();
 
-      await queryRunner.commitTransaction();
+      // await queryRunner.commitTransaction();
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      // await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
     } finally {
-      await queryRunner.release();
+      // await queryRunner.release();
     }
   }
 

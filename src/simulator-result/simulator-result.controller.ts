@@ -55,10 +55,15 @@ export class SimulatorResultController {
       'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
   @ApiBody({ type: userSelectInput })
+  @UseInterceptors(TransactionInterceptor)
   @Post('/make-build-up-order-order/with/ps')
-  createBuildUpOrderBySimulatorResult(@Body() body: userSelectInput) {
+  createBuildUpOrderBySimulatorResult(
+    @Body() body: userSelectInput,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
     return this.simulatorResultService.createBuildUpOrderBySimulatorResult(
       body,
+      queryRunnerManager,
     );
   }
 
