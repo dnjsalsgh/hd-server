@@ -91,9 +91,13 @@ export class SimulatorResultController {
     description: 'uld를 새롭게 설정하는 reboot',
   })
   @ApiBody({ type: PsApiRequest })
+  @UseInterceptors(TransactionInterceptor)
   @Post('/reboot')
-  reboot(@Body() body: PsApiRequest) {
-    return this.simulatorResultService.reboot(body);
+  reboot(
+    @Body() body: PsApiRequest,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.simulatorResultService.reboot(body, queryRunnerManager);
   }
 
   @ApiOperation({

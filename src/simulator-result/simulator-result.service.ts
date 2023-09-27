@@ -770,8 +770,8 @@ export class SimulatorResultService {
   }
 
   // 패키지 시뮬레이터에서 자동창고, 안착대 정보로만 [자동창고 불출] 만드는 곳
-  async reboot(apiRequest: PsApiRequest) {
-    const queryRunner = await this.dataSource.createQueryRunner();
+  async reboot(apiRequest: PsApiRequest, queryRunnerManager: EntityManager) {
+    const queryRunner = queryRunnerManager.queryRunner;
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
@@ -939,12 +939,12 @@ export class SimulatorResultService {
           .subscribe();
       }
 
-      await queryRunner.commitTransaction();
+      // await queryRunner.commitTransaction();
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      // await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
     } finally {
-      await queryRunner.release();
+      // await queryRunner.release();
     }
   }
 
