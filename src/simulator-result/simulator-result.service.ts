@@ -10,6 +10,7 @@ import {
   Between,
   DataSource,
   DeepPartial,
+  EntityManager,
   Equal,
   FindOperator,
   ILike,
@@ -479,8 +480,12 @@ export class SimulatorResultService {
   // }
 
   // 패키지 시뮬레이터와 소통 후 [자동창고 불출, build-up-order] 만드는 곳
-  async createAsrsOutOrderBySimulatorResult(apiRequest: PsApiRequest) {
-    const queryRunner = await this.dataSource.createQueryRunner();
+  async createAsrsOutOrderBySimulatorResult(
+    apiRequest: PsApiRequest,
+    queryRunnerManager: EntityManager,
+  ) {
+    // const queryRunner = this.dataSource.createQueryRunner();
+    const queryRunner = queryRunnerManager.queryRunner;
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
@@ -492,13 +497,18 @@ export class SimulatorResultService {
     // ps에 보낼 Awb 정보들 모아두는 배열
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
-    if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
+    if (Awbs.length <= 0) {
+      // await queryRunner.release();
+      throw new HttpException(`창고 이력이 없습니다.`, 400);
+    }
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
     await this.setUldStateByUldCode(apiRequest, Ulds);
-    if (Ulds.length <= 0)
+    if (Ulds.length <= 0) {
+      // await queryRunner.release();
       throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
+    }
 
     const packageSimulatorCallRequestObject = {
       mode: false,
@@ -994,7 +1004,7 @@ export class SimulatorResultService {
         .subscribe();
       return psResult;
     } catch (e) {
-      throw new HttpException(`정보를 정확히 입력해주세요 (ULD) ${e}`, 400);
+      throw new HttpException(`정보를 정확히 입력해주세요 ${e}`, 400);
     }
   }
 
