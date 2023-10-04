@@ -30,7 +30,7 @@ export class Uld {
     example: 'Uld-001',
     description: 'Uld 코드',
   })
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   code: string;
 
   @ApiProperty({
