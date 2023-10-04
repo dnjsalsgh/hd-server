@@ -43,7 +43,7 @@ export class UldService {
       });
       createUldDto.UldType = uldTypeResult.id;
     } catch (e) {
-      throw new NotFoundException();
+      throw new NotFoundException(`uldType not found`);
     }
 
     return await this.uldRepository.save(createUldDto);
