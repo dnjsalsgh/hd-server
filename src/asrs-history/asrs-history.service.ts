@@ -21,6 +21,10 @@ export class AsrsHistoryService {
   constructor(
     @InjectRepository(AsrsHistory)
     private readonly asrsHistoryRepository: Repository<AsrsHistory>,
+    @InjectRepository(Asrs)
+    private readonly asrsRepository: Repository<Asrs>,
+    @InjectRepository(Awb)
+    private readonly awbRepository: Repository<Awb>,
     private dataSource: DataSource,
   ) {}
 
@@ -29,21 +33,25 @@ export class AsrsHistoryService {
       typeof createAsrsHistoryDto.Asrs === 'string' &&
       typeof createAsrsHistoryDto.Awb === 'string'
     ) {
-      const AsrsResult = await this.dataSource.manager
-        .getRepository(Asrs)
-        .findOne({ where: { name: createAsrsHistoryDto.Asrs } });
+      try {
+        const AsrsResult = await this.asrsRepository.findOne({
+          where: { name: createAsrsHistoryDto.Asrs },
+        });
+        const AwbResult = await this.awbRepository.findOne({
+          where: { name: createAsrsHistoryDto.Awb },
+        });
 
-      const AwbResult = await this.dataSource.manager
-        .getRepository(Awb)
-        .findOne({ where: { name: createAsrsHistoryDto.Awb } });
+        // 창고, 화물의 이름으로 찾은 것들 id로 변환작업
+        createAsrsHistoryDto.Asrs = AsrsResult?.id;
+        createAsrsHistoryDto.Awb = AwbResult?.id;
 
-      // 창고, 화물의 이름으로 찾은 것들 id로 변환작업
-      createAsrsHistoryDto.Asrs = AsrsResult.id;
-      createAsrsHistoryDto.Awb = AwbResult.id;
-
-      return await this.asrsHistoryRepository.save(
-        createAsrsHistoryDto as AsrsHistory,
-      );
+        const insertResult = await this.asrsHistoryRepository.save(
+          createAsrsHistoryDto as AsrsHistory,
+        );
+        return insertResult;
+      } catch (error) {
+        throw new Error(error);
+      }
     }
   }
 

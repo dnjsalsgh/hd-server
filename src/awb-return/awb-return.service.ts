@@ -45,6 +45,9 @@ export class AwbReturnService {
       where: {
         createdAt: findDate,
       },
+      relations: {
+        Awb: true,
+      },
       order: orderByUtil(query.order),
       take: query.limit,
       skip: query.offset,
