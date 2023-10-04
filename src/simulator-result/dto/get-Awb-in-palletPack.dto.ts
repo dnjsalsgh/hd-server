@@ -59,7 +59,7 @@ export interface awbInPalletRackResult {
   code: number;
   result: {
     palletRackRatio: PalletRackRatioItem[];
-    palletRackResult: PalletRackResultItem[][];
+    palletRackResult: PalletRackResultItem[];
   }[];
   state: string;
 }

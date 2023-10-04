@@ -35,6 +35,14 @@ export class UldTypeController {
     return this.uldTypeService.create(createUldTypeDto);
   }
 
+  @ApiOperation({
+    summary: 'uld-type의 code가 중복었다면 update, 없다면 insert',
+  })
+  @Post('/upsert')
+  upsert(@Body() createUldTypeDto: CreateUldTypeDto) {
+    return this.uldTypeService.upsert(createUldTypeDto);
+  }
+
   @ApiQuery({ name: 'code', required: false })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'createdAtFrom', required: false })

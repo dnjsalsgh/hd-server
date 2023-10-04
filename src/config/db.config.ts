@@ -27,6 +27,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Vms } from '../vms/entities/vms.entity';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { Alarm } from '../alarm/entities/alarm.entity';
+import { AwbReturn } from '../awb-return/entities/awb-return.entity';
 
 const postgresConfig: TypeOrmModuleOptions = {
   // PostgreSQL 연결 설정...
@@ -62,6 +63,7 @@ const postgresConfig: TypeOrmModuleOptions = {
     CommonCode,
     AwbGroup,
     Alarm,
+    AwbReturn,
   ],
   // autoLoadEntities: true,  [버그있어서 사용 지양]
   logging: true, // 쿼리 보여주는 옵션

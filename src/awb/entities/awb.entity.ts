@@ -25,6 +25,7 @@ import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { Scc } from '../../scc/entities/scc.entity';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
+import { AwbReturn } from '../../awb-return/entities/awb-return.entity';
 
 @Entity()
 export class Awb {
@@ -321,6 +322,9 @@ export class Awb {
     },
   })
   Scc: Scc[];
+
+  @OneToMany(() => AwbReturn, (awbReturn) => awbReturn.Awb)
+  AwbReturns: Relation<AwbReturn[]>;
 }
 
 export const AwbAttribute = {

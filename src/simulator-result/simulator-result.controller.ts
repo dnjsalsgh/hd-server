@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { SimulatorResultService } from './simulator-result.service';
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
@@ -19,6 +20,9 @@ import {
   awbInPalletRackResultRequest,
   userSelectInput,
 } from './dto/user-select-input.dto';
+import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
+import { TransactionManager } from '../lib/decorator/transaction.decorator';
+import { EntityManager } from 'typeorm';
 
 @Controller('simulator-result')
 @ApiTags('[시뮬레이터 결과]simulator-result')
@@ -51,10 +55,15 @@ export class SimulatorResultController {
       'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
   @ApiBody({ type: userSelectInput })
+  @UseInterceptors(TransactionInterceptor)
   @Post('/make-build-up-order-order/with/ps')
-  createBuildUpOrderBySimulatorResult(@Body() body: userSelectInput) {
+  createBuildUpOrderBySimulatorResult(
+    @Body() body: userSelectInput,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
     return this.simulatorResultService.createBuildUpOrderBySimulatorResult(
       body,
+      queryRunnerManager,
     );
   }
 
@@ -65,10 +74,15 @@ export class SimulatorResultController {
       'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
   @ApiBody({ type: PsApiRequest })
+  @UseInterceptors(TransactionInterceptor)
   @Post('/make-asrs-out-order/with/ps')
-  createAsrsOutOrderBySimulatorResult(@Body() body: PsApiRequest) {
+  createAsrsOutOrderBySimulatorResult(
+    @Body() body: PsApiRequest,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
     return this.simulatorResultService.createAsrsOutOrderBySimulatorResult(
       body,
+      queryRunnerManager,
     );
   }
 
@@ -77,9 +91,13 @@ export class SimulatorResultController {
     description: 'uld를 새롭게 설정하는 reboot',
   })
   @ApiBody({ type: PsApiRequest })
+  @UseInterceptors(TransactionInterceptor)
   @Post('/reboot')
-  reboot(@Body() body: PsApiRequest) {
-    return this.simulatorResultService.reboot(body);
+  reboot(
+    @Body() body: PsApiRequest,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.simulatorResultService.reboot(body, queryRunnerManager);
   }
 
   @ApiOperation({

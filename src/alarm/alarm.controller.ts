@@ -1,11 +1,10 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
   Put,
   Query,
 } from '@nestjs/common';
@@ -13,7 +12,6 @@ import { AlarmService } from './alarm.service';
 import { CreateAlarmDto } from './dto/create-alarm.dto';
 import { UpdateAlarmDto } from './dto/update-alarm.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { UldType } from '../uld-type/entities/uld-type.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { Alarm } from './entities/alarm.entity';
 
@@ -26,7 +24,7 @@ export class AlarmController {
   create(@Body() createAlarmDto: CreateAlarmDto) {
     const reuslt = this.alarmService.create(createAlarmDto);
 
-    return this.alarmService.create(createAlarmDto);
+    return reuslt;
   }
 
   @ApiQuery({ name: 'createdAtFrom', required: false })

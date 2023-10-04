@@ -52,7 +52,7 @@ export class CommonCode {
     example: 'system',
     description: 'user, system 타입 설정',
   })
-  @Column({ type: 'varchar', length: 20, nullable: false })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   type: string;
 
   @ApiProperty({

@@ -25,6 +25,20 @@ export class AsrsHistoryController {
     return this.asrsHistoryService.create(createAsrsHistoryDto);
   }
 
+  @ApiOperation({
+    summary: '[태스트용] 창고의 이력을 list 형태로 넣기 위함',
+    description: '창고의 이력을 list 형태로 넣기 위함',
+  })
+  @Post('/list')
+  async createList(@Body() createAsrsHistoryDtos: CreateAsrsHistoryDto[]) {
+    const insertResults = [];
+    for (const asrsHistoryDto of createAsrsHistoryDtos) {
+      const insertResult = await this.asrsHistoryService.create(asrsHistoryDto);
+      insertResults.push(insertResult);
+    }
+    return insertResults;
+  }
+
   @ApiQuery({ name: 'Asrs', required: false, type: 'number' })
   @ApiQuery({ name: 'Awb', required: false, type: 'number' })
   @ApiQuery({ name: 'createdAtFrom', required: false })

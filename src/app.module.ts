@@ -40,6 +40,7 @@ import { CheckModule } from './check/check.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
 import { AlarmModule } from './alarm/alarm.module';
+import { AwbReturnModule } from './awb-return/awb-return.module';
 
 @Module({
   imports: [
@@ -104,6 +105,7 @@ import { AlarmModule } from './alarm/alarm.module';
     HacsModule,
     CheckModule,
     AlarmModule,
+    AwbReturnModule,
     // WorkerModule,
   ],
   controllers: [AppController],

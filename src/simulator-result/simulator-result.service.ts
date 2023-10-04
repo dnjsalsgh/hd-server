@@ -10,6 +10,7 @@ import {
   Between,
   DataSource,
   DeepPartial,
+  EntityManager,
   Equal,
   FindOperator,
   ILike,
@@ -479,8 +480,12 @@ export class SimulatorResultService {
   // }
 
   // 패키지 시뮬레이터와 소통 후 [자동창고 불출, build-up-order] 만드는 곳
-  async createAsrsOutOrderBySimulatorResult(apiRequest: PsApiRequest) {
-    const queryRunner = await this.dataSource.createQueryRunner();
+  async createAsrsOutOrderBySimulatorResult(
+    apiRequest: PsApiRequest,
+    queryRunnerManager: EntityManager,
+  ) {
+    // const queryRunner = this.dataSource.createQueryRunner();
+    const queryRunner = queryRunnerManager.queryRunner;
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
@@ -492,18 +497,22 @@ export class SimulatorResultService {
     // ps에 보낼 Awb 정보들 모아두는 배열
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
+    if (Awbs.length <= 0) {
+      throw new HttpException(`창고 이력이 없습니다.`, 400);
+    }
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
     await this.setUldStateByUldCode(apiRequest, Ulds);
+    if (Ulds.length <= 0) {
+      throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
+    }
 
     const packageSimulatorCallRequestObject = {
       mode: false,
       Awbs: Awbs,
       Ulds: Ulds,
     };
-    console.log(JSON.stringify(packageSimulatorCallRequestObject));
-
     const psResult = await getOrderDischarge(packageSimulatorCallRequestObject);
     // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
@@ -542,18 +551,6 @@ export class SimulatorResultService {
             awb: Awb.name,
           };
         });
-
-        // asrs의 출고이력을 저장하기 위함
-        // TODO. dt에서 출고 이력을 잘 넣어주는지 확인하기, 넣어준다면 이 로직 필요 없음
-        // const asrsHistoryBody: CreateAsrsHistoryDto = {
-        //   Asrs: (asrsResult[0].Asrs as Asrs).id,
-        //   Awb: (asrsResult[0].Awb as Awb).id,
-        //   inOutType: 'out',
-        //   count: 1,
-        // };
-        // await queryRunner.manager
-        //   .getRepository(AsrsHistory)
-        //   .save(asrsHistoryBody as AsrsHistory);
 
         /**
          * 시뮬레이션 결과,이력을 저장하기 위한 부분 start
@@ -611,19 +608,22 @@ export class SimulatorResultService {
           .subscribe();
       }
 
-      await queryRunner.commitTransaction();
+      // await queryRunner.commitTransaction();
       return psResult;
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      // await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
     } finally {
-      await queryRunner.release();
+      // await queryRunner.release();
     }
   }
 
   // 패키지 시뮬레이터의 결과로 [빌드업 작업지시]만 만드는 곳
-  async createBuildUpOrderBySimulatorResult(apiRequest: userSelectInput) {
-    const queryRunner = await this.dataSource.createQueryRunner();
+  async createBuildUpOrderBySimulatorResult(
+    apiRequest: userSelectInput,
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
@@ -643,14 +643,19 @@ export class SimulatorResultService {
     // 현재 ASRS의 정보들
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
+    if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
     await this.setUldStateByUldCode(apiRequest, Ulds);
+    if (Ulds.length <= 0)
+      throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
 
     // 안착대 현재 상황 묶음
     const palletRack = [];
     this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+    if (palletRack.length <= 0)
+      throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
     // uld의 현재 상황 묶음
     const currentAWBsInULD = [];
@@ -755,18 +760,18 @@ export class SimulatorResultService {
           .send(`hyundai/asrs1/outOrder`, mqttOutOrderArray)
           .subscribe();
 
-      await queryRunner.commitTransaction();
+      // await queryRunner.commitTransaction();
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      // await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
     } finally {
-      await queryRunner.release();
+      // await queryRunner.release();
     }
   }
 
   // 패키지 시뮬레이터에서 자동창고, 안착대 정보로만 [자동창고 불출] 만드는 곳
-  async reboot(apiRequest: PsApiRequest) {
-    const queryRunner = await this.dataSource.createQueryRunner();
+  async reboot(apiRequest: PsApiRequest, queryRunnerManager: EntityManager) {
+    const queryRunner = queryRunnerManager.queryRunner;
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
@@ -782,14 +787,19 @@ export class SimulatorResultService {
     // ps에 보낼 Awb 정보들 모아두는 배열
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
+    if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
     await this.setUldStateByUldCode(apiRequest, Ulds);
+    if (Ulds.length <= 0)
+      throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
 
     // 안착대 현재 상황 묶음
     const palletRack = [];
     this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+    if (palletRack.length <= 0)
+      throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
     const packageSimulatorCallRequestObject = {
       mode: false,
@@ -929,12 +939,12 @@ export class SimulatorResultService {
           .subscribe();
       }
 
-      await queryRunner.commitTransaction();
+      // await queryRunner.commitTransaction();
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      // await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
     } finally {
-      await queryRunner.release();
+      // await queryRunner.release();
     }
   }
 
@@ -954,21 +964,27 @@ export class SimulatorResultService {
       );
 
       // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
-      // 현재 ASRS의 정보들
+      // ps에 보낼 Awb 정보들 모아두는 배열
       const Awbs = [];
       this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
+      if (Awbs.length <= 0)
+        throw new HttpException(`창고 이력이 없습니다.`, 400);
 
       // ps에 보낼 Uld정보를 모아두는
       const Ulds = [];
       await this.setUldStateByUldCode(apiRequest, Ulds);
+      if (Ulds.length <= 0)
+        throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
 
       // 안착대 현재 상황 묶음
       const palletRack = [];
       this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+      if (palletRack.length <= 0)
+        throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
       // uld의 현재 상황 묶음
       const currentAWBsInULD = [];
-      this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+      this.setCurrentAwbInUld(uldStateArray, currentAWBsInULD);
 
       const packageSimulatorCallRequestObject = {
         mode: false,
@@ -976,25 +992,20 @@ export class SimulatorResultService {
         Ulds: Ulds,
         currentAWBsInULD: currentAWBsInULD,
         palletRack: palletRack,
-        // inputAWB: inputAWB,
       };
-
       const psResult = await getAWBinPalletRack(
         packageSimulatorCallRequestObject,
       );
       // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
-      // 작업지시 파트에서 필요없는 정보라고 삭제 요청해서 palletRactResult 객체 삭제
-      // delete psResult.result[0].palletRackResult;
       // 안착대 추천도 결과를 mqtt에 전송
-      console.log('psResult = ', psResult);
       this.client
         .send('hyundai/ps/recommend', psResult)
         .pipe(take(1))
         .subscribe();
       return psResult;
     } catch (e) {
-      throw new HttpException(`정보를 정확히 입력해주세요 (ULD) ${e}`, 400);
+      throw new HttpException(`정보를 정확히 입력해주세요 ${e}`, 400);
     }
   }
 
@@ -1173,6 +1184,7 @@ export class SimulatorResultService {
         waterVolume: AwbInfo.waterVolume,
         weight: AwbInfo.weight,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
+        palletRackId: SkidPlatformInfo.id, // pallet의 id를 ps에 넘겨주기 위함
       };
       palletRack.push(targetSkidPlatform);
     }
@@ -1212,7 +1224,6 @@ export class SimulatorResultService {
             y: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}y`],
             z: +bodyResult.predictionResult[i].coordinate[j - 1][`p${j}z`],
           };
-
           historyParamArray.push(historyParam);
 
           // 2-3. 작업자 작업지시를 만들기
@@ -1250,6 +1261,7 @@ export class SimulatorResultService {
             y: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}y`],
             z: +bodyResult.AWBInfoList[i].coordinate[j - 1][`p${j}z`],
           };
+
           historyParamArray.push(historyParam);
           // 2-3. 작업자 작업지시를 만들기
           // 꼭지점 좌표를 모두 저장하기

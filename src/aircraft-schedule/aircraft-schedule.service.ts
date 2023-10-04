@@ -5,19 +5,33 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AircraftSchedule } from './entities/aircraft-schedule.entity';
 import {
   Between,
+  DataSource,
   Equal,
   FindOperator,
   ILike,
+  In,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
+  TypeORMError,
 } from 'typeorm';
-import { AircraftAttribute } from '../aircraft/entities/aircraft.entity';
-import { CcIdDestinationAttribute } from '../common-code/entities/common-code.entity';
+import {
+  Aircraft,
+  AircraftAttribute,
+} from '../aircraft/entities/aircraft.entity';
+import {
+  CcIdDestinationAttribute,
+  CommonCode,
+} from '../common-code/entities/common-code.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
+import { CreateAircraftScheduleByNameDto } from './dto/create-aircraft-schedule-by-name.dto';
+import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
+import { CreateCommonCodeDto } from '../common-code/dto/create-common-code.dto';
+import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
+import { Uld } from '../uld/entities/uld.entity';
 
 @Injectable()
 export class AircraftScheduleService {
@@ -27,10 +41,70 @@ export class AircraftScheduleService {
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
+    private dataSource: DataSource,
   ) {}
 
   create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
     return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
+  }
+
+  async createByName(
+    createAircraftScheduleDto: CreateAircraftScheduleByNameDto,
+  ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // 1. 출발지 입력
+      const departureCommonCodeBody: CreateCommonCodeDto = {
+        name: createAircraftScheduleDto.CcIdDeparture,
+        code: createAircraftScheduleDto.CcIdDeparture,
+        masterCode: 'route',
+      };
+      const departureCommonCodeResult = await queryRunner.manager
+        .getRepository(CommonCode)
+        .upsert(departureCommonCodeBody, ['code']);
+
+      // 2. 목적지 입력
+      const destinationCommonCodeBody: CreateCommonCodeDto = {
+        name: createAircraftScheduleDto.CcIdDestination,
+        code: createAircraftScheduleDto.CcIdDestination,
+        masterCode: 'route',
+      };
+      const destinationCommonCodeResult = await queryRunner.manager
+        .getRepository(CommonCode)
+        .upsert(destinationCommonCodeBody, ['code']);
+
+      // 3. 항공편 입력
+      const aircraftBody: CreateAircraftDto = {
+        name: createAircraftScheduleDto.name,
+        code: createAircraftScheduleDto.code,
+        info: createAircraftScheduleDto.info,
+        allow: createAircraftScheduleDto.allow,
+        allowDryIce: createAircraftScheduleDto.allowDryIce,
+      };
+      const aircraftResult = await queryRunner.manager
+        .getRepository(Aircraft)
+        .upsert(aircraftBody, ['name']);
+
+      // 4. Uld 입력(항공편 안에 있는 uld 입력)
+      const UldsInAircraftShedule = createAircraftScheduleDto.Ulds;
+      const uldBodys: Uld[] = [];
+      for (const uld of UldsInAircraftShedule) {
+        uldBodys.push(uld);
+      }
+      await queryRunner.manager.getRepository(Uld).save(uldBodys);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
+
+    // return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
   }
 
   async createWithAwbs(createAircraftScheduleDto: CreateAircraftScheduleDto) {

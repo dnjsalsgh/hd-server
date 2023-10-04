@@ -99,37 +99,37 @@ export class CreateAwbWithAircraftDto extends PickType(Awb, [
     example: new Date(),
     description: '현지출발시간',
   })
-  localDepartureTime: string;
+  localDepartureTime: Date;
 
   @ApiProperty({
     example: new Date(),
     description: '한국도착시간',
   })
-  koreaArrivalTime: string;
+  koreaArrivalTime: Date;
 
   @ApiProperty({
     example: new Date(),
     description: '작업시작시간',
   })
-  workStartTime: string;
+  workStartTime: Date;
 
   @ApiProperty({
     example: new Date(),
     description: '작업완료목표시간',
   })
-  workCompleteTargetTime: string;
+  workCompleteTargetTime: Date;
 
   @ApiProperty({
     example: new Date(),
     description: '한국출항시간',
   })
-  koreaDepartureTime: string;
+  koreaDepartureTime: Date;
 
   @ApiProperty({
     example: new Date(),
     description: '현지도착시간',
   })
-  localArrivalTime: string;
+  localArrivalTime: Date;
 
   @ApiProperty({
     example: ['GEN', 'TEL', 'QRL'],

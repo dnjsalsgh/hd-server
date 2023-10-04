@@ -13,6 +13,7 @@ import { AircraftScheduleService } from './aircraft-schedule.service';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { CreateAircraftScheduleByNameDto } from './dto/create-aircraft-schedule-by-name.dto';
 
 @Controller('aircraft-schedule')
 @ApiTags('[항공기 스케줄]aircraft-schedule')
@@ -21,9 +22,24 @@ export class AircraftScheduleController {
     private readonly aircraftScheduleService: AircraftScheduleService,
   ) {}
 
+  @ApiOperation({
+    summary: '항공편에 항공기, 출발지, 도착지를 FK id로 생성하기',
+  })
   @Post()
   async create(@Body() createAircraftScheduleDto: CreateAircraftScheduleDto) {
     return await this.aircraftScheduleService.create(createAircraftScheduleDto);
+  }
+
+  @ApiOperation({
+    summary: '항공편에 항공기, 출발지, 도착지를 name으로 생성하기',
+  })
+  @Post('/use/name')
+  async createByName(
+    @Body() createAircraftScheduleDto: CreateAircraftScheduleByNameDto,
+  ) {
+    return await this.aircraftScheduleService.createByName(
+      createAircraftScheduleDto,
+    );
   }
 
   @ApiOperation({

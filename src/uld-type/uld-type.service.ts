@@ -27,6 +27,13 @@ export class UldTypeService {
     return result;
   }
 
+  async upsert(createUldTypeDto: CreateUldTypeDto) {
+    const upsertResult = await this.uldTypeRepository.upsert(createUldTypeDto, [
+      'code',
+    ]);
+    return upsertResult;
+  }
+
   async findAll(query: UldType & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
