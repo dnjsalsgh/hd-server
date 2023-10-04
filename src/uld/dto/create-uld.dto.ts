@@ -1,5 +1,6 @@
-import { PickType } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Uld } from '../entities/uld.entity';
+import { UldType } from '../../uld-type/entities/uld-type.entity';
 
 export class CreateUldDto extends PickType(Uld, [
   'code',
@@ -9,5 +10,11 @@ export class CreateUldDto extends PickType(Uld, [
   'boundaryPrefab',
   'loadRate',
   'createdAt',
-  'UldType',
-]) {}
+  // 'UldType',
+]) {
+  @ApiProperty({
+    example: 'SCA_Type1',
+    description: 'Uld 타입 코드',
+  })
+  UldType: Partial<UldType> | string | number;
+}
