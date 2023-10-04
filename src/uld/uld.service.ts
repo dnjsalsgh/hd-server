@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUldDto } from './dto/create-uld.dto';
 import { UpdateUldDto } from './dto/update-uld.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,6 +20,7 @@ import {
 import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
 import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class UldService {
@@ -30,6 +31,7 @@ export class UldService {
     private readonly UldTypeRepository: Repository<UldType>,
     @InjectRepository(UldSccJoin)
     private readonly uldSccJoinRepository: Repository<UldSccJoin>,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
   async create(createUldDto: CreateUldDto) {
@@ -39,10 +41,9 @@ export class UldService {
       const uldTypeResult = await this.UldTypeRepository.findOne({
         where: { code: uldTypeCode },
       });
-      console.log('uldTypeResult = ', uldTypeResult);
       createUldDto.UldType = uldTypeResult.id;
     } catch (e) {
-      new NotFoundException();
+      throw new NotFoundException();
     }
 
     return await this.uldRepository.save(createUldDto);
@@ -90,6 +91,10 @@ export class UldService {
       },
     });
     return result;
+  }
+
+  complete() {
+    this.client.send(`hyundai/work/complete`, { work: 'complete' }).subscribe();
   }
 
   update(id: number, updateUldDto: UpdateUldDto) {

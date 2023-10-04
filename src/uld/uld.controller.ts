@@ -41,6 +41,17 @@ export class UldController {
     return this.uldService.findAll(query);
   }
 
+  @ApiOperation({
+    summary:
+      'uld 작업이 끝났다는 mqtt 신호를 보내주기 위함 토픽:(hyundai/work/complete)',
+    description:
+      '[목표] 모바일에서 uld가 끝났다는 신호를 mqtt로 쏘기 위한 api 입니다.',
+  })
+  @Get('/complete')
+  complete() {
+    return this.uldService.complete();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.uldService.findOne(+id);
@@ -49,11 +60,6 @@ export class UldController {
   @Put(':id')
   update(@Param('id') id: string, @Body() updateUldDto: UpdateUldDto) {
     return this.uldService.update(+id, updateUldDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.uldService.remove(+id);
   }
 
   @ApiOperation({
@@ -68,5 +74,10 @@ export class UldController {
     @Body() body: UldSccInjectionDto,
   ) {
     return this.uldService.injectionScc(id, body);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.uldService.remove(+id);
   }
 }
