@@ -16,7 +16,7 @@ export class CreateAwbDto extends PickType(Awb, [
   'depth',
   'weight',
   // 'isStructure',
-  // 'barcode',
+  'barcode',
   // 'destination',
   // 'source',
   // 'breakDown',

@@ -42,6 +42,13 @@ export class Awb {
   name: string;
 
   @ApiProperty({
+    example: '010101',
+    description: '바코드',
+  })
+  @Column({ type: 'varchar', length: 5000, nullable: true })
+  barcode: string;
+
+  @ApiProperty({
     example: '3d Model Name',
     description: '생성된 3D 모델링명',
   })
@@ -96,13 +103,6 @@ export class Awb {
   })
   @Column({ type: 'boolean', nullable: true })
   isStructure: boolean;
-
-  @ApiProperty({
-    example: '010101',
-    description: '바코드',
-  })
-  @Column({ type: 'varchar', length: 5000, nullable: true })
-  barcode: string;
 
   @ApiProperty({
     example: '미국',

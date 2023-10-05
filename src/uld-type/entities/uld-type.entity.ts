@@ -82,7 +82,7 @@ export class UldType {
     example: '{ x1: (0,2,0), x2: (1,2,3), x3:(5,6,4) }',
     description: '꼭지점좌표, 바닥부터 시계방향으로 0부터 시작',
   })
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   vertexCord: string;
 
   // 피드백 반영 후 새로생긴 칼럼
