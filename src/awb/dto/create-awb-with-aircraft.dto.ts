@@ -6,7 +6,7 @@ import { Column } from 'typeorm';
 import { AwbGroup } from '../../awb-group/entities/awb-group.entity';
 
 export class CreateAwbWithAircraftDto extends PickType(Awb, [
-  'name',
+  // 'name',
   'prefab',
   'waterVolume',
   'squareVolume',

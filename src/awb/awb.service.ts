@@ -273,7 +273,7 @@ export class AwbService {
 
         // awb 등록하는 부분
         const createAwbDto: Partial<CreateAwbDto> = {
-          name: vms.name,
+          barcode: vms.name,
           waterVolume: vms.waterVolume,
           width: vms.width,
           length: vms.length,
@@ -329,7 +329,6 @@ export class AwbService {
 
     const searchResult = await this.awbRepository.find({
       where: {
-        name: query.name ? ILike(`%${query.name}%`) : undefined,
         prefab: query.prefab,
         waterVolume: query.waterVolume,
         squareVolume: query.squareVolume,
@@ -338,7 +337,7 @@ export class AwbService {
         depth: query.depth,
         weight: query.weight,
         isStructure: query.isStructure,
-        barcode: query.barcode,
+        barcode: query.barcode ? ILike(`%${query.barcode}%`) : undefined,
         destination: query.destination,
         source: query.source,
         breakDown: query.breakDown,
@@ -421,7 +420,7 @@ export class AwbService {
 
   async breakDown(parentName: string, createAwbDtos: CreateAwbDto[]) {
     const parentCargo = await this.awbRepository.findOne({
-      where: { name: parentName },
+      where: { barcode: parentName },
     });
     // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
     if (
@@ -465,7 +464,7 @@ export class AwbService {
       // 2-3. 부모 화물 breakDown: True로 상태 변경
       await queryRunner.manager
         .getRepository(Awb)
-        .update({ name: parentName }, { breakDown: true });
+        .update({ barcode: parentName }, { breakDown: true });
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -542,7 +541,7 @@ export class AwbService {
   ) {
     try {
       const targetAwb = await this.awbRepository.findOne({
-        where: { name: awbName, modelPath: null },
+        where: { barcode: awbName, modelPath: null },
       });
 
       const pattern = /(obj|ply)/;
@@ -618,7 +617,7 @@ export class AwbService {
         });
         // 누락된 데이터찾기 & 누락되었다면 입력
         for (const vms of vmsResult) {
-          const existVms = awbResult.find((awb) => awb.name === vms.name);
+          const existVms = awbResult.find((awb) => awb.barcode === vms.name);
           if (!existVms && vms.Sccs) {
             // vms가 존재하고 Sccs가 존재한다면 vms에 등록된 scc 정보 찾기
             const sccResult = await this.sccRepository.find({
@@ -627,7 +626,7 @@ export class AwbService {
 
             // awb 등록하는 부분
             const createAwbDto: Partial<CreateAwbDto> = {
-              name: vms.name,
+              barcode: vms.name,
               waterVolume: vms.waterVolume,
               width: vms.width,
               length: vms.length,

@@ -38,7 +38,7 @@ export class AsrsHistoryService {
           where: { name: createAsrsHistoryDto.Asrs },
         });
         const AwbResult = await this.awbRepository.findOne({
-          where: { name: createAsrsHistoryDto.Awb },
+          where: { barcode: createAsrsHistoryDto.Awb },
         });
 
         // 창고, 화물의 이름으로 찾은 것들 id로 변환작업

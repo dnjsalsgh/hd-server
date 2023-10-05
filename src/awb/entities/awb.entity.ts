@@ -32,14 +32,14 @@ export class Awb {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({
-    example: '화물-001',
-    description: '화물의 이름',
-  })
-  @Column({ type: 'varchar', length: 500, nullable: false, unique: true })
-  @IsString()
-  @IsNotEmpty()
-  name: string;
+  // @ApiProperty({
+  //   example: '화물-001',
+  //   description: '화물의 이름',
+  // })
+  // @Column({ type: 'varchar', length: 500, nullable: false, unique: true })
+  // @IsString()
+  // @IsNotEmpty()
+  // name: string;
 
   @ApiProperty({
     example: '010101',

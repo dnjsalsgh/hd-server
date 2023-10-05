@@ -7,7 +7,7 @@ import { AwbGroup } from '../../awb-group/entities/awb-group.entity';
 import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 
 export class CreateAwbDto extends PickType(Awb, [
-  'name',
+  // 'name',
   'prefab',
   'waterVolume',
   'squareVolume',

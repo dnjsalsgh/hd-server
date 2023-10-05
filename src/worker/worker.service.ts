@@ -56,7 +56,7 @@ export class WorkerService {
         const currentFolder = await this.fileService.readFolder(directory);
 
         const awbNamesInFolder = currentFolder.map((v) => v.split('.')[0]); // 파일 안에 awb 이름들
-        const awbNamesInDB = missModelAwbList.map((v) => v.name); // db 안에 awb 이름들
+        const awbNamesInDB = missModelAwbList.map((v) => v.barcode); // db 안에 awb 이름들
         const targetAwbs = this.findDuplicates(awbNamesInFolder, awbNamesInDB); // 누락된 awb 를 찾습니다.
 
         for (const awbName of targetAwbs) {

@@ -9,7 +9,6 @@ import { SimulatorResult } from './entities/simulator-result.entity';
 import {
   Between,
   DataSource,
-  DeepPartial,
   EntityManager,
   Equal,
   FindOperator,
@@ -25,7 +24,6 @@ import {
 import { CreateSimulatorResultDto } from './dto/create-simulator-result.dto';
 import { UpdateSimulatorResultDto } from './dto/update-simulator-result.dto';
 import { Uld, UldAttribute } from '../uld/entities/uld.entity';
-import { CreateSimulatorResultWithAwbAndHistoryDto } from './dto/create-simulator-result-with-awb';
 import { SimulatorResultAwbJoin } from '../simulator-result-awb-join/entities/simulator-result-awb-join.entity';
 import { SimulatorHistory } from '../simulator-history/entities/simulator-history.entity';
 import { CreateSimulatorHistoryDto } from '../simulator-history/dto/create-simulator-history.dto';
@@ -33,7 +31,6 @@ import { CreateSimulatorResultAwbJoinDto } from '../simulator-result-awb-join/dt
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
-import { CreateSimulatorResultOrderDto } from './dto/create-simulator-result-order.dto';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
@@ -41,9 +38,8 @@ import { BuildUpOrder } from '../build-up-order/entities/build-up-order.entity';
 import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-order.dto';
 import { CreateBuildUpOrderDto } from '../build-up-order/dto/create-build-up-order.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { elementAt, take } from 'rxjs';
+import { take } from 'rxjs';
 import { BuildUpOrderService } from '../build-up-order/build-up-order.service';
-import { pakageSimulatorCallResultData } from '../lib/util/pakageSimulatorCallResultData.json';
 
 import { PsApiRequest } from './dto/ps-input.dto';
 import { Asrs } from '../asrs/entities/asrs.entity';
@@ -63,7 +59,6 @@ import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platfo
 import { userSelectInput } from './dto/user-select-input.dto';
 import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
 import { UldHistoryService } from '../uld-history/uld-history.service';
-import { awbInPalletRackResult } from './dto/get-Awb-in-palletPack.dto';
 import { UldHistory } from '../uld-history/entities/uld-history.entity';
 import { UserSelectResult } from './dto/user-select-output';
 import { AWBGroupResult } from './dto/ps-output.dto';
@@ -517,6 +512,12 @@ export class SimulatorResultService {
 
     try {
       const bodyResult = psResult.result[0];
+      if (!(bodyResult.AWBInfoList.length > 0))
+        throw new HttpException(
+          'ps에서 awb 정보를 찾아오지 못했습니다. (더이상 uld에 화물을 넣지 못함)',
+          400,
+        );
+
       // 1. 자동창고 작업지시를 만들기
       const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
       for (const [index, element] of bodyResult.AWBInfoList.entries()) {
@@ -547,7 +548,7 @@ export class SimulatorResultService {
           return {
             order: asrsOutOrderElement.order,
             asrs: Asrs.name,
-            awb: Awb.name,
+            awb: Awb.barcode,
           };
         });
 
@@ -697,7 +698,7 @@ export class SimulatorResultService {
       });
       const mqttReuslt = {
         order: 0,
-        awb: targetAwb.name,
+        awb: targetAwb.barcode,
         skidPlatform: targetSkidPlatform.name,
       };
       mqttOutOrderArray.push(mqttReuslt);
@@ -842,7 +843,7 @@ export class SimulatorResultService {
             },
             select: {
               Asrs: { id: true, name: true },
-              Awb: { id: true, name: true },
+              Awb: { id: true, barcode: true },
             },
             where: {
               id: In(asrsOutOrderResult.identifiers.map((v) => v.id)),
@@ -857,7 +858,7 @@ export class SimulatorResultService {
           return {
             order: asrsOutOrderElement.order,
             asrs: Asrs.name,
-            awb: Awb.name,
+            awb: Awb.barcode,
           };
         });
 
@@ -1076,7 +1077,7 @@ export class SimulatorResultService {
       },
       select: {
         Asrs: { id: true, name: true },
-        Awb: { id: true, name: true },
+        Awb: { id: true, barcode: true },
       },
       where: {
         id: In(asrsOutOrderResult.identifiers.map((v) => v.id)),
@@ -1132,7 +1133,7 @@ export class SimulatorResultService {
       const targetAwb = {
         id: AwbInfo.id,
         storageId: AsrsInfo.id,
-        name: AwbInfo.name,
+        name: AwbInfo.barcode,
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -1154,7 +1155,7 @@ export class SimulatorResultService {
       const AwbInfo = uldHistory.Awb as Awb;
       const targetUld = {
         id: AwbInfo.id,
-        name: AwbInfo.name,
+        name: AwbInfo.barcode,
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -1176,7 +1177,7 @@ export class SimulatorResultService {
       const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
       const targetSkidPlatform = {
         id: AwbInfo.id,
-        name: AwbInfo.name,
+        name: AwbInfo.barcode,
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,

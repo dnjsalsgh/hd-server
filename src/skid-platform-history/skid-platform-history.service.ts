@@ -50,7 +50,7 @@ export class SkidPlatformHistoryService {
 
       const AwbResult = await this.dataSource.manager
         .getRepository(Awb)
-        .findOne({ where: { name: createSkidPlatformHistoryDto.Awb } });
+        .findOne({ where: { barcode: createSkidPlatformHistoryDto.Awb } });
 
       const SkidPlatformResult = await this.dataSource.manager
         .getRepository(SkidPlatform)
