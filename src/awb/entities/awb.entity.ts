@@ -45,7 +45,7 @@ export class Awb {
     example: '010101',
     description: '바코드',
   })
-  @Column({ type: 'varchar', length: 5000, nullable: true })
+  @Column({ type: 'varchar', length: 5000, nullable: false, unique: true })
   barcode: string;
 
   @ApiProperty({
@@ -329,7 +329,7 @@ export class Awb {
 
 export const AwbAttribute = {
   id: true,
-  name: true,
+  // name: true,
   prefab: true,
   waterVolume: true,
   squareVolume: true,

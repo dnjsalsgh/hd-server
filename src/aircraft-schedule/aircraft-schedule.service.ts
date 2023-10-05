@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,7 +9,6 @@ import {
   Equal,
   FindOperator,
   ILike,
-  In,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
@@ -26,12 +25,12 @@ import {
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { ClientProxy } from '@nestjs/microservices';
-import { take } from 'rxjs';
 import { CreateAircraftScheduleByNameDto } from './dto/create-aircraft-schedule-by-name.dto';
-import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { CreateCommonCodeDto } from '../common-code/dto/create-common-code.dto';
 import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
 import { Uld } from '../uld/entities/uld.entity';
+import { UldService } from '../uld/uld.service';
+import { UldType } from '../uld-type/entities/uld-type.entity';
 
 @Injectable()
 export class AircraftScheduleService {
@@ -42,6 +41,10 @@ export class AircraftScheduleService {
     private readonly awbRepository: Repository<Awb>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
     private dataSource: DataSource,
+    @InjectRepository(Uld)
+    private readonly uldRepository: Repository<Uld>,
+    @InjectRepository(UldType)
+    private readonly UldTypeRepository: Repository<UldType>,
   ) {}
 
   create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
@@ -76,7 +79,7 @@ export class AircraftScheduleService {
         .getRepository(CommonCode)
         .upsert(destinationCommonCodeBody, ['code']);
 
-      // 3. 항공편 입력
+      // 3. 항공기 입력
       const aircraftBody: CreateAircraftDto = {
         name: createAircraftScheduleDto.name,
         code: createAircraftScheduleDto.code,
@@ -86,17 +89,49 @@ export class AircraftScheduleService {
       };
       const aircraftResult = await queryRunner.manager
         .getRepository(Aircraft)
-        .upsert(aircraftBody, ['name']);
+        .upsert(aircraftBody, ['code']);
 
       // 4. Uld 입력(항공편 안에 있는 uld 입력)
       const UldsInAircraftShedule = createAircraftScheduleDto.Ulds;
-      const uldBodys: Uld[] = [];
-      for (const uld of UldsInAircraftShedule) {
-        uldBodys.push(uld);
+      if (UldsInAircraftShedule && UldsInAircraftShedule.length > 0) {
+        // uld가 있다면 동작하게끔 예외처리
+        for (const uld of UldsInAircraftShedule) {
+          // uldType 주입
+          try {
+            const uldTypeCode = uld.UldType as unknown as string;
+            const uldTypeResult = await this.UldTypeRepository.findOne({
+              where: { code: uldTypeCode },
+            });
+            uld.UldType = uldTypeResult.id;
+          } catch (e) {
+            throw new NotFoundException(`uldType not found`);
+          }
+          await queryRunner.manager.getRepository(Uld).save(uld);
+        }
       }
-      await queryRunner.manager.getRepository(Uld).save(uldBodys);
+
+      // 5. 항공편 입력
+      const aircraftSchedule: CreateAircraftScheduleDto = {
+        source: createAircraftScheduleDto.source,
+        localDepartureTime: createAircraftScheduleDto.localDepartureTime,
+        koreaArrivalTime: createAircraftScheduleDto.koreaArrivalTime,
+        workStartTime: createAircraftScheduleDto.workStartTime,
+        workCompleteTargetTime:
+          createAircraftScheduleDto.workCompleteTargetTime,
+        koreaDepartureTime: createAircraftScheduleDto.koreaDepartureTime,
+        localArrivalTime: createAircraftScheduleDto.localArrivalTime,
+        waypoint: createAircraftScheduleDto.waypoint,
+        Aircraft: aircraftResult.identifiers[0]?.id,
+        CcIdDestination: destinationCommonCodeResult.identifiers[0]?.id,
+        CcIdDeparture: departureCommonCodeResult.identifiers[0]?.id,
+      };
+
+      const airScheduleResult = await queryRunner.manager
+        .getRepository(AircraftSchedule)
+        .save(aircraftSchedule);
 
       await queryRunner.commitTransaction();
+      return airScheduleResult;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);

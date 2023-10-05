@@ -23,48 +23,8 @@ export class CreateAircraftScheduleByNameDto extends PickType(
     // 'CcIdDeparture',
   ],
 ) {
-  // @ApiProperty({
-  //   example:
-  //     '[{\n' +
-  //     '  "name": "화물-001",\n' +
-  //     '  "prefab": "3d Model Name",\n' +
-  //     '  "waterVolume": 1,\n' +
-  //     '  "squareVolume": 1,\n' +
-  //     '  "width": 1,\n' +
-  //     '  "length": 1,\n' +
-  //     '  "depth": 1,\n' +
-  //     '  "weight": 1,\n' +
-  //     '  "isStructure": true,\n' +
-  //     '  "barcode": "010101",\n' +
-  //     '  "destination": "미국",\n' +
-  //     '  "source": "한국",\n' +
-  //     '  "breakDown": false,\n' +
-  //     '  "piece": 1,\n' +
-  //     '  "state": "saved",\n' +
-  //     '  "parent": 0,\n' +
-  //     '  "modelPath": "",\n' +
-  //     '  "simulation": true,\n' +
-  //     '  "dataCapacity": 1,\n' +
-  //     '  "flight": "fly",\n' +
-  //     '  "from": "출발지",\n' +
-  //     '  "airportArrival": "공항도착",\n' +
-  //     '  "path": "/c/file/xxx",\n' +
-  //     '  "spawnRatio": 1,\n' +
-  //     '  "description": "배송설명",\n' +
-  //     '  "rmComment": "RM 코멘트",\n' +
-  //     '  "localTime": "2023-07-12",\n' +
-  //     '  "localInTerminal": "AIR-001",\n' +
-  //     '  "scc": [\n' +
-  //     '    "GEN",\n' +
-  //     '    "EAT"\n' +
-  //     '  ]\n' +
-  //     '}]',
-  //   description: '입력된 화물들',
-  // })
-  // Awbs?: Awb[];
-
   @ApiProperty({
-    example: 'test',
+    example: 'B777F',
     description: '항공기 이름',
   })
   @IsString()
@@ -73,7 +33,7 @@ export class CreateAircraftScheduleByNameDto extends PickType(
   name: string;
 
   @ApiProperty({
-    example: new Date().getTime().toString(),
+    example: 'B777F',
     description: '고유코드',
   })
   @IsString()
@@ -82,7 +42,7 @@ export class CreateAircraftScheduleByNameDto extends PickType(
   code: string;
 
   @ApiProperty({
-    example: '{ "test": "test" }',
+    example: {},
     description: '항공기 정보',
   })
   info: unknown;
@@ -118,7 +78,7 @@ export class CreateAircraftScheduleByNameDto extends PickType(
       '      "width": 243.8,\n' +
       '      "length": 317.5,\n' +
       '      "depth": 243.8,\n' +
-      '      "uldType": "SCA",\n' +
+      '      "UldType": "SCA",\n' +
       '      "vertexCord": { "t1" : { "x1": 197.6 , "y1": 243.8 , "x2": 243.8 , "y2": 198.2 } }\n' +
       '    }]',
     description: '입력된 화물들',

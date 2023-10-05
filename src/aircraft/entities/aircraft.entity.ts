@@ -18,7 +18,7 @@ export class Aircraft {
   id: number;
 
   @ApiProperty({
-    example: 'test',
+    example: 'B777F',
     description: '항공기 이름',
   })
   @IsString()
@@ -28,7 +28,7 @@ export class Aircraft {
   name: string;
 
   @ApiProperty({
-    example: new Date().getTime().toString(),
+    example: 'B777F',
     description: '고유코드',
   })
   @IsString()

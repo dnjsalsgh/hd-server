@@ -33,42 +33,42 @@ export class AircraftSchedule {
 
   // 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({
-    example: '2023-07-10:15:00:00',
+    example: new Date().toISOString(),
     description: '현지출발시간',
   })
   @Column({ nullable: true })
   localDepartureTime: Date;
 
   @ApiProperty({
-    example: '2023-07-14:15:00:00',
+    example: new Date().toISOString(),
     description: '한국도착시간',
   })
   @Column({ nullable: true })
   koreaArrivalTime: Date;
 
   @ApiProperty({
-    example: '2023-07-14:13:00:00',
+    example: new Date().toISOString(),
     description: '작업시작시간',
   })
   @Column({ nullable: true })
   workStartTime: Date;
 
   @ApiProperty({
-    example: '2023-07-15:13:00:00',
+    example: new Date().toISOString(),
     description: '작업완료목표시간',
   })
   @Column({ nullable: true })
   workCompleteTargetTime: Date;
 
   @ApiProperty({
-    example: '2023-07-15:13:00:00',
+    example: new Date().toISOString(),
     description: '한국출항시간',
   })
   @Column({ nullable: true })
   koreaDepartureTime: Date;
 
   @ApiProperty({
-    example: '2023-07-15:13:00:00',
+    example: new Date().toISOString(),
     description: '현지도착시간',
   })
   @Column({ nullable: true })

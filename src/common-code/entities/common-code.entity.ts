@@ -59,7 +59,7 @@ export class CommonCode {
     example: '상세설명',
     description: '상세설명',
   })
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
   @CreateDateColumn()

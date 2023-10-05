@@ -32,6 +32,7 @@ export class AircraftScheduleController {
 
   @ApiOperation({
     summary: '항공편에 항공기, 출발지, 도착지를 name으로 생성하기',
+    description: ' awb 없어도 됨',
   })
   @Post('/use/name')
   async createByName(
@@ -44,6 +45,7 @@ export class AircraftScheduleController {
 
   @ApiOperation({
     summary: '항공편 안에 화물 정보를 넣어서 입력하기 위한 api',
+    description: 'uld 없어도 됨',
   })
   @Post('/with/awbs')
   async createWithAwbs(

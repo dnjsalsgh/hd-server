@@ -63,7 +63,7 @@ export class AwbService {
       // 2. awb를 입력하기
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
-        .upsert(awbDto, ['name']);
+        .upsert(awbDto, ['barcode']);
 
       // scc 정보, awb이 입력되어야 동작하게끔
       if (scc && awbResult.identifiers) {
