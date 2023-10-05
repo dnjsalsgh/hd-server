@@ -299,7 +299,6 @@ export class SimulatorResultService {
   //       depth: AwbInfo.depth,
   //       waterVolume: AwbInfo.waterVolume,
   //       weight: AwbInfo.weight,
-  //       color: 'yellow',
   //       SCCs: AwbInfo.Scc?.map((v) => v.code),
   //       iceWeight: 0,
   //     };
@@ -979,8 +978,9 @@ export class SimulatorResultService {
       // 안착대 현재 상황 묶음
       const palletRack = [];
       this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
-      if (palletRack.length <= 0)
-        throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
+      // 파레트가 없는 경우도 있을 수 있으니 주석처리
+      // if (palletRack.length <= 0)
+      //   throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
       // uld의 현재 상황 묶음
       const currentAWBsInULD = [];
@@ -1138,7 +1138,6 @@ export class SimulatorResultService {
         depth: AwbInfo.depth,
         waterVolume: AwbInfo.waterVolume,
         weight: AwbInfo.weight,
-        color: 'yellow',
         SCCs: AwbInfo.Scc?.map((v) => v.code),
         iceWeight: 0,
       };
