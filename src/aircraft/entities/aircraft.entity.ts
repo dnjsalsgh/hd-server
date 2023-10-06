@@ -18,23 +18,23 @@ export class Aircraft {
   id: number;
 
   @ApiProperty({
-    example: 'test',
+    example: 'B777F',
     description: '항공기 이름',
   })
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   name: string;
 
   @ApiProperty({
-    example: new Date().getTime().toString(),
+    example: 'B777F',
     description: '고유코드',
   })
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
-  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   code: string;
 
   @ApiProperty({

@@ -50,7 +50,7 @@ export class UldHistoryController {
     description: '안착대id로 이력의 최신본만 가져오기',
   })
   @Get('/now')
-  StatusOfUld(@Param('uldCode') uldCode: string) {
+  StatusOfUld(@Query('uldCode') uldCode: string) {
     return this.uldHistoryService.nowState(uldCode);
   }
 

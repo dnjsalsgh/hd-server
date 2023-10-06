@@ -79,3 +79,24 @@ export const getAWBinPalletRack = async (
     throw new HttpException(`ps 정보를 받아오지 못했습니다.${error}`, 404); // 에러 처리
   }
 };
+
+export const packageSimulatorCallAll = async (
+  input: any,
+): Promise<PsAllResponse> => {
+  try {
+    const response = await axios.post<PsAllResponse>(
+      `${process.env.PS_SERVER}/package-simulator-call-all`,
+      input,
+      {
+        headers: {
+          'Content-Type': 'application/json', // JSON 형식의 데이터 전송
+        },
+      },
+    );
+
+    const data = response.data; // 응답 데이터 가져오기
+    return data;
+  } catch (error) {
+    throw new HttpException(`ps 정보를 받아오지 못했습니다.${error}`, 404); // 에러 처리
+  }
+};

@@ -26,7 +26,6 @@ import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
-import { take } from 'rxjs';
 
 @Controller('asrs')
 @ApiTags('[자동창고]Asrs')

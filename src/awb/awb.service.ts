@@ -3,7 +3,6 @@ import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  Any,
   Between,
   DataSource,
   FindOperator,
@@ -12,7 +11,6 @@ import {
   IsNull,
   LessThanOrEqual,
   MoreThanOrEqual,
-  Not,
   QueryRunner,
   Repository,
   TypeORMError,
@@ -33,7 +31,6 @@ import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
 import { Vms } from '../vms/entities/vms.entity';
 import { CreateAwbWithAircraftDto } from '../awb/dto/create-awb-with-aircraft.dto';
-import fs from 'fs/promises';
 
 @Injectable()
 export class AwbService {
@@ -63,7 +60,7 @@ export class AwbService {
       // 2. awb를 입력하기
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
-        .upsert(awbDto, ['name']);
+        .upsert(awbDto, ['barcode']);
 
       // scc 정보, awb이 입력되어야 동작하게끔
       if (scc && awbResult.identifiers) {
@@ -130,15 +127,11 @@ export class AwbService {
       };
       const aircraftResult = await queryRunner.manager
         .getRepository(Aircraft)
-        .upsert(aircraftBody, ['code']);
-
-      // 출발지, 도착지를 찾기위해 공통코드 검색
-      const routeResult = await queryRunner.manager
-        .getRepository(CommonCode)
-        .find({ where: { masterCode: 'route' } });
+        .save(aircraftBody);
 
       // 3. aircraftSchedule 입력하기
       const aircraftScheduleBody: CreateAircraftScheduleDto = {
+        code: createAwbDto.aircraftCode,
         source: createAwbDto.source,
         localDepartureTime: createAwbDto.localDepartureTime,
         koreaArrivalTime: createAwbDto.koreaArrivalTime,
@@ -147,14 +140,9 @@ export class AwbService {
         koreaDepartureTime: createAwbDto.koreaDepartureTime,
         localArrivalTime: createAwbDto.localArrivalTime,
         waypoint: createAwbDto.waypoint,
-        Aircraft: aircraftResult.identifiers[0].id,
-        CcIdDestination:
-          routeResult.find((item) => item.code === createAwbDto.destination)
-            ?.id || 0,
-        CcIdDeparture:
-          routeResult.find((item) => item.code === createAwbDto.departure)
-            ?.id || 0,
-        // Awb: awbResult.id,
+        Aircraft: aircraftResult.id,
+        departure: createAwbDto.departure,
+        destination: createAwbDto.destination,
       };
       const aircraftScheduleResult = await queryRunner.manager
         .getRepository(AircraftSchedule)
@@ -273,7 +261,7 @@ export class AwbService {
 
         // awb 등록하는 부분
         const createAwbDto: Partial<CreateAwbDto> = {
-          name: vms.name,
+          barcode: vms.name,
           waterVolume: vms.waterVolume,
           width: vms.width,
           length: vms.length,
@@ -329,7 +317,6 @@ export class AwbService {
 
     const searchResult = await this.awbRepository.find({
       where: {
-        name: query.name ? ILike(`%${query.name}%`) : undefined,
         prefab: query.prefab,
         waterVolume: query.waterVolume,
         squareVolume: query.squareVolume,
@@ -338,7 +325,7 @@ export class AwbService {
         depth: query.depth,
         weight: query.weight,
         isStructure: query.isStructure,
-        barcode: query.barcode,
+        barcode: query.barcode ? ILike(`%${query.barcode}%`) : undefined,
         destination: query.destination,
         source: query.source,
         breakDown: query.breakDown,
@@ -421,7 +408,7 @@ export class AwbService {
 
   async breakDown(parentName: string, createAwbDtos: CreateAwbDto[]) {
     const parentCargo = await this.awbRepository.findOne({
-      where: { name: parentName },
+      where: { barcode: parentName },
     });
     // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
     if (
@@ -465,7 +452,7 @@ export class AwbService {
       // 2-3. 부모 화물 breakDown: True로 상태 변경
       await queryRunner.manager
         .getRepository(Awb)
-        .update({ name: parentName }, { breakDown: true });
+        .update({ barcode: parentName }, { breakDown: true });
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -542,7 +529,7 @@ export class AwbService {
   ) {
     try {
       const targetAwb = await this.awbRepository.findOne({
-        where: { name: awbName, modelPath: null },
+        where: { barcode: awbName, modelPath: null },
       });
 
       const pattern = /(obj|ply)/;
@@ -618,7 +605,7 @@ export class AwbService {
         });
         // 누락된 데이터찾기 & 누락되었다면 입력
         for (const vms of vmsResult) {
-          const existVms = awbResult.find((awb) => awb.name === vms.name);
+          const existVms = awbResult.find((awb) => awb.barcode === vms.name);
           if (!existVms && vms.Sccs) {
             // vms가 존재하고 Sccs가 존재한다면 vms에 등록된 scc 정보 찾기
             const sccResult = await this.sccRepository.find({
@@ -627,7 +614,7 @@ export class AwbService {
 
             // awb 등록하는 부분
             const createAwbDto: Partial<CreateAwbDto> = {
-              name: vms.name,
+              barcode: vms.name,
               waterVolume: vms.waterVolume,
               width: vms.width,
               length: vms.length,

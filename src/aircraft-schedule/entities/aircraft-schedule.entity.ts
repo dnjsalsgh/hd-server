@@ -24,51 +24,72 @@ export class AircraftSchedule {
 
   @ApiProperty({
     example: 'GEN',
-    description: '현지출발시간',
+    description: '출처',
   })
-  @IsString()
-  @MaxLength(5)
+  // @IsString()
+  // @MaxLength(5)
   @Column({ type: 'varchar', length: 500, nullable: false, default: 'GEN' })
   source: string;
 
+  @ApiProperty({
+    example: 'KE0223',
+    description: '항공편 명',
+  })
+  @Column({ type: 'varchar', length: 500 })
+  code: string;
+
+  @ApiProperty({
+    example: 'ICN',
+    description: '출발지',
+  })
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  departure: string;
+
+  @ApiProperty({
+    example: 'JPN',
+    description: '도착지',
+  })
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  destination: string;
+
   // 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({
-    example: '2023-07-10:15:00:00',
+    example: new Date().toISOString(),
     description: '현지출발시간',
   })
   @Column({ nullable: true })
   localDepartureTime: Date;
 
   @ApiProperty({
-    example: '2023-07-14:15:00:00',
+    example: new Date().toISOString(),
     description: '한국도착시간',
   })
   @Column({ nullable: true })
   koreaArrivalTime: Date;
 
   @ApiProperty({
-    example: '2023-07-14:13:00:00',
+    example: new Date().toISOString(),
     description: '작업시작시간',
   })
   @Column({ nullable: true })
   workStartTime: Date;
 
   @ApiProperty({
-    example: '2023-07-15:13:00:00',
+    example: new Date().toISOString(),
     description: '작업완료목표시간',
   })
   @Column({ nullable: true })
   workCompleteTargetTime: Date;
 
   @ApiProperty({
-    example: '2023-07-15:13:00:00',
+    example: new Date().toISOString(),
     description: '한국출항시간',
   })
   @Column({ nullable: true })
   koreaDepartureTime: Date;
 
   @ApiProperty({
-    example: '2023-07-15:13:00:00',
+    example: new Date().toISOString(),
     description: '현지도착시간',
   })
   @Column({ nullable: true })
@@ -112,29 +133,29 @@ export class AircraftSchedule {
   // commonCode의 일방향 관계설정
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.aircraftSchedules)
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.id)
-  @ApiProperty({
-    example: 1,
-    description: '목적지FK',
-    type: () => CommonCode,
-  })
-  @IsNotEmpty()
-  @ManyToOne(() => CommonCode, {
-    nullable: false,
-  })
-  @JoinColumn({ name: 'cc_id_destination' }) // 원하는 컬럼 이름을 지정합니다.
-  CcIdDestination: Relation<CommonCode> | number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '목적지FK',
+  //   type: () => CommonCode,
+  // })
+  // @IsNotEmpty()
+  // @ManyToOne(() => CommonCode, {
+  //   nullable: false,
+  // })
+  // @JoinColumn({ name: 'cc_id_destination' }) // 원하는 컬럼 이름을 지정합니다.
+  // CcIdDestination: Relation<CommonCode> | number;
 
-  @ApiProperty({
-    example: 1,
-    description: '출발지FK',
-    type: () => CommonCode,
-  })
-  @IsNotEmpty()
-  @ManyToOne(() => CommonCode, {
-    nullable: false,
-  })
-  @JoinColumn({ name: 'cc_id_departure' }) // 원하는 컬럼 이름을 지정합니다.
-  CcIdDeparture: Relation<CommonCode> | number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '출발지FK',
+  //   type: () => CommonCode,
+  // })
+  // @IsNotEmpty()
+  // @ManyToOne(() => CommonCode, {
+  //   nullable: false,
+  // })
+  // @JoinColumn({ name: 'cc_id_departure' }) // 원하는 컬럼 이름을 지정합니다.
+  // CcIdDeparture: Relation<CommonCode> | number;
 
   @ApiProperty({
     example: 1,

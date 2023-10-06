@@ -23,6 +23,7 @@ import {
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager } from 'typeorm';
+import { PsAllRequest } from './dto/ps-all-input.dto';
 
 @Controller('simulator-result')
 @ApiTags('[시뮬레이터 결과]simulator-result')
@@ -108,6 +109,21 @@ export class SimulatorResultController {
   @Post('/getAWBinPalletRack')
   getAWBinPalletRack(@Body() body: userSelectInput) {
     return this.simulatorResultService.getAWBinPalletRack(body);
+  }
+
+  @ApiOperation({
+    summary: 'uld안, 안착대, 창고의 상황을 모두 고려해서 ps의 결과를 알려줌',
+    description:
+      'uld안, 안착대, 창고의 상황을 모두 고려해서 ps의 결과를 알려줌',
+  })
+  @ApiBody({ type: PsAllRequest })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/ps-all')
+  psAll(
+    @Body() body: PsAllRequest,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.simulatorResultService.psAll(body, queryRunnerManager);
   }
 
   @ApiQuery({ name: 'Uld', required: false, type: 'number' })
