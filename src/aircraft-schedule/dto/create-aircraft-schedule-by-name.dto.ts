@@ -18,6 +18,8 @@ export class CreateAircraftScheduleByNameDto extends PickType(
     'koreaDepartureTime',
     'localArrivalTime',
     'waypoint',
+    'destination',
+    'departure',
     // 'Aircraft',
     // 'CcIdDestination',
     // 'CcIdDeparture',

@@ -31,6 +31,27 @@ export class AircraftSchedule {
   @Column({ type: 'varchar', length: 500, nullable: false, default: 'GEN' })
   source: string;
 
+  @ApiProperty({
+    example: 'KE0223',
+    description: '항공편 명',
+  })
+  @Column({ type: 'varchar', length: 500 })
+  name: string;
+
+  @ApiProperty({
+    example: 'ICN',
+    description: '출발지',
+  })
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  departure: string;
+
+  @ApiProperty({
+    example: 'JPN',
+    description: '도착지',
+  })
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  destination: string;
+
   // 피드백 반영 후 새로생긴 칼럼
   @ApiProperty({
     example: new Date().toISOString(),
@@ -112,29 +133,29 @@ export class AircraftSchedule {
   // commonCode의 일방향 관계설정
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.aircraftSchedules)
   // @ManyToOne(() => CommonCode, (commonCode) => commonCode.id)
-  @ApiProperty({
-    example: 1,
-    description: '목적지FK',
-    type: () => CommonCode,
-  })
-  @IsNotEmpty()
-  @ManyToOne(() => CommonCode, {
-    nullable: false,
-  })
-  @JoinColumn({ name: 'cc_id_destination' }) // 원하는 컬럼 이름을 지정합니다.
-  CcIdDestination: Relation<CommonCode> | number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '목적지FK',
+  //   type: () => CommonCode,
+  // })
+  // @IsNotEmpty()
+  // @ManyToOne(() => CommonCode, {
+  //   nullable: false,
+  // })
+  // @JoinColumn({ name: 'cc_id_destination' }) // 원하는 컬럼 이름을 지정합니다.
+  // CcIdDestination: Relation<CommonCode> | number;
 
-  @ApiProperty({
-    example: 1,
-    description: '출발지FK',
-    type: () => CommonCode,
-  })
-  @IsNotEmpty()
-  @ManyToOne(() => CommonCode, {
-    nullable: false,
-  })
-  @JoinColumn({ name: 'cc_id_departure' }) // 원하는 컬럼 이름을 지정합니다.
-  CcIdDeparture: Relation<CommonCode> | number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '출발지FK',
+  //   type: () => CommonCode,
+  // })
+  // @IsNotEmpty()
+  // @ManyToOne(() => CommonCode, {
+  //   nullable: false,
+  // })
+  // @JoinColumn({ name: 'cc_id_departure' }) // 원하는 컬럼 이름을 지정합니다.
+  // CcIdDeparture: Relation<CommonCode> | number;
 
   @ApiProperty({
     example: 1,

@@ -18,18 +18,12 @@ import {
   Aircraft,
   AircraftAttribute,
 } from '../aircraft/entities/aircraft.entity';
-import {
-  CcIdDestinationAttribute,
-  CommonCode,
-} from '../common-code/entities/common-code.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateAircraftScheduleByNameDto } from './dto/create-aircraft-schedule-by-name.dto';
-import { CreateCommonCodeDto } from '../common-code/dto/create-common-code.dto';
 import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
 import { Uld } from '../uld/entities/uld.entity';
-import { UldService } from '../uld/uld.service';
 import { UldType } from '../uld-type/entities/uld-type.entity';
 
 @Injectable()
@@ -59,27 +53,7 @@ export class AircraftScheduleService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. 출발지 입력
-      const departureCommonCodeBody: CreateCommonCodeDto = {
-        name: createAircraftScheduleDto.CcIdDeparture,
-        code: createAircraftScheduleDto.CcIdDeparture,
-        masterCode: 'route',
-      };
-      const departureCommonCodeResult = await queryRunner.manager
-        .getRepository(CommonCode)
-        .upsert(departureCommonCodeBody, ['code']);
-
-      // 2. 목적지 입력
-      const destinationCommonCodeBody: CreateCommonCodeDto = {
-        name: createAircraftScheduleDto.CcIdDestination,
-        code: createAircraftScheduleDto.CcIdDestination,
-        masterCode: 'route',
-      };
-      const destinationCommonCodeResult = await queryRunner.manager
-        .getRepository(CommonCode)
-        .upsert(destinationCommonCodeBody, ['code']);
-
-      // 3. 항공기 입력
+      // 1. 항공기 입력
       const aircraftBody: CreateAircraftDto = {
         name: createAircraftScheduleDto.name,
         code: createAircraftScheduleDto.code,
@@ -91,7 +65,7 @@ export class AircraftScheduleService {
         .getRepository(Aircraft)
         .upsert(aircraftBody, ['code']);
 
-      // 4. Uld 입력(항공편 안에 있는 uld 입력)
+      // 2. Uld 입력(항공편 안에 있는 uld 입력)
       const UldsInAircraftShedule = createAircraftScheduleDto.Ulds;
       if (UldsInAircraftShedule && UldsInAircraftShedule.length > 0) {
         // uld가 있다면 동작하게끔 예외처리
@@ -110,7 +84,7 @@ export class AircraftScheduleService {
         }
       }
 
-      // 5. 항공편 입력
+      // 3. 항공편 입력
       const aircraftSchedule: CreateAircraftScheduleDto = {
         source: createAircraftScheduleDto.source,
         localDepartureTime: createAircraftScheduleDto.localDepartureTime,
@@ -122,8 +96,8 @@ export class AircraftScheduleService {
         localArrivalTime: createAircraftScheduleDto.localArrivalTime,
         waypoint: createAircraftScheduleDto.waypoint,
         Aircraft: aircraftResult.identifiers[0]?.id,
-        CcIdDestination: destinationCommonCodeResult.identifiers[0]?.id,
-        CcIdDeparture: departureCommonCodeResult.identifiers[0]?.id,
+        destination: createAircraftScheduleDto.destination,
+        departure: createAircraftScheduleDto.departure,
       };
 
       const airScheduleResult = await queryRunner.manager
@@ -185,21 +159,15 @@ export class AircraftScheduleService {
     const result = await this.aircraftScheduleRepository.find({
       relations: {
         Aircraft: true,
-        CcIdDestination: true,
-        CcIdDeparture: true,
         Awbs: true,
       },
       select: {
         Aircraft: AircraftAttribute,
-        CcIdDestination: CcIdDestinationAttribute,
-        CcIdDeparture: CcIdDestinationAttribute,
         Awbs: AwbAttribute,
       },
       where: {
         source: source ? ILike(`%${source}%`) : undefined,
         Aircraft: Aircraft ? Equal(+Aircraft) : undefined,
-        CcIdDestination: CcIdDestination ? Equal(+CcIdDestination) : undefined,
-        CcIdDeparture: CcIdDeparture ? Equal(+CcIdDeparture) : undefined,
         createdAt: findDate,
       },
       order: orderByUtil(order),
@@ -218,14 +186,10 @@ export class AircraftScheduleService {
       where: { id: id },
       relations: {
         Aircraft: true,
-        CcIdDestination: true,
-        CcIdDeparture: true,
         Awbs: true,
       },
       select: {
         Aircraft: AircraftAttribute,
-        CcIdDestination: CcIdDestinationAttribute,
-        CcIdDeparture: CcIdDestinationAttribute,
         Awbs: AwbAttribute,
       },
     });
@@ -237,11 +201,10 @@ export class AircraftScheduleService {
     id: number,
     updateAircraftScheduleDto: UpdateAircraftScheduleDto,
   ) {
-    const { source, Aircraft, CcIdDestination } = updateAircraftScheduleDto;
+    const { source, Aircraft } = updateAircraftScheduleDto;
     await this.aircraftScheduleRepository.update(id, {
       source,
       Aircraft,
-      CcIdDestination,
     });
     return;
   }

@@ -14,8 +14,8 @@ export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
   'localArrivalTime',
   'waypoint',
   'Aircraft',
-  'CcIdDestination',
-  'CcIdDeparture',
+  'departure',
+  'destination',
 ]) {
   @ApiProperty({
     example:

@@ -34,7 +34,6 @@ export class TransactionInterceptor implements NestInterceptor {
         }
       }),
       tap(async () => {
-        console.log('tap에 들어옴');
         await queryRunner.commitTransaction();
         await queryRunner.release();
       }),
