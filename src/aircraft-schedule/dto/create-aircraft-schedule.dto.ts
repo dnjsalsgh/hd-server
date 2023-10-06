@@ -5,6 +5,7 @@ import { CreateAwbWithAircraftDto } from '../../awb/dto/create-awb-with-aircraft
 import { CreateAwbDto } from '../../awb/dto/create-awb.dto';
 
 export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
+  'code',
   'source',
   'localDepartureTime',
   'koreaArrivalTime',

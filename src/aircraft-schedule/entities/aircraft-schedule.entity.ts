@@ -24,10 +24,10 @@ export class AircraftSchedule {
 
   @ApiProperty({
     example: 'GEN',
-    description: '현지출발시간',
+    description: '출처',
   })
-  @IsString()
-  @MaxLength(5)
+  // @IsString()
+  // @MaxLength(5)
   @Column({ type: 'varchar', length: 500, nullable: false, default: 'GEN' })
   source: string;
 
@@ -36,7 +36,7 @@ export class AircraftSchedule {
     description: '항공편 명',
   })
   @Column({ type: 'varchar', length: 500 })
-  name: string;
+  code: string;
 
   @ApiProperty({
     example: 'ICN',

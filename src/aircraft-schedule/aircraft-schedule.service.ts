@@ -63,7 +63,7 @@ export class AircraftScheduleService {
       };
       const aircraftResult = await queryRunner.manager
         .getRepository(Aircraft)
-        .upsert(aircraftBody, ['code']);
+        .upsert(aircraftBody, ['name']);
 
       // 2. Uld 입력(항공편 안에 있는 uld 입력)
       const UldsInAircraftShedule = createAircraftScheduleDto.Ulds;
@@ -86,6 +86,7 @@ export class AircraftScheduleService {
 
       // 3. 항공편 입력
       const aircraftSchedule: CreateAircraftScheduleDto = {
+        code: createAircraftScheduleDto.code,
         source: createAircraftScheduleDto.source,
         localDepartureTime: createAircraftScheduleDto.localDepartureTime,
         koreaArrivalTime: createAircraftScheduleDto.koreaArrivalTime,

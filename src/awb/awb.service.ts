@@ -131,6 +131,7 @@ export class AwbService {
 
       // 3. aircraftSchedule 입력하기
       const aircraftScheduleBody: CreateAircraftScheduleDto = {
+        code: createAwbDto.aircraftCode,
         source: createAwbDto.source,
         localDepartureTime: createAwbDto.localDepartureTime,
         koreaArrivalTime: createAwbDto.koreaArrivalTime,

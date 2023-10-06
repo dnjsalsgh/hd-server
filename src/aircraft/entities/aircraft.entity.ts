@@ -24,7 +24,7 @@ export class Aircraft {
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   name: string;
 
   @ApiProperty({
@@ -34,7 +34,7 @@ export class Aircraft {
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
-  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   code: string;
 
   @ApiProperty({

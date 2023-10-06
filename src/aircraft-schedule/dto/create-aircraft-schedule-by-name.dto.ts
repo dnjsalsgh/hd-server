@@ -36,7 +36,7 @@ export class CreateAircraftScheduleByNameDto extends PickType(
 
   @ApiProperty({
     example: 'B777F',
-    description: '고유코드',
+    description: '항공편 고유코드',
   })
   @IsString()
   @MaxLength(50)
@@ -61,17 +61,6 @@ export class CreateAircraftScheduleByNameDto extends PickType(
     description: '허용가능 드라이아이스',
   })
   allowDryIce: boolean;
-  @ApiProperty({
-    example: 'KOR',
-    description: '출발지',
-  })
-  CcIdDestination: string;
-
-  @ApiProperty({
-    example: 'ORD',
-    description: '도착지',
-  })
-  CcIdDeparture: string;
 
   @ApiProperty({
     example:
