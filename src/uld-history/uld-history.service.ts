@@ -46,35 +46,37 @@ export class UldHistoryService {
     }
     return await this.uldHistoryRepository.find({
       select: {
-        BuildUpOrder: {
-          ...BuildUpOrderAttribute,
-          SkidPlatform: SkidPlatformAttribute,
-          Uld: UldAttribute,
-          Awb: AwbAttribute,
-        },
+        // BuildUpOrder: {
+        //   ...BuildUpOrderAttribute,
+        //   SkidPlatform: SkidPlatformAttribute,
+        //   Uld: UldAttribute,
+        //   Awb: AwbAttribute,
+        // },
         // buildUpOrder에 중복되는 내용이라 생략
-        // SkidPlatform: SkidPlatformAttribute,
-        // Uld: UldAttribute,
-        // Awb: AwbAttribute,
+        SkidPlatform: SkidPlatformAttribute,
+        Uld: UldAttribute,
+        Awb: AwbAttribute,
       },
       relations: {
-        BuildUpOrder: {
-          SkidPlatform: true,
-          Uld: true,
-          Awb: true,
-        },
-        // SkidPlatform: true,
-        // Uld: true,
-        // Awb: true,
+        // BuildUpOrder: {
+        //   SkidPlatform: true,
+        //   Uld: true,
+        //   Awb: true,
+        // },
+        SkidPlatform: true,
+        Uld: true,
+        Awb: true,
       },
       where: {
         // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
-        BuildUpOrder: query.BuildUpOrder
-          ? Equal(+query.BuildUpOrder)
+        // BuildUpOrder: query.BuildUpOrder
+        //   ? Equal(+query.BuildUpOrder)
+        //   : undefined,
+        SkidPlatform: query.SkidPlatform
+          ? Equal(+query.SkidPlatform)
           : undefined,
-        // SkidPlatform: query.SkidPlatform ? Equal(+query.SkidPlatform) : undefined,
-        // Uld: query.Uld ? Equal(+query.Uld) : undefined,
-        // Awb: query.Awb ? Equal(+query.Awb) : undefined,
+        Uld: query.Uld ? Equal(+query.Uld) : undefined,
+        Awb: query.Awb ? Equal(+query.Awb) : undefined,
         createdAt: findDate,
       },
     });
@@ -91,16 +93,22 @@ export class UldHistoryService {
    * uld 이력에서 uld_id를 기준으로 최신 안착대의 상태만 가져옴
    */
   async nowState(uldCode: string) {
-    const tartgetUld = await this.uldRepository.findOne({
+    const targetUld = await this.uldRepository.findOne({
       where: { code: uldCode },
     });
-
-    return await this.uldHistoryRepository.find({
-      where: {
-        Uld: tartgetUld.id,
-      },
-      relations: { Awb: { Scc: true } },
-    });
+    const uldHistory = await this.uldHistoryRepository
+      .createQueryBuilder('uh')
+      .innerJoinAndSelect('uh.Awb', 'awb')
+      .innerJoinAndSelect('awb.Scc', 'scc')
+      .where('uh.Uld = :uldId', { uldId: targetUld.id })
+      .getMany();
+    return uldHistory;
+    // return await this.uldHistoryRepository.find({
+    //   where: {
+    //     Uld: tartgetUld.id,
+    //   },
+    //   relations: { Awb: { Scc: true } },
+    // });
   }
 
   update(id: number, updateUldHistoryDto: UpdateUldHistoryDto) {
