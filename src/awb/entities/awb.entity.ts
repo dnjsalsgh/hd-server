@@ -45,7 +45,7 @@ export class Awb {
     example: '010101',
     description: '바코드',
   })
-  @Column({ type: 'varchar', length: 5000, nullable: false, unique: true })
+  @Column({ type: 'varchar', length: 5000, nullable: false })
   barcode: string;
 
   @ApiProperty({

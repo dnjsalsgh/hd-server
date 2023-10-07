@@ -36,6 +36,9 @@ import { ConfigService } from '@nestjs/config';
 import { take } from 'rxjs';
 import { findDuplicates } from '../lib/util/usefull.util';
 import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
+import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
+import { TransactionManager } from '../lib/decorator/transaction.decorator';
+import { EntityManager } from 'typeorm';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -48,9 +51,13 @@ export class AwbController {
   ) {}
 
   @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
+  @UseInterceptors(TransactionInterceptor)
   @Post()
-  create(@Body() createAwbDto: CreateAwbDto) {
-    return this.awbService.create(createAwbDto);
+  create(
+    @Body() createAwbDto: CreateAwbDto,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.awbService.create(createAwbDto, queryRunnerManager);
   }
 
   @ApiOperation({
