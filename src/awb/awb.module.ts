@@ -9,6 +9,7 @@ import { Scc } from '../scc/entities/scc.entity';
 import { MqttModule } from '../mqtt.module';
 import { FileService } from '../file/file.service';
 import { Vms } from '../vms/entities/vms.entity';
+import { MqttService } from '../mqtt.service';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { Vms } from '../vms/entities/vms.entity';
     MqttModule,
   ],
   controllers: [AwbController],
-  providers: [AwbService, FileService],
+  providers: [AwbService, FileService, MqttService],
 })
 export class AwbModule {}

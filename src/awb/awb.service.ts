@@ -32,6 +32,7 @@ import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
 import { Vms } from '../vms/entities/vms.entity';
 import { CreateAwbWithAircraftDto } from '../awb/dto/create-awb-with-aircraft.dto';
+import { MqttService } from '../mqtt.service';
 
 @Injectable()
 export class AwbService {
@@ -45,6 +46,7 @@ export class AwbService {
     private readonly fileService: FileService,
     @InjectRepository(Vms, 'mssqlDB')
     private readonly vmsRepository: Repository<Vms>,
+    private readonly mqttService: MqttService,
   ) {}
   private sendMqttMessage(topic: string, message: any): Observable<any> {
     return this.client.send(topic, message).pipe(take(1));
@@ -127,10 +129,17 @@ export class AwbService {
       }
 
       // [통합 테스트용] dt에 vms create되었다고 알려주기
-      this.sendMqttMessage(`hyundai/vms1/create`, awbResult);
-
+      this.mqttService.sendMqttMessage(
+        `hyundai/vms1/create`,
+        JSON.stringify(awbResult),
+      );
       // awb 실시간 데이터를 MQTT로 publish
-      this.sendMqttMessage(`hyundai/vms1/readCompl`, { fileRead: true });
+      this.mqttService.sendMqttMessage(
+        `hyundai/vms1/readCompl`,
+        JSON.stringify({
+          fileRead: true,
+        }),
+      );
       return awbResult;
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
