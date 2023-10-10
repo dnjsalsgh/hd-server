@@ -28,6 +28,7 @@ export class BuildUpOrderService {
     private readonly uldHistoryRepository: Repository<UldHistory>,
     private dataSource: DataSource,
   ) {}
+
   async create(createBuildUpOrderDto: CreateBuildUpOrderDto) {
     const result = await this.buildUpOrderRepository.save(
       createBuildUpOrderDto,

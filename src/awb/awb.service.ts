@@ -51,8 +51,6 @@ export class AwbService {
     const { scc, ...awbDto } = createAwbDto;
 
     const queryRunner = queryRunnerManager.queryRunner;
-    // await queryRunner.connect();
-    // await queryRunner.startTransaction();
 
     try {
       // 2. awb를 입력하기
@@ -82,7 +80,6 @@ export class AwbService {
           .subscribe();
       }
 
-      // await queryRunner.commitTransaction();
       // awb실시간 데이터 mqtt로 publish 하기 위함
       this.client
         .send(`hyundai/vms1/readCompl`, {
@@ -92,7 +89,63 @@ export class AwbService {
         .subscribe();
       return awbResult;
     } catch (error) {
-      // await queryRunner.rollbackTransaction();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      // await queryRunner.release();
+    }
+  }
+
+  async createList(
+    createAwbDtos: CreateAwbDto[],
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
+
+    try {
+      const createAwbDtoArray: CreateAwbDto[] = [];
+
+      for (const createAwbDto of createAwbDtos) {
+        const sccNames: Partial<Scc>[] = createAwbDto.scc;
+        const awbDto: CreateAwbDto = createAwbDto;
+        createAwbDtoArray.push(awbDto);
+      }
+      const awbResult = await queryRunner.manager
+        .getRepository(Awb)
+        .save(createAwbDtoArray);
+
+      for (const awb of awbResult) {
+        if (awb.scc && awb && awb.id) {
+          // 4. 입력된 scc찾기
+          const sccResult = await this.sccRepository.find({
+            where: { code: In(awb.scc) },
+          });
+
+          // 5. awb와 scc를 연결해주기 위한 작업
+          const joinParam = sccResult.map((item) => {
+            return {
+              Awb: awb.id,
+              Scc: item.id,
+            };
+          });
+          await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+        }
+      }
+
+      // [통합 테스트용] dt에 vms create되었다고 알려주기
+      this.client
+        .send(`hyundai/vms1/create`, awbResult)
+        .pipe(take(1))
+        .subscribe();
+
+      // awb실시간 데이터 mqtt로 publish 하기 위함
+      this.client
+        .send(`hyundai/vms1/readCompl`, {
+          fileRead: true,
+        })
+        .pipe(take(1))
+        .subscribe();
+      return awbResult;
+    } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     } finally {
       // await queryRunner.release();
@@ -134,7 +187,6 @@ export class AwbService {
           .subscribe();
       }
 
-      // await queryRunner.commitTransaction();
       // awb실시간 데이터 mqtt로 publish 하기 위함
       this.client
         .send(`hyundai/vms1/readCompl`, {
