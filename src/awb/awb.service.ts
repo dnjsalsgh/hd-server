@@ -42,15 +42,12 @@ export class AwbService {
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
     private dataSource: DataSource,
-    @Inject('MQTT_SERVICE') private client: ClientProxy,
     private readonly fileService: FileService,
     @InjectRepository(Vms, 'mssqlDB')
     private readonly vmsRepository: Repository<Vms>,
     private readonly mqttService: MqttService,
   ) {}
-  private sendMqttMessage(topic: string, message: any): Observable<any> {
-    return this.client.send(topic, message).pipe(take(1));
-  }
+
   async create(createAwbDto: CreateAwbDto, queryRunnerManager: EntityManager) {
     const { scc, ...awbDto } = createAwbDto;
 
@@ -78,19 +75,12 @@ export class AwbService {
         });
         await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
         // [통합 테스트용] dt에 vms create되었다고 알려주기
-        this.client
-          .send(`hyundai/vms1/create`, awbResult)
-          .pipe(take(1))
-          .subscribe();
+        this.mqttService.sendMqttMessage(`hyundai/vms1/create`, awbResult);
       }
-
-      // awb실시간 데이터 mqtt로 publish 하기 위함
-      this.client
-        .send(`hyundai/vms1/readCompl`, {
-          fileRead: true,
-        })
-        .pipe(take(1))
-        .subscribe();
+      // awb 실시간 데이터를 MQTT로 publish
+      this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
+        fileRead: true,
+      });
       return awbResult;
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
@@ -129,17 +119,11 @@ export class AwbService {
       }
 
       // [통합 테스트용] dt에 vms create되었다고 알려주기
-      this.mqttService.sendMqttMessage(
-        `hyundai/vms1/create`,
-        JSON.stringify(awbResult),
-      );
+      this.mqttService.sendMqttMessage(`hyundai/vms1/create`, awbResult);
       // awb 실시간 데이터를 MQTT로 publish
-      this.mqttService.sendMqttMessage(
-        `hyundai/vms1/readCompl`,
-        JSON.stringify({
-          fileRead: true,
-        }),
-      );
+      this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
+        fileRead: true,
+      });
       return awbResult;
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
@@ -150,8 +134,6 @@ export class AwbService {
     const { scc, ...awbDto } = createAwbDto;
 
     const queryRunner = queryRunnerManager.queryRunner;
-    // await queryRunner.connect();
-    // await queryRunner.startTransaction();
 
     try {
       // 2. awb를 입력하기
@@ -175,19 +157,15 @@ export class AwbService {
         });
         await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
         // [통합 테스트용] dt에 vms create되었다고 알려주기
-        this.client
-          .send(`hyundai/vms1/create`, awbResult)
-          .pipe(take(1))
-          .subscribe();
+
+        // [통합 테스트용] dt에 vms create되었다고 알려주기
+        this.mqttService.sendMqttMessage(`hyundai/vms1/create`, awbResult);
       }
 
-      // awb실시간 데이터 mqtt로 publish 하기 위함
-      this.client
-        .send(`hyundai/vms1/readCompl`, {
-          fileRead: true,
-        })
-        .pipe(take(1))
-        .subscribe();
+      // awb 실시간 데이터를 MQTT로 publish
+      this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
+        fileRead: true,
+      });
       return awbResult;
     } catch (error) {
       // await queryRunner.rollbackTransaction();
@@ -264,13 +242,10 @@ export class AwbService {
       }
 
       await queryRunner.commitTransaction();
-      // awb실시간 데이터 mqtt로 publish 하기 위함
-      this.client
-        .send(`hyundai/vms1/readCompl`, {
-          fileRead: true,
-        })
-        .pipe(take(1))
-        .subscribe();
+      // awb 실시간 데이터를 MQTT로 publish
+      this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
+        fileRead: true,
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
@@ -314,13 +289,10 @@ export class AwbService {
 
       // 외부 트랜젝션으로 commit을 결정
       await queryRunner.commitTransaction();
-      // awb실시간 데이터 mqtt로 publish 하기 위함
-      this.client
-        .send(`hyundai/vms1/readCompl`, {
-          fileRead: true,
-        })
-        .pipe(take(1))
-        .subscribe();
+      // awb 실시간 데이터를 MQTT로 publish
+      this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
+        fileRead: true,
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
@@ -645,11 +617,9 @@ export class AwbService {
   async modelingCompleteWithNAS() {
     // vms데이터를 받았다는 신호를전송합니다
     // awb실시간 데이터 mqtt로 publish 하기 위함
-    this.client
-      .send(`hyundai/vms1/readCompl`, {
-        fileRead: true,
-      })
-      .subscribe();
+    this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
+      fileRead: true,
+    });
   }
 
   async getAwbNotCombineModelPath() {
