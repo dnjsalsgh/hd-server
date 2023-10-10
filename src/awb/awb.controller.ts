@@ -60,6 +60,17 @@ export class AwbController {
     return this.awbService.create(createAwbDto, queryRunnerManager);
   }
 
+  @ApiOperation({ summary: '리스트 형태로vms 입력데이터 저장하기(scc와 함께)' })
+  @ApiBody({ type: [CreateAwbDto] })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/list')
+  createList(
+    @Body() createAwbDto: CreateAwbDto[],
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.awbService.createList(createAwbDto, queryRunnerManager);
+  }
+
   @ApiOperation({
     summary:
       '[사용x] vms 입력데이터 저장하기(scc와 항공편 스케줄 함께) /airschedule/awb를 사용하세요',

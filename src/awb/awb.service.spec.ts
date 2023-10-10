@@ -11,8 +11,6 @@ import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { AwbModule } from './awb.module';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
-import { MqttModule } from '../mqtt.module';
-import { MqttService } from '../mqtt.service';
 import {
   ClientProxy,
   ClientProxyFactory,
@@ -72,7 +70,7 @@ describe('AwbService', () => {
 
   it('Awb 테스트 데이터 넣기', async () => {
     const awbTestData: Partial<CreateAwbDto> = {
-      name: 'test',
+      // name: 'test',
       prefab: '3d Model Name',
       waterVolume: 1,
       squareVolume: 1,
@@ -142,7 +140,7 @@ describe('AwbService', () => {
     // 2. scc정보가 같이 들어왔다고 가정합니다.
 
     const awbBodyTest: Partial<CreateAwbDto> = {
-      name: 'test',
+      // name: 'test',
       prefab: '3d Model Name',
       waterVolume: 1,
       squareVolume: 1,

@@ -26,7 +26,7 @@ const clients = ClientsModule.register([
   imports: [clients],
   controllers: [MqttController],
   providers: [MqttService],
-  exports: [clients], // 다른 모듈에서 쓸 수 있게 출력
+  exports: [clients, MqttService], // 다른 모듈에서 쓸 수 있게 출력
 })
 export class MqttModule {
   constructor() {}
