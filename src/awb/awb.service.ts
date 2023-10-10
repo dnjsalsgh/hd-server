@@ -41,10 +41,10 @@ export class AwbService {
     private readonly awbRepository: Repository<Awb>,
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
-    private dataSource: DataSource,
-    private readonly fileService: FileService,
     @InjectRepository(Vms, 'mssqlDB')
     private readonly vmsRepository: Repository<Vms>,
+    private dataSource: DataSource,
+    private readonly fileService: FileService,
     private readonly mqttService: MqttService,
   ) {}
 
@@ -127,51 +127,6 @@ export class AwbService {
       return awbResult;
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
-    }
-  }
-
-  async upsert(createAwbDto: CreateAwbDto, queryRunnerManager: EntityManager) {
-    const { scc, ...awbDto } = createAwbDto;
-
-    const queryRunner = queryRunnerManager.queryRunner;
-
-    try {
-      // 2. awb를 입력하기
-      const awbResult = await queryRunner.manager
-        .getRepository(Awb)
-        .upsert(awbDto, ['barcode']);
-
-      // scc 정보, awb이 입력되어야 동작하게끔
-      if (scc && awbResult.identifiers) {
-        // 4. 입력된 scc찾기
-        const sccResult = await this.sccRepository.find({
-          where: { code: In(scc) },
-        });
-
-        // 5. awb와 scc를 연결해주기 위한 작업
-        const joinParam = sccResult.map((item) => {
-          return {
-            Awb: awbResult.identifiers[0].id,
-            Scc: item.id,
-          };
-        });
-        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
-        // [통합 테스트용] dt에 vms create되었다고 알려주기
-
-        // [통합 테스트용] dt에 vms create되었다고 알려주기
-        this.mqttService.sendMqttMessage(`hyundai/vms1/create`, awbResult);
-      }
-
-      // awb 실시간 데이터를 MQTT로 publish
-      this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
-        fileRead: true,
-      });
-      return awbResult;
-    } catch (error) {
-      // await queryRunner.rollbackTransaction();
-      throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      // await queryRunner.release();
     }
   }
 
@@ -596,18 +551,19 @@ export class AwbService {
       });
 
       const pattern = /(obj|ply)/;
-      // parameter에 있는 Awb 정보에 모델링파일을 연결합니다.
+      // png면 path column에 저장
       if (fileName.includes('png')) {
         await this.awbRepository.update(targetAwb.id, {
           path: filePath,
           state: 'saved',
-        }); // png면 path column에 저장
-      } else if (pattern.test(fileName)) {
+        });
+      }
+      // obj면 modelPath column에 저장
+      else if (pattern.test(fileName)) {
         await this.awbRepository.update(targetAwb.id, {
           modelPath: filePath,
           state: 'saved',
-        }); // obj면 modelPath column에 저장
-        // binary로 변환시켜서 mqtt publish 하는 로직 삭제 => 너무 오래걸림
+        });
       }
     } catch (e) {
       console.error(e);
