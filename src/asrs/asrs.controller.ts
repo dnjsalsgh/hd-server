@@ -91,7 +91,7 @@ export class AsrsController {
       '[사용x] plc를 활용한 창고에 화물 이력(이력등록), plc 데이터를 가정한 테스트용 api',
     description: '창고로 일어나는 작업이기 때문에 asrs로 넣음',
   })
-  @Post('/plc/asrs')
+  @Post('/plc/asrs/test')
   createByPlcIn(@Body() body: CreateAsrsPlcDto) {
     return this.asrsService.createByPlcIn(body);
   }

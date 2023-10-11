@@ -12,14 +12,13 @@ import {
   Like,
   MoreThanOrEqual,
   Repository,
-  TypeORMError,
 } from 'typeorm';
-import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Awb } from '../awb/entities/awb.entity';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class AsrsService {
@@ -30,8 +29,8 @@ export class AsrsService {
     private readonly asrsHistoryRepository: Repository<AsrsHistory>,
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-
     private dataSource: DataSource,
+    private redisService: RedisService,
   ) {}
 
   async create(createAsrsDto: CreateAsrsDto): Promise<Asrs> {
@@ -173,72 +172,27 @@ export class AsrsService {
    * awb와 asrs의 정보를 처리해야함
    * @param body
    */
-  async createByPlcIn(body: CreateAsrsPlcDto) {
-    // TODO: 가정된 데이터들 어떤 화물정보가 들어있을줄 모르니 다 분기처리할 것
+  async createByPlcIn(body: CreateAsrsPlcDto) {}
 
-    // 만약 랙에 대한 정보가 db에 없다면 추가하기
-
-    const asrsId = +body.LH_ASRS_ID || +body.RH_ASRS_ID;
-
-    const LH_ASRS_ID = body.LH_ASRS_ID;
-    const RH_ASRS_ID = body.RH_ASRS_ID;
-    const LH_Rack_ID = [];
-    const RH_Rack_ID = [];
-    const LH_Rack_Part_On: string[] = [];
-    const RH_Rack_Part_On: string[] = [];
-    const ASRS_LH_Rack_Part_Info: string[] = [];
-    const ASRS_RH_Rack_Part_Info: string[] = [];
-
-    for (let i = 1; i <= 9; i++) {
-      LH_Rack_Part_On.push(body[`LH_Rack${i}_Part_On`]);
-      RH_Rack_Part_On.push(body[`RH_Rack${i}_Part_On`]);
-      LH_Rack_ID.push(body[`LH_Rack${i}_ID`]);
-      RH_Rack_ID.push(body[`RH_Rack${i}_ID`]);
-      ASRS_LH_Rack_Part_Info.push(body[`ASRS_LH_Rack${i}_Part_Info`]);
-      ASRS_RH_Rack_Part_Info.push(body[`ASRS_RH_Rack${i}_Part_Info`]);
-      const asrsBodyLH: CreateAsrsDto = {
-        name: body[`LH_Rack${i}_ID`],
-        parent: 0,
-      };
-      const asrsBodyRH: CreateAsrsDto = {
-        name: body[`RH_Rack${i}_ID`],
-        parent: 0,
-      };
-      // Rack_ID를 name으로 asrs table에 저장
-      await this.asrsRepository.save(asrsBodyLH);
-      await this.asrsRepository.save(asrsBodyRH);
-    }
-
-    // 화물정보 안에 화물Id(화물이름) 들어왔다고 가정
-    // await this.awbRepository.findOne({
-    //   where: { name: awbInfo.awbId as unknown as string },
-    // });
-    // const awbId = awbInfo.awbId;
-
-    const asrsHistoryBody: CreateAsrsHistoryDto = {
-      Asrs: asrsId,
-      // Awb: awbId,
-      Awb: 1,
+  async inAsrs(asrsId: number, awbId: number) {
+    const asrsHistoryBody = {
       inOutType: 'in',
-      count: 1,
+      count: 0,
+      Asrs: asrsId,
+      Awb: awbId,
     };
+    await this.asrsHistoryRepository.save(asrsHistoryBody);
+    await this.redisService.set(asrsId.toString(), awbId.toString());
+  }
 
-    const queryRunner = await this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      // asrs에서 동작한 data를 이력 등록
-      // await queryRunner.manager
-      //   .getRepository(AsrsHistory)
-      //   .save(asrsHistoryBody);
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
-    }
+  async outAsrs(asrsId: number, awbId: number) {
+    const asrsHistoryBody = {
+      inOutType: 'out',
+      count: 0,
+      Asrs: asrsId,
+      Awb: awbId,
+    };
+    await this.asrsHistoryRepository.save(asrsHistoryBody);
+    await this.redisService.set(asrsId.toString(), awbId.toString());
   }
 }
