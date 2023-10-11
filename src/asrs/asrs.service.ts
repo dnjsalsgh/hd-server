@@ -172,26 +172,6 @@ export class AsrsService {
    * awb와 asrs의 정보를 처리해야함
    * @param body
    */
-  // async createByPlcIn(body: CreateAsrsPlcDto) {
-  //   for (let i = 1; i <= 18; i++) {
-  //     const formattedNumber = i.toString().padStart(2, '0');
-  //     const previousState = await this.redisService.get(String(i));
-  //     const onTag = `STK_03_${formattedNumber}_SKID_ON`;
-  //     const offTag = `STK_03_${formattedNumber}_SKID_OFF`;
-  //     const awbNo = `STK_03_${formattedNumber}_Bill_No`;
-  //     // 창고에 값이 없다가 있어야 한다. 초기에는 값이 없으니 값이 없어도 true로 취급하는 로직 추가
-  //     if (body[onTag] && (previousState === 'out' || !previousState)) {
-  //       const awb = await this.findAwbByBarcode(body[awbNo]);
-  //       await this.inAsrs(i, awb.id);
-  //       await this.settingRedis(String(i), 'in');
-  //     } else if (body[offTag] && previousState === 'in') {
-  //       const awb = await this.findAwbByBarcode(body[awbNo]);
-  //       await this.outAsrs(i, awb.id);
-  //       await this.settingRedis(String(i), 'out');
-  //     }
-  //   }
-  // }
-
   async createByPlcIn(body: CreateAsrsPlcDto) {
     for (let unitNumber = 1; unitNumber <= 18; unitNumber++) {
       const unitKey = this.formatUnitNumber(unitNumber);
@@ -232,14 +212,14 @@ export class AsrsService {
   async processInOut(unitNumber: number, awbNo: string, state: 'in' | 'out') {
     const awb = await this.findAwbByBarcode(awbNo);
     if (state === 'in') {
-      await this.inAsrs(unitNumber, awb.id);
+      await this.recordInboundOperation(unitNumber, awb.id);
     } else if (state === 'out') {
-      await this.outAsrs(unitNumber, awb.id);
+      await this.recordOutboundOperation(unitNumber, awb.id);
     }
     await this.settingRedis(String(unitNumber), state);
   }
 
-  async inAsrs(asrsId: number, awbId: number) {
+  async recordInboundOperation(asrsId: number, awbId: number) {
     const asrsHistoryBody = {
       inOutType: 'in',
       count: 0,
@@ -250,7 +230,7 @@ export class AsrsService {
     await this.settingRedis(asrsId.toString(), awbId.toString());
   }
 
-  async outAsrs(asrsId: number, awbId: number) {
+  async recordOutboundOperation(asrsId: number, awbId: number) {
     const asrsHistoryBody = {
       inOutType: 'out',
       count: 0,
