@@ -211,34 +211,24 @@ export class AsrsService {
 
   async processInOut(unitNumber: number, awbNo: string, state: 'in' | 'out') {
     const awb = await this.findAwbByBarcode(awbNo);
-    if (state === 'in') {
-      await this.recordInboundOperation(unitNumber, awb.id);
-    } else if (state === 'out') {
-      await this.recordOutboundOperation(unitNumber, awb.id);
-    }
+    const inOutType = state === 'in' ? 'in' : 'out';
+    await this.recordOperation(unitNumber, awb.id, inOutType);
     await this.settingRedis(String(unitNumber), state);
   }
 
-  async recordInboundOperation(asrsId: number, awbId: number) {
+  async recordOperation(
+    asrsId: number,
+    awbId: number,
+    inOutType: 'in' | 'out',
+  ) {
     const asrsHistoryBody = {
-      inOutType: 'in',
+      inOutType,
       count: 0,
       Asrs: asrsId,
       Awb: awbId,
     };
     await this.asrsHistoryRepository.save(asrsHistoryBody);
-    await this.settingRedis(asrsId.toString(), awbId.toString());
-  }
-
-  async recordOutboundOperation(asrsId: number, awbId: number) {
-    const asrsHistoryBody = {
-      inOutType: 'out',
-      count: 0,
-      Asrs: asrsId,
-      Awb: awbId,
-    };
-    await this.asrsHistoryRepository.save(asrsHistoryBody);
-    await this.settingRedis(asrsId.toString(), awbId.toString());
+    await this.settingRedis(asrsId.toString(), inOutType);
   }
 
   async settingRedis(key: string, value: string) {

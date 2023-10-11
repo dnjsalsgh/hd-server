@@ -85,10 +85,10 @@ export class SimulatorResultService {
     @InjectRepository(SkidPlatform)
     private readonly skidPlatformRepository: Repository<SkidPlatform>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
-    private dataSource: DataSource,
-    private readonly buildUpOrderService: BuildUpOrderService,
     @InjectRepository(Uld)
     private readonly uldRepository: Repository<Uld>,
+    private dataSource: DataSource,
+    private readonly buildUpOrderService: BuildUpOrderService,
     private readonly asrsHistoryService: AsrsHistoryService,
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
     private readonly uldHistoryService: UldHistoryService,
