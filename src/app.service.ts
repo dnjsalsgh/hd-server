@@ -1,6 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
-import * as console from 'console';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {

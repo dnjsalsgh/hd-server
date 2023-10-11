@@ -91,7 +91,7 @@ export class AsrsController {
       '[사용x] plc를 활용한 창고에 화물 이력(이력등록), plc 데이터를 가정한 테스트용 api',
     description: '창고로 일어나는 작업이기 때문에 asrs로 넣음',
   })
-  @Post('/plc/asrs')
+  @Post('/plc/asrs/test')
   createByPlcIn(@Body() body: CreateAsrsPlcDto) {
     return this.asrsService.createByPlcIn(body);
   }
@@ -100,33 +100,8 @@ export class AsrsController {
   // @MessagePattern('hyundai/asrs1/eqData') //구독하는 주제
   @MessagePattern('hyundai/asrs1/data') //구독하는 주제
   createByPlcMatt(@Payload() data) {
-    // mqtt에서 넘어온 데이터를 object 형태로 만들기 위한 전처리 과정
-    // const handlingAsrsInfoFromIf: { [key: string]: unknown } = {};
-    // for (const asrsInfoFromIfElement of data) {
-    //   handlingAsrsInfoFromIf[asrsInfoFromIfElement.name] =
-    //     asrsInfoFromIfElement.value;
-    // }
-    // 자동창고 이력을 등록하는 부분
-    /**
-     * 안착대의 상태를 감지해서 화물을 등록하기 위함
-     */
-    // if (
-    //   handlingAsrsInfoFromIf.Pallet_Rack1_Part_On ||
-    //   handlingAsrsInfoFromIf.Pallet_Rack2_Part_On ||
-    //   handlingAsrsInfoFromIf.Pallet_Rack3_Part_On ||
-    //   handlingAsrsInfoFromIf.Pallet_Rack4_Part_On
-    // ) {
-    //   this.asrsService.createByPlcIn(handlingAsrsInfoFromIf);
-    //   this.skidPlatformHistoryService.checkSkidPlatformChange(
-    //     handlingAsrsInfoFromIf,
-    //   );
-    // }
-    // /**
-    //  * 자동창고의 in을 처리하기 위함
-    //  */
-    // this.asrsService.createByPlcIn(handlingAsrsInfoFromIf);
-    // 원준님과 이야기 후 data 그대로 넘겨주면 된다는거 파악
-    // 자동창고&스태커크레인&안착대 데이터를 발산하는 mqtt
-    // this.client.send(`hyundai/asrs1/eqData2`, data).pipe(take(1)).subscribe();
+    if (data) {
+      // this.asrsService.createByPlcIn(data);
+    }
   }
 }

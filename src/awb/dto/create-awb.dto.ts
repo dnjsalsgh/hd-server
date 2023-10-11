@@ -1,9 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Awb } from '../entities/awb.entity';
 import { Scc } from '../../scc/entities/scc.entity';
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
-import { Column } from 'typeorm';
-import { AwbGroup } from '../../awb-group/entities/awb-group.entity';
 import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 
 export class CreateAwbDto extends PickType(Awb, [
@@ -48,7 +45,7 @@ export class CreateAwbDto extends PickType(Awb, [
     example: 1,
     description: '항공편 FK',
   })
-  AirCraftSchedule: Partial<AircraftSchedule>;
+  AirCraftSchedule?: Partial<AircraftSchedule>;
 
   // /*
   // aircraft 요소

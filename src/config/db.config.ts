@@ -70,7 +70,6 @@ const postgresConfig: TypeOrmModuleOptions = {
   synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
   namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
   useUTC: false,
-
   extra: {
     timezone: 'Asia/Seoul',
   },

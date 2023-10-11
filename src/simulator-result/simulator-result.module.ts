@@ -18,6 +18,8 @@ import { UldHistoryService } from '../uld-history/uld-history.service';
 import { Awb } from '../awb/entities/awb.entity';
 import { Asrs } from '../asrs/entities/asrs.entity';
 import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
+import { RedisService } from '../redis/redis.service';
+import { redisProvider } from '../redis/redis.provider';
 
 @Module({
   imports: [
@@ -48,6 +50,8 @@ import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
     AsrsHistoryService,
     SkidPlatformHistoryService,
     UldHistoryService,
+    RedisService,
+    ...redisProvider,
   ],
 })
 export class SimulatorResultModule {}
