@@ -10,6 +10,8 @@ import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platfo
 import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { Awb } from '../awb/entities/awb.entity';
+import { RedisService } from '../redis/redis.service';
+import { redisProvider } from '../redis/redis.provider';
 
 @Module({
   imports: [
@@ -25,6 +27,11 @@ import { Awb } from '../awb/entities/awb.entity';
     MqttModule,
   ],
   controllers: [AsrsController],
-  providers: [AsrsService, SkidPlatformHistoryService],
+  providers: [
+    AsrsService,
+    SkidPlatformHistoryService,
+    RedisService,
+    ...redisProvider,
+  ],
 })
 export class AsrsModule {}
