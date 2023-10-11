@@ -1,38 +1,22 @@
-import { Controller, Get, Inject, OnModuleInit } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
+import { RedisClientType } from 'redis';
 import { ClientProxy } from '@nestjs/microservices';
-import { take } from 'rxjs';
 
 @Controller()
-// implements OnModuleInit
 export class AppController {
   constructor(
     @Inject('MQTT_SERVICE') private mqttClient: ClientProxy, // @Inject('MATH_SERVICE') private client: ClientProxy,
+    @Inject('REDIS_CLIENT') private readonly redis: RedisClientType,
   ) {}
-
-  // onModuleInit() {
-  //   this.client.connect();
-  // }
-  //
-  // private connectToMqttBroker() {
-  //   return this.mqttClient.connect();
-  // }
 
   @Get()
   async getHello(): Promise<string> {
     return 'Hello from NestJS!';
   }
-  // @Get()
-  // async getHello() {
-  //   this.mqttClient.send('hyundai/test', 1234).pipe(take(1)).subscribe();
-  // }
-
-  // @Get('/check/mqtt')
-  // async checkMqtt(): Promise<string> {
-  //   const mqttResult = await this.mqttClient.connect();
-  //   return mqttResult ? 'mqttConnected' : 'not Found mqtt';
-  // }
-  // @Get('/check/mssql')
-  // async checkMssql() {
-  //   return this.secondaryDataSource.metadataTableName;
-  // }
+  @Get('/redis')
+  async getRedis(): Promise<string> {
+    await this.redis.set('test', '11');
+    const value = await this.redis.get('test');
+    return value;
+  }
 }

@@ -373,24 +373,6 @@ export class AwbService {
       },
     });
 
-    // name으로 awb를 찾을 시 모델의 binary를 mqtt에 전송하기 위함, name으로 찾을 시 awb 1개만 나옴
-    // TODO: awb의 경로를 유니티에서 읽어야 할 듯 8mb를 binary로 변환 후 mqtt 전송하려면 너무 오래걸리고 서버가 멈춤
-    // if (query.name && searchResult && searchResult[0].modelPath) {
-    //   const awbModelFile = await this.fileService.readFile(
-    //     searchResult[0].modelPath,
-    //   );
-    //   const imgFilePath = await fs.readFile(searchResult[0].path);
-    //   const awbImgFile = await this.fileService.readFile(searchResult[0].path);
-
-    // Buffer를 binary 문자열로 변환합니다.
-    // this.client
-    //   .send(`hyundai/awb/model`, {
-    //     modelFile: awbModelFile.toString('binary'),
-    //     imgFile: imgFilePath.toString('binary'),
-    //   })
-    //   .subscribe();
-    // }
-
     return searchResult;
   }
 

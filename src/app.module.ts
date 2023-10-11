@@ -29,18 +29,17 @@ import { AircraftScheduleModule } from './aircraft-schedule/aircraft-schedule.mo
 import { CommonCodeModule } from './common-code/common-code.module';
 import { AwbGroupModule } from './awb-group/awb-group.module';
 import { MqttModule } from './mqtt.module';
-import { RedisCacheModule } from './cache/redis.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FileModule } from './file/file.module';
-import { mssqlConfig, postgresConfig } from './config/db.config';
 import { VmsModule } from './vms/vms.module';
 import { HacsModule } from './hacs/hacs.module';
 import { WorkerModule } from './worker/worker.module';
 import { CheckModule } from './check/check.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
 import { AlarmModule } from './alarm/alarm.module';
 import { AwbReturnModule } from './awb-return/awb-return.module';
+
+import { mssqlConfig, postgresConfig } from './config/db.config';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -94,7 +93,7 @@ import { AwbReturnModule } from './awb-return/awb-return.module';
     MqttModule,
 
     // redis 모듈설정
-    RedisCacheModule,
+    RedisModule,
 
     // schedule 모듈 설정
     ScheduleModule.forRoot(),
@@ -106,7 +105,7 @@ import { AwbReturnModule } from './awb-return/awb-return.module';
     CheckModule,
     AlarmModule,
     AwbReturnModule,
-    // WorkerModule,
+    WorkerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

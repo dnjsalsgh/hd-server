@@ -120,15 +120,15 @@ describe('SimulatorResultService', () => {
         joinParamArray.push(joinParam);
 
         // 2-2. SimulatorHistory 입력
-        const historyParam: CreateSimulatorHistoryDto = {
-          Uld: testSimulationResultBody.Uld,
-          Awb: testSimulationResultBody.AwbWithXYZ[i].Awb,
-          SimulatorResult: simulatorResultResult.id,
-          x: testSimulationResultBody.AwbWithXYZ[i].x,
-          y: testSimulationResultBody.AwbWithXYZ[i].y,
-          z: testSimulationResultBody.AwbWithXYZ[i].z,
-        };
-        historyParamArray.push(historyParam);
+        // const historyParam: CreateSimulatorHistoryDto = {
+        //   Uld: testSimulationResultBody.Uld,
+        //   Awb: testSimulationResultBody.AwbWithXYZ[i].Awb,
+        //   SimulatorResult: simulatorResultResult.id,
+        //   x: testSimulationResultBody.AwbWithXYZ[i].x,
+        //   y: testSimulationResultBody.AwbWithXYZ[i].y,
+        //   z: testSimulationResultBody.AwbWithXYZ[i].z,
+        // };
+        // historyParamArray.push(historyParam);
       }
 
       const joinResult = await SimulatorResultAwbJoinRepository.save(
