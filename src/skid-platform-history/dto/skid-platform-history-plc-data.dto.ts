@@ -1,32 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SkidPlatformHistoryPlcDataDto {
-  @ApiProperty({ example: true, description: '안착대1 파트감지' })
-  Pallet_Rack1_Part_On?: boolean;
-  @ApiProperty({ example: false, description: '안착대2 파트감지' })
-  Pallet_Rack2_Part_On?: boolean;
-  @ApiProperty({ example: false, description: '안착대3 파트감지' })
-  Pallet_Rack3_Part_On?: boolean;
-  @ApiProperty({ example: false, description: '안착대4 파트감지' })
-  Pallet_Rack4_Part_On?: boolean;
-  @ApiProperty({
-    example: { skidPlatformId: 1, awbId: 1 },
-    description: '안착대1 화물정보',
-  })
-  Pallet_Rack1_Part_Info?: string | unknown;
-  @ApiProperty({
-    example: { skidPlatformId: 2, awbId: 1 },
-    description: '안착대2 화물정보',
-  })
-  Pallet_Rack2_Part_Info?: string | unknown;
-  @ApiProperty({
-    example: { skidPlatformId: 3, awbId: 1 },
-    description: '안착대3 화물정보',
-  })
-  Pallet_Rack3_Part_Info?: string | unknown;
-  @ApiProperty({
-    example: { skidPlatformId: 4, awbId: 1 },
-    description: '안착대4 화물정보',
-  })
-  Pallet_Rack4_Part_Info?: string | unknown;
+  @ApiProperty({ example: '안착대1', description: '안착대Id' })
+  SUPPLY_01_01_P2A_SKID_ID?: string;
+  @ApiProperty({ example: 'test2', description: '화물ID' })
+  SUPPLY_01_01_P2A_Bill_No?: string;
+  @ApiProperty({ example: false, description: '일반 스키드 인식 센서' })
+  SUPPLY_01_01_P2A_G_SKID_ON?: boolean;
+  @ApiProperty({ example: false, description: '전용 스키드 인식 센서' })
+  SUPPLY_01_01_P2A_D_SKID_ON?: boolean;
+  @ApiProperty({ example: '안착대2', description: '안착대Id' })
+  SUPPLY_01_02_P2A_SKID_ID?: string;
+  @ApiProperty({ example: 'test2', description: '화물ID' })
+  SUPPLY_01_02_P2A_Bill_No?: string;
+  @ApiProperty({ example: false, description: '일반 스키드 인식 센서' })
+  SUPPLY_01_02_P2A_G_SKID_ON?: boolean;
+  @ApiProperty({ example: false, description: '전용 스키드 인식 센서' })
+  SUPPLY_01_02_P2A_D_SKID_ON?: boolean;
+  @ApiProperty({ example: '안착대3', description: '안착대Id' })
+  SUPPLY_01_03_P2A_SKID_ID?: string;
+  @ApiProperty({ example: 'test2', description: '화물ID' })
+  SUPPLY_01_03_P2A_Bill_No?: string;
+  @ApiProperty({ example: false, description: '일반 스키드 인식 센서' })
+  SUPPLY_01_03_P2A_G_SKID_ON?: boolean;
+  @ApiProperty({ example: false, description: '전용 스키드 인식 센서' })
+  SUPPLY_01_03_P2A_D_SKID_ON?: boolean;
+  @ApiProperty({ example: '안착대4', description: '안착대Id' })
+  SUPPLY_01_04_P2A_SKID_ID?: string;
+  @ApiProperty({ example: 'test2', description: '화물ID' })
+  SUPPLY_01_04_P2A_Bill_No?: string;
+  @ApiProperty({ example: false, description: '일반 스키드 인식 센서' })
+  SUPPLY_01_04_P2A_G_SKID_ON?: boolean;
+  @ApiProperty({ example: false, description: '전용 스키드 인식 센서' })
+  SUPPLY_01_04_P2A_D_SKID_ON?: boolean;
 }

@@ -172,24 +172,71 @@ export class AsrsService {
    * awb와 asrs의 정보를 처리해야함
    * @param body
    */
+  // async createByPlcIn(body: CreateAsrsPlcDto) {
+  //   for (let i = 1; i <= 18; i++) {
+  //     const formattedNumber = i.toString().padStart(2, '0');
+  //     const previousState = await this.redisService.get(String(i));
+  //     const onTag = `STK_03_${formattedNumber}_SKID_ON`;
+  //     const offTag = `STK_03_${formattedNumber}_SKID_OFF`;
+  //     const awbNo = `STK_03_${formattedNumber}_Bill_No`;
+  //     // 창고에 값이 없다가 있어야 한다. 초기에는 값이 없으니 값이 없어도 true로 취급하는 로직 추가
+  //     if (body[onTag] && (previousState === 'out' || !previousState)) {
+  //       const awb = await this.findAwbByBarcode(body[awbNo]);
+  //       await this.inAsrs(i, awb.id);
+  //       await this.settingRedis(String(i), 'in');
+  //     } else if (body[offTag] && previousState === 'in') {
+  //       const awb = await this.findAwbByBarcode(body[awbNo]);
+  //       await this.outAsrs(i, awb.id);
+  //       await this.settingRedis(String(i), 'out');
+  //     }
+  //   }
+  // }
+
   async createByPlcIn(body: CreateAsrsPlcDto) {
-    for (let i = 1; i <= 18; i++) {
-      const formattedNumber = i.toString().padStart(2, '0');
-      const previousState = await this.redisService.get(String(i));
-      const onTag = `STK_03_${formattedNumber}_SKID_ON`;
-      const offTag = `STK_03_${formattedNumber}_SKID_OFF`;
-      const awbNo = `STK_03_${formattedNumber}_Bill_No`;
-      // 창고에 값이 없다가 있어야 한다. 초기에는 값이 없으니 값이 없어도 true로 취급하는 로직 추가
-      if (body[onTag] && (previousState === 'out' || !previousState)) {
-        const awb = await this.findAwbByBarcode(body[awbNo]);
-        await this.inAsrs(i, awb.id);
-        await this.settingRedis(String(i), 'in');
-      } else if (body[offTag] && previousState === 'in') {
-        const awb = await this.findAwbByBarcode(body[awbNo]);
-        await this.outAsrs(i, awb.id);
-        await this.settingRedis(String(i), 'out');
+    for (let unitNumber = 1; unitNumber <= 18; unitNumber++) {
+      const unitKey = this.formatUnitNumber(unitNumber);
+      const previousState = await this.redisService.get(unitNumber.toString());
+      const onTag = `STK_03_${unitKey}_SKID_ON`;
+      const offTag = `STK_03_${unitKey}_SKID_OFF`;
+      const awbNo = `STK_03_${unitKey}_Bill_No`;
+
+      if (this.shouldSetInAsrs(body, onTag, previousState)) {
+        await this.processInOut(unitNumber, body[awbNo], 'in');
+      } else if (this.shouldSetOutAsrs(body, offTag, previousState)) {
+        await this.processInOut(unitNumber, body[awbNo], 'out');
       }
     }
+  }
+
+  // plc로 오는 데이터가 2자리 수로 맞춰놔서 convert 함수
+  formatUnitNumber(unitNumber: number): string {
+    return unitNumber.toString().padStart(2, '0');
+  }
+
+  shouldSetInAsrs(
+    body: CreateAsrsPlcDto,
+    onTag: string,
+    previousState: string | null,
+  ): boolean {
+    return body[onTag] && (previousState === 'out' || previousState === null);
+  }
+
+  shouldSetOutAsrs(
+    body: CreateAsrsPlcDto,
+    offTag: string,
+    previousState: string | null,
+  ): boolean {
+    return body[offTag] && previousState === 'in';
+  }
+
+  async processInOut(unitNumber: number, awbNo: string, state: 'in' | 'out') {
+    const awb = await this.findAwbByBarcode(awbNo);
+    if (state === 'in') {
+      await this.inAsrs(unitNumber, awb.id);
+    } else if (state === 'out') {
+      await this.outAsrs(unitNumber, awb.id);
+    }
+    await this.settingRedis(String(unitNumber), state);
   }
 
   async inAsrs(asrsId: number, awbId: number) {

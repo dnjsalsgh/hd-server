@@ -101,7 +101,7 @@ export class AsrsController {
   @MessagePattern('hyundai/asrs1/data') //구독하는 주제
   createByPlcMatt(@Payload() data) {
     if (data) {
-      this.asrsService.createByPlcIn(data);
+      // this.asrsService.createByPlcIn(data);
     }
   }
 }
