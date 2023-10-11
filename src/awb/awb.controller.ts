@@ -86,24 +86,32 @@ export class AwbController {
       '부모 화물의 이름을 parameter로 넣고, body에 자식 awb를 배열형태로 입력합니다.',
   })
   @ApiBody({ type: [CreateAwbDto] })
+  @UseInterceptors(TransactionInterceptor)
   @Post('/break-down/:parent')
   breakDownByName(
     @Param('parent') parent: string,
     @Body() createAwbDtoArray: CreateAwbDto[],
+    @TransactionManager() queryRunnerManager: EntityManager,
   ) {
-    return this.awbService.breakDown(parent, createAwbDtoArray);
+    return this.awbService.breakDown(
+      parent,
+      createAwbDtoArray,
+      queryRunnerManager,
+    );
   }
 
   @ApiOperation({
     summary: '해포 실행 by id',
     description: '부모 화물의 id를 넣고, 자식을 body의 [id]로 넣습니다.',
   })
+  @UseInterceptors(TransactionInterceptor)
   @Post('/break-down-by-id/:awbId')
   breakDownById(
     @Param('awbId', ParseIntPipe) awbId: number,
     @Body() body: CreateAwbBreakDownDto,
+    @TransactionManager() queryRunnerManager: EntityManager,
   ) {
-    return this.awbService.breakDownById(awbId, body);
+    return this.awbService.breakDownById(awbId, body, queryRunnerManager);
   }
 
   // @ApiQuery({ name: 'name', required: false })

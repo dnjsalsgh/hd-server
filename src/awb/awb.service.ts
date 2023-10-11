@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,12 +21,9 @@ import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { Scc } from '../scc/entities/scc.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { ClientProxy } from '@nestjs/microservices';
-import { Observable, take } from 'rxjs';
 import { Aircraft } from '../aircraft/entities/aircraft.entity';
 import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
 import { CreateAircraftScheduleDto } from '../aircraft-schedule/dto/create-aircraft-schedule.dto';
-import { CommonCode } from '../common-code/entities/common-code.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
@@ -406,7 +403,11 @@ export class AwbService {
     return this.awbRepository.update(id, updateAwbDto);
   }
 
-  async breakDown(parentName: string, createAwbDtos: CreateAwbDto[]) {
+  async breakDown(
+    parentName: string,
+    createAwbDtos: CreateAwbDto[],
+    queryRunnerManager: EntityManager,
+  ) {
     const parentCargo = await this.awbRepository.findOne({
       where: { barcode: parentName },
     });
@@ -419,9 +420,7 @@ export class AwbService {
       throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const queryRunner = queryRunnerManager.queryRunner;
     try {
       // 2. 해포된 화물들 등록
       for (let i = 0; i < createAwbDtos.length; i++) {
@@ -453,17 +452,16 @@ export class AwbService {
       await queryRunner.manager
         .getRepository(Awb)
         .update({ barcode: parentName }, { breakDown: true });
-
-      await queryRunner.commitTransaction();
     } catch (error) {
-      await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
     }
   }
 
-  async breakDownById(awbId: number, body: CreateAwbBreakDownDto) {
+  async breakDownById(
+    awbId: number,
+    body: CreateAwbBreakDownDto,
+    queryRunnerManager: EntityManager,
+  ) {
     try {
       const parentAwb = await this.awbRepository.findOneBy({
         id: awbId,
@@ -480,9 +478,8 @@ export class AwbService {
       throw new NotFoundException(`${e}`);
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const queryRunner = queryRunnerManager.queryRunner;
+
     try {
       // 2. 해포된 화물들 등록
       for (let i = 0; i < body.awbs.length; i++) {
@@ -498,13 +495,8 @@ export class AwbService {
       await queryRunner.manager
         .getRepository(Awb)
         .update({ id: awbId }, { breakDown: true });
-
-      await queryRunner.commitTransaction();
     } catch (error) {
-      await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
     }
   }
 

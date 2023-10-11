@@ -21,7 +21,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { SimulatorResultAwbJoin } from '../../simulator-result-awb-join/entities/simulator-result-awb-join.entity';
 import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
 import { AsrsOutOrder } from '../../asrs-out-order/entities/asrs-out-order.entity';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 import { Scc } from '../../scc/entities/scc.entity';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
@@ -31,15 +31,6 @@ import { AwbReturn } from '../../awb-return/entities/awb-return.entity';
 export class Awb {
   @PrimaryGeneratedColumn()
   id: number;
-
-  // @ApiProperty({
-  //   example: '화물-001',
-  //   description: '화물의 이름',
-  // })
-  // @Column({ type: 'varchar', length: 500, nullable: false, unique: true })
-  // @IsString()
-  // @IsNotEmpty()
-  // name: string;
 
   @ApiProperty({
     example: '010101',
