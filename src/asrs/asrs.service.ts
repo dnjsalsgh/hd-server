@@ -172,7 +172,25 @@ export class AsrsService {
    * awb와 asrs의 정보를 처리해야함
    * @param body
    */
-  async createByPlcIn(body: CreateAsrsPlcDto) {}
+  async createByPlcIn(body: CreateAsrsPlcDto) {
+    for (let i = 1; i <= 18; i++) {
+      const formattedNumber = i.toString().padStart(2, '0');
+      const previousState = await this.redisService.get(String(i));
+      const onTag = `STK_03_${formattedNumber}_SKID_ON`;
+      const offTag = `STK_03_${formattedNumber}_SKID_OFF`;
+      const awbNo = `STK_03_${formattedNumber}_Bill_No`;
+      // 창고에 값이 없다가 있어야 한다. 초기에는 값이 없으니 값이 없어도 true로 취급하는 로직 추가
+      if (body[onTag] && (previousState === 'out' || !previousState)) {
+        const awb = await this.findAwbByBarcode(body[awbNo]);
+        await this.inAsrs(i, awb.id);
+        await this.settingRedis(String(i), 'in');
+      } else if (body[offTag] && previousState === 'in') {
+        const awb = await this.findAwbByBarcode(body[awbNo]);
+        await this.outAsrs(i, awb.id);
+        await this.settingRedis(String(i), 'out');
+      }
+    }
+  }
 
   async inAsrs(asrsId: number, awbId: number) {
     const asrsHistoryBody = {
@@ -182,7 +200,7 @@ export class AsrsService {
       Awb: awbId,
     };
     await this.asrsHistoryRepository.save(asrsHistoryBody);
-    await this.redisService.set(asrsId.toString(), awbId.toString());
+    await this.settingRedis(asrsId.toString(), awbId.toString());
   }
 
   async outAsrs(asrsId: number, awbId: number) {
@@ -193,6 +211,18 @@ export class AsrsService {
       Awb: awbId,
     };
     await this.asrsHistoryRepository.save(asrsHistoryBody);
-    await this.redisService.set(asrsId.toString(), awbId.toString());
+    await this.settingRedis(asrsId.toString(), awbId.toString());
+  }
+
+  async settingRedis(key: string, value: string) {
+    await this.redisService.set(key, value);
+  }
+
+  async findAsrsByName(name: string) {
+    return await this.asrsRepository.findOne({ where: { name: name } });
+  }
+
+  async findAwbByBarcode(billNo: string) {
+    return await this.awbRepository.findOne({ where: { barcode: billNo } });
   }
 }
