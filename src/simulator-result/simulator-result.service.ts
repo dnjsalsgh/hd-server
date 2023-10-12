@@ -1067,7 +1067,8 @@ export class SimulatorResultService {
 
     try {
       const bodyResult = psResult.result[0];
-      if (bodyResult.isDone) return 'uld에 더이상 화물이 들어가지 못합니다.';
+      // uld에 더이상 화물이 들어가지 못합니다.
+      if (bodyResult.isDone) return psResult;
 
       // 1. 자동창고 작업지시를 만들기
       const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
@@ -1081,7 +1082,6 @@ export class SimulatorResultService {
         if (asrsOutOrderParam.Asrs !== 0)
           asrsOutOrderParamArray.push(asrsOutOrderParam);
       }
-      // console.log('asrsOutOrderParamArray = ', asrsOutOrderParamArray);
       const asrsOutOrderResult = await queryRunner.manager
         .getRepository(AsrsOutOrder)
         .upsert(asrsOutOrderParamArray, ['Awb', 'Asrs']);
