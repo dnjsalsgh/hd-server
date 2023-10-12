@@ -73,6 +73,7 @@ import { SccService } from '../scc/scc.service';
       useValue: 'WorkerService', // 원하는 값을 useValue로 지정합니다.
     },
     FileService,
+
     AwbService,
     SccService,
   ],

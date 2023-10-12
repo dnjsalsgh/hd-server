@@ -12,10 +12,12 @@ import path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { winstonLogger } from './lib/logger/winston.util';
 import * as dotenv from 'dotenv';
+
 declare const module: any;
 import mqtt from 'mqtt';
 
 dotenv.config();
+
 async function bootstrap() {
   // 1. http서버로 사용
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {

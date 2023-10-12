@@ -311,9 +311,32 @@ export class AwbService {
     }
   }
 
+  /**
+   * 누락된 vms를 update하기 위한 로직
+   */
+  async preventMissingData(vms: Vms) {
+    try {
+      const createAwbDto: Partial<CreateAwbDto> = {
+        barcode: vms.name,
+        modelPath: vms.modelPath,
+        path: vms.modelPath,
+      };
+
+      // vms에서 nas 경로를 읽어서 파일 저장하는 부분
+      const filePath = await this.fileUpload(vms);
+      createAwbDto.modelPath = filePath;
+
+      const awbResult = await this.awbRepository.update(
+        { barcode: createAwbDto.barcode },
+        createAwbDto,
+      );
+    } catch (error) {
+      throw new TypeORMError(`rollback Working - ${error}`);
+    }
+  }
+
   private async fileUpload(vms: Vms) {
     const file = `${vms.modelPath}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
-    console.log('file = ', file);
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
@@ -392,7 +415,7 @@ export class AwbService {
       where: { id: id },
       relations: {
         Scc: true,
-        // AirCraftSchedules: true,
+        AirCraftSchedule: true,
       },
     });
     return searchResult;
@@ -560,19 +583,25 @@ export class AwbService {
   async getAwbNotCombineModelPath() {
     return await this.awbRepository.find({
       where: [
-        {
-          modelPath: IsNull(), // modelPath가 null인 경우, modelPath가 빈 문자열인 경우
-          path: IsNull(),
-        },
+        { modelPath: IsNull() }, // modelPath가 null인 경우
+        // { path: IsNull() },
       ],
       order: { id: 'desc' },
     });
   }
 
-  async getAwbByVmsAndMssql() {
+  async getAwbByVmsAndMssql(takeNumber: number) {
     const [result] = await this.vmsRepository.find({
       order: orderByUtil(null),
-      take: 1,
+      take: takeNumber,
+    });
+    return result;
+  }
+
+  async getAwbByVmsAndMssqlByName(name: string) {
+    const [result] = await this.vmsRepository.find({
+      order: orderByUtil(null),
+      where: { name: name },
     });
     return result;
   }
@@ -581,54 +610,54 @@ export class AwbService {
    * 엣지에서 보내주는 vms 데이터 중 누락된 데이터를 다시 저장하기 위한 로직
    * @param vmsMissCount edge에서 보내주는 지금까지 보내준 vms의 총 개수
    */
-  async preventMissingData(vmsMissCount: number) {
-    try {
-      // vms와의 차이를 구하기 위해 awb의 총 개수를 구하기
-      // const awbAllCount = await this.awbRepository.count();
-
-      // 만약 엣지에서 들어온 숫자와 vms의 전체 숫자가 같지 않으면
-      // if (vmsMissCount !== awbAllCount) {
-      const awbResult = await this.awbRepository.find({
-        order: orderByUtil(null),
-        take: 100 * Math.abs(vmsMissCount), // awb테이블의 최소한만 가져오려고 함(개수차이*100)
-        // skip: 100 * i,
-      });
-      // 1 ~ 100 / 101 ~ 200 / 201 ~ 300 ... 누락된 데이터를 찾음
-      for (let i = 0; i <= Math.floor(vmsMissCount / 100); i++) {
-        const vmsResult = await this.vmsRepository.find({
-          order: orderByUtil(null),
-          take: 100,
-          skip: 100 * i,
-        });
-        // 누락된 데이터찾기 & 누락되었다면 입력
-        for (const vms of vmsResult) {
-          const existVms = awbResult.find((awb) => awb.barcode === vms.name);
-          if (!existVms && vms.Sccs) {
-            // vms가 존재하고 Sccs가 존재한다면 vms에 등록된 scc 정보 찾기
-            const sccResult = await this.sccRepository.find({
-              where: { code: In(vms.Sccs.split(',')) },
-            });
-
-            // awb 등록하는 부분
-            const createAwbDto: Partial<CreateAwbDto> = {
-              barcode: vms.name,
-              waterVolume: vms.waterVolume,
-              width: vms.width,
-              length: vms.length,
-              depth: vms.depth,
-              weight: vms.weight,
-              state: 'saved',
-              modelPath: vms.modelPath,
-              scc: sccResult,
-            };
-
-            await this.awbRepository.create(createAwbDto);
-          }
-        }
-      }
-      // }
-    } catch (e) {
-      throw new TypeORMError(`rollback Working - ${e}`);
-    }
-  }
+  // async preventMissingData(vmsMissCount: number) {
+  //   try {
+  //     // vms와의 차이를 구하기 위해 awb의 총 개수를 구하기
+  //     // const awbAllCount = await this.awbRepository.count();
+  //
+  //     // 만약 엣지에서 들어온 숫자와 vms의 전체 숫자가 같지 않으면
+  //     // if (vmsMissCount !== awbAllCount) {
+  //     const awbResult = await this.awbRepository.find({
+  //       order: orderByUtil(null),
+  //       take: 100 * Math.abs(vmsMissCount), // awb테이블의 최소한만 가져오려고 함(개수차이*100)
+  //       // skip: 100 * i,
+  //     });
+  //     // 1 ~ 100 / 101 ~ 200 / 201 ~ 300 ... 누락된 데이터를 찾음
+  //     for (let i = 0; i <= Math.floor(vmsMissCount / 100); i++) {
+  //       const vmsResult = await this.vmsRepository.find({
+  //         order: orderByUtil(null),
+  //         take: 100,
+  //         skip: 100 * i,
+  //       });
+  //       // 누락된 데이터찾기 & 누락되었다면 입력
+  //       for (const vms of vmsResult) {
+  //         const existVms = awbResult.find((awb) => awb.barcode === vms.name);
+  //         if (!existVms && vms.Sccs) {
+  //           // vms가 존재하고 Sccs가 존재한다면 vms에 등록된 scc 정보 찾기
+  //           const sccResult = await this.sccRepository.find({
+  //             where: { code: In(vms.Sccs.split(',')) },
+  //           });
+  //
+  //           // awb 등록하는 부분
+  //           const createAwbDto: Partial<CreateAwbDto> = {
+  //             barcode: vms.name,
+  //             waterVolume: vms.waterVolume,
+  //             width: vms.width,
+  //             length: vms.length,
+  //             depth: vms.depth,
+  //             weight: vms.weight,
+  //             state: 'saved',
+  //             modelPath: vms.modelPath,
+  //             scc: sccResult,
+  //           };
+  //
+  //           await this.awbRepository.create(createAwbDto);
+  //         }
+  //       }
+  //     }
+  //     // }
+  //   } catch (e) {
+  //     throw new TypeORMError(`rollback Working - ${e}`);
+  //   }
+  // }
 }

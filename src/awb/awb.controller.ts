@@ -241,21 +241,9 @@ export class AwbController {
         throw new NotFoundException('vms 테이블에 연결할 수 없습니다.');
       }
 
-      const directory = this.getDirectory();
       await this.createAwbDataInMssql(oneVmsData);
       await this.sendModelingCompleteSignal();
 
-      // const currentFolder = await this.readFilesInDirectory(directory);
-      // const awbNamesInFolder = this.extractAwbNamesFromFiles(currentFolder);
-      // const awbNamesInDB = oneVmsData.name;
-      // const targetAwbs = findDuplicates(awbNamesInFolder, awbNamesInDB);
-      //
-      // for (const awbName of targetAwbs) {
-      //   const missingFiles = currentFolder.filter((file) =>
-      //     file.includes(awbName),
-      //   );
-      //   await this.processMissingFiles(directory, missingFiles);
-      // }
       console.log('Modeling complete');
     } catch (error) {
       console.error('Error:', error);
@@ -263,7 +251,7 @@ export class AwbController {
   }
 
   private async fetchAwbData() {
-    return await this.awbService.getAwbByVmsAndMssql();
+    return await this.awbService.getAwbByVmsAndMssql(1);
   }
 
   private getDirectory() {

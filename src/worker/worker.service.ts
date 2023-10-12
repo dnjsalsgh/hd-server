@@ -42,52 +42,19 @@ export class WorkerService {
     name: 'missingAWBModelingFileHandlingLogic',
     timeZone: 'Asia/Seoul',
   })
+  // 3d 모델 누락 스케줄러
   async missingAWBModelingFileHandlingLogic() {
     if (this.configService.get<string>('SCHEDULE') === 'true') {
-      const missModelAwbList =
-        await this.awbService.getAwbNotCombineModelPath();
-      if (missModelAwbList && missModelAwbList.length > 0) {
-        const directory =
-          this.configService.get<string>('NODE_ENV') === 'pro'
-            ? '/var/nas'
-            : this.configService.getOrThrow('NAS_PATH'); // 목표 디랙토리(nas)
+      const missingAwbs = await this.awbService.getAwbNotCombineModelPath();
 
-        // 폴더 안에 파일 모두 가져오기
-        const currentFolder = await this.fileService.readFolder(directory);
-
-        const awbNamesInFolder = currentFolder.map((v) => v.split('.')[0]); // 파일 안에 awb 이름들
-        const awbNamesInDB = missModelAwbList.map((v) => v.barcode); // db 안에 awb 이름들
-        const targetAwbs = this.findDuplicates(awbNamesInFolder, awbNamesInDB); // 누락된 awb 를 찾습니다.
-
-        for (const awbName of targetAwbs) {
-          const missingFiles = currentFolder.filter((file) =>
-            file.includes(awbName),
-          ); // 누락된 파일 원본이름으로 찾음 ex) test.png, test.obj
-
-          for (const missingFile of missingFiles) {
-            const savedFilePath = path.join(directory, missingFile); // 저장된 파일 경로
-            const awbName = missingFile.split('.')[0]; // 확장자를 땐 awb 이름
-
-            // nas에서 파일을 읽어오고 서버에 upload
-            const fileContent = await this.fileService.readFile(savedFilePath);
-            const pathOfUploadedFile =
-              await this.fileService.uploadFileToLocalServer(
-                fileContent,
-                missingFile,
-              );
-            const localUploadPath =
-              this.configService.getOrThrow('LOCAL_UPLOAD_PATH') + missingFile;
-            // upload된 파일의 경로를 awb정보에 update
-            await this.awbService.modelingCompleteToHandlingPath(
-              missingFile,
-              awbName,
-              localUploadPath,
-              fileContent,
-            );
-          }
+      for (const missingAwb of missingAwbs) {
+        const missingVms = await this.awbService.getAwbByVmsAndMssqlByName(
+          missingAwb.barcode,
+        );
+        if (missingVms) {
+          await this.awbService.preventMissingData(missingVms);
         }
       }
-      console.log('누락된 awb 모델링 파일 연결 스케줄러 동작');
     }
   }
 }
