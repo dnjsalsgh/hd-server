@@ -114,7 +114,6 @@ export class AwbController {
     return this.awbService.breakDownById(awbId, body, queryRunnerManager);
   }
 
-  // @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'prefab', required: false, type: 'string' })
   @ApiQuery({ name: 'waterVolume', required: false, type: 'number' })
   @ApiQuery({ name: 'squareVolume', required: false, type: 'number' })
