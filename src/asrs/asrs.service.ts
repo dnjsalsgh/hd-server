@@ -176,11 +176,11 @@ export class AsrsService {
     for (let unitNumber = 1; unitNumber <= 18; unitNumber++) {
       const unitKey = this.formatUnitNumber(unitNumber);
       const previousState = await this.redisService.get(unitNumber.toString());
-      const onTag = `STK_03_${unitKey}_SKID_ON`;
+      const onOffTag = `STK_03_${unitKey}_SKID_ON`;
       const offTag = `STK_03_${unitKey}_SKID_OFF`;
       const awbNo = `STK_03_${unitKey}_Bill_No`;
 
-      if (this.shouldSetInAsrs(body, onTag, previousState)) {
+      if (this.shouldSetInAsrs(body, onOffTag, previousState)) {
         await this.processInOut(unitNumber, body[awbNo], 'in');
       } else if (this.shouldSetOutAsrs(body, offTag, previousState)) {
         await this.processInOut(unitNumber, body[awbNo], 'out');
@@ -195,10 +195,18 @@ export class AsrsService {
 
   shouldSetInAsrs(
     body: CreateAsrsPlcDto,
-    onTag: string,
+    onOffTag: string,
     previousState: string | null,
   ): boolean {
-    return body[onTag] && (previousState === 'out' || previousState === null);
+    if (onOffTag) {
+      return (
+        body[onOffTag] && (previousState === 'out' || previousState === null)
+      );
+    } else {
+      return (
+        body[onOffTag] && (previousState === 'out' || previousState === null)
+      );
+    }
   }
 
   shouldSetOutAsrs(

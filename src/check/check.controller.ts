@@ -6,6 +6,7 @@ import { Vms } from '../vms/entities/vms.entity';
 import * as dotenv from 'dotenv';
 import { MqttService } from '../mqtt.service';
 import { ApiOperation } from '@nestjs/swagger';
+import { checkPsServer } from '../lib/util/axios.util';
 
 dotenv.config();
 
@@ -54,5 +55,14 @@ export class CheckController {
     const repositoryExist = this.vmsRepository;
     const exist = await repositoryExist.query(`select 1`);
     return exist ? 'mssql Connected' : 'no Found Mssql';
+  }
+
+  @ApiOperation({
+    summary: '[ps 통신 확인]',
+    description: '',
+  })
+  @Get('ps')
+  async checkPs() {
+    return checkPsServer();
   }
 }
