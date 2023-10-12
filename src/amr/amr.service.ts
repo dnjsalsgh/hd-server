@@ -23,8 +23,6 @@ import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Hacs } from '../hacs/entities/hacs.entity';
-import { Cron } from '@nestjs/schedule';
-import { print } from '../lib/util/consolelogConvert.util';
 import { LoggerService } from '../lib/logger/logger.service';
 
 @Injectable()
@@ -344,6 +342,7 @@ export class AmrService {
         await queryRunner.commitTransaction();
       } catch (error) {
         await queryRunner.rollbackTransaction();
+        await queryRunner.release();
         throw new TypeORMError(`rollback Working - ${error}`);
       } finally {
         await queryRunner.release();

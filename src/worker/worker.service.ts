@@ -29,11 +29,6 @@ export class WorkerService {
     }
   }
 
-  // 폴더와 db와 차이가 나는 파일이름 찾기
-  findDuplicates(array1: string[], array2: string[]) {
-    return array1.filter((item) => array2.includes(item));
-  }
-
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
   // * 10 * * * *
   // every 10minute between 8am and 7pm
