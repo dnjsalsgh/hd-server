@@ -98,17 +98,11 @@ export class UldHistoryService {
     });
     const uldHistory = await this.uldHistoryRepository
       .createQueryBuilder('uh')
-      .innerJoinAndSelect('uh.Awb', 'awb')
-      .innerJoinAndSelect('awb.Scc', 'scc')
+      .leftJoinAndSelect('uh.Awb', 'Awb')
+      .leftJoinAndSelect('Awb.Scc', 'Scc')
       .where('uh.Uld = :uldId', { uldId: targetUld.id })
       .getMany();
     return uldHistory;
-    // return await this.uldHistoryRepository.find({
-    //   where: {
-    //     Uld: tartgetUld.id,
-    //   },
-    //   relations: { Awb: { Scc: true } },
-    // });
   }
 
   update(id: number, updateUldHistoryDto: UpdateUldHistoryDto) {
