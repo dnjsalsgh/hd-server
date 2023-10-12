@@ -17,17 +17,17 @@ export class CreateSkidPlatformHistoryDto extends PickType(
     example: 1,
     description: '창고 이름',
   })
-  Asrs: string | number;
+  Asrs: number;
 
   @ApiProperty({
     example: 1,
     description: '화물 이름',
   })
-  Awb: string | number;
+  Awb: number;
 
   @ApiProperty({
     example: 1,
     description: '안착대 이름',
   })
-  SkidPlatform: string | number;
+  SkidPlatform: number;
 }
