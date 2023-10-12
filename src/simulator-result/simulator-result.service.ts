@@ -1045,8 +1045,8 @@ export class SimulatorResultService {
     // 안착대 현재 상황 묶음
     const palletRack = [];
     this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
-    if (palletRack.length <= 0)
-      throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
+    // if (palletRack.length <= 0)
+    //   throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
     // uld의 현재 상황 묶음
     const currentAWBsInULD = [];
@@ -1186,8 +1186,8 @@ export class SimulatorResultService {
     // 안착대 현재 상황 묶음
     const palletRack = [];
     this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
-    if (palletRack.length <= 0)
-      throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
+    // if (palletRack.length <= 0)
+    //   throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
     const packageSimulatorCallRequestObject = {
       mode: false,
