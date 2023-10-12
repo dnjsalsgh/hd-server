@@ -30,21 +30,10 @@ export class AsrsHistoryService {
 
   async create(createAsrsHistoryDto: CreateAsrsHistoryDto) {
     if (
-      typeof createAsrsHistoryDto.Asrs === 'string' &&
-      typeof createAsrsHistoryDto.Awb === 'string'
+      typeof createAsrsHistoryDto.Asrs === 'number' &&
+      typeof createAsrsHistoryDto.Awb === 'number'
     ) {
       try {
-        const AsrsResult = await this.asrsRepository.findOne({
-          where: { name: createAsrsHistoryDto.Asrs },
-        });
-        const AwbResult = await this.awbRepository.findOne({
-          where: { barcode: createAsrsHistoryDto.Awb },
-        });
-
-        // 창고, 화물의 이름으로 찾은 것들 id로 변환작업
-        createAsrsHistoryDto.Asrs = AsrsResult?.id;
-        createAsrsHistoryDto.Awb = AwbResult?.id;
-
         const insertResult = await this.asrsHistoryRepository.save(
           createAsrsHistoryDto as AsrsHistory,
         );
