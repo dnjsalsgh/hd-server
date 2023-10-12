@@ -1059,7 +1059,6 @@ export class SimulatorResultService {
       currentAWBsInULD: currentAWBsInULD,
       palletRack: palletRack,
     };
-
     const psResult = await packageSimulatorCallAll(
       packageSimulatorCallRequestObject,
     );
@@ -1162,13 +1161,9 @@ export class SimulatorResultService {
           .subscribe();
       }
 
-      // await queryRunner.commitTransaction();
       return psResult;
     } catch (error) {
-      // await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      // await queryRunner.release();
     }
   }
 

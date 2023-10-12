@@ -176,14 +176,13 @@ export class AsrsService {
     for (let unitNumber = 1; unitNumber <= 18; unitNumber++) {
       const unitKey = this.formatUnitNumber(unitNumber);
       const previousState = await this.redisService.get(unitNumber.toString());
-      const onOffTag = `STK_03_${unitKey}_SKID_ON`;
-      const offTag = `STK_03_${unitKey}_SKID_OFF`;
-      const awbNo = `STK_03_${unitKey}_Bill_No`;
+      const onOffTag = this.getTag('SKID_ON', unitKey);
+      const awbNo = this.getTag('Bill_No', unitKey);
+      const onOffSignal = this.checkOnOff(body, onOffTag);
+      const variableInOut = onOffSignal ? 'in' : 'out';
 
-      if (this.shouldSetInAsrs(body, onOffTag, previousState)) {
-        await this.processInOut(unitNumber, body[awbNo], 'in');
-      } else if (this.shouldSetOutAsrs(body, offTag, previousState)) {
-        await this.processInOut(unitNumber, body[awbNo], 'out');
+      if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
+        await this.processInOut(unitNumber, body[awbNo], variableInOut);
       }
     }
   }
@@ -193,28 +192,26 @@ export class AsrsService {
     return unitNumber.toString().padStart(2, '0');
   }
 
-  shouldSetInAsrs(
-    body: CreateAsrsPlcDto,
-    onOffTag: string,
-    previousState: string | null,
-  ): boolean {
-    if (onOffTag) {
-      return (
-        body[onOffTag] && (previousState === 'out' || previousState === null)
-      );
-    } else {
-      return (
-        body[onOffTag] && (previousState === 'out' || previousState === null)
-      );
-    }
+  checkOnOff(body: CreateAsrsPlcDto, onOffTag: string) {
+    return body[onOffTag];
   }
 
-  shouldSetOutAsrs(
-    body: CreateAsrsPlcDto,
-    offTag: string,
+  getTag(suffix: string, unitKey: string) {
+    return `STK_03_${unitKey}_${suffix}`;
+  }
+
+  shouldSetInOUtAsrs(
+    onOffSignal: boolean,
     previousState: string | null,
   ): boolean {
-    return body[offTag] && previousState === 'in';
+    // 'in'
+    if (onOffSignal) {
+      return previousState === 'out' || previousState === null;
+    }
+    // 'out'
+    else {
+      return previousState === 'in';
+    }
   }
 
   async processInOut(unitNumber: number, awbNo: string, state: 'in' | 'out') {

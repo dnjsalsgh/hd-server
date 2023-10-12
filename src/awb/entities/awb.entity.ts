@@ -126,17 +126,19 @@ export class Awb {
   @ApiProperty({
     example: 'saved',
     description:
-      '상태(예약미입고, 입고중, 창고대기, 불출예정, 이동중, uld 작업장 대기, ULD작업',
+      '상태(예약미입고, 입고중, 창고대기, 불출예정, 이동중, uld 작업장 대기, ULD작업, 회수, 반송)',
   })
   @IsString()
   @IsEnum([
-    'saved',
-    'invms',
-    'inasrs',
+    'saved', // 예약미입고
+    'invms', // 입고중
+    'inasrs', // 창고대기
+    'outasrs', // 불출예정
+    'inskidplatform', // 안착대 적재
     'register',
-    'outasrs',
-    'inskidplatform',
-    'inuld',
+    'inuld', // uld 적재
+    'return', // 회수
+    'recall', // 반송
   ])
   @Column({ type: 'varchar', length: 500, nullable: true, default: 'saved' })
   state: string;

@@ -19,6 +19,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { FileService } from '../file/file.service';
 import { AwbService } from '../awb/awb.service';
 import { Vms } from '../vms/entities/vms.entity';
+import { SccService } from '../scc/scc.service';
 
 @Module({
   imports: [
@@ -72,7 +73,9 @@ import { Vms } from '../vms/entities/vms.entity';
       useValue: 'WorkerService', // 원하는 값을 useValue로 지정합니다.
     },
     FileService,
+
     AwbService,
+    SccService,
   ],
 })
 export class WorkerModule {}

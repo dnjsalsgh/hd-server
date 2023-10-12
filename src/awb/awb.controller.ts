@@ -39,6 +39,7 @@ import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager } from 'typeorm';
+import { Vms } from '../vms/entities/vms.entity';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -231,64 +232,76 @@ export class AwbController {
   }
 
   // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
-  @MessagePattern('hyundai/vms1/createFile') //구독하는 주제
+  @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
   async updateFileByMqttSignal(@Payload() data) {
-    // mssql의 vms 테이블에서
-    const oneVmsData = await this.awbService.getAwbByVmsAndMssql();
+    try {
+      const oneVmsData = await this.fetchAwbData();
 
-    // nas 서버 접속해서 이미지 파일을 다운 받고 upload 진행하기
-    if (oneVmsData && oneVmsData[0].name) {
-      const name = oneVmsData[0].name as string;
-      // const directory = this.configService.getOrThrow('NAS_PATH'); // 목표 디랙토리(nas)
-      const directory =
-        this.configService.get<string>('NODE_ENV') === 'pro'
-          ? '/var/nas'
-          : this.configService.getOrThrow('NAS_PATH'); // 목표 디랙토리(nas)
-
-      // mssql에서 가져온 10개의 데이터를 저장하기 위함
-      await this.awbService.createWithMssql();
-
-      // vms데이터를 받았다는 신호를전송합니다(hyundai/vms1/readCompl)
-      await this.awbService.modelingCompleteWithNAS();
-
-      // 폴더 안에 파일 모두 가져오기
-      const currentFolder = await this.fileService.readFolder(directory);
-
-      const awbNamesInFolder = currentFolder.map((v) => v.split('.')[0]); // 파일 안에 awb 이름들
-      const awbNamesInDB = oneVmsData.map((v) => v.name); // db 안에 awb 이름들
-      const targetAwbs = findDuplicates(awbNamesInFolder, awbNamesInDB); // 누락된 awb 를 찾습니다.
-
-      for (const awbName of targetAwbs) {
-        const missingFiles = currentFolder.filter((file) =>
-          file.includes(awbName),
-        ); // 누락된 파일 원본이름으로 찾음 ex) test.png, test.obj
-
-        for (const missingFile of missingFiles) {
-          const savedFilePath = path.join(directory, missingFile); // 저장된 파일 경로
-          const awbName = missingFile.split('.')[0]; // 확장자를 땐 awb 이름
-
-          // nas에서 파일을 읽어오고 서버에 upload
-          const fileContent = await this.fileService.readFile(savedFilePath);
-          const pathOfUploadedFile =
-            await this.fileService.uploadFileToLocalServer(
-              fileContent,
-              missingFile,
-            );
-
-          const localUploadPath =
-            this.configService.getOrThrow('LOCAL_UPLOAD_PATH') + missingFile;
-          // upload된 파일의 경로를 awb정보에 update
-          await this.awbService.modelingCompleteToHandlingPath(
-            missingFile,
-            awbName,
-            localUploadPath,
-            fileContent,
-          );
-        }
+      if (!oneVmsData || oneVmsData.length === 0 || !oneVmsData.name) {
+        throw new NotFoundException('vms 테이블에 연결할 수 없습니다.');
       }
-      console.log('modeling complete');
-    } else {
-      new NotFoundException('vms 테이블에 연결할 수 없습니다.');
+
+      await this.createAwbDataInMssql(oneVmsData);
+      await this.sendModelingCompleteSignal();
+
+      console.log('Modeling complete');
+    } catch (error) {
+      console.error('Error:', error);
     }
+  }
+
+  private async fetchAwbData() {
+    return await this.awbService.getAwbByVmsAndMssql(1);
+  }
+
+  private getDirectory() {
+    const isProduction = this.configService.get<string>('NODE_ENV') === 'pro';
+    return isProduction
+      ? '/var/nas'
+      : this.configService.getOrThrow('NAS_PATH');
+  }
+
+  private async createAwbDataInMssql(vms: Vms) {
+    await this.awbService.createWithMssql(vms);
+  }
+
+  private async sendModelingCompleteSignal() {
+    await this.awbService.sendModelingCompleteMqttMessage();
+  }
+
+  private async readFilesInDirectory(directory: string) {
+    return await this.fileService.readFolder(directory);
+  }
+
+  private extractAwbNamesFromFiles(files: string[]) {
+    return files.map((file) => file.split('.')[0]);
+  }
+
+  private async processMissingFiles(directory: string, missingFiles: string[]) {
+    for (const missingFile of missingFiles) {
+      const savedFilePath = path.join(directory, missingFile);
+      const awbName = missingFile.split('.')[0];
+      const fileContent = await this.fileService.readFile(savedFilePath);
+      const pathOfUploadedFile = await this.uploadAndHandleFile(
+        fileContent,
+        missingFile,
+        awbName,
+      );
+    }
+  }
+
+  private async uploadAndHandleFile(
+    fileContent: any,
+    missingFile: string,
+    awbName: string,
+  ) {
+    const localUploadPath =
+      this.configService.getOrThrow('LOCAL_UPLOAD_PATH') + missingFile;
+    return await this.awbService.modelingCompleteToHandlingPath(
+      missingFile,
+      awbName,
+      localUploadPath,
+      fileContent,
+    );
   }
 }

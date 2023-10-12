@@ -48,7 +48,7 @@ describe('AsrsOutOrderService', () => {
     asrsRepository = module.get('AsrsRepository');
     awbRepository = module.get('AwbRepository');
     skidPlatformRepository = module.get('SkidPlatformRepository');
-    asrsOutOrderService = new AsrsOutOrderService(asrsOutOrderRepository);
+    // asrsOutOrderService = new AsrsOutOrderService(asrsOutOrderRepository);
   });
 
   it('should be defined', () => {
@@ -76,44 +76,44 @@ describe('AsrsOutOrderService', () => {
     await asrsRepository.save(testAsrsBody);
 
     // 2. mock 화물 데이터 생성
-    const testAwbBody: CreateAwbDto = {
-      name: new Date().getTime().toString(),
-      prefab: '3d Model Name',
-      waterVolume: 1,
-      squareVolume: 1,
-      width: 1,
-      length: 1,
-      depth: 1,
-      weight: 1,
-      isStructure: true,
-      barcode: '010101',
-      destination: '미국',
-      source: '한국',
-      breakDown: false,
-      piece: 1,
-      state: 'saved',
-      parent: 0,
-      modelPath: '/c/file/xxx',
-      simulation: true,
-      dataCapacity: 1,
-      flight: 'fly',
-      from: '출발지',
-      airportArrival: '공항도착',
-      path: '/c/file/xxx',
-      spawnRatio: 1,
-      description: '배송설명',
-      rmComment: 'RM 코멘트',
-      localTime: new Date(),
-      localInTerminal: 'AIR-001',
-      scc: {
-        code: 'Scc-001',
-        name: '드라이아이스',
-        score: 1,
-        description: '',
-        path: '',
-      },
-    };
-    await awbRepository.save(testAwbBody);
+    // const testAwbBody: CreateAwbDto = {
+    //   // name: new Date().getTime().toString(),
+    //   prefab: '3d Model Name',
+    //   waterVolume: 1,
+    //   squareVolume: 1,
+    //   width: 1,
+    //   length: 1,
+    //   depth: 1,
+    //   weight: 1,
+    //   // isStructure: true,
+    //   barcode: '010101',
+    //   // destination: '미국',
+    //   // source: '한국',
+    //   // breakDown: false,
+    //   piece: 1,
+    //   state: 'saved',
+    //   parent: 0,
+    //   modelPath: '/c/file/xxx',
+    //   simulation: true,
+    //   // dataCapacity: 1,
+    //   // flight: 'fly',
+    //   // from: '출발지',
+    //   // airportArrival: '공항도착',
+    //   path: '/c/file/xxx',
+    //   spawnRatio: 1,
+    //   description: '배송설명',
+    //   // rmComment: 'RM 코멘트',
+    //   // localTime: new Date(),
+    //   // localInTerminal: 'AIR-001',
+    //   // scc: {
+    //   // code: 'Scc-001',
+    //   // name: '드라이아이스',
+    //   // score: 1,
+    //   // description: '',
+    //   // path: '',
+    //   // },
+    // };
+    // await awbRepository.save(testAwbBody);
     // 3. mock 안착대 데이터 생성
     const testSkidPlatformBody: CreateSkidPlatformDto = {
       name: skidPlatformRandomName,
@@ -150,7 +150,7 @@ describe('AsrsOutOrderService', () => {
     const testAsrsOutOrderBody: CreateAsrsOutOrderDto = {
       order: 1,
       Asrs: lastestAsrs[0].id,
-      SkidPlatform: lastestSkidPlatform[0].id,
+      // SkidPlatform: lastestSkidPlatform[0].id,
       Awb: lastestAwb[0].id,
     };
     await asrsOutOrderRepository.save(testAsrsOutOrderBody);

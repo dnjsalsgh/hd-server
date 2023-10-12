@@ -6,6 +6,7 @@ import {
   Between,
   FindOperator,
   ILike,
+  In,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
@@ -20,6 +21,7 @@ export class SccService {
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
   ) {}
+
   async create(createSccDto: CreateSccDto) {
     const result = await this.sccRepository.save(createSccDto);
     return result;
@@ -82,6 +84,13 @@ export class SccService {
     });
 
     return searchResult;
+  }
+
+  async findByNames(sccNames: string[]) {
+    const sccResult = await this.sccRepository.find({
+      where: { code: In(sccNames) },
+    });
+    return sccResult;
   }
 
   async findOne(id: number) {
