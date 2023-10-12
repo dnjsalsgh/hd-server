@@ -11,9 +11,6 @@ export class FileService {
     } catch (error) {
       throw new Error(`Error reading file: ${error.message}`);
     }
-    // // 첫 번재 파일이 없어도 다른 파일을 찾아볼 수 있게 에러처리 안해보기
-    // const fileContent = await fs.readFile(filePath);
-    // return fileContent;
   }
 
   async readFolder(filePath: string) {

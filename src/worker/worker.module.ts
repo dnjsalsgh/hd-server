@@ -19,6 +19,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { FileService } from '../file/file.service';
 import { AwbService } from '../awb/awb.service';
 import { Vms } from '../vms/entities/vms.entity';
+import { SccService } from '../scc/scc.service';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { Vms } from '../vms/entities/vms.entity';
     },
     FileService,
     AwbService,
+    SccService,
   ],
 })
 export class WorkerModule {}

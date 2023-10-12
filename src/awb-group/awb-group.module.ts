@@ -11,6 +11,7 @@ import { Vms } from '../vms/entities/vms.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { MqttModule } from '../mqtt.module';
 import { FileService } from '../file/file.service';
+import { SccService } from '../scc/scc.service';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { FileService } from '../file/file.service';
     MqttModule,
   ],
   controllers: [AwbGroupController],
-  providers: [AwbGroupService, FileService, AwbService],
+  providers: [AwbGroupService, FileService, AwbService, SccService],
 })
 export class AwbGroupModule {}
