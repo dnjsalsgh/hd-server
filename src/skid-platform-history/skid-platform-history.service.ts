@@ -43,22 +43,16 @@ export class SkidPlatformHistoryService {
     private redisService: RedisService,
   ) {}
   async create(createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto) {
-    if (
-      typeof createSkidPlatformHistoryDto.Asrs === 'number' &&
-      typeof createSkidPlatformHistoryDto.Awb === 'number' &&
-      typeof createSkidPlatformHistoryDto.SkidPlatform === 'number'
-    ) {
-      const historyResult = await this.skidPlatformHistoryRepository.save(
-        createSkidPlatformHistoryDto as SkidPlatformHistory,
-      );
+    const historyResult = await this.skidPlatformHistoryRepository.save(
+      createSkidPlatformHistoryDto as SkidPlatformHistory,
+    );
 
-      // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
-      this.client
-        .send(`hyundai/skidPlatform/insert`, { data: historyResult })
-        .pipe(take(1))
-        .subscribe();
-      return historyResult;
-    }
+    // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
+    this.client
+      .send(`hyundai/skidPlatform/insert`, { data: historyResult })
+      .pipe(take(1))
+      .subscribe();
+    return historyResult;
   }
 
   async findAll(query: SkidPlatformHistory & BasicQueryParamDto) {

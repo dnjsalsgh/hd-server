@@ -15,6 +15,7 @@ import {
 import { AsrsHistory } from './entities/asrs-history.entity';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
+import { TypeOrmExceptionFilter } from '../lib/filter/typeOrmException.filter';
 
 @Injectable()
 export class AsrsHistoryService {
@@ -29,18 +30,13 @@ export class AsrsHistoryService {
   ) {}
 
   async create(createAsrsHistoryDto: CreateAsrsHistoryDto) {
-    if (
-      typeof createAsrsHistoryDto.Asrs === 'number' &&
-      typeof createAsrsHistoryDto.Awb === 'number'
-    ) {
-      try {
-        const insertResult = await this.asrsHistoryRepository.save(
-          createAsrsHistoryDto as AsrsHistory,
-        );
-        return insertResult;
-      } catch (error) {
-        throw new Error(error);
-      }
+    try {
+      const insertResult = await this.asrsHistoryRepository.save(
+        createAsrsHistoryDto,
+      );
+      return insertResult;
+    } catch (error) {
+      throw new TypeOrmExceptionFilter(error);
     }
   }
 
