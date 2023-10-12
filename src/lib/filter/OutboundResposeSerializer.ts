@@ -8,9 +8,9 @@ export class OutboundResponseSerializer implements Serializer {
     // this.logger.debug(
     //   `-->> Serializing outbound response: \n${JSON.stringify(value)}`,
     // );
-    // this.logger.log(
-    //   `-->> Serializing outbound response: \n${JSON.stringify(value)}`,
-    // );
+    this.logger.log(
+      `-->> Serializing outbound response: \n${JSON.stringify(value)}`,
+    );
     return value.data;
   }
 }

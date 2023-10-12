@@ -126,6 +126,15 @@ export class SimulatorResultController {
     return this.simulatorResultService.psAll(body, queryRunnerManager);
   }
 
+  @ApiOperation({
+    summary: '안착대, 창고의 상황을 보여줍니다.',
+    description: 'uld안, 안착대, 창고의 상황을 보여줍니다.',
+  })
+  @Get('/input-group')
+  inputGroup() {
+    return this.simulatorResultService.inputGroup();
+  }
+
   @ApiQuery({ name: 'Uld', required: false, type: 'number' })
   @ApiQuery({ name: 'loadRate', required: false })
   @ApiQuery({ name: 'version', required: false })
