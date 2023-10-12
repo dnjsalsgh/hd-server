@@ -44,51 +44,17 @@ export class SkidPlatformHistoryService {
   ) {}
   async create(createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto) {
     if (
-      typeof createSkidPlatformHistoryDto.Asrs === 'string' &&
-      typeof createSkidPlatformHistoryDto.Awb === 'string' &&
-      typeof createSkidPlatformHistoryDto.SkidPlatform === 'string'
+      typeof createSkidPlatformHistoryDto.Asrs === 'number' &&
+      typeof createSkidPlatformHistoryDto.Awb === 'number' &&
+      typeof createSkidPlatformHistoryDto.SkidPlatform === 'number'
     ) {
-      const AsrsResult = await this.dataSource.manager
-        .getRepository(Asrs)
-        .findOne({ where: { name: createSkidPlatformHistoryDto.Asrs } });
-
-      const AwbResult = await this.dataSource.manager
-        .getRepository(Awb)
-        .findOne({ where: { barcode: createSkidPlatformHistoryDto.Awb } });
-
-      const SkidPlatformResult = await this.dataSource.manager
-        .getRepository(SkidPlatform)
-        .findOne({
-          where: { name: createSkidPlatformHistoryDto.SkidPlatform },
-        });
-
-      // 창고, 화물, 안착대의 이름으로 찾은 것들 id로 변환작업
-      createSkidPlatformHistoryDto.Asrs = AsrsResult.id;
-      createSkidPlatformHistoryDto.Awb = AwbResult.id;
-      createSkidPlatformHistoryDto.SkidPlatform = SkidPlatformResult.id;
-
       const historyResult = await this.skidPlatformHistoryRepository.save(
         createSkidPlatformHistoryDto as SkidPlatformHistory,
       );
 
-      const historyResultObject = await this.skidPlatformHistoryRepository.find(
-        {
-          select: {
-            Awb: AwbAttribute,
-            Asrs: AsrsAttribute,
-            SkidPlatform: SkidPlatformAttribute,
-          },
-          relations: {
-            Awb: true,
-            Asrs: true,
-            SkidPlatform: true,
-          },
-        },
-      );
-
       // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
       this.client
-        .send(`hyundai/skidPlatform/insert`, { data: historyResultObject })
+        .send(`hyundai/skidPlatform/insert`, { data: historyResult })
         .pipe(take(1))
         .subscribe();
       return historyResult;
