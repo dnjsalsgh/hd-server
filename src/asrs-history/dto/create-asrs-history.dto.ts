@@ -12,11 +12,11 @@ export class CreateAsrsHistoryDto extends PickType(AsrsHistory, [
     example: 1,
     description: '창고 이름',
   })
-  Asrs: string | number;
+  Asrs: number;
 
   @ApiProperty({
     example: 1,
     description: '화물 이름',
   })
-  Awb: string | number;
+  Awb: number;
 }
