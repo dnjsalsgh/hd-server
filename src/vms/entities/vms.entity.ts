@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString } from 'class-validator';
 
 @Entity({ name: 'VWMS_3D_RESULT_DATA' })
 export class Vms {

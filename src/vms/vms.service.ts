@@ -36,7 +36,6 @@ export class VmsService {
       findDate = LessThanOrEqual(createdAtTo);
     }
 
-    console.log(await this.vmsRepository.find({}));
     return await this.vmsRepository.find({
       where: {
         name: query.name ? ILike(`%${query.name}%`) : undefined,
