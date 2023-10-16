@@ -127,6 +127,20 @@ export class SimulatorResultController {
   }
 
   @ApiOperation({
+    summary: 'ps input',
+    description: 'ps input',
+  })
+  @ApiBody({ type: PsAllRequest })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/ps-all-input')
+  psAllInput(
+    @Body() body: PsAllRequest,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.simulatorResultService.psAllInput(body, queryRunnerManager);
+  }
+
+  @ApiOperation({
     summary: '안착대, 창고의 상황을 보여줍니다.',
     description: 'uld안, 안착대, 창고의 상황을 보여줍니다.',
   })

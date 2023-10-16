@@ -11,7 +11,7 @@ import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-plat
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { Awb } from '../awb/entities/awb.entity';
 import { RedisService } from '../redis/redis.service';
-import { redisProvider } from '../redis/redis.provider';
+import { redisCustomProvider } from '../redis/redisCustomProvider';
 
 @Module({
   imports: [
@@ -31,7 +31,7 @@ import { redisProvider } from '../redis/redis.provider';
     AsrsService,
     SkidPlatformHistoryService,
     RedisService,
-    ...redisProvider,
+    ...redisCustomProvider,
   ],
 })
 export class AsrsModule {}
