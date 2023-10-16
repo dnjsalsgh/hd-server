@@ -13,7 +13,7 @@ import {
 import { UldHistory } from './entities/uld-history.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { AsrsAttribute } from '../asrs/entities/asrs.entity';
-import { AwbAttribute } from '../awb/entities/awb.entity';
+import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
 import { Uld, UldAttribute } from '../uld/entities/uld.entity';
 import { BuildUpOrderAttribute } from '../build-up-order/entities/build-up-order.entity';
@@ -102,6 +102,7 @@ export class UldHistoryService {
       .leftJoinAndSelect('Awb.Scc', 'Scc')
       .where('uh.Uld = :uldId', { uldId: targetUld.id })
       .getMany();
+
     return uldHistory;
   }
 
