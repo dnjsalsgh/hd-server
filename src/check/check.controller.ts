@@ -1,12 +1,13 @@
 import { Controller, Get, Inject, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
 import { Vms } from '../vms/entities/vms.entity';
 import * as dotenv from 'dotenv';
 import { MqttService } from '../mqtt.service';
 import { ApiOperation } from '@nestjs/swagger';
 import { checkPsServer } from '../lib/util/axios.util';
+import { HttpExceptionFilter } from '../lib/filter/httpExceptionFilter';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ export class CheckController {
     @InjectRepository(Vms, 'mssqlDB')
     private readonly vmsRepository: Repository<Vms>,
     private readonly mqttService: MqttService,
+    private readonly dataSource: DataSource,
   ) {}
 
   @ApiOperation({
@@ -64,5 +66,19 @@ export class CheckController {
   @Get('ps')
   async checkPs() {
     return checkPsServer();
+  }
+
+  @ApiOperation({
+    summary: '[db 통신 확인]',
+    description: '',
+  })
+  @Get('db')
+  async checkDb() {
+    try {
+      const checkDb = await this.dataSource.query(`select 1`);
+      return checkDb ? 'postgresDB Connected.' : 'no Found postgresDB';
+    } catch (error) {
+      throw new HttpExceptionFilter();
+    }
   }
 }

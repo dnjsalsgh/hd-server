@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { MqttModule } from '../mqtt.module';
 import { RedisService } from '../redis/redis.service';
-import { redisProvider } from '../redis/redis.provider';
+import { redisCustomProvider } from '../redis/redisCustomProvider';
 import { Awb } from '../awb/entities/awb.entity';
 
 @Module({
@@ -15,6 +15,6 @@ import { Awb } from '../awb/entities/awb.entity';
     MqttModule,
   ],
   controllers: [SkidPlatformHistoryController],
-  providers: [SkidPlatformHistoryService, RedisService, ...redisProvider],
+  providers: [SkidPlatformHistoryService, RedisService, ...redisCustomProvider],
 })
 export class SkidPlatformHistoryModule {}

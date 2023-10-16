@@ -1059,6 +1059,7 @@ export class SimulatorResultService {
       currentAWBsInULD: currentAWBsInULD,
       palletRack: palletRack,
     };
+    console.log(JSON.stringify(packageSimulatorCallRequestObject));
     const psResult = await packageSimulatorCallAll(
       packageSimulatorCallRequestObject,
     );
@@ -1166,6 +1167,59 @@ export class SimulatorResultService {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
   }
+
+  async psAllInput(
+    apiRequest: PsAllRequest,
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
+    // await queryRunner.connect();
+    // await queryRunner.startTransaction();
+
+    const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
+
+    // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
+    const asrsStateArray = await this.asrsHistoryService.nowState();
+    // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const skidPlatformStateArray =
+      await this.skidPlatformHistoryService.nowState();
+    // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const uldStateArray = await this.uldHistoryService.nowState(
+      apiRequest.UldCode,
+    );
+
+    // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
+    // 현재 ASRS의 정보들
+    const Awbs = [];
+    this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
+    if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
+
+    // ps에 보낼 Uld정보를 모아두는
+    const Ulds = [];
+    await this.setUldStateByUldCode(apiRequest, Ulds);
+    if (Ulds.length <= 0)
+      throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
+
+    // 안착대 현재 상황 묶음
+    const palletRack = [];
+    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+    // if (palletRack.length <= 0)
+    //   throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
+
+    // uld의 현재 상황 묶음
+    const currentAWBsInULD = [];
+    this.setCurrentAwbInUld(uldStateArray, currentAWBsInULD);
+
+    const packageSimulatorCallRequestObject = {
+      mode: false,
+      Awbs: Awbs,
+      Ulds: Ulds,
+      currentAWBsInULD: currentAWBsInULD,
+      palletRack: palletRack,
+    };
+    return packageSimulatorCallRequestObject;
+  }
+
   async inputGroup() {
     // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
     const asrsStateArray = await this.asrsHistoryService.nowState();
@@ -1327,7 +1381,6 @@ export class SimulatorResultService {
         waterVolume: AwbInfo.waterVolume,
         weight: AwbInfo.weight,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
-        iceWeight: 0,
       };
       Awbs.push(targetAwb);
     }

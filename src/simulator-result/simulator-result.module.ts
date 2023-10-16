@@ -19,7 +19,7 @@ import { Awb } from '../awb/entities/awb.entity';
 import { Asrs } from '../asrs/entities/asrs.entity';
 import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
 import { RedisService } from '../redis/redis.service';
-import { redisProvider } from '../redis/redis.provider';
+import { redisCustomProvider } from '../redis/redisCustomProvider';
 
 @Module({
   imports: [
@@ -51,7 +51,7 @@ import { redisProvider } from '../redis/redis.provider';
     SkidPlatformHistoryService,
     UldHistoryService,
     RedisService,
-    ...redisProvider,
+    ...redisCustomProvider,
   ],
 })
 export class SimulatorResultModule {}
