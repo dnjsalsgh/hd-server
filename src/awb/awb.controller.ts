@@ -239,13 +239,8 @@ export class AwbController {
       const oneVmsData = await this.fetchAwbData();
       const onVms2dData = await this.fetchAwb2dData();
 
-      if (
-        !oneVmsData ||
-        oneVmsData.length === 0 ||
-        !oneVmsData.name ||
-        !onVms2dData
-      ) {
-        throw new NotFoundException('vms 테이블에 연결할 수 없습니다.');
+      if (!oneVmsData || oneVmsData.length === 0 || !oneVmsData.name) {
+        throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 
       await this.createAwbDataInMssql(oneVmsData, onVms2dData);

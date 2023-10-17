@@ -41,6 +41,7 @@ import { AwbReturnModule } from './awb-return/awb-return.module';
 import { mssqlConfig, postgresConfig } from './config/db.config';
 import { RedisModule } from './redis/redis.module';
 import { Vms2dModule } from './vms2d/vms2d.module';
+import { BasicModule } from './basic/basic.module';
 
 @Module({
   imports: [
@@ -108,6 +109,7 @@ import { Vms2dModule } from './vms2d/vms2d.module';
     AwbReturnModule,
     WorkerModule,
     Vms2dModule,
+    BasicModule,
   ],
   controllers: [AppController],
   providers: [AppService],

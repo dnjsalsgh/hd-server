@@ -13,6 +13,7 @@ export class AppController {
   async getHello(): Promise<string> {
     return 'Hello from NestJS!';
   }
+
   @Get('/redis')
   async getRedis(): Promise<string> {
     await this.redis.set('test', '11');

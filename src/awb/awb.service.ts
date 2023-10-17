@@ -345,7 +345,7 @@ export class AwbService {
         createAwbDto.path = filePath;
       }
 
-      const awbResult = await this.awbRepository.update(
+      await this.awbRepository.update(
         { barcode: createAwbDto.barcode },
         createAwbDto,
       );

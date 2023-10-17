@@ -21,6 +21,7 @@ import { AwbService } from '../awb/awb.service';
 import { Vms } from '../vms/entities/vms.entity';
 import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
+import { Basic } from '../basic/entities/basic.entity';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { Vms2d } from '../vms2d/entities/vms2d.entity';
       Awb,
       AwbSccJoin,
       Scc,
+      Basic,
     ]),
     TypeOrmModule.forFeature([Hacs, Vms, Vms2d], 'mssqlDB'),
     MulterModule.register({ dest: './upload' }),

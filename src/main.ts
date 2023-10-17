@@ -14,7 +14,6 @@ import { winstonLogger } from './lib/logger/winston.util';
 import * as dotenv from 'dotenv';
 
 declare const module: any;
-import mqtt from 'mqtt';
 
 dotenv.config();
 
@@ -24,22 +23,9 @@ async function bootstrap() {
     cors: true,
     logger: winstonLogger,
   });
-  // 2. mqtt서버로 사용
 
   // 스케줄러 프로세스 생성
   const sheduler = await NestFactory.create(WorkerModule);
-
-  // 3. redis서버로 사용
-  const redisApp = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.REDIS,
-      options: {
-        host: `${process.env.REDIS_HOST}`,
-        port: +process.env.REDIS_PORT,
-      },
-    },
-  );
 
   app.useGlobalPipes(new ValidationPipe()); // class validator 처리
   app.useGlobalFilters(new HttpExceptionFilter()); // Http 에러 처리
@@ -67,7 +53,6 @@ async function bootstrap() {
 
   // cors 설정
   app.enableCors();
-  // await redisApp.listen();
   await app.listen(port);
 
   // nest app 먼저 구동하고 mqtt 연결(mqtt 연결 안됬을 시 nest 구동 불가를 막기 위함)
