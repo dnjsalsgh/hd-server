@@ -40,6 +40,7 @@ import { TransactionInterceptor } from '../lib/interceptor/transaction.interface
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager } from 'typeorm';
 import { Vms } from '../vms/entities/vms.entity';
+import { Vms2d } from '../vms2d/entities/vms2d.entity';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -236,12 +237,18 @@ export class AwbController {
   async updateFileByMqttSignal(@Payload() data) {
     try {
       const oneVmsData = await this.fetchAwbData();
+      const onVms2dData = await this.fetchAwb2dData();
 
-      if (!oneVmsData || oneVmsData.length === 0 || !oneVmsData.name) {
+      if (
+        !oneVmsData ||
+        oneVmsData.length === 0 ||
+        !oneVmsData.name ||
+        !onVms2dData
+      ) {
         throw new NotFoundException('vms 테이블에 연결할 수 없습니다.');
       }
 
-      await this.createAwbDataInMssql(oneVmsData);
+      await this.createAwbDataInMssql(oneVmsData, onVms2dData);
       await this.sendModelingCompleteSignal();
 
       console.log('Modeling complete');
@@ -251,7 +258,10 @@ export class AwbController {
   }
 
   private async fetchAwbData() {
-    return await this.awbService.getAwbByVmsAndMssql(1);
+    return await this.awbService.getAwbByVms(1);
+  }
+  private async fetchAwb2dData() {
+    return await this.awbService.getAwbByVms2d(1);
   }
 
   private getDirectory() {
@@ -261,8 +271,8 @@ export class AwbController {
       : this.configService.getOrThrow('NAS_PATH');
   }
 
-  private async createAwbDataInMssql(vms: Vms) {
-    await this.awbService.createWithMssql(vms);
+  private async createAwbDataInMssql(vms: Vms, vms2d: Vms2d) {
+    await this.awbService.createWithMssql(vms, vms2d);
   }
 
   private async sendModelingCompleteSignal() {

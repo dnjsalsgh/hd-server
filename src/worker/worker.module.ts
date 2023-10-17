@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { WorkerService } from './worker.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Amr } from '../amr/entities/amr.entity';
@@ -20,6 +20,7 @@ import { FileService } from '../file/file.service';
 import { AwbService } from '../awb/awb.service';
 import { Vms } from '../vms/entities/vms.entity';
 import { SccService } from '../scc/scc.service';
+import { Vms2d } from '../vms2d/entities/vms2d.entity';
 
 @Module({
   imports: [
@@ -61,7 +62,7 @@ import { SccService } from '../scc/scc.service';
       AwbSccJoin,
       Scc,
     ]),
-    TypeOrmModule.forFeature([Hacs, Vms], 'mssqlDB'),
+    TypeOrmModule.forFeature([Hacs, Vms, Vms2d], 'mssqlDB'),
     MulterModule.register({ dest: './upload' }),
   ],
   providers: [

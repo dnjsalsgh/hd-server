@@ -31,6 +31,7 @@ import { Vms } from '../vms/entities/vms.entity';
 import { CreateAwbWithAircraftDto } from '../awb/dto/create-awb-with-aircraft.dto';
 import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
+import { Vms2d } from '../vms2d/entities/vms2d.entity';
 
 @Injectable()
 export class AwbService {
@@ -41,6 +42,8 @@ export class AwbService {
     private readonly sccRepository: Repository<Scc>,
     @InjectRepository(Vms, 'mssqlDB')
     private readonly vmsRepository: Repository<Vms>,
+    @InjectRepository(Vms2d, 'mssqlDB')
+    private readonly vms2dRepository: Repository<Vms2d>,
     private dataSource: DataSource,
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
@@ -260,7 +263,7 @@ export class AwbService {
   /**
    * mssql에서 vms 정보를 가져와서 등록하기 위한 로직
    */
-  async createWithMssql(vms: Vms) {
+  async createWithMssql(vms: Vms, vms2d: Vms2d) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
@@ -280,8 +283,16 @@ export class AwbService {
       };
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
-      const filePath = await this.fileUpload(vms);
-      createAwbDto.modelPath = filePath;
+      if (vms && vms.modelPath) {
+        const filePath = await this.fileUpload(vms);
+        createAwbDto.modelPath = filePath;
+      }
+
+      // vms에서 png 파일을 저장하고 연결하는 부분
+      if (vms2d && vms2d.modelPath) {
+        const filePath2d = await this.fileUpload2d(vms2d);
+        createAwbDto.path = filePath2d;
+      }
 
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
@@ -314,17 +325,25 @@ export class AwbService {
   /**
    * 누락된 vms를 update하기 위한 로직
    */
-  async preventMissingData(vms: Vms) {
+  async preventMissingData(vms: Vms, vms2d: Vms2d) {
     try {
       const createAwbDto: Partial<CreateAwbDto> = {
         barcode: vms.name,
         modelPath: vms.modelPath,
-        path: vms.modelPath,
+        path: vms2d.modelPath,
       };
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
-      const filePath = await this.fileUpload(vms);
-      createAwbDto.modelPath = filePath;
+      if (createAwbDto.modelPath) {
+        const filePath = await this.fileUpload(vms);
+        createAwbDto.modelPath = filePath;
+      }
+
+      // vms에서 2d 데이터 파일 저장하는 부분
+      if (createAwbDto.path) {
+        const filePath = await this.fileUpload2d(vms2d);
+        createAwbDto.path = filePath;
+      }
 
       const awbResult = await this.awbRepository.update(
         { barcode: createAwbDto.barcode },
@@ -341,6 +360,16 @@ export class AwbService {
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
       vms.FILE_NAME,
+    );
+    return fileResult;
+  }
+
+  private async fileUpload2d(vms2d: Vms2d) {
+    const file = `${vms2d.modelPath}/${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`;
+    const fileContent = await this.fileService.readFile(file);
+    const fileResult = await this.fileService.uploadFileToLocalServer(
+      fileContent,
+      vms2d.FILE_NAME,
     );
     return fileResult;
   }
@@ -590,7 +619,7 @@ export class AwbService {
     });
   }
 
-  async getAwbByVmsAndMssql(takeNumber: number) {
+  async getAwbByVms(takeNumber: number) {
     const [result] = await this.vmsRepository.find({
       order: orderByUtil(null),
       take: takeNumber,
@@ -598,8 +627,24 @@ export class AwbService {
     return result;
   }
 
-  async getAwbByVmsAndMssqlByName(name: string) {
+  async getAwbByVmsByName(name: string) {
     const [result] = await this.vmsRepository.find({
+      order: orderByUtil(null),
+      where: { name: name },
+    });
+    return result;
+  }
+
+  async getAwbByVms2d(takeNumber: number) {
+    const [result] = await this.vms2dRepository.find({
+      order: orderByUtil(null),
+      take: takeNumber,
+    });
+    return result;
+  }
+
+  async getAwbByVms2dByName(name: string) {
+    const [result] = await this.vms2dRepository.find({
       order: orderByUtil(null),
       where: { name: name },
     });
