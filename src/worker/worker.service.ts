@@ -43,11 +43,14 @@ export class WorkerService {
       const missingAwbs = await this.awbService.getAwbNotCombineModelPath();
 
       for (const missingAwb of missingAwbs) {
-        const missingVms = await this.awbService.getAwbByVmsAndMssqlByName(
+        const missingVms = await this.awbService.getAwbByVmsByName(
           missingAwb.barcode,
         );
-        if (missingVms) {
-          await this.awbService.preventMissingData(missingVms);
+        const missingVms2d = await this.awbService.getAwbByVms2dByName(
+          missingAwb.barcode,
+        );
+        if (missingVms || missingVms2d) {
+          await this.awbService.preventMissingData(missingVms, missingVms2d);
         }
       }
     }

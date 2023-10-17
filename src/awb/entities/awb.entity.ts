@@ -164,36 +164,6 @@ export class Awb {
   @Column({ type: 'boolean', nullable: true })
   simulation: boolean;
 
-  // v1 피드백 반영 후 새로생긴 칼럼
-  @ApiProperty({
-    example: 1.0,
-    description: '데이터 용량',
-  })
-  @Column({ type: 'double precision', nullable: true })
-  dataCapacity: number;
-
-  @ApiProperty({
-    example: 'fly',
-    description: '항공편',
-  })
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  flight: string;
-
-  @ApiProperty({
-    example: '출발지',
-    description: '출발지',
-  })
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  from: string;
-
-  @ApiProperty({
-    example: '공항도착',
-    description: '공항도착',
-  })
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  airportArrival: string;
-  // ========= v1 피드백 반영 후 새로생긴 칼럼 끝 =========
-
   // ============v0.2 추가=================
   @ApiProperty({
     example: '/c/file/xxx',

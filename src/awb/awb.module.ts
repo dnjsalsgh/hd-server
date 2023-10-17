@@ -11,12 +11,13 @@ import { FileService } from '../file/file.service';
 import { Vms } from '../vms/entities/vms.entity';
 import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
-import { SccModule } from '../scc/scc.module';
+import { Vms2d } from '../vms2d/entities/vms2d.entity';
+import { Basic } from '../basic/entities/basic.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Awb, AwbSccJoin, Scc]),
-    TypeOrmModule.forFeature([Vms], 'mssqlDB'),
+    TypeOrmModule.forFeature([Awb, AwbSccJoin, Scc, Basic]),
+    TypeOrmModule.forFeature([Vms, Vms2d], 'mssqlDB'),
     MulterModule.register({ dest: './upload' }),
     // mqtt 모듈설정
     MqttModule,

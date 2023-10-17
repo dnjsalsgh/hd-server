@@ -90,7 +90,7 @@ services:
       - redis:redis
       - mssql:mssql
 
-  back-schedule: # 일반 서버
+  back-schedule: # 스케줄 서버
     container_name: schedule-server
     build:
       context: .
