@@ -70,7 +70,7 @@ export class Amr {
 
   @ApiProperty({
     example: 74,
-    description: '배터리SOH(현재 배터리량)',
+    description: '배터리SOC(현재 배터리량)',
   })
   @Column({ type: 'int', nullable: false })
   soc?: number;
