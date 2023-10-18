@@ -209,7 +209,11 @@ export class AwbController {
       '\n' +
       'uld 작업장 대기(inskidplatform): 안착대에 있는 상태입니다.\n' +
       '\n' +
-      'uld 작업(inuld): uld 이력에 들어가 있는 상태입니다.',
+      'uld 작업(inuld): uld 이력에 들어가 있는 상태입니다.\n' +
+      '\n' +
+      '회수(return): 안착대에 있는걸 회수 합니다.\n' +
+      '\n' +
+      '반송(recall): 안착대에 있는걸 반송합니다.',
   })
   @Put(':id/:state')
   updateState(
