@@ -1059,7 +1059,6 @@ export class SimulatorResultService {
       currentAWBsInULD: currentAWBsInULD,
       palletRack: palletRack,
     };
-    console.log(JSON.stringify(packageSimulatorCallRequestObject));
     const psResult = await packageSimulatorCallAll(
       packageSimulatorCallRequestObject,
     );
@@ -1217,6 +1216,7 @@ export class SimulatorResultService {
       currentAWBsInULD: currentAWBsInULD,
       palletRack: palletRack,
     };
+
     return packageSimulatorCallRequestObject;
   }
 
