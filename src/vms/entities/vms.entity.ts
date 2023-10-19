@@ -23,8 +23,12 @@ export class Vms {
   @Column({ name: 'FILE_NAME', type: 'nvarchar', length: 17, nullable: true })
   FILE_NAME: string;
 
-  // @Column({ name: 'FILE_PATH', type: 'nvarchar', length: 1024, nullable: true })
-  // FILE_PATH: string;
+  @ApiProperty({
+    example: '',
+    description: '모델파일 경로',
+  })
+  @Column({ name: 'FILE_PATH', type: 'nvarchar', length: 1024, nullable: true })
+  modelPath: string;
 
   @Column({
     name: 'FILE_EXTENSION',
@@ -90,19 +94,13 @@ export class Vms {
   @Column({ type: 'int', nullable: true })
   iceWeight: number;
 
+  // scc가 string으로 들어오는대신 ,로 구분되어진다고 가정
   @ApiProperty({
     example: ['REG', 'GEN'],
     description: 'scc들',
   })
   @Column({ type: 'varchar', length: 500, nullable: true })
   Sccs: string;
-
-  @ApiProperty({
-    example: '',
-    description: '모델파일 경로',
-  })
-  @Column({ name: 'FILE_PATH', type: 'nvarchar', length: 1024, nullable: true })
-  modelPath: string;
 
   @CreateDateColumn()
   createdAt: Date;

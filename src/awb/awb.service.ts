@@ -32,6 +32,8 @@ import { CreateAwbWithAircraftDto } from '../awb/dto/create-awb-with-aircraft.dt
 import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
+import { CreateVmsDto } from '../vms/dto/create-vms.dto';
+import { CreateVms2dDto } from '../vms2d/dto/create-vms2d.dto';
 
 @Injectable()
 export class AwbService {
@@ -127,6 +129,42 @@ export class AwbService {
         fileRead: true,
       });
       return awbResult;
+    } catch (error) {
+      throw new TypeORMError(`rollback Working - ${error}`);
+    }
+  }
+
+  async createIntegrate(
+    createAwbDto: CreateAwbDto,
+    queryRunnerManager: EntityManager,
+  ) {
+    const { scc, ...awbDto } = createAwbDto;
+
+    const queryRunner = queryRunnerManager.queryRunner;
+
+    try {
+      // 서버 내부적으로 body 데이터 기반으로 태스트용 디모아DB에 VMS 생성
+      const createVmsDto: CreateVmsDto = {
+        name: awbDto.barcode,
+        FILE_NAME: awbDto.barcode,
+        modelPath: process.env.NAS_PATH,
+        FILE_EXTENSION: 'ply',
+        FILE_SIZE: 0,
+        RESULT_TYPE: true,
+        waterVolume: awbDto.waterVolume,
+        width: awbDto.width,
+        length: awbDto.length,
+        depth: awbDto.depth,
+        weight: awbDto.weight,
+        iceWeight: null,
+        Sccs: scc.join(','),
+      };
+      const insertVmsResult = await this.vmsRepository.save(createVmsDto);
+
+      // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,
+      // 서버 내부적으로 디모아DB에 담긴 vms 파일을 읽어오기
+      // 읽어온 vms 파일을 result 형태로 mqtt(hyundai/vms1/create)로 전송
+      this.mqttService.sendMqttMessage(`hyundai/vms1/createFile`, {});
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
@@ -359,7 +397,7 @@ export class AwbService {
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      vms.FILE_NAME,
+      `${vms.FILE_NAME}.${vms.FILE_EXTENSION}`,
     );
     return fileResult;
   }
