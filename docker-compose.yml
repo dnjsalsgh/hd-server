@@ -139,10 +139,10 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: C:/nas
+      device: ${NAS_PATH}
   volume_name_2:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: C:/Users/wmh/Desktop/hd-auto-logistic-server/upload
+      device: ${LOCAL_UPLOAD_PATH}

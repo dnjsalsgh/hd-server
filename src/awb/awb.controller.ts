@@ -75,6 +75,19 @@ export class AwbController {
 
   @ApiOperation({
     summary:
+      'vms 입력데이터 저장하기, 디모아, nas에 모델링 파일 들어왔다고 가정',
+  })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/integrate')
+  createIntegrate(
+    @Body() createAwbDto: CreateAwbDto,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.awbService.createIntegrate(createAwbDto, queryRunnerManager);
+  }
+
+  @ApiOperation({
+    summary:
       '[사용x] vms 입력데이터 저장하기(scc와 항공편 스케줄 함께) /airschedule/awb를 사용하세요',
   })
   @Post('/aircraft')
