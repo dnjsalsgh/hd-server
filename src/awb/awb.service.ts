@@ -32,6 +32,9 @@ import { CreateAwbWithAircraftDto } from '../awb/dto/create-awb-with-aircraft.dt
 import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
+import { CreateVmsDto } from '../vms/dto/create-vms.dto';
+import { CreateVms2dDto } from '../vms2d/dto/create-vms2d.dto';
+import { HttpExceptionFilter } from '../lib/filter/httpExceptionFilter';
 
 @Injectable()
 export class AwbService {
@@ -127,6 +130,51 @@ export class AwbService {
         fileRead: true,
       });
       return awbResult;
+    } catch (error) {
+      throw new TypeORMError(`rollback Working - ${error}`);
+    }
+  }
+
+  async createIntegrate(
+    createAwbDto: CreateAwbDto,
+    queryRunnerManager: EntityManager,
+  ) {
+    const { scc, ...awbDto } = createAwbDto;
+
+    try {
+      // 서버 내부적으로 body 데이터 기반으로 태스트용 디모아DB에 VMS 생성
+      const createVmsDto: CreateVmsDto = {
+        name: awbDto.barcode,
+        FILE_NAME: awbDto.barcode,
+        modelPath: process.env.NAS_PATH,
+        FILE_EXTENSION: 'ply',
+        FILE_SIZE: 0,
+        RESULT_TYPE: true,
+        waterVolume: awbDto.waterVolume,
+        width: awbDto.width,
+        length: awbDto.length,
+        depth: awbDto.depth,
+        weight: awbDto.weight,
+        iceWeight: null,
+        Sccs: scc.join(','),
+      };
+      const insertVmsResult = this.vmsRepository.save(createVmsDto);
+      const createVms2Dto: CreateVms2dDto = {
+        name: awbDto.barcode,
+        FILE_NAME: awbDto.barcode,
+        modelPath: process.env.NAS_PATH_2D,
+        FILE_EXTENSION: 'png',
+        FILE_SIZE: 0,
+        CREATE_USER_ID: '',
+      };
+      const insertVms2dResult = this.vms2dRepository.save(createVms2Dto);
+
+      Promise.allSettled([insertVmsResult, insertVms2dResult]);
+
+      // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,
+      // 서버 내부적으로 디모아DB에 담긴 vms 파일을 읽어오기
+      // 읽어온 vms 파일을 result 형태로 mqtt(hyundai/vms1/create)로 전송
+      await this.mqttService.sendMqttMessage(`hyundai/vms1/createFile`, {});
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
@@ -284,14 +332,22 @@ export class AwbService {
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
       if (vms && vms.modelPath) {
-        const filePath = await this.fileUpload(vms);
-        createAwbDto.modelPath = filePath;
+        try {
+          const filePath = await this.fileUpload(vms);
+          createAwbDto.modelPath = filePath;
+        } catch (error) {
+          throw new NotFoundException(error);
+        }
       }
 
       // vms에서 png 파일을 저장하고 연결하는 부분
       if (vms2d && vms2d.modelPath) {
-        const filePath2d = await this.fileUpload2d(vms2d);
-        createAwbDto.path = filePath2d;
+        try {
+          const filePath2d = await this.fileUpload2d(vms2d);
+          createAwbDto.path = filePath2d;
+        } catch (error) {
+          throw new NotFoundException(error);
+        }
       }
 
       const awbResult = await queryRunner.manager
@@ -359,7 +415,7 @@ export class AwbService {
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      vms.FILE_NAME,
+      `${vms.FILE_NAME}.${vms.FILE_EXTENSION}`,
     );
     return fileResult;
   }
@@ -369,7 +425,7 @@ export class AwbService {
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      vms2d.FILE_NAME,
+      `${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`,
     );
     return fileResult;
   }
@@ -603,6 +659,8 @@ export class AwbService {
     this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
       fileRead: true,
     });
+    const awb = await this.getLastAwb();
+    this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
   }
 
   async getAwbNotCombineModelPath() {
@@ -645,6 +703,14 @@ export class AwbService {
       where: { name: name },
     });
     return result;
+  }
+
+  async getLastAwb() {
+    const [awbResult] = await this.awbRepository.find({
+      order: orderByUtil(null),
+      take: 1,
+    });
+    return awbResult;
   }
 
   /**
