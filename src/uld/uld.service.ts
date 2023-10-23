@@ -48,7 +48,7 @@ export class UldService {
     const createResult = await this.uldRepository.save(createUldDto);
 
     // uld 생성되면 mqtt로 전송
-    this.client.send(`hyundai/uld/create`, createResult).subscribe();
+    this.client.send(`hyundai/uld/insert`, createResult).subscribe();
 
     return createResult;
   }

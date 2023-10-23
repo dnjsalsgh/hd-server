@@ -625,6 +625,9 @@ export class SimulatorResultService {
     apiRequest: userSelectInput,
     queryRunnerManager: EntityManager,
   ) {
+    // userSelect을 할 때 insert로 들어오는 화물, 안착대 정보를 mqtt로 publish
+    this.client.send(` hyundai/userSelect/insert`, apiRequest).subscribe();
+
     const queryRunner = queryRunnerManager.queryRunner;
     // await queryRunner.connect();
     // await queryRunner.startTransaction();
