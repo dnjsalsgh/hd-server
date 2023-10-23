@@ -80,8 +80,10 @@ services:
       - '${PORT}:3000'
     volumes:
       - logs-volume:/var/app/logs
-      - volume_name_1:/var
+#      - volume_name_1:/var/nas
       - volume_name_2:/var/app/src/upload
+#      -  //LAPTOP-G537CIUA/nas:/mnt/share
+      -  //LAPTOP-G537CIUA/nas:/var/nas
     networks:
       - overlay
     links:
@@ -139,10 +141,10 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /mnt/d:/:/var/nas
+      device: Z:\
   volume_name_2:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: C:/Users/wmh/Desktop/hd-auto-logistic-server/upload
+      device: ${LOCAL_UPLOAD_PATH}

@@ -45,8 +45,12 @@ export class UldService {
     } catch (e) {
       throw new NotFoundException(`uldType not found`);
     }
+    const createResult = await this.uldRepository.save(createUldDto);
 
-    return await this.uldRepository.save(createUldDto);
+    // uld 생성되면 mqtt로 전송
+    this.client.send(`hyundai/uld/create`, createResult).subscribe();
+
+    return createResult;
   }
 
   async findAll(query: Uld & BasicQueryParamDto) {
