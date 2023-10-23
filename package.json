@@ -9,6 +9,7 @@
     "build": "nest build",
     "startpm": "pm2 start dist/main.js --name \"hd-server\"",
     "start:all": "npm-run-all --parallel build startpm",
+    "reload": "pm2 reload 0",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev-backup": "nest start --watch",
