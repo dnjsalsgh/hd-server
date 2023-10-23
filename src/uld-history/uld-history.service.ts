@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
 import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,11 +12,10 @@ import {
 } from 'typeorm';
 import { UldHistory } from './entities/uld-history.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
-import { AsrsAttribute } from '../asrs/entities/asrs.entity';
-import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
+import { AwbAttribute } from '../awb/entities/awb.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
 import { Uld, UldAttribute } from '../uld/entities/uld.entity';
-import { BuildUpOrderAttribute } from '../build-up-order/entities/build-up-order.entity';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class UldHistoryService {
@@ -25,11 +24,14 @@ export class UldHistoryService {
     private readonly uldHistoryRepository: Repository<UldHistory>,
     @InjectRepository(Uld)
     private readonly uldRepository: Repository<Uld>,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
   async create(createUldHistoryDto: CreateUldHistoryDto) {
     const result = await this.uldHistoryRepository.create(createUldHistoryDto);
 
-    await this.uldHistoryRepository.save(result);
+    const insertResult = await this.uldHistoryRepository.save(result);
+    // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
+    this.client.send(`hyundai/uldHistory/insert`, insertResult).subscribe();
     return result;
   }
 
