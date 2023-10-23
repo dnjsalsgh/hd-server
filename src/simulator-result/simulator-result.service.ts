@@ -996,6 +996,7 @@ export class SimulatorResultService {
         currentAWBsInULD: currentAWBsInULD,
         palletRack: palletRack,
       };
+
       const psResult = await getAWBinPalletRack(
         packageSimulatorCallRequestObject,
       );
@@ -1059,6 +1060,14 @@ export class SimulatorResultService {
       currentAWBsInULD: currentAWBsInULD,
       palletRack: palletRack,
     };
+    console.log(
+      'packageSimulatorCallRequestObject = ',
+      packageSimulatorCallRequestObject,
+    );
+    this.client
+      .send('hyundai/ps/input', packageSimulatorCallRequestObject)
+      .pipe(take(1))
+      .subscribe();
     const psResult = await packageSimulatorCallAll(
       packageSimulatorCallRequestObject,
     );
