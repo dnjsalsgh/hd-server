@@ -101,7 +101,7 @@ export class SimulatorResultService {
     return result;
   }
 
-  // ps 패키지 시뮬레이터와 소통 후 [자동창고 불출, build-up-order] 만드는 곳
+  // [자동창고 불출, build-up-order] 만드는 곳, ps 콜
   async createAsrsOutOrderBySimulatorResult(
     apiRequest: PsApiRequest,
     queryRunnerManager: EntityManager,
@@ -313,7 +313,6 @@ export class SimulatorResultService {
           Asrs: element.storageId,
           Awb: element.AwbId,
         };
-        // TODO: ps에서 안착대 id를 준다고 하면 안착대 id를 불출 서열로 하는 parameter 따로 만들어야 함
         if (asrsOutOrderParam.Asrs !== 0)
           asrsOutOrderParamArray.push(asrsOutOrderParam);
       }
@@ -693,7 +692,6 @@ export class SimulatorResultService {
           Asrs: element.storageId,
           Awb: element.AwbId,
         };
-        // TODO: ps에서 안착대 id를 준다고 하면 안착대 id를 불출 서열로 하는 parameter 따로 만들어야 함
         if (asrsOutOrderParam.Asrs !== 0)
           asrsOutOrderParamArray.push(asrsOutOrderParam);
       }

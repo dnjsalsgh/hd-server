@@ -49,14 +49,17 @@ export class SkidPlatformHistoryService {
 
     const skidPlatformNowState = await this.nowState();
     // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
-    this.client
-      .send(`hyundai/skidPlatform/insert`, {
-        statusCode: 200,
-        message: 'current skidPlatform state',
-        data: skidPlatformNowState,
-      })
-      .pipe(take(1))
-      .subscribe();
+    if (createSkidPlatformHistoryDto.inOutType === 'in') {
+      // in 됐을 때만 신호 알리기
+      this.client
+        .send(`hyundai/skidPlatform/insert`, {
+          statusCode: 200,
+          message: 'current skidPlatform state',
+          data: skidPlatformNowState,
+        })
+        .pipe(take(1))
+        .subscribe();
+    }
     return historyResult;
   }
 
