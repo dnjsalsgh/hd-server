@@ -135,10 +135,7 @@ export class AwbService {
     }
   }
 
-  async createIntegrate(
-    createAwbDto: CreateAwbDto,
-    queryRunnerManager: EntityManager,
-  ) {
+  async createIntegrate(createAwbDto: CreateAwbDto) {
     const { scc, ...awbDto } = createAwbDto;
 
     try {
