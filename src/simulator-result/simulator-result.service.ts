@@ -258,7 +258,6 @@ export class SimulatorResultService {
     // 현재 ASRS의 정보들
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
-    if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
@@ -299,15 +298,25 @@ export class SimulatorResultService {
     };
     this.client
       .send('hyundai/ps/input', packageSimulatorCallRequestObject)
-      .pipe(take(1))
+      .pipe()
       .subscribe();
     const psResult = await getUserSelect(packageSimulatorCallRequestObject); // ps 콜
+    this.client.send('hyundai/ps/result', psResult).pipe(take(1)).subscribe();
+
+    // ps의 결과가 Failure로 올 때 예외 처리
+    if (psResult.inputState !== 'Success') {
+      throw new HttpException(
+        `입력 데이터가 잘못되었습니다. 다시 한번 확인해 주세요`,
+        400,
+      );
+    }
 
     try {
       const bodyResult = psResult.result[0];
       // 1. 자동창고 작업지시를 만들기
       const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
-      for (const [index, element] of bodyResult.AWBInfoList.entries()) {
+
+      for (const [index, element] of bodyResult.predictionResult.entries()) {
         const asrsOutOrderParam: CreateAsrsOutOrderDto = {
           order: index,
           Asrs: element.storageId,
@@ -382,9 +391,6 @@ export class SimulatorResultService {
 
         // 3. awbjoin 테이블, 이력 테이블 함께 저장
         await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳
-        /**
-         * 시뮬레이션 결과,이력을 저장하기 위한 부분 end
-         */
 
         // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
         this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
