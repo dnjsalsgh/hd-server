@@ -239,7 +239,7 @@ export class SimulatorResultService {
     }
   }
 
-  // 패키지 시뮬레이터의 결과로 [빌드업 작업지시]만 만드는 곳
+  // 패키지 시뮬레이터의 userSelect 실행
   async createBuildUpOrderBySimulatorResult(
     apiRequest: userSelectInput,
     queryRunnerManager: EntityManager,
@@ -300,6 +300,10 @@ export class SimulatorResultService {
       palletRack: palletRack,
       inputAWB: inputAWB,
     };
+    this.client
+      .send('hyundai/ps/input', packageSimulatorCallRequestObject)
+      .pipe(take(1))
+      .subscribe();
     const psResult = await getUserSelect(packageSimulatorCallRequestObject); // ps 콜
 
     try {
