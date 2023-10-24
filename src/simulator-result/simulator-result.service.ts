@@ -590,8 +590,6 @@ export class SimulatorResultService {
       // ps에 보낼 Awb 정보들 모아두는 배열
       const Awbs = [];
       this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
-      if (Awbs.length <= 0)
-        throw new HttpException(`창고 이력이 없습니다.`, 400);
 
       // ps에 보낼 Uld정보를 모아두는
       const Ulds = [];
@@ -602,9 +600,6 @@ export class SimulatorResultService {
       // 안착대 현재 상황 묶음
       const palletRack = [];
       this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
-      // 파레트가 없는 경우도 있을 수 있으니 주석처리
-      // if (palletRack.length <= 0)
-      //   throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
       // uld의 현재 상황 묶음
       const currentAWBsInULD = [];
@@ -621,7 +616,6 @@ export class SimulatorResultService {
       const psResult = await getAWBinPalletRack(
         packageSimulatorCallRequestObject,
       );
-      // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
 
       // 안착대 추천도 결과를 mqtt에 전송
       this.client
