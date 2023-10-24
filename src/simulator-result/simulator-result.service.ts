@@ -84,9 +84,9 @@ export class SimulatorResultService {
     private readonly asrsRepository: Repository<Asrs>,
     @InjectRepository(SkidPlatform)
     private readonly skidPlatformRepository: Repository<SkidPlatform>,
-    @Inject('MQTT_SERVICE') private client: ClientProxy,
     @InjectRepository(Uld)
     private readonly uldRepository: Repository<Uld>,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
     private dataSource: DataSource,
     private readonly buildUpOrderService: BuildUpOrderService,
     private readonly asrsHistoryService: AsrsHistoryService,
@@ -101,7 +101,7 @@ export class SimulatorResultService {
     return result;
   }
 
-  // 패키지 시뮬레이터와 소통 후 [자동창고 불출, build-up-order] 만드는 곳
+  // ps 패키지 시뮬레이터와 소통 후 [자동창고 불출, build-up-order] 만드는 곳
   async createAsrsOutOrderBySimulatorResult(
     apiRequest: PsApiRequest,
     queryRunnerManager: EntityManager,
@@ -112,13 +112,9 @@ export class SimulatorResultService {
     // 자동창고의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const asrsStateArray = await this.asrsHistoryService.nowState();
 
-    // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
     // ps에 보낼 Awb 정보들 모아두는 배열
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
-    if (Awbs.length <= 0) {
-      throw new HttpException(`창고 이력이 없습니다.`, 400);
-    }
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
@@ -132,7 +128,12 @@ export class SimulatorResultService {
       Awbs: Awbs,
       Ulds: Ulds,
     };
-    const psResult = await getOrderDischarge(packageSimulatorCallRequestObject);
+
+    this.client
+      .send('hyundai/ps/input', packageSimulatorCallRequestObject)
+      .pipe(take(1))
+      .subscribe();
+    const psResult = await getOrderDischarge(packageSimulatorCallRequestObject); // ps 콜
 
     try {
       const bodyResult = psResult.result[0];
@@ -229,13 +230,9 @@ export class SimulatorResultService {
           .subscribe();
       }
 
-      // await queryRunner.commitTransaction();
       return psResult;
     } catch (error) {
-      // await queryRunner.rollbackTransaction();
       throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      // await queryRunner.release();
     }
   }
 
@@ -418,11 +415,10 @@ export class SimulatorResultService {
     const skidPlatformStateArray =
       await this.skidPlatformHistoryService.nowState();
 
-    // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
     // ps에 보낼 Awb 정보들 모아두는 배열
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
-    if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
+    // if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
@@ -433,8 +429,6 @@ export class SimulatorResultService {
     // 안착대 현재 상황 묶음
     const palletRack = [];
     this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
-    if (palletRack.length <= 0)
-      throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
     const packageSimulatorCallRequestObject = {
       mode: false,
@@ -560,9 +554,6 @@ export class SimulatorResultService {
 
         // 3. awbjoin 테이블, 이력 테이블 함께 저장
         await Promise.all([joinResult, historyResult]); // 실제로 쿼리 날아가는곳
-        /**
-         * 시뮬레이션 결과,이력을 저장하기 위한 부분 end
-         */
 
         // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
         this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
@@ -574,7 +565,7 @@ export class SimulatorResultService {
           .subscribe();
       }
 
-      // await queryRunner.commitTransaction();
+      return psResult;
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
@@ -662,7 +653,7 @@ export class SimulatorResultService {
     // 현재 ASRS의 정보들
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
-    if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
+    // if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
@@ -685,10 +676,7 @@ export class SimulatorResultService {
       currentAWBsInULD: currentAWBsInULD,
       palletRack: palletRack,
     };
-    console.log(
-      'packageSimulatorCallRequestObject = ',
-      packageSimulatorCallRequestObject,
-    );
+
     this.client
       .send('hyundai/ps/input', packageSimulatorCallRequestObject)
       .pipe(take(1))
@@ -801,13 +789,12 @@ export class SimulatorResultService {
     }
   }
 
+  // psAll에서 ps로 보내는 body를 확인하기 위한 용도
   async psAllInput(
     apiRequest: PsAllRequest,
     queryRunnerManager: EntityManager,
   ) {
     const queryRunner = queryRunnerManager.queryRunner;
-    // await queryRunner.connect();
-    // await queryRunner.startTransaction();
 
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
 
@@ -821,11 +808,9 @@ export class SimulatorResultService {
       apiRequest.UldCode,
     );
 
-    // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
     // 현재 ASRS의 정보들
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
-    if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
@@ -836,8 +821,6 @@ export class SimulatorResultService {
     // 안착대 현재 상황 묶음
     const palletRack = [];
     this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
-    // if (palletRack.length <= 0)
-    //   throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
     // uld의 현재 상황 묶음
     const currentAWBsInULD = [];
@@ -854,18 +837,14 @@ export class SimulatorResultService {
     return packageSimulatorCallRequestObject;
   }
 
+  // 현재 자동창고, 안착대 상황을 한번에 보여주기
   async inputGroup() {
     // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
     const asrsStateArray = await this.asrsHistoryService.nowState();
     // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const skidPlatformStateArray =
       await this.skidPlatformHistoryService.nowState();
-    // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
-    // const uldStateArray = await this.uldHistoryService.nowState(
-    //   apiRequest.UldCode,
-    // );
 
-    // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
     // 현재 ASRS의 정보들
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
@@ -874,8 +853,6 @@ export class SimulatorResultService {
     // 안착대 현재 상황 묶음
     const palletRack = [];
     this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
-    // if (palletRack.length <= 0)
-    //   throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
     const packageSimulatorCallRequestObject = {
       mode: false,
