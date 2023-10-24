@@ -80,7 +80,7 @@ export class userSelectInput {
   palletRack: palletRack[];
   Awb: Awbs[];
   @ApiProperty({
-    example: 'A-Type2',
+    example: 'testUld001',
     description: 'Uld의 code',
   })
   UldCode: string;
