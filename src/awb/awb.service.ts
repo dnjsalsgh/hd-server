@@ -166,7 +166,7 @@ export class AwbService {
       };
       const insertVms2dResult = this.vms2dRepository.save(createVms2Dto);
 
-      Promise.allSettled([insertVmsResult, insertVms2dResult]);
+      await Promise.allSettled([insertVmsResult, insertVms2dResult]);
 
       // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,
       // 서버 내부적으로 디모아DB에 담긴 vms 파일을 읽어오기
