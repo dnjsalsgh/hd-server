@@ -51,55 +51,14 @@ services:
       - overlay
     restart: always
 
-  back: # 일반 서버
-    container_name: main-server2
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      SCHEDULE: 'false'
-      DATABASE_HOST: ${DATABASE_HOST} # Use host.docker.internal to refer to the host machine's IP
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_USER: ${DATABASE_USER}
-      DATABASE_PASS: ${DATABASE_PASS}
-      DATABASE_NAME: ${DATABASE_NAME}
-      REDIS_HOST: host.docker.internal
-      REDIS_PORT: ${REDIS_PORT}
-      MQTT_HOST: ${MQTT_HOST}
-      MQTT_PORT: ${MQTT_PORT}
-      MSSQL_DATABASE_USER: ${MSSQL_DATABASE_USER}
-      MSSQL_DATABASE_PASS: ${MSSQL_DATABASE_PASS}
-      MSSQL_DATABASE_HOST: ${MSSQL_DATABASE_HOST}
-      MSSQL_DATABASE_NAME: ${MSSQL_DATABASE_NAME}
-      MSSQL_DATABASE_PORT: ${MSSQL_DATABASE_PORT}
-      NAS_PATH: ${NAS_PATH}
-      LOCAL_UPLOAD_PATH: ${LOCAL_UPLOAD_PATH}
-      TZ: 'Asia/Seoul'
-    ports:
-      - '${PORT}:3000'
-    volumes:
-      - logs-volume:/var/app/logs
-#      - volume_name_1:/var/nas
-      - volume_name_2:/var/app/src/upload
-#      -  //LAPTOP-G537CIUA/nas:/mnt/share
-      -  //LAPTOP-G537CIUA/nas:/var/nas
-    networks:
-      - overlay
-    links:
-      - postgres:postgres
-      - mqtt:mqtt
-      - redis:redis
-      - mssql:mssql
-
-#  back-schedule: # 스케줄 서버
-#    container_name: schedule-server
+#  back: # 일반 서버
+#    container_name: main-server2
 #    build:
 #      context: .
 #      dockerfile: Dockerfile
 #    environment:
 #      NODE_ENV: ${NODE_ENV}
-#      SCHEDULE: 'true'
+#      SCHEDULE: 'false'
 #      DATABASE_HOST: ${DATABASE_HOST} # Use host.docker.internal to refer to the host machine's IP
 #      DATABASE_PORT: ${DATABASE_PORT}
 #      DATABASE_USER: ${DATABASE_USER}
@@ -118,9 +77,13 @@ services:
 #      LOCAL_UPLOAD_PATH: ${LOCAL_UPLOAD_PATH}
 #      TZ: 'Asia/Seoul'
 #    ports:
-#      - '3001:3000'
+#      - '${PORT}:3000'
 #    volumes:
 #      - logs-volume:/var/app/logs
+##      - volume_name_1:/var/nas
+#      - volume_name_2:/var/app/src/upload
+##      -  //LAPTOP-G537CIUA/nas:/mnt/share
+#      -  //LAPTOP-G537CIUA/nas:/var/nas
 #    networks:
 #      - overlay
 #    links:
@@ -128,6 +91,43 @@ services:
 #      - mqtt:mqtt
 #      - redis:redis
 #      - mssql:mssql
+
+  back-schedule: # 스케줄 서버
+    container_name: schedule-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      SCHEDULE: 'true'
+      DATABASE_HOST: ${DATABASE_HOST} # Use host.docker.internal to refer to the host machine's IP
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DATABASE_NAME: ${DATABASE_NAME}
+      REDIS_HOST: host.docker.internal
+      REDIS_PORT: ${REDIS_PORT}
+      MQTT_HOST: ${MQTT_HOST}
+      MQTT_PORT: ${MQTT_PORT}
+      MSSQL_DATABASE_USER: ${MSSQL_DATABASE_USER}
+      MSSQL_DATABASE_PASS: ${MSSQL_DATABASE_PASS}
+      MSSQL_DATABASE_HOST: ${MSSQL_DATABASE_HOST}
+      MSSQL_DATABASE_NAME: ${MSSQL_DATABASE_NAME}
+      MSSQL_DATABASE_PORT: ${MSSQL_DATABASE_PORT}
+      NAS_PATH: ${NAS_PATH}
+      LOCAL_UPLOAD_PATH: ${LOCAL_UPLOAD_PATH}
+      TZ: 'Asia/Seoul'
+    ports:
+      - '3001:3000'
+    volumes:
+      - logs-volume:/var/app/logs
+    networks:
+      - overlay
+    links:
+      - postgres:postgres
+      - mqtt:mqtt
+      - redis:redis
+      - mssql:mssql
 
 networks:
   overlay:
