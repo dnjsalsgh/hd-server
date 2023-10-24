@@ -77,13 +77,9 @@ export class AwbController {
     summary:
       'vms 입력데이터 저장하기, 디모아, nas에 모델링 파일 들어왔다고 가정',
   })
-  @UseInterceptors(TransactionInterceptor)
   @Post('/integrate')
-  createIntegrate(
-    @Body() createAwbDto: CreateAwbDto,
-    @TransactionManager() queryRunnerManager: EntityManager,
-  ) {
-    return this.awbService.createIntegrate(createAwbDto, queryRunnerManager);
+  createIntegrate(@Body() createAwbDto: CreateAwbDto) {
+    return this.awbService.createIntegrate(createAwbDto);
   }
 
   @ApiOperation({
