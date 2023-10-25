@@ -24,7 +24,7 @@ export class Alarm {
     example: new Date(),
     description: '조치시간',
   })
-  @Column({ type: 'timestamptz', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   responseTime: Date;
 
   @ApiProperty({

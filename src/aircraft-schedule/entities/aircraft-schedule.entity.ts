@@ -14,6 +14,7 @@ import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Awb } from '../../awb/entities/awb.entity';
 import { TimeTable } from '../../time-table/entities/time-table.entity';
+import { Uld } from '../../uld/entities/uld.entity';
 
 @Entity()
 export class AircraftSchedule {
@@ -135,6 +136,14 @@ export class AircraftSchedule {
   })
   @OneToMany(() => TimeTable, (timeTable) => timeTable.AircraftSchedule)
   TimeTables: Relation<TimeTable[]>;
+
+  @ApiProperty({
+    example: 1,
+    description: 'ULDFK',
+    type: () => Uld,
+  })
+  @OneToMany(() => Uld, (uld) => uld.AircraftSchedule)
+  Ulds: Relation<Uld[]> | number;
 }
 
 export const AircraftScheduleAttributes = {

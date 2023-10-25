@@ -45,6 +45,7 @@ export class UldService {
     } catch (e) {
       throw new NotFoundException(`uldType not found`);
     }
+
     const createResult = await this.uldRepository.save(createUldDto);
 
     // uld 생성되면 mqtt로 전송
