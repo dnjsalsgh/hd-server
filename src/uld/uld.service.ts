@@ -21,6 +21,7 @@ import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
 import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
 import { ClientProxy } from '@nestjs/microservices';
+import { AircraftScheduleAttributes } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Injectable()
 export class UldService {
@@ -88,11 +89,11 @@ export class UldService {
       where: { id: id },
       relations: {
         UldType: true,
-        Scc: true,
+        AircraftSchedule: true,
       },
       select: {
         UldType: UldTypeAttribute,
-        Scc: SccAttribute,
+        AircraftSchedule: AircraftScheduleAttributes,
       },
     });
     return result;

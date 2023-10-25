@@ -23,7 +23,7 @@ import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateAircraftScheduleByNameDto } from './dto/create-aircraft-schedule-by-name.dto';
 import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
-import { Uld } from '../uld/entities/uld.entity';
+import { Uld, UldAttribute } from '../uld/entities/uld.entity';
 import { UldType } from '../uld-type/entities/uld-type.entity';
 
 @Injectable()
@@ -109,12 +109,12 @@ export class AircraftScheduleService {
       return airScheduleResult;
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+
       throw new TypeORMError(`rollback Working - ${error}`);
     } finally {
       await queryRunner.release();
     }
-
-    // return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
   }
 
   async createWithAwbs(createAircraftScheduleDto: CreateAircraftScheduleDto) {
@@ -139,8 +139,8 @@ export class AircraftScheduleService {
 
   async findAll(
     Aircraft: number,
-    CcIdDestination: number,
-    CcIdDeparture: number,
+    destination: string,
+    departure: string,
     source?: string,
     createdAtFrom?: Date,
     createdAtTo?: Date,
@@ -161,14 +161,18 @@ export class AircraftScheduleService {
       relations: {
         Aircraft: true,
         Awbs: true,
+        Ulds: true,
       },
       select: {
         Aircraft: AircraftAttribute,
         Awbs: AwbAttribute,
+        Ulds: UldAttribute,
       },
       where: {
         source: source ? ILike(`%${source}%`) : undefined,
         Aircraft: Aircraft ? Equal(+Aircraft) : undefined,
+        destination: destination ? destination : undefined,
+        departure: departure ? departure : undefined,
         createdAt: findDate,
       },
       order: orderByUtil(order),
