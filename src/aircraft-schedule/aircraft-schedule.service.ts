@@ -192,10 +192,12 @@ export class AircraftScheduleService {
       relations: {
         Aircraft: true,
         Awbs: true,
+        Ulds: true,
       },
       select: {
         Aircraft: AircraftAttribute,
         Awbs: AwbAttribute,
+        Ulds: UldAttribute,
       },
     });
     this.client.send(`hyundai/aircraftSchedule/find`, result).subscribe();
