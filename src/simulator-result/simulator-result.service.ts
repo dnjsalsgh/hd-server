@@ -305,10 +305,7 @@ export class SimulatorResultService {
 
     // ps의 결과가 Failure로 올 때 예외 처리
     if (psResult.inputState !== 'Success') {
-      throw new HttpException(
-        `입력 데이터가 잘못되었습니다. 다시 한번 확인해 주세요`,
-        400,
-      );
+      return psResult;
     }
 
     try {
