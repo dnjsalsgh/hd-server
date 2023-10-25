@@ -1,4 +1,4 @@
-version: '3.9' # Docker Compose 버전 (필요에 따라 변경 가능)
+  version: '3.9' # Docker Compose 버전 (필요에 따라 변경 가능)
 
 services:
   mssql:
