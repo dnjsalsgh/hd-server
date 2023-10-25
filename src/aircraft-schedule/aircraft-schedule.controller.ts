@@ -31,19 +31,6 @@ export class AircraftScheduleController {
   }
 
   @ApiOperation({
-    summary: '항공편에 항공기, 출발지, 도착지를 name으로 생성하기',
-    description: ' awb 없어도 됨',
-  })
-  @Post('/use/name')
-  async createByName(
-    @Body() createAircraftScheduleDto: CreateAircraftScheduleByNameDto,
-  ) {
-    return await this.aircraftScheduleService.createByName(
-      createAircraftScheduleDto,
-    );
-  }
-
-  @ApiOperation({
     summary: '항공편 안에 화물 정보를 넣어서 입력하기 위한 api',
     description: 'uld 없어도 됨',
   })
@@ -56,9 +43,22 @@ export class AircraftScheduleController {
     );
   }
 
+  // @ApiOperation({
+  //   summary: '항공편에 항공기, 출발지, 도착지를 name으로 생성하기',
+  //   description: ' awb 없어도 됨',
+  // })
+  // @Post('/use/name')
+  // async createByName(
+  //   @Body() createAircraftScheduleDto: CreateAircraftScheduleByNameDto,
+  // ) {
+  //   return await this.aircraftScheduleService.createByName(
+  //     createAircraftScheduleDto,
+  //   );
+  // }
+
   @ApiQuery({ name: 'Aircraft', required: false, type: 'number' })
-  @ApiQuery({ name: 'CcIdDestination', required: false, type: 'number' })
-  @ApiQuery({ name: 'CcIdDeparture', required: false, type: 'number' })
+  @ApiQuery({ name: 'destination', required: false, type: 'string' })
+  @ApiQuery({ name: 'departure', required: false, type: 'string' })
   @ApiQuery({ name: 'source', required: false })
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })
@@ -68,8 +68,8 @@ export class AircraftScheduleController {
   @Get()
   findAll(
     @Query('Aircraft') Aircraft?: number,
-    @Query('CcIdDestination') CcIdDestination?: number,
-    @Query('CcIdDeparture') CcIdDeparture?: number,
+    @Query('destination') destination?: string,
+    @Query('departure') departure?: string,
     @Query('source') source?: string,
     @Query('createdAtFrom') createdAtFrom?: Date,
     @Query('createdAtTo') createdAtTo?: Date,
@@ -79,8 +79,8 @@ export class AircraftScheduleController {
   ) {
     return this.aircraftScheduleService.findAll(
       Aircraft,
-      CcIdDestination,
-      CcIdDeparture,
+      destination,
+      departure,
       source,
       createdAtFrom,
       createdAtTo,
