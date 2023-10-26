@@ -89,6 +89,12 @@ export class AsrsHistoryService {
     return '창고가 비었습니다.';
   }
 
+  async resetAsrsAll() {
+    const asrsResult = await this.asrsHistoryRepository.delete({});
+
+    return '창고가 비었습니다.';
+  }
+
   async findAll(query: AsrsHistory & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;

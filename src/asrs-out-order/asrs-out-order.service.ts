@@ -54,16 +54,17 @@ export class AsrsOutOrderService {
     } else if (createdAtTo) {
       findDate = LessThanOrEqual(createdAtTo);
     }
+
     return await this.asrsOutOrderRepository.find({
-      relations: {
-        Asrs: true,
-        SkidPlatform: true,
-        Awb: true,
-      },
       select: {
         Asrs: AsrsAttribute,
         SkidPlatform: SkidPlatformAttribute,
         Awb: AwbAttribute,
+      },
+      relations: {
+        Asrs: true,
+        SkidPlatform: true,
+        Awb: true,
       },
       where: {
         // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정

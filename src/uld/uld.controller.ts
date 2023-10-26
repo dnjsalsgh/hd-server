@@ -31,6 +31,7 @@ export class UldController {
   @ApiQuery({ name: 'airplaneType', required: false })
   @ApiQuery({ name: 'simulation', required: false })
   @ApiQuery({ name: 'UldType', required: false, type: 'number' })
+  @ApiQuery({ name: 'AircraftSchedule', required: false, type: 'number' })
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })
   @ApiQuery({ name: 'order', required: false })

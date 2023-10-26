@@ -69,9 +69,11 @@ export class UldService {
     return await this.uldRepository.find({
       select: {
         UldType: UldTypeAttribute,
+        AircraftSchedule: AircraftScheduleAttributes,
       },
       relations: {
         UldType: true,
+        AircraftSchedule: true,
       },
       where: {
         // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
@@ -79,6 +81,9 @@ export class UldService {
         airplaneType: query.airplaneType,
         simulation: query.simulation,
         UldType: query.UldType ? Equal(+query.UldType) : undefined,
+        AircraftSchedule: query.AircraftSchedule
+          ? Equal(+query.AircraftSchedule)
+          : undefined,
         createdAt: findDate,
       },
     });

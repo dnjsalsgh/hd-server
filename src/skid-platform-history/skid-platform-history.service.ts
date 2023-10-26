@@ -157,7 +157,7 @@ export class SkidPlatformHistoryService {
   /**
    * 안착대 이력에서 asrs_id를 기준으로 최신 안착대의 'in' 상태인거 모두 삭제
    */
-  async resetAsrs() {
+  async resetSkidPlatform() {
     const skidPlatfromState = await this.skidPlatformHistoryRepository
       .createQueryBuilder('sph')
       .distinctOn(['sph.skid_platform_id'])
@@ -191,6 +191,14 @@ export class SkidPlatformHistoryService {
         .execute();
       return deleteResult;
     }
+    return '안착대가 비었습니다.';
+  }
+
+  async resetSkidPlatformAll() {
+    const skidPlatformResult = await this.skidPlatformHistoryRepository.delete(
+      {},
+    );
+
     return '안착대가 비었습니다.';
   }
 

@@ -30,8 +30,6 @@ export class AwbReturnController {
     return this.awbReturnService.create(createAwbReturnDto);
   }
 
-  @ApiQuery({ name: 'name', required: false })
-  @ApiQuery({ name: 'code', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'order', required: false })

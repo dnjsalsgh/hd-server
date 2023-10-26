@@ -2,7 +2,7 @@ import { ApiProperty, PickType } from '@nestjs/swagger';
 import { AwbGroup } from '../entities/awb-group.entity';
 import { Awb } from '../../awb/entities/awb.entity';
 
-export class CreateAwbGroupDto extends PickType(AwbGroup, ['name', 'code']) {
+export class CreateAwbGroupDto extends PickType(AwbGroup, ['code']) {
   @ApiProperty({
     example:
       '[{\n' +
