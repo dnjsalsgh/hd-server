@@ -24,7 +24,7 @@ export class UldType {
 
   @ApiProperty({
     example: 'Uld-A',
-    description: 'Uld 이름',
+    description: 'Uld타입 이름',
   })
   @Column({ type: 'varchar', length: 500, nullable: true })
   name: string;
