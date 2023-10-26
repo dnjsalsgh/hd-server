@@ -82,6 +82,7 @@ export class BuildUpOrderService {
       return result;
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      await queryRunner.release();
       throw new TypeORMError(`rollback Working - ${error}`);
     }
     // finally {
