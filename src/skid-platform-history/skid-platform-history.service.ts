@@ -194,6 +194,14 @@ export class SkidPlatformHistoryService {
     return '안착대가 비었습니다.';
   }
 
+  async resetAsrsAll() {
+    const skidPlatformResult = await this.skidPlatformHistoryRepository.delete(
+      {},
+    );
+
+    return skidPlatformResult;
+  }
+
   update(
     id: number,
     updateSkidPlatformHistoryDto: UpdateSkidPlatformHistoryDto,

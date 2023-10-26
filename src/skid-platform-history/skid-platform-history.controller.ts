@@ -57,6 +57,15 @@ export class SkidPlatformHistoryController {
   }
 
   @ApiOperation({
+    summary: '안착대의 이력 삭제',
+    description: '안착대의 이력 삭제',
+  })
+  @Post('/reset-all')
+  resetAsrsAll() {
+    return this.skidPlatformHistoryService.resetAsrsAll();
+  }
+
+  @ApiOperation({
     summary: '안착대의 현재 상태를 가져오기(inOutType이 out 이면 빈 안착대)',
     description: '안착대id로 이력의 최신본만 가져오기',
   })
