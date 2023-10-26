@@ -103,6 +103,7 @@ export class UldHistoryService {
       .leftJoinAndSelect('uh.Awb', 'Awb')
       .leftJoinAndSelect('Awb.Scc', 'Scc')
       .where('uh.Uld = :uldId', { uldId: targetUld.id })
+      .orderBy('uh.id', 'ASC')
       .getMany();
 
     return uldHistory;
