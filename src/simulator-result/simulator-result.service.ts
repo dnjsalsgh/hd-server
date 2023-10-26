@@ -947,7 +947,7 @@ export class SimulatorResultService {
           UldType: true,
         },
         where: {
-          code: apiRequest.UldCode ? apiRequest.UldCode : undefined,
+          code: apiRequest.UldCode ? Equal(apiRequest.UldCode) : undefined,
         },
       });
       // Uld주입하기
@@ -961,7 +961,6 @@ export class SimulatorResultService {
           length,
           depth,
           uldType: typeof UldType === 'object' ? UldType.code : null,
-          maxWeight: 10000,
           vertexCord,
         });
       }
