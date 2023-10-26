@@ -38,11 +38,12 @@ export class FileService {
 
       // 파일 저장 경로
       const filePath = path.join(uploadsDirectory, fileName);
-
       // 파일 저장
       await fs.writeFile(filePath, fileContent);
 
-      return filePath; // 저장된 파일의 경로 반환
+      const relativePath = path.relative(modifiedPath, filePath);
+      console.log('relativePath = ', relativePath);
+      return relativePath; // 저장된 파일의 경로 반환
     } catch (error) {
       throw new Error(`Error uploading file: ${error.message}`);
     }
