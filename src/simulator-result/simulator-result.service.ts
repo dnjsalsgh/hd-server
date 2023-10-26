@@ -680,7 +680,7 @@ export class SimulatorResultService {
     const psResult = await packageSimulatorCallAll(
       packageSimulatorCallRequestObject,
     );
-    // ps에 현재 자동창고, 안착대 상태 보내기 로직 end
+    this.client.send('hyundai/ps/result', psResult).pipe(take(1)).subscribe();
 
     try {
       const bodyResult = psResult.result[0];
@@ -947,9 +947,7 @@ export class SimulatorResultService {
           UldType: true,
         },
         where: {
-          code: apiRequest.UldCode
-            ? ILike(`%${apiRequest.UldCode}%`)
-            : undefined,
+          code: apiRequest.UldCode ? apiRequest.UldCode : undefined,
         },
       });
       // Uld주입하기
