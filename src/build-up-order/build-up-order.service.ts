@@ -18,6 +18,7 @@ import { UldAttribute } from '../uld/entities/uld.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { UldHistory } from '../uld-history/entities/uld-history.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class BuildUpOrderService {
@@ -120,6 +121,9 @@ export class BuildUpOrderService {
         Awb: query.Awb ? Equal(+query.Awb) : undefined,
         createdAt: findDate,
       },
+      order: orderByUtil(query.order),
+      take: query.limit,
+      skip: query.offset,
     });
   }
 

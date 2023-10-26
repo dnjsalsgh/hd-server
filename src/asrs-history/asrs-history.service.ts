@@ -16,6 +16,7 @@ import { AsrsHistory } from './entities/asrs-history.entity';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { TypeOrmExceptionFilter } from '../lib/filter/typeOrmException.filter';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class AsrsHistoryService {
@@ -114,6 +115,9 @@ export class AsrsHistoryService {
         Awb: query.Awb ? Equal(+query.Awb) : undefined,
         createdAt: findDate,
       },
+      order: orderByUtil(query.order),
+      take: query.limit,
+      skip: query.offset,
     });
   }
 
