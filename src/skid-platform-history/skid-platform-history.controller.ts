@@ -53,16 +53,16 @@ export class SkidPlatformHistoryController {
   })
   @Post('/reset')
   resetAsrs() {
-    return this.skidPlatformHistoryService.resetAsrs();
+    return this.skidPlatformHistoryService.resetSkidPlatform();
   }
 
   @ApiOperation({
     summary: '안착대의 이력 삭제',
     description: '안착대의 이력 삭제',
   })
-  @Post('/reset-all')
+  @Delete('/reset-all')
   resetAsrsAll() {
-    return this.skidPlatformHistoryService.resetAsrsAll();
+    return this.skidPlatformHistoryService.resetSkidPlatformAll();
   }
 
   @ApiOperation({

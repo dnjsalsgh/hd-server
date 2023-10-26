@@ -92,7 +92,7 @@ export class AsrsHistoryService {
   async resetAsrsAll() {
     const asrsResult = await this.asrsHistoryRepository.delete({});
 
-    return asrsResult;
+    return '창고가 비었습니다.';
   }
 
   async findAll(query: AsrsHistory & BasicQueryParamDto) {

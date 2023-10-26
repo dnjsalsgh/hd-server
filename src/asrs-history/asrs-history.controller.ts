@@ -64,7 +64,7 @@ export class AsrsHistoryController {
     summary: '창고의 이력 삭제',
     description: '창고의 이력 삭제',
   })
-  @Post('/reset-all')
+  @Delete('/reset-all')
   resetAsrsAll() {
     return this.asrsHistoryService.resetAsrsAll();
   }
