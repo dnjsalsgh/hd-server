@@ -4,12 +4,30 @@ import path from 'path';
 
 @Injectable()
 export class FileService {
+  private readonly currentScriptPath: string;
+  private readonly modifiedPath: string;
+  private readonly uploadsDirectory: string;
+
+  constructor() {
+    this.currentScriptPath = path.dirname(require.resolve('../../src/main.ts'));
+    this.modifiedPath = this.currentScriptPath.replace(/\\src$/, '');
+    this.uploadsDirectory = path.join(this.modifiedPath, 'upload');
+  }
+
+  private async handleError(error: any) {
+    if (error.code === 'ENOENT') {
+      throw new NotFoundException(`File or directory not found`);
+    } else {
+      throw new Error(`Error processing file or directory: ${error.message}`);
+    }
+  }
+
   async readFile(filePath: string): Promise<Buffer> {
     try {
       const fileContent = await fs.readFile(filePath);
       return fileContent;
     } catch (error) {
-      throw new Error(`Error reading file: ${error.message}`);
+      await this.handleError(error);
     }
   }
 
@@ -18,7 +36,7 @@ export class FileService {
       const dir = await fs.readdir(filePath);
       return dir;
     } catch (error) {
-      throw new NotFoundException(`can not found folder${filePath}`);
+      await this.handleError(error);
     }
   }
 
@@ -26,46 +44,21 @@ export class FileService {
     fileContent: Buffer | string,
     fileName: string,
   ): Promise<string> {
-    const currentScriptPath = path.dirname(
-      require.resolve('../../src/main.ts'), // 현재 실행 중인 TypeScript 파일의 경로
-    );
-    const modifiedPath = currentScriptPath.replace(/\\src$/, ''); // '\src' 부분을 빈 문자열로 대체
-    const uploadsDirectory = path.join(modifiedPath, 'upload'); // 내부 서버의 uploads 폴더 경로
-
     try {
       // uploads 폴더가 없으면 생성
-      await fs.mkdir(uploadsDirectory, { recursive: true });
+      await fs.mkdir(this.uploadsDirectory, { recursive: true });
 
       // 파일 저장 경로
-      const filePath = path.join(uploadsDirectory, fileName);
+      const filePath = path.join(this.uploadsDirectory, fileName);
+
       // 파일 저장
       await fs.writeFile(filePath, fileContent);
 
-      const relativePath = path.relative(modifiedPath, filePath);
-      console.log('relativePath = ', relativePath);
-      return relativePath; // 저장된 파일의 경로 반환
+      const relativePath = path.relative(this.modifiedPath, filePath);
+
+      return relativePath; // 저장된 파일의 상대경로 반환(서버의 정적자원 반환을 위해)
     } catch (error) {
-      throw new Error(`Error uploading file: ${error.message}`);
+      await this.handleError(error);
     }
   }
 }
-
-// controller에서 file 업로드 기본 형태
-// @ApiOperation({ summary: '파일 업로드 하기' })
-// @ApiConsumes('multipart/form-data')
-// @ApiBody({
-//   schema: {
-//     type: 'object',
-//     properties: {
-//       file: {
-//         type: 'string',
-//         format: 'binary',
-//       },
-//     },
-//   },
-// })
-// @Post('upload')
-// @UseInterceptors(FileInterceptor('file'))
-// uploadFile(@UploadedFile() file: Express.Multer.File) {
-//   console.log(file);
-// }

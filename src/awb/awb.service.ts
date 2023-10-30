@@ -82,7 +82,7 @@ export class AwbService {
         // [통합 테스트용] dt에 vms create되었다고 알려주기
         this.mqttService.sendMqttMessage(`hyundai/vms1/create`, awbResult);
       }
-      // awb 실시간 데이터를 MQTT로 publish
+      // awb가 생성되었다는 것을 알려주기
       this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
         fileRead: true,
       });
@@ -144,7 +144,7 @@ export class AwbService {
         name: awbDto.barcode,
         FILE_NAME: awbDto.barcode,
         modelPath: process.env.NAS_PATH,
-        FILE_EXTENSION: 'ply',
+        FILE_EXTENSION: 'fbx',
         FILE_SIZE: 0,
         RESULT_TYPE: true,
         waterVolume: awbDto.waterVolume,
@@ -166,7 +166,10 @@ export class AwbService {
       };
       const insertVms2dResult = this.vms2dRepository.save(createVms2Dto);
 
-      await Promise.allSettled([insertVmsResult, insertVms2dResult]);
+      const [vmsResult, vms2dResult] = await Promise.allSettled([
+        insertVmsResult,
+        insertVms2dResult,
+      ]);
 
       // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,
       // 서버 내부적으로 디모아DB에 담긴 vms 파일을 읽어오기
@@ -323,8 +326,6 @@ export class AwbService {
         depth: vms.depth,
         weight: vms.weight,
         state: 'invms',
-        // modelPath: vms.modelPath,
-        // scc: sccResult,
       };
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
@@ -333,7 +334,7 @@ export class AwbService {
           const filePath = await this.fileUpload(vms);
           createAwbDto.modelPath = filePath;
         } catch (error) {
-          throw new NotFoundException(error);
+          // throw new NotFoundException(error); 파일이 없더라도 화물 생성되게
         }
       }
 
@@ -343,7 +344,7 @@ export class AwbService {
           const filePath2d = await this.fileUpload2d(vms2d);
           createAwbDto.path = filePath2d;
         } catch (error) {
-          throw new NotFoundException(error);
+          // throw new NotFoundException(error); 파일이 없더라도 화물 생성되게
         }
       }
 
@@ -366,6 +367,10 @@ export class AwbService {
       }
 
       await queryRunner.commitTransaction();
+
+      // [통합 테스트용] dt에 vms create되었다고 알려주기
+      this.mqttService.sendMqttMessage(`hyundai/vms1/create`, awbResult);
+      return awbResult;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
