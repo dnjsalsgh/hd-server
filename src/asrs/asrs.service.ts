@@ -172,7 +172,7 @@ export class AsrsService {
    * awb와 asrs의 정보를 처리해야함
    * @param body
    */
-  async createByPlcIn(body: CreateAsrsPlcDto) {
+  async checkAsrsChange(body: CreateAsrsPlcDto) {
     for (let unitNumber = 1; unitNumber <= 18; unitNumber++) {
       const unitKey = this.formatUnitNumber(unitNumber);
       const previousState = await this.redisService.get(unitNumber.toString());
@@ -217,8 +217,10 @@ export class AsrsService {
   async processInOut(unitNumber: number, awbNo: string, state: 'in' | 'out') {
     const awb = await this.findAwbByBarcode(awbNo);
     const inOutType = state === 'in' ? 'in' : 'out';
-    await this.recordOperation(unitNumber, awb.id, inOutType);
-    await this.settingRedis(String(unitNumber), state);
+    if (awb && awb.id) {
+      await this.recordOperation(unitNumber, awb?.id, inOutType);
+      await this.settingRedis(String(unitNumber), state);
+    }
   }
 
   async recordOperation(
@@ -226,14 +228,20 @@ export class AsrsService {
     awbId: number,
     inOutType: 'in' | 'out',
   ) {
-    const asrsHistoryBody = {
-      inOutType,
-      count: 0,
-      Asrs: asrsId,
-      Awb: awbId,
-    };
-    await this.asrsHistoryRepository.save(asrsHistoryBody);
-    await this.settingRedis(asrsId.toString(), inOutType);
+    try {
+      const asrsHistoryBody = {
+        inOutType,
+        count: 0,
+        Asrs: asrsId,
+        Awb: awbId,
+      };
+      console.log('asrsHistoryBody = ', asrsHistoryBody);
+      await this.asrsHistoryRepository.save(asrsHistoryBody);
+      await this.settingRedis(asrsId.toString(), inOutType);
+    } catch (error) {
+      console.log(error);
+      // throw new Error(error);
+    }
   }
 
   async settingRedis(key: string, value: string) {
@@ -241,10 +249,16 @@ export class AsrsService {
   }
 
   async findAsrsByName(name: string) {
-    return await this.asrsRepository.findOne({ where: { name: name } });
+    return await this.asrsRepository.findOne({
+      where: { name: name },
+      order: orderByUtil(null),
+    });
   }
 
   async findAwbByBarcode(billNo: string) {
-    return await this.awbRepository.findOne({ where: { barcode: billNo } });
+    return await this.awbRepository.findOne({
+      where: { barcode: billNo },
+      order: orderByUtil(null),
+    });
   }
 }
