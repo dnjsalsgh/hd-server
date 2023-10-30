@@ -235,12 +235,10 @@ export class AsrsService {
         Asrs: asrsId,
         Awb: awbId,
       };
-      console.log('asrsHistoryBody = ', asrsHistoryBody);
       await this.asrsHistoryRepository.save(asrsHistoryBody);
       await this.settingRedis(asrsId.toString(), inOutType);
     } catch (error) {
       console.log(error);
-      // throw new Error(error);
     }
   }
 

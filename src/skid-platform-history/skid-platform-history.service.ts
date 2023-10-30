@@ -7,7 +7,7 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { pipe, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
@@ -18,7 +18,7 @@ import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SkidPlatformHistory } from './entities/skid-platform-history.entity';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
-import { Asrs, AsrsAttribute } from '../asrs/entities/asrs.entity';
+import { AsrsAttribute } from '../asrs/entities/asrs.entity';
 import {
   SkidPlatform,
   SkidPlatformAttribute,
@@ -28,6 +28,7 @@ import {
   AsrsOutOrderAttribute,
 } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { RedisService } from '../redis/redis.service';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -259,7 +260,9 @@ export class SkidPlatformHistoryService {
   async processInOut(unitNumber: number, awbNo: string, state: 'in' | 'out') {
     const awb = await this.findAwbByBarcode(awbNo);
     const inOutType = state === 'in' ? 'in' : 'out';
-    await this.recordOperation(unitNumber, awb.id, inOutType);
+    if (awb && awb.id) {
+      await this.recordOperation(unitNumber, awb.id, inOutType);
+    }
   }
 
   async recordOperation(
@@ -267,14 +270,18 @@ export class SkidPlatformHistoryService {
     awbId: number,
     inOutType: 'in' | 'out',
   ) {
-    const asrsHistoryBody = {
-      inOutType,
-      count: 0,
-      SkidPlatform: SkidPlatformId,
-      Awb: awbId,
-    };
-    await this.skidPlatformHistoryRepository.save(asrsHistoryBody);
-    await this.settingRedis(`p${SkidPlatformId}`, inOutType);
+    try {
+      const asrsHistoryBody = {
+        inOutType,
+        count: 0,
+        SkidPlatform: SkidPlatformId,
+        Awb: awbId,
+      };
+      await this.skidPlatformHistoryRepository.save(asrsHistoryBody);
+      await this.settingRedis(`p${SkidPlatformId}`, inOutType);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async settingRedis(key: string, value: string) {
@@ -282,6 +289,9 @@ export class SkidPlatformHistoryService {
   }
 
   async findAwbByBarcode(billNo: string) {
-    return await this.awbRepository.findOne({ where: { barcode: billNo } });
+    return await this.awbRepository.findOne({
+      where: { barcode: billNo },
+      order: orderByUtil(null),
+    });
   }
 }
