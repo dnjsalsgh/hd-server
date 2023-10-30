@@ -56,7 +56,7 @@ export class FileService {
 
       const relativePath = path.relative(this.modifiedPath, filePath);
 
-      return relativePath; // 저장된 파일의 경로 반환
+      return relativePath; // 저장된 파일의 상대경로 반환(서버의 정적자원 반환을 위해)
     } catch (error) {
       await this.handleError(error);
     }
