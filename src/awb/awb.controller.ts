@@ -77,13 +77,9 @@ export class AwbController {
     summary:
       'vms 입력데이터 저장하기, 디모아, nas에 모델링 파일 들어왔다고 가정',
   })
-  @UseInterceptors(TransactionInterceptor)
   @Post('/integrate')
-  createIntegrate(
-    @Body() createAwbDto: CreateAwbDto,
-    @TransactionManager() queryRunnerManager: EntityManager,
-  ) {
-    return this.awbService.createIntegrate(createAwbDto, queryRunnerManager);
+  createIntegrate(@Body() createAwbDto: CreateAwbDto) {
+    return this.awbService.createIntegrate(createAwbDto);
   }
 
   @ApiOperation({
@@ -276,54 +272,11 @@ export class AwbController {
     return await this.awbService.getAwbByVms2d(1);
   }
 
-  private getDirectory() {
-    const isProduction = this.configService.get<string>('NODE_ENV') === 'pro';
-    return isProduction
-      ? '/var/nas'
-      : this.configService.getOrThrow('NAS_PATH');
-  }
-
   private async createAwbDataInMssql(vms: Vms, vms2d: Vms2d) {
     await this.awbService.createWithMssql(vms, vms2d);
   }
 
   private async sendModelingCompleteSignal() {
     await this.awbService.sendModelingCompleteMqttMessage();
-  }
-
-  private async readFilesInDirectory(directory: string) {
-    return await this.fileService.readFolder(directory);
-  }
-
-  private extractAwbNamesFromFiles(files: string[]) {
-    return files.map((file) => file.split('.')[0]);
-  }
-
-  private async processMissingFiles(directory: string, missingFiles: string[]) {
-    for (const missingFile of missingFiles) {
-      const savedFilePath = path.join(directory, missingFile);
-      const awbName = missingFile.split('.')[0];
-      const fileContent = await this.fileService.readFile(savedFilePath);
-      const pathOfUploadedFile = await this.uploadAndHandleFile(
-        fileContent,
-        missingFile,
-        awbName,
-      );
-    }
-  }
-
-  private async uploadAndHandleFile(
-    fileContent: any,
-    missingFile: string,
-    awbName: string,
-  ) {
-    const localUploadPath =
-      this.configService.getOrThrow('LOCAL_UPLOAD_PATH') + missingFile;
-    return await this.awbService.modelingCompleteToHandlingPath(
-      missingFile,
-      awbName,
-      localUploadPath,
-      fileContent,
-    );
   }
 }

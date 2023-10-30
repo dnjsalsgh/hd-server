@@ -93,6 +93,6 @@ export const SccAttribute = {
   score: true,
   description: true,
   path: true,
-  notTogetherList: true,
+  banList: true,
   createdAt: true,
 };

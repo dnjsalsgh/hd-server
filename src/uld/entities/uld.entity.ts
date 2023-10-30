@@ -20,6 +20,7 @@ import { TimeTable } from '../../time-table/entities/time-table.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
 import { Scc } from '../../scc/entities/scc.entity';
+import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Entity()
 export class Uld {
@@ -85,6 +86,16 @@ export class Uld {
   })
   @ManyToOne(() => UldType, (uldType) => uldType.ulds)
   UldType: Relation<UldType> | number;
+
+  @ApiProperty({
+    example: 1,
+    description: '항공편 FK',
+  })
+  @ManyToOne(
+    () => AircraftSchedule,
+    (aircraftSchedule) => aircraftSchedule.Ulds,
+  )
+  AircraftSchedule?: Relation<AircraftSchedule> | number;
 
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Uld)
   buildUpOrders: Relation<BuildUpOrder[]>;

@@ -292,7 +292,6 @@ export class Awb {
 
 export const AwbAttribute = {
   id: true,
-  // name: true,
   prefab: true,
   waterVolume: true,
   squareVolume: true,

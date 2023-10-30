@@ -46,8 +46,8 @@ export class UldHistoryController {
   }
 
   @ApiOperation({
-    summary: '안착대의 현재 상태를 가져오기',
-    description: '안착대id로 이력의 최신본만 가져오기',
+    summary: 'Uld의 현재 상태를 가져오기',
+    description: 'uld code 로 이력의 최신본만 가져오기',
   })
   @Get('/now')
   StatusOfUld(@Query('uldCode') uldCode: string) {

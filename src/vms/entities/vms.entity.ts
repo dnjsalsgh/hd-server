@@ -20,6 +20,17 @@ export class Vms {
   @Column({ name: 'AWB_NUMBER', type: 'nvarchar', length: 100, nullable: true })
   name: string;
 
+  @ApiProperty({
+    example: '화물-001',
+    description: '화물의 이름',
+  })
+  @Column({
+    name: 'SEPARATION_NUMBER',
+    type: 'int',
+    nullable: true,
+  })
+  separationNumber: boolean;
+
   @Column({ name: 'FILE_NAME', type: 'nvarchar', length: 17, nullable: true })
   FILE_NAME: string;
 

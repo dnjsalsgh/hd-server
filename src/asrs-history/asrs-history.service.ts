@@ -16,6 +16,7 @@ import { AsrsHistory } from './entities/asrs-history.entity';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { TypeOrmExceptionFilter } from '../lib/filter/typeOrmException.filter';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class AsrsHistoryService {
@@ -88,6 +89,12 @@ export class AsrsHistoryService {
     return '창고가 비었습니다.';
   }
 
+  async resetAsrsAll() {
+    const asrsResult = await this.asrsHistoryRepository.delete({});
+
+    return '창고가 비었습니다.';
+  }
+
   async findAll(query: AsrsHistory & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
@@ -114,6 +121,9 @@ export class AsrsHistoryService {
         Awb: query.Awb ? Equal(+query.Awb) : undefined,
         createdAt: findDate,
       },
+      order: orderByUtil(query.order),
+      take: query.limit,
+      skip: query.offset,
     });
   }
 

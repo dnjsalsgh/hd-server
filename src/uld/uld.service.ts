@@ -21,6 +21,7 @@ import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
 import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
 import { ClientProxy } from '@nestjs/microservices';
+import { AircraftScheduleAttributes } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Injectable()
 export class UldService {
@@ -46,7 +47,12 @@ export class UldService {
       throw new NotFoundException(`uldType not found`);
     }
 
-    return await this.uldRepository.save(createUldDto);
+    const createResult = await this.uldRepository.save(createUldDto);
+
+    // uld 생성되면 mqtt로 전송
+    this.client.send(`hyundai/uld/insert`, createResult).subscribe();
+
+    return createResult;
   }
 
   async findAll(query: Uld & BasicQueryParamDto) {
@@ -63,9 +69,11 @@ export class UldService {
     return await this.uldRepository.find({
       select: {
         UldType: UldTypeAttribute,
+        AircraftSchedule: AircraftScheduleAttributes,
       },
       relations: {
         UldType: true,
+        AircraftSchedule: true,
       },
       where: {
         // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
@@ -73,6 +81,9 @@ export class UldService {
         airplaneType: query.airplaneType,
         simulation: query.simulation,
         UldType: query.UldType ? Equal(+query.UldType) : undefined,
+        AircraftSchedule: query.AircraftSchedule
+          ? Equal(+query.AircraftSchedule)
+          : undefined,
         createdAt: findDate,
       },
     });
@@ -83,11 +94,11 @@ export class UldService {
       where: { id: id },
       relations: {
         UldType: true,
-        Scc: true,
+        AircraftSchedule: true,
       },
       select: {
         UldType: UldTypeAttribute,
-        Scc: SccAttribute,
+        AircraftSchedule: AircraftScheduleAttributes,
       },
     });
     return result;

@@ -28,7 +28,7 @@ export class AwbGroupService {
   ) {}
 
   async create(createAwbGroupDto: CreateAwbGroupDto) {
-    const { name, code, awbs } = createAwbGroupDto;
+    const { code, awbs } = createAwbGroupDto;
 
     const queryRunner = await this.dataSource.createQueryRunner();
 
@@ -37,7 +37,6 @@ export class AwbGroupService {
       await queryRunner.startTransaction();
 
       const awbGroupBody: CreateAwbGroupDto = {
-        name: name,
         code: code,
       };
       const awbGroupResult = await queryRunner.manager
@@ -76,7 +75,6 @@ export class AwbGroupService {
     }
     return this.awbGroupRepository.find({
       where: {
-        name: query.name ? ILike(`%${query.name}%`) : undefined,
         code: query.code ? ILike(`%${query.code}%`) : undefined,
         createdAt: findDate,
       },

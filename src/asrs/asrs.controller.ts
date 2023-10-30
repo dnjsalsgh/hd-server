@@ -93,7 +93,7 @@ export class AsrsController {
   })
   @Post('/plc/asrs/test')
   createByPlcIn(@Body() body: CreateAsrsPlcDto) {
-    return this.asrsService.createByPlcIn(body);
+    return this.asrsService.checkAsrsChange(body);
   }
 
   // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
@@ -101,7 +101,8 @@ export class AsrsController {
   @MessagePattern('hyundai/asrs1/data') //구독하는 주제
   createByPlcMatt(@Payload() data) {
     if (data) {
-      // this.asrsService.createByPlcIn(data);
+      this.asrsService.checkAsrsChange(data);
+      this.skidPlatformHistoryService.checkSkidPlatformChange(data);
     }
   }
 }
