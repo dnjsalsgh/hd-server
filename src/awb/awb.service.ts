@@ -367,10 +367,6 @@ export class AwbService {
       }
 
       await queryRunner.commitTransaction();
-
-      // [통합 테스트용] dt에 vms create되었다고 알려주기
-      this.mqttService.sendMqttMessage(`hyundai/vms1/create`, awbResult);
-      return awbResult;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
