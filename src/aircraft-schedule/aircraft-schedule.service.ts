@@ -19,7 +19,11 @@ import {
   AircraftAttribute,
 } from '../aircraft/entities/aircraft.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
+import {
+  Awb,
+  AwbAttribute,
+  AwbSimpleAttribute,
+} from '../awb/entities/awb.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateAircraftScheduleByNameDto } from './dto/create-aircraft-schedule-by-name.dto';
 import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
@@ -170,10 +174,10 @@ export class AircraftScheduleService {
       },
       select: {
         Aircraft: AircraftAttribute,
-        Awbs: AwbAttribute,
+        Awbs: AwbSimpleAttribute,
         Ulds: {
           ...UldAttribute,
-          uldHistories: { ...UldHistoryAttribute, Awb: AwbAttribute },
+          uldHistories: { ...UldHistoryAttribute, Awb: AwbSimpleAttribute },
         },
       },
       where: {
@@ -208,10 +212,10 @@ export class AircraftScheduleService {
       },
       select: {
         Aircraft: AircraftAttribute,
-        Awbs: AwbAttribute,
+        Awbs: AwbSimpleAttribute,
         Ulds: {
           ...UldAttribute,
-          uldHistories: { ...UldHistoryAttribute, Awb: AwbAttribute },
+          uldHistories: { ...UldHistoryAttribute, Awb: AwbSimpleAttribute },
         },
       },
     });
