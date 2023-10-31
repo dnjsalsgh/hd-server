@@ -39,6 +39,13 @@ export class Awb {
   @Column({ type: 'varchar', length: 5000, nullable: false })
   barcode: string;
 
+  // @ApiProperty({
+  //   example: '010101',
+  //   description: '바코드',
+  // })
+  // @Column({ type: 'varchar', length: 5000, nullable: false })
+  // seperateNumber: number;
+
   @ApiProperty({
     example: '3d Model Name',
     description: '생성된 3D 모델링명',
@@ -315,5 +322,21 @@ export const AwbAttribute = {
   rmComment: true,
   localTime: true,
   localInTerminal: true,
+  createdAt: true,
+};
+
+export const AwbSimpleAttribute = {
+  id: true,
+  barcode: true,
+  waterVolume: true,
+  squareVolume: true,
+  width: true,
+  length: true,
+  depth: true,
+  weight: true,
+  destination: true,
+  piece: true,
+  state: true,
+  simulation: true,
   createdAt: true,
 };
