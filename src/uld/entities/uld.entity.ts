@@ -106,11 +106,8 @@ export class Uld {
   @OneToMany(() => SimulatorHistory, (simulatorHistory) => simulatorHistory.Uld)
   simulatorHistories: Relation<SimulatorHistory[]>;
 
-  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.BuildUpOrder)
+  @OneToMany(() => UldHistory, (uldHistory) => uldHistory.Uld)
   uldHistories: Relation<UldHistory[]>;
-
-  // @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.uld)
-  // uldSccJoin: Relation<UldSccJoin[]>;
 
   @ManyToMany(() => Scc, (scc) => scc.Uld, {
     cascade: true,

@@ -25,6 +25,7 @@ import { CreateAircraftScheduleByNameDto } from './dto/create-aircraft-schedule-
 import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
 import { Uld, UldAttribute } from '../uld/entities/uld.entity';
 import { UldType } from '../uld-type/entities/uld-type.entity';
+import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
 
 @Injectable()
 export class AircraftScheduleService {
@@ -161,12 +162,19 @@ export class AircraftScheduleService {
       relations: {
         Aircraft: true,
         Awbs: true,
-        Ulds: true,
+        Ulds: {
+          uldHistories: {
+            Awb: true,
+          },
+        },
       },
       select: {
         Aircraft: AircraftAttribute,
         Awbs: AwbAttribute,
-        Ulds: UldAttribute,
+        Ulds: {
+          ...UldAttribute,
+          uldHistories: { ...UldHistoryAttribute, Awb: AwbAttribute },
+        },
       },
       where: {
         source: source ? ILike(`%${source}%`) : undefined,
@@ -192,12 +200,19 @@ export class AircraftScheduleService {
       relations: {
         Aircraft: true,
         Awbs: true,
-        Ulds: true,
+        Ulds: {
+          uldHistories: {
+            Awb: true,
+          },
+        },
       },
       select: {
         Aircraft: AircraftAttribute,
         Awbs: AwbAttribute,
-        Ulds: UldAttribute,
+        Ulds: {
+          ...UldAttribute,
+          uldHistories: { ...UldHistoryAttribute, Awb: AwbAttribute },
+        },
       },
     });
     this.client.send(`hyundai/aircraftSchedule/find`, result).subscribe();

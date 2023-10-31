@@ -22,6 +22,8 @@ import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { AircraftScheduleAttributes } from '../aircraft-schedule/entities/aircraft-schedule.entity';
+import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
+import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 
 @Injectable()
 export class UldService {
@@ -67,13 +69,17 @@ export class UldService {
       findDate = LessThanOrEqual(createdAtTo);
     }
     return await this.uldRepository.find({
-      select: {
-        UldType: UldTypeAttribute,
-        AircraftSchedule: AircraftScheduleAttributes,
-      },
       relations: {
         UldType: true,
         AircraftSchedule: true,
+        uldHistories: {
+          Awb: true,
+        },
+      },
+      select: {
+        UldType: UldTypeAttribute,
+        AircraftSchedule: AircraftScheduleAttributes,
+        uldHistories: { ...UldHistoryAttribute, Awb: AwbAttribute },
       },
       where: {
         // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
@@ -95,10 +101,14 @@ export class UldService {
       relations: {
         UldType: true,
         AircraftSchedule: true,
+        uldHistories: {
+          Awb: true,
+        },
       },
       select: {
         UldType: UldTypeAttribute,
         AircraftSchedule: AircraftScheduleAttributes,
+        uldHistories: { ...UldHistoryAttribute, Awb: AwbAttribute },
       },
     });
     return result;
