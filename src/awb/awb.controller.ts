@@ -265,6 +265,26 @@ export class AwbController {
     }
   }
 
+  // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
+  @MessagePattern('hyundai/vms1/createFile1') // 구독하는 주제
+  async updateAwbByVmsDB(@Payload() data) {
+    try {
+      const oneVmsData = await this.fetchAwbData();
+      const onVms2dData = await this.fetchAwb2dData();
+
+      if (!oneVmsData || oneVmsData.length === 0 || !oneVmsData.name) {
+        throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
+      }
+
+      await this.createAwbDataInMssql2(oneVmsData, onVms2dData);
+      await this.sendModelingCompleteSignal();
+
+      console.log('Modeling complete');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
   private async fetchAwbData() {
     return await this.awbService.getAwbByVms(1);
   }
@@ -274,6 +294,10 @@ export class AwbController {
 
   private async createAwbDataInMssql(vms: Vms, vms2d: Vms2d) {
     await this.awbService.createWithMssql(vms, vms2d);
+  }
+
+  private async createAwbDataInMssql2(vms: Vms, vms2d: Vms2d) {
+    await this.awbService.createWithMssql2(vms, vms2d);
   }
 
   private async sendModelingCompleteSignal() {

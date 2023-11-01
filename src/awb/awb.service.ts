@@ -174,7 +174,7 @@ export class AwbService {
       // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,
       // 서버 내부적으로 디모아DB에 담긴 vms 파일을 읽어오기
       // 읽어온 vms 파일을 result 형태로 mqtt(hyundai/vms1/create)로 전송
-      await this.mqttService.sendMqttMessage(`hyundai/vms1/createFile`, {});
+      await this.mqttService.sendMqttMessage(`hyundai/vms1/createFile1`, {});
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
@@ -365,6 +365,86 @@ export class AwbService {
         });
         await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
       }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async createWithMssql2(vms: Vms, vms2d: Vms2d) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    try {
+      await queryRunner.startTransaction();
+
+      const createAwbDto: Partial<CreateAwbDto> = {
+        barcode: vms.name,
+        waterVolume: vms.waterVolume,
+        width: vms.width,
+        length: vms.length,
+        depth: vms.depth,
+        weight: vms.weight,
+        state: 'invms',
+      };
+
+      // vms에서 nas 경로를 읽어서 파일 저장하는 부분
+      if (vms && vms.modelPath) {
+        try {
+          const filePath = await this.fileUpload(vms);
+          createAwbDto.modelPath = filePath;
+        } catch (error) {
+          // throw new NotFoundException(error); 파일이 없더라도 화물 생성되게
+        }
+      }
+
+      // vms에서 png 파일을 저장하고 연결하는 부분
+      if (vms2d && vms2d.modelPath) {
+        try {
+          const filePath2d = await this.fileUpload2d(vms2d);
+          createAwbDto.path = filePath2d;
+        } catch (error) {
+          // throw new NotFoundException(error); 파일이 없더라도 화물 생성되게
+        }
+      }
+
+      // 예약되어 있는 awb 찾기
+      const [targetAwb] = await queryRunner.manager.getRepository(Awb).find({
+        where: { barcode: createAwbDto.barcode },
+        order: orderByUtil(null),
+      });
+
+      if (!targetAwb) {
+        this.mqttService.sendMqttMessage(`hyundai/vms1/create`, {
+          data: '예약된 화물이 존재하지 않습니다.',
+        });
+        throw new NotFoundException('예약된 화물이 존재하지 않습니다.');
+      }
+
+      const awbResult = await queryRunner.manager
+        .getRepository(Awb)
+        .update(targetAwb.id, createAwbDto);
+
+      if (vms.Sccs && targetAwb) {
+        const sccResult = await this.sccService.findByNames(
+          vms.Sccs.split(','),
+        );
+        // 5. awb와 scc를 연결해주기 위한 작업
+        const joinParam = sccResult.map((item) => {
+          return {
+            Awb: targetAwb.id,
+            Scc: item.id,
+          };
+        });
+        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+      }
+
+      this.mqttService.sendMqttMessage(`hyundai/vms1/create`, targetAwb);
 
       await queryRunner.commitTransaction();
     } catch (error) {
