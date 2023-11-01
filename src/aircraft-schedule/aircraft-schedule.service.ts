@@ -105,7 +105,7 @@ export class AircraftScheduleService {
           ...UldAttribute,
           uldHistories: {
             ...UldHistoryAttribute,
-            Awb: { ...AwbSimpleAttribute },
+            Awb: { ...AwbSimpleAttribute, Scc: SccAttribute },
           },
         },
       },
