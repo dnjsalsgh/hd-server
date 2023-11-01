@@ -465,14 +465,18 @@ export class AwbService {
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
       if (createAwbDto.modelPath) {
-        const filePath = await this.fileUpload(vms);
-        createAwbDto.modelPath = filePath;
+        try {
+          const filePath = await this.fileUpload(vms);
+          createAwbDto.modelPath = filePath;
+        } catch (e) {}
       }
 
       // vms에서 2d 데이터 파일 저장하는 부분
       if (createAwbDto.path) {
-        const filePath = await this.fileUpload2d(vms2d);
-        createAwbDto.path = filePath;
+        try {
+          const filePath = await this.fileUpload2d(vms2d);
+          createAwbDto.path = filePath;
+        } catch (e) {}
       }
 
       await this.awbRepository.update(
