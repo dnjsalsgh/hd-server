@@ -20,6 +20,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { Uld, UldAttribute } from '../uld/entities/uld.entity';
 import { UldType } from '../uld-type/entities/uld-type.entity';
 import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
+import { SccAttribute } from '../scc/entities/scc.entity';
 
 @Injectable()
 export class AircraftScheduleService {
@@ -86,7 +87,9 @@ export class AircraftScheduleService {
         Awbs: true,
         Ulds: {
           uldHistories: {
-            Awb: true,
+            Awb: {
+              Scc: true,
+            },
           },
         },
       },
@@ -95,7 +98,10 @@ export class AircraftScheduleService {
         Awbs: AwbSimpleAttribute,
         Ulds: {
           ...UldAttribute,
-          uldHistories: { ...UldHistoryAttribute, Awb: AwbSimpleAttribute },
+          uldHistories: {
+            ...UldHistoryAttribute,
+            Awb: { ...AwbSimpleAttribute },
+          },
         },
       },
       where: {
@@ -121,10 +127,10 @@ export class AircraftScheduleService {
       where: { id: id },
       relations: {
         Aircraft: true,
-        Awbs: true,
+        Awbs: { Scc: true },
         Ulds: {
           uldHistories: {
-            Awb: true,
+            Awb: { Scc: true },
           },
         },
       },
@@ -133,7 +139,10 @@ export class AircraftScheduleService {
         Awbs: AwbSimpleAttribute,
         Ulds: {
           ...UldAttribute,
-          uldHistories: { ...UldHistoryAttribute, Awb: AwbSimpleAttribute },
+          uldHistories: {
+            ...UldHistoryAttribute,
+            Awb: { ...AwbSimpleAttribute, Scc: SccAttribute },
+          },
         },
       },
     });
