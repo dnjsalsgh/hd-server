@@ -39,12 +39,12 @@ export class Awb {
   @Column({ type: 'varchar', length: 5000, nullable: false })
   barcode: string;
 
-  // @ApiProperty({
-  //   example: '010101',
-  //   description: '바코드',
-  // })
-  // @Column({ type: 'varchar', length: 5000, nullable: false })
-  // seperateNumber: number;
+  @ApiProperty({
+    example: 0,
+    description: '화물 분리 번호',
+  })
+  @Column({ type: 'int', nullable: false, default: 0 })
+  separateNumber: number;
 
   @ApiProperty({
     example: '3d Model Name',

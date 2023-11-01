@@ -35,6 +35,7 @@ import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { CreateVmsDto } from '../vms/dto/create-vms.dto';
 import { CreateVms2dDto } from '../vms2d/dto/create-vms2d.dto';
 import { HttpExceptionFilter } from '../lib/filter/httpExceptionFilter';
+import { AwbUtilService } from './awbUtil.service';
 
 @Injectable()
 export class AwbService {
@@ -51,6 +52,7 @@ export class AwbService {
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
     private readonly sccService: SccService,
+    private readonly awbUtilService: AwbUtilService,
   ) {}
 
   async create(createAwbDto: CreateAwbDto, queryRunnerManager: EntityManager) {
@@ -141,18 +143,20 @@ export class AwbService {
     try {
       // 서버 내부적으로 body 데이터 기반으로 태스트용 디모아DB에 VMS 생성
       const createVmsDto: CreateVmsDto = {
-        name: awbDto.barcode,
+        AWB_NUMBER: awbDto.barcode,
+        SEPARATION_NO: awbDto.separateNumber,
+        MEASUREMENT_COUNT: 0,
         FILE_NAME: awbDto.barcode,
-        modelPath: process.env.NAS_PATH,
+        VWMS_ID: '',
+        FILE_PATH: process.env.NAS_PATH,
         FILE_EXTENSION: 'fbx',
         FILE_SIZE: 0,
-        RESULT_TYPE: true,
+        RESULT_TYPE: 'C',
         waterVolume: awbDto.waterVolume,
-        width: awbDto.width,
-        length: awbDto.length,
-        depth: awbDto.depth,
-        weight: awbDto.weight,
-        iceWeight: null,
+        WIDTH: awbDto.width,
+        LENGTH: awbDto.length,
+        HEIGHT: awbDto.depth,
+        WEIGHT: awbDto.weight,
         Sccs: scc.join(','),
       };
       const insertVmsResult = this.vmsRepository.save(createVmsDto);
@@ -174,7 +178,7 @@ export class AwbService {
       // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,
       // 서버 내부적으로 디모아DB에 담긴 vms 파일을 읽어오기
       // 읽어온 vms 파일을 result 형태로 mqtt(hyundai/vms1/create)로 전송
-      await this.mqttService.sendMqttMessage(`hyundai/vms1/createFile`, {});
+      await this.mqttService.sendMqttMessage(`hyundai/vms1/createFile1`, {});
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
@@ -319,17 +323,16 @@ export class AwbService {
       await queryRunner.startTransaction();
 
       const createAwbDto: Partial<CreateAwbDto> = {
-        barcode: vms.name,
-        waterVolume: vms.waterVolume,
-        width: vms.width,
-        length: vms.length,
-        depth: vms.depth,
-        weight: vms.weight,
+        barcode: vms.AWB_NUMBER,
+        width: vms.WIDTH,
+        length: vms.LENGTH,
+        depth: vms.HEIGHT,
+        weight: vms.WEIGHT,
         state: 'invms',
       };
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
-      if (vms && vms.modelPath) {
+      if (vms && vms.FILE_PATH) {
         try {
           const filePath = await this.fileUpload(vms);
           createAwbDto.modelPath = filePath;
@@ -339,7 +342,7 @@ export class AwbService {
       }
 
       // vms에서 png 파일을 저장하고 연결하는 부분
-      if (vms2d && vms2d.modelPath) {
+      if (vms2d && vms2d.FILE_PATH) {
         try {
           const filePath2d = await this.fileUpload2d(vms2d);
           createAwbDto.path = filePath2d;
@@ -376,15 +379,55 @@ export class AwbService {
     }
   }
 
+  async createWithMssql2(vms: Vms, vms2d: Vms2d) {
+    const queryRunner = this.awbUtilService.getQueryRunner();
+    await queryRunner.connect();
+
+    try {
+      await queryRunner.startTransaction();
+
+      const awbDto = await this.awbUtilService.prepareAwbDto(vms, vms2d);
+      const existingAwb = await this.awbUtilService.findExistingAwb(
+        queryRunner,
+        awbDto.barcode,
+      );
+
+      if (existingAwb && vms.SEPARATION_NO === 0) {
+        await this.awbUtilService.updateAwb(
+          queryRunner,
+          existingAwb.id,
+          awbDto,
+        );
+      } else {
+        await this.awbUtilService.insertAwb(queryRunner, awbDto);
+      }
+
+      if (vms.Sccs && existingAwb) {
+        await this.awbUtilService.connectAwbWithScc(
+          queryRunner,
+          vms,
+          existingAwb,
+        );
+        await this.awbUtilService.sendMqttMessage(existingAwb);
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await this.awbUtilService.handleError(queryRunner, error);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   /**
    * 누락된 vms를 update하기 위한 로직
    */
   async preventMissingData(vms: Vms, vms2d: Vms2d) {
     try {
       const createAwbDto: Partial<CreateAwbDto> = {
-        barcode: vms.name,
-        modelPath: vms.modelPath,
-        path: vms2d.modelPath,
+        barcode: vms.AWB_NUMBER,
+        modelPath: vms.FILE_PATH,
+        path: vms2d.FILE_PATH,
       };
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
@@ -408,8 +451,8 @@ export class AwbService {
     }
   }
 
-  private async fileUpload(vms: Vms) {
-    const file = `${vms.modelPath}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
+  protected async fileUpload(vms: Vms) {
+    const file = `${vms.FILE_PATH}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
@@ -418,8 +461,8 @@ export class AwbService {
     return fileResult;
   }
 
-  private async fileUpload2d(vms2d: Vms2d) {
-    const file = `${vms2d.modelPath}/${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`;
+  protected async fileUpload2d(vms2d: Vms2d) {
+    const file = `${vms2d.FILE_PATH}/${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
@@ -620,37 +663,6 @@ export class AwbService {
     }
   }
 
-  async modelingCompleteToHandlingPath(
-    fileName: string,
-    awbName: string,
-    filePath: string,
-    fileContent: Buffer,
-  ) {
-    try {
-      const targetAwb = await this.awbRepository.findOne({
-        where: { barcode: awbName, modelPath: null },
-      });
-
-      const pattern = /(obj|ply)/;
-      // png면 path column에 저장
-      if (fileName.includes('png')) {
-        await this.awbRepository.update(targetAwb.id, {
-          path: filePath,
-          state: 'saved',
-        });
-      }
-      // obj면 modelPath column에 저장
-      else if (pattern.test(fileName)) {
-        await this.awbRepository.update(targetAwb.id, {
-          modelPath: filePath,
-          state: 'saved',
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   async sendModelingCompleteMqttMessage() {
     // vms데이터를 받았다는 신호를전송합니다
     // awb실시간 데이터 mqtt로 publish 하기 위함
@@ -682,7 +694,7 @@ export class AwbService {
   async getAwbByVmsByName(name: string) {
     const [result] = await this.vmsRepository.find({
       order: orderByUtil(null),
-      where: { name: name },
+      where: { AWB_NUMBER: name },
     });
     return result;
   }
@@ -698,7 +710,7 @@ export class AwbService {
   async getAwbByVms2dByName(name: string) {
     const [result] = await this.vms2dRepository.find({
       order: orderByUtil(null),
-      where: { name: name },
+      where: { AWB_NUMBER: name },
     });
     return result;
   }

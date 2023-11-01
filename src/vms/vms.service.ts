@@ -38,8 +38,9 @@ export class VmsService {
 
     return await this.vmsRepository.find({
       where: {
-        name: query.name ? ILike(`%${query.name}%`) : undefined,
-        createdAt: findDate,
+        AWB_NUMBER: query.AWB_NUMBER
+          ? ILike(`%${query.AWB_NUMBER}%`)
+          : undefined,
       },
       order: orderByUtil(query.order),
       take: query.limit,
