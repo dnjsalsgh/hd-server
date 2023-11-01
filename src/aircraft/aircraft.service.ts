@@ -12,7 +12,6 @@ import {
   Repository,
 } from 'typeorm';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
-import { UldTypeAttribute } from '../uld-type/entities/uld-type.entity';
 import { AircraftScheduleAttributes } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Injectable()
