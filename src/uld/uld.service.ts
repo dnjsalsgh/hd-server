@@ -19,11 +19,10 @@ import {
 } from '../uld-type/entities/uld-type.entity';
 import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
 import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
-import { SccAttribute } from '../scc/entities/scc.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { AircraftScheduleAttributes } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
-import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
+import { AwbAttribute } from '../awb/entities/awb.entity';
 
 @Injectable()
 export class UldService {
