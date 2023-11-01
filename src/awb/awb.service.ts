@@ -34,7 +34,7 @@ import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { CreateVmsDto } from '../vms/dto/create-vms.dto';
 import { CreateVms2dDto } from '../vms2d/dto/create-vms2d.dto';
-import { HttpExceptionFilter } from '../lib/filter/httpExceptionFilter';
+import { HttpExceptionFilter } from '../lib/filter/httpException.filter';
 import { AwbUtilService } from './awbUtil.service';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 
