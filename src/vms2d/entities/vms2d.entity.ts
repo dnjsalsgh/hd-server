@@ -20,6 +20,17 @@ export class Vms2d {
   @Column({ name: 'AWB_NUMBER', type: 'nvarchar', length: 100, nullable: true })
   name: string;
 
+  @ApiProperty({
+    example: 0,
+    description: '화물 분리 번호',
+  })
+  @Column({
+    name: 'SEPARATION_NO',
+    type: 'int',
+    nullable: true,
+  })
+  separationNumber: boolean;
+
   @Column({ name: 'FILE_NAME', type: 'nvarchar', length: 17, nullable: true })
   FILE_NAME: string;
 

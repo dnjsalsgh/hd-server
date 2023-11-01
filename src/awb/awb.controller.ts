@@ -252,7 +252,7 @@ export class AwbController {
       const oneVmsData = await this.fetchAwbData();
       const onVms2dData = await this.fetchAwb2dData();
 
-      if (!oneVmsData || oneVmsData.length === 0 || !oneVmsData.name) {
+      if (!oneVmsData) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 
@@ -272,7 +272,7 @@ export class AwbController {
       const oneVmsData = await this.fetchAwbData();
       const onVms2dData = await this.fetchAwb2dData();
 
-      if (!oneVmsData || oneVmsData.length === 0 || !oneVmsData.name) {
+      if (!oneVmsData) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 

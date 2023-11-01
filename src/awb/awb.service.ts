@@ -141,18 +141,20 @@ export class AwbService {
     try {
       // 서버 내부적으로 body 데이터 기반으로 태스트용 디모아DB에 VMS 생성
       const createVmsDto: CreateVmsDto = {
-        name: awbDto.barcode,
+        AWB_NUMBER: awbDto.barcode,
+        SEPARATION_NUMBER: awbDto.separateNumber,
+        MEASUREMENT_COUNT: 0,
         FILE_NAME: awbDto.barcode,
-        modelPath: process.env.NAS_PATH,
+        VWMS_ID: '',
+        FILE_PATH: process.env.NAS_PATH,
         FILE_EXTENSION: 'fbx',
         FILE_SIZE: 0,
-        RESULT_TYPE: true,
+        RESULT_TYPE: 'C',
         waterVolume: awbDto.waterVolume,
-        width: awbDto.width,
-        length: awbDto.length,
-        depth: awbDto.depth,
-        weight: awbDto.weight,
-        iceWeight: null,
+        WIDTH: awbDto.width,
+        LENGTH: awbDto.length,
+        HEIGHT: awbDto.depth,
+        WEIGHT: awbDto.weight,
         Sccs: scc.join(','),
       };
       const insertVmsResult = this.vmsRepository.save(createVmsDto);
@@ -319,17 +321,16 @@ export class AwbService {
       await queryRunner.startTransaction();
 
       const createAwbDto: Partial<CreateAwbDto> = {
-        barcode: vms.name,
-        waterVolume: vms.waterVolume,
-        width: vms.width,
-        length: vms.length,
-        depth: vms.depth,
-        weight: vms.weight,
+        barcode: vms.AWB_NUMBER,
+        width: vms.WIDTH,
+        length: vms.LENGTH,
+        depth: vms.HEIGHT,
+        weight: vms.WEIGHT,
         state: 'invms',
       };
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
-      if (vms && vms.modelPath) {
+      if (vms && vms.FILE_PATH) {
         try {
           const filePath = await this.fileUpload(vms);
           createAwbDto.modelPath = filePath;
@@ -352,19 +353,19 @@ export class AwbService {
         .getRepository(Awb)
         .save(createAwbDto);
 
-      if (vms.Sccs && awbResult) {
-        const sccResult = await this.sccService.findByNames(
-          vms.Sccs.split(','),
-        );
-        // 5. awb와 scc를 연결해주기 위한 작업
-        const joinParam = sccResult.map((item) => {
-          return {
-            Awb: awbResult.id,
-            Scc: item.id,
-          };
-        });
-        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
-      }
+      // if (vms.Sccs && awbResult) {
+      //   const sccResult = await this.sccService.findByNames(
+      //     vms.Sccs.split(','),
+      //   );
+      //   // 5. awb와 scc를 연결해주기 위한 작업
+      //   const joinParam = sccResult.map((item) => {
+      //     return {
+      //       Awb: awbResult.id,
+      //       Scc: item.id,
+      //     };
+      //   });
+      //   await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+      // }
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -384,17 +385,17 @@ export class AwbService {
       await queryRunner.startTransaction();
 
       const createAwbDto: Partial<CreateAwbDto> = {
-        barcode: vms.name,
-        waterVolume: vms.waterVolume,
-        width: vms.width,
-        length: vms.length,
-        depth: vms.depth,
-        weight: vms.weight,
+        barcode: vms.AWB_NUMBER,
+        // waterVolume: vms.waterVolume,
+        width: vms.WIDTH,
+        length: vms.LENGTH,
+        depth: vms.HEIGHT,
+        weight: vms.WEIGHT,
         state: 'invms',
       };
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
-      if (vms && vms.modelPath) {
+      if (vms && vms.FILE_PATH) {
         try {
           const filePath = await this.fileUpload(vms);
           createAwbDto.modelPath = filePath;
@@ -430,19 +431,19 @@ export class AwbService {
         .getRepository(Awb)
         .update(targetAwb.id, createAwbDto);
 
-      if (vms.Sccs && targetAwb) {
-        const sccResult = await this.sccService.findByNames(
-          vms.Sccs.split(','),
-        );
-        // 5. awb와 scc를 연결해주기 위한 작업
-        const joinParam = sccResult.map((item) => {
-          return {
-            Awb: targetAwb.id,
-            Scc: item.id,
-          };
-        });
-        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
-      }
+      // if (vms.Sccs && targetAwb) {
+      //   const sccResult = await this.sccService.findByNames(
+      //     vms.Sccs.split(','),
+      //   );
+      //   // 5. awb와 scc를 연결해주기 위한 작업
+      //   const joinParam = sccResult.map((item) => {
+      //     return {
+      //       Awb: targetAwb.id,
+      //       Scc: item.id,
+      //     };
+      //   });
+      //   await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+      // }
 
       this.mqttService.sendMqttMessage(`hyundai/vms1/create`, targetAwb);
 
@@ -462,8 +463,8 @@ export class AwbService {
   async preventMissingData(vms: Vms, vms2d: Vms2d) {
     try {
       const createAwbDto: Partial<CreateAwbDto> = {
-        barcode: vms.name,
-        modelPath: vms.modelPath,
+        barcode: vms.AWB_NUMBER,
+        modelPath: vms.FILE_PATH,
         path: vms2d.modelPath,
       };
 
@@ -489,7 +490,7 @@ export class AwbService {
   }
 
   private async fileUpload(vms: Vms) {
-    const file = `${vms.modelPath}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
+    const file = `${vms.FILE_PATH}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
@@ -762,7 +763,7 @@ export class AwbService {
   async getAwbByVmsByName(name: string) {
     const [result] = await this.vmsRepository.find({
       order: orderByUtil(null),
-      where: { name: name },
+      where: { AWB_NUMBER: name },
     });
     return result;
   }
