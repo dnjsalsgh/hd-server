@@ -37,13 +37,13 @@ export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
       '  "piece": 1,\n' +
       '  "state": "saved",\n' +
       '  "parent": 0,\n' +
-      '  "modelPath": "",\n' +
+      '  "modelPath": null,\n' +
       '  "simulation": true,\n' +
       '  "dataCapacity": 1,\n' +
       '  "flight": "fly",\n' +
       '  "from": "출발지",\n' +
       '  "airportArrival": "공항도착",\n' +
-      '  "path": "/c/file/xxx",\n' +
+      '  "path": null,\n' +
       '  "spawnRatio": 1,\n' +
       '  "description": "배송설명",\n' +
       '  "rmComment": "RM 코멘트",\n' +
