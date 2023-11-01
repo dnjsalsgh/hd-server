@@ -134,6 +134,7 @@ export class AwbController {
   @ApiQuery({ name: 'weight', required: false, type: 'number' })
   @ApiQuery({ name: 'isStructure', required: false, type: 'boolean' })
   @ApiQuery({ name: 'barcode', required: false, type: 'string' })
+  @ApiQuery({ name: 'separateNumber', required: false, type: 'number' })
   @ApiQuery({ name: 'destination', required: false, type: 'string' })
   @ApiQuery({ name: 'source', required: false, type: 'string' })
   @ApiQuery({ name: 'breakDown', required: false, type: 'boolean' })
