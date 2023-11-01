@@ -25,8 +25,6 @@ export class AircraftSchedule {
     example: 'GEN',
     description: '출처',
   })
-  // @IsString()
-  // @MaxLength(5)
   @Column({ type: 'varchar', length: 500, nullable: false, default: 'GEN' })
   source: string;
 

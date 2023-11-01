@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,21 +12,11 @@ import {
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
-  TypeORMError,
 } from 'typeorm';
-import {
-  Aircraft,
-  AircraftAttribute,
-} from '../aircraft/entities/aircraft.entity';
+import { AircraftAttribute } from '../aircraft/entities/aircraft.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import {
-  Awb,
-  AwbAttribute,
-  AwbSimpleAttribute,
-} from '../awb/entities/awb.entity';
+import { Awb, AwbSimpleAttribute } from '../awb/entities/awb.entity';
 import { ClientProxy } from '@nestjs/microservices';
-import { CreateAircraftScheduleByNameDto } from './dto/create-aircraft-schedule-by-name.dto';
-import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
 import { Uld, UldAttribute } from '../uld/entities/uld.entity';
 import { UldType } from '../uld-type/entities/uld-type.entity';
 import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
@@ -34,92 +24,20 @@ import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity'
 @Injectable()
 export class AircraftScheduleService {
   constructor(
-    @InjectRepository(AircraftSchedule)
-    private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-    @Inject('MQTT_SERVICE') private client: ClientProxy,
-    private dataSource: DataSource,
     @InjectRepository(Uld)
     private readonly uldRepository: Repository<Uld>,
     @InjectRepository(UldType)
     private readonly UldTypeRepository: Repository<UldType>,
+    @InjectRepository(AircraftSchedule)
+    private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
+    private dataSource: DataSource,
   ) {}
 
   create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
     return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
-  }
-
-  async createByName(
-    createAircraftScheduleDto: CreateAircraftScheduleByNameDto,
-  ) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      // 1. 항공기 입력
-      const aircraftBody: CreateAircraftDto = {
-        name: createAircraftScheduleDto.name,
-        code: createAircraftScheduleDto.code,
-        info: createAircraftScheduleDto.info,
-        allow: createAircraftScheduleDto.allow,
-        allowDryIce: createAircraftScheduleDto.allowDryIce,
-      };
-      const aircraftResult = await queryRunner.manager
-        .getRepository(Aircraft)
-        .upsert(aircraftBody, ['name']);
-
-      // 2. Uld 입력(항공편 안에 있는 uld 입력)
-      const UldsInAircraftShedule = createAircraftScheduleDto.Ulds;
-      if (UldsInAircraftShedule && UldsInAircraftShedule.length > 0) {
-        // uld가 있다면 동작하게끔 예외처리
-        for (const uld of UldsInAircraftShedule) {
-          // uldType 주입
-          try {
-            const uldTypeCode = uld.UldType as unknown as string;
-            const uldTypeResult = await this.UldTypeRepository.findOne({
-              where: { code: uldTypeCode },
-            });
-            uld.UldType = uldTypeResult.id;
-          } catch (e) {
-            throw new NotFoundException(`uldType not found`);
-          }
-          await queryRunner.manager.getRepository(Uld).save(uld);
-        }
-      }
-
-      // 3. 항공편 입력
-      const aircraftSchedule: CreateAircraftScheduleDto = {
-        code: createAircraftScheduleDto.code,
-        source: createAircraftScheduleDto.source,
-        localDepartureTime: createAircraftScheduleDto.localDepartureTime,
-        koreaArrivalTime: createAircraftScheduleDto.koreaArrivalTime,
-        workStartTime: createAircraftScheduleDto.workStartTime,
-        workCompleteTargetTime:
-          createAircraftScheduleDto.workCompleteTargetTime,
-        koreaDepartureTime: createAircraftScheduleDto.koreaDepartureTime,
-        localArrivalTime: createAircraftScheduleDto.localArrivalTime,
-        waypoint: createAircraftScheduleDto.waypoint,
-        Aircraft: aircraftResult.identifiers[0]?.id,
-        destination: createAircraftScheduleDto.destination,
-        departure: createAircraftScheduleDto.departure,
-      };
-
-      const airScheduleResult = await queryRunner.manager
-        .getRepository(AircraftSchedule)
-        .save(aircraftSchedule);
-
-      await queryRunner.commitTransaction();
-      return airScheduleResult;
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      await queryRunner.release();
-
-      throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
-    }
   }
 
   async createWithAwbs(createAircraftScheduleDto: CreateAircraftScheduleDto) {
