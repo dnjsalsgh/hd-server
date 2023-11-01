@@ -7,7 +7,7 @@ import * as dotenv from 'dotenv';
 import { MqttService } from '../mqtt.service';
 import { ApiOperation } from '@nestjs/swagger';
 import { checkPsServer } from '../lib/util/axios.util';
-import { HttpExceptionFilter } from '../lib/filter/httpExceptionFilter';
+import { HttpExceptionFilter } from '../lib/filter/httpException.filter';
 
 dotenv.config();
 

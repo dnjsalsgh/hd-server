@@ -3,7 +3,7 @@ import { MqttController } from './mqtt.controller';
 import { MqttService } from './mqtt.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import * as dotenv from 'dotenv';
-import { OutboundResponseSerializer } from './lib/filter/OutboundResposeSerializer';
+import { OutboundResponseSerializer } from './lib/filter/outBoundResposeSerializer.filter';
 import process from 'process';
 
 dotenv.config();
