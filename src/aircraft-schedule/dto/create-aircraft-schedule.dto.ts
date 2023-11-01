@@ -1,8 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { AircraftSchedule } from '../entities/aircraft-schedule.entity';
 import { Awb } from '../../awb/entities/awb.entity';
-import { CreateAwbWithAircraftDto } from '../../awb/dto/create-awb-with-aircraft.dto';
-import { CreateAwbDto } from '../../awb/dto/create-awb.dto';
 
 export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
   'code',
@@ -37,13 +35,13 @@ export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
       '  "piece": 1,\n' +
       '  "state": "saved",\n' +
       '  "parent": 0,\n' +
-      '  "modelPath": "",\n' +
+      '  "modelPath": null,\n' +
       '  "simulation": true,\n' +
       '  "dataCapacity": 1,\n' +
       '  "flight": "fly",\n' +
       '  "from": "출발지",\n' +
       '  "airportArrival": "공항도착",\n' +
-      '  "path": "/c/file/xxx",\n' +
+      '  "path": null,\n' +
       '  "spawnRatio": 1,\n' +
       '  "description": "배송설명",\n' +
       '  "rmComment": "RM 코멘트",\n' +
@@ -57,25 +55,4 @@ export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
     description: '입력된 화물들',
   })
   Awbs?: Awb[];
-
-  // @ApiProperty({
-  //   example: 'GEN',
-  //   description: '출처',
-  // })
-  // source: string;
-  // @ApiProperty({
-  //   example: '4',
-  //   description: '항공기 FK',
-  // })
-  // Aircraft: Aircraft;
-  // @ApiProperty({
-  //   example: '31',
-  //   description: '공통코드 FK',
-  // })
-  // CcIdDestination: CommonCode;
-  // @ApiProperty({
-  //   example: '1',
-  //   description: '항공기Id',
-  // })
-  // aircraft: number;
 }

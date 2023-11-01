@@ -386,12 +386,14 @@ export class AwbService {
     try {
       await queryRunner.startTransaction();
 
+      // vms에서 온 데이터 세팅
       const awbDto = await this.awbUtilService.prepareAwbDto(vms, vms2d);
       const existingAwb = await this.awbUtilService.findExistingAwb(
         queryRunner,
         awbDto.barcode,
       );
 
+      // 예약된 화물(separateNO가 0이라 가정)은 awb에 저장되어 있으니 update, 그 외에는 insert
       if (existingAwb && vms.SEPARATION_NO === 0) {
         await this.awbUtilService.updateAwb(
           queryRunner,
@@ -494,6 +496,7 @@ export class AwbService {
         weight: query.weight,
         isStructure: query.isStructure,
         barcode: query.barcode ? ILike(`%${query.barcode}%`) : undefined,
+        separateNumber: query.separateNumber,
         destination: query.destination,
         source: query.source,
         breakDown: query.breakDown,

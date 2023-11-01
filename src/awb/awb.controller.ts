@@ -134,6 +134,7 @@ export class AwbController {
   @ApiQuery({ name: 'weight', required: false, type: 'number' })
   @ApiQuery({ name: 'isStructure', required: false, type: 'boolean' })
   @ApiQuery({ name: 'barcode', required: false, type: 'string' })
+  @ApiQuery({ name: 'separateNumber', required: false, type: 'number' })
   @ApiQuery({ name: 'destination', required: false, type: 'string' })
   @ApiQuery({ name: 'source', required: false, type: 'string' })
   @ApiQuery({ name: 'breakDown', required: false, type: 'boolean' })
@@ -242,7 +243,7 @@ export class AwbController {
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
   async createByPlcMatt(@Payload() data) {
     // vms 데이터 mqtt로 publish 하기 위함
-    // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
+    this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
   // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거

@@ -1,10 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { AircraftSchedule } from '../entities/aircraft-schedule.entity';
-import { Awb } from '../../awb/entities/awb.entity';
-import { CreateAwbWithAircraftDto } from '../../awb/dto/create-awb-with-aircraft.dto';
-import { CreateAwbDto } from '../../awb/dto/create-awb.dto';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
-import { Column } from 'typeorm';
 import { Uld } from '../../uld/entities/uld.entity';
 
 export class CreateAircraftScheduleByNameDto extends PickType(
@@ -20,9 +16,6 @@ export class CreateAircraftScheduleByNameDto extends PickType(
     'waypoint',
     'destination',
     'departure',
-    // 'Aircraft',
-    // 'CcIdDestination',
-    // 'CcIdDeparture',
   ],
 ) {
   @ApiProperty({
@@ -75,25 +68,4 @@ export class CreateAircraftScheduleByNameDto extends PickType(
     description: '입력된 화물들',
   })
   Ulds?: Uld[];
-
-  // @ApiProperty({
-  //   example: 'GEN',
-  //   description: '출처',
-  // })
-  // source: string;
-  // @ApiProperty({
-  //   example: '4',
-  //   description: '항공기 FK',
-  // })
-  // Aircraft: Aircraft;
-  // @ApiProperty({
-  //   example: '31',
-  //   description: '공통코드 FK',
-  // })
-  // CcIdDestination: CommonCode;
-  // @ApiProperty({
-  //   example: '1',
-  //   description: '항공기Id',
-  // })
-  // aircraft: number;
 }

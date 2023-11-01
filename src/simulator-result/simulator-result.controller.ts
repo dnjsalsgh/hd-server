@@ -42,18 +42,11 @@ export class SimulatorResultController {
     return this.simulatorResultService.create(createSimulatorResultDto);
   }
 
-  // @ApiOperation({
-  //   summary: '패키지 시뮬레이터를 사용해서 asrs, uld 작업지시 만들기',
-  // })
-  // @Post('/make-order/with/ps')
-  // createOrderByPs(@Body() body: PsApiRequest) {
-  //   return this.simulatorResultService.createOrderByResult(body);
-  // }
-
   @ApiOperation({
-    summary: '[4개가 채워진 후 1개 뽑고 싶을 때] uld 작업지시 만들기',
+    summary:
+      '[userSelect, 4개가 채워진 후 1개 뽑고 싶을 때] uld 작업지시 만들기',
     description:
-      'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
+      '[userSelect] UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
   @ApiBody({ type: userSelectInput })
   @UseInterceptors(TransactionInterceptor)
@@ -70,7 +63,7 @@ export class SimulatorResultController {
 
   @ApiOperation({
     summary:
-      '[최초에 안착대 4개 다 비어있을 시] asrs작업지시 만들기, build-up-order 같이만들기 ',
+      '[ps 최초에 안착대 4개 다 비어있을 시] asrs작업지시 만들기, build-up-order 같이만들기 ',
     description:
       'UldCode: uld의 코드, simulation: 시뮬레이션=ture, 커넥티드=false',
   })
@@ -127,7 +120,7 @@ export class SimulatorResultController {
   }
 
   @ApiOperation({
-    summary: 'ps input',
+    summary: 'ps input 파라미터',
     description: 'ps input',
   })
   @ApiBody({ type: PsAllRequest })

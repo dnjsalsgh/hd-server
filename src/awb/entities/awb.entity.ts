@@ -338,5 +338,6 @@ export const AwbSimpleAttribute = {
   piece: true,
   state: true,
   simulation: true,
+  Scc: true,
   createdAt: true,
 };
