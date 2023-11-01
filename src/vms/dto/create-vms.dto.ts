@@ -1,6 +1,6 @@
 export class CreateVmsDto {
   AWB_NUMBER: string;
-  SEPARATION_NUMBER: number;
+  SEPARATION_NO: number;
   MEASUREMENT_COUNT: number;
   FILE_NAME: string;
   VWMS_ID: string;

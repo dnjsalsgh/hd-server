@@ -13,6 +13,7 @@ import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { Basic } from '../basic/entities/basic.entity';
+import { AwbUtilService } from './awbUtil.service';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { Basic } from '../basic/entities/basic.entity';
     MqttModule,
   ],
   controllers: [AwbController],
-  providers: [AwbService, FileService, MqttService, SccService],
+  providers: [AwbService, AwbUtilService, FileService, MqttService, SccService],
 })
 export class AwbModule {}
