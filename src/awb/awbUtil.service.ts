@@ -5,14 +5,18 @@ import { CreateAwbDto } from './dto/create-awb.dto';
 import { Awb } from './entities/awb.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
-import { DataSource, TypeORMError } from 'typeorm';
+import { DataSource, In, Repository, TypeORMError } from 'typeorm';
 import { FileService } from '../file/file.service';
 import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
+import { Scc } from '../scc/entities/scc.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AwbUtilService {
   constructor(
+    @InjectRepository(Scc)
+    private readonly sccRepository: Repository<Scc>,
     private dataSource: DataSource,
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
@@ -105,5 +109,21 @@ export class AwbUtilService {
 
   getQueryRunner() {
     return this.dataSource.createQueryRunner();
+  }
+  async findSccByCodeList(sccList: string[]) {
+    return this.sccRepository.find({
+      where: { code: In(sccList) },
+    });
+  }
+
+  createAwbSccJoinParams(awbId: number, sccResult: Scc[]) {
+    return sccResult.map((item) => ({
+      Awb: awbId,
+      Scc: item.id,
+    }));
+  }
+
+  async saveAwbSccJoin(queryRunner, joinParam) {
+    return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
   }
 }

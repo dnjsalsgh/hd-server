@@ -36,6 +36,7 @@ import { CreateVmsDto } from '../vms/dto/create-vms.dto';
 import { CreateVms2dDto } from '../vms2d/dto/create-vms2d.dto';
 import { HttpExceptionFilter } from '../lib/filter/httpExceptionFilter';
 import { AwbUtilService } from './awbUtil.service';
+import { InjectionSccDto } from './dto/injection-scc.dto';
 
 @Injectable()
 export class AwbService {
@@ -132,6 +133,36 @@ export class AwbService {
         fileRead: true,
       });
       return awbResult;
+    } catch (error) {
+      throw new TypeORMError(`rollback Working - ${error}`);
+    }
+  }
+
+  async injectionScc(
+    awbId: number,
+    body: InjectionSccDto,
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
+    try {
+      if (body.Sccs && body.Sccs.length <= 0) {
+        throw new NotFoundException('Sccs가 존재하지 않습니다.');
+      }
+      const sccList = body.Sccs;
+
+      const sccResult = await this.awbUtilService.findSccByCodeList(sccList);
+
+      const joinParam = this.awbUtilService.createAwbSccJoinParams(
+        awbId,
+        sccResult,
+      );
+
+      const joinResult = await this.awbUtilService.saveAwbSccJoin(
+        queryRunner,
+        joinParam,
+      );
+
+      return joinResult;
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }

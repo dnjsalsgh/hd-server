@@ -41,6 +41,7 @@ import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager } from 'typeorm';
 import { Vms } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
+import { InjectionSccDto } from './dto/injection-scc.dto';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -123,6 +124,20 @@ export class AwbController {
     @TransactionManager() queryRunnerManager: EntityManager,
   ) {
     return this.awbService.breakDownById(awbId, body, queryRunnerManager);
+  }
+
+  @ApiOperation({
+    summary: 'scc 주입',
+    description: '존재하는 화물에 scc를 주입',
+  })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/injection/:awbId')
+  injectionScc(
+    @Param('awbId', ParseIntPipe) awbId: number,
+    @Body() body: InjectionSccDto,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.awbService.injectionScc(awbId, body, queryRunnerManager);
   }
 
   @ApiQuery({ name: 'prefab', required: false, type: 'string' })
