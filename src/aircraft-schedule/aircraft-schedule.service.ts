@@ -18,7 +18,10 @@ import { orderByUtil } from '../lib/util/orderBy.util';
 import { Awb, AwbSimpleAttribute } from '../awb/entities/awb.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { Uld, UldAttribute } from '../uld/entities/uld.entity';
-import { UldType } from '../uld-type/entities/uld-type.entity';
+import {
+  UldType,
+  UldTypeAttribute,
+} from '../uld-type/entities/uld-type.entity';
 import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
 
@@ -86,6 +89,7 @@ export class AircraftScheduleService {
         Aircraft: true,
         Awbs: true,
         Ulds: {
+          UldType: true,
           uldHistories: {
             Awb: {
               Scc: true,
@@ -97,6 +101,7 @@ export class AircraftScheduleService {
         Aircraft: AircraftAttribute,
         Awbs: AwbSimpleAttribute,
         Ulds: {
+          UldType: UldTypeAttribute,
           ...UldAttribute,
           uldHistories: {
             ...UldHistoryAttribute,
@@ -129,6 +134,8 @@ export class AircraftScheduleService {
         Aircraft: true,
         Awbs: { Scc: true },
         Ulds: {
+          UldType: true,
+
           uldHistories: {
             Awb: { Scc: true },
           },
@@ -138,6 +145,7 @@ export class AircraftScheduleService {
         Aircraft: AircraftAttribute,
         Awbs: AwbSimpleAttribute,
         Ulds: {
+          UldType: UldTypeAttribute,
           ...UldAttribute,
           uldHistories: {
             ...UldHistoryAttribute,
