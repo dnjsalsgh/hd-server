@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'VWMS_3D_RESULT_DATA' })
-export class Vms {
+export class Vms3D {
   @PrimaryGeneratedColumn()
   id: number;
 

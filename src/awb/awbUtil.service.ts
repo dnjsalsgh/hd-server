@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Vms } from '../vms/entities/vms.entity';
+import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { Awb } from './entities/awb.entity';
@@ -23,7 +23,7 @@ export class AwbUtilService {
     private readonly sccService: SccService,
   ) {}
 
-  async prepareAwbDto(vms: Vms, vms2d: Vms2d) {
+  async prepareAwbDto(vms: Vms3D, vms2d: Vms2d) {
     const awbDto: Partial<CreateAwbDto> = {
       barcode: vms.AWB_NUMBER,
       separateNumber: vms.SEPARATION_NO,
@@ -87,7 +87,7 @@ export class AwbUtilService {
     throw new TypeORMError(`rollback Working - ${error}`);
   }
 
-  protected async fileUpload(vms: Vms) {
+  protected async fileUpload(vms: Vms3D) {
     const file = `${vms.FILE_PATH}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(

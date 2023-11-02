@@ -18,7 +18,7 @@ import { Scc } from '../scc/entities/scc.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { FileService } from '../file/file.service';
 import { AwbService } from '../awb/awb.service';
-import { Vms } from '../vms/entities/vms.entity';
+import { Vms3D } from '../vms/entities/vms.entity';
 import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { Basic } from '../basic/entities/basic.entity';
@@ -65,7 +65,7 @@ import { AwbUtilService } from '../awb/awbUtil.service';
       Scc,
       Basic,
     ]),
-    TypeOrmModule.forFeature([Hacs, Vms, Vms2d], 'mssqlDB'),
+    TypeOrmModule.forFeature([Hacs, Vms3D, Vms2d], 'mssqlDB'),
     MulterModule.register({ dest: './upload' }),
   ],
   providers: [

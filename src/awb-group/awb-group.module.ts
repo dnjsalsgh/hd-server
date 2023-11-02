@@ -11,7 +11,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { MqttModule } from '../mqtt.module';
 import { FileService } from '../file/file.service';
 import { SccService } from '../scc/scc.service';
-import { Vms } from '../vms/entities/vms.entity';
+import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { Basic } from '../basic/entities/basic.entity';
 import { AwbUtilService } from '../awb/awbUtil.service';
@@ -19,7 +19,7 @@ import { AwbUtilService } from '../awb/awbUtil.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([AwbGroup, Awb, AwbSccJoin, Scc, Basic]),
-    TypeOrmModule.forFeature([Vms, Vms2d], 'mssqlDB'),
+    TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
     MulterModule.register({ dest: './upload' }),
     // mqtt 모듈설정
     MqttModule,

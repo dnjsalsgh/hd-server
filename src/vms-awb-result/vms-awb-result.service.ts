@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { CreateVmsAwbResultDto } from './dto/create-vms-awb-result.dto';
+import { UpdateVmsAwbResultDto } from './dto/update-vms-awb-result.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Vms3D } from './entities/vms.entity';
+import { Vms3D } from '../vms/entities/vms.entity';
 import {
   Between,
   FindOperator,
@@ -9,22 +11,23 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { CreateVmsDto } from './dto/create-vms.dto';
+import { CreateVmsDto } from '../vms/dto/create-vms.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import { VmsAwbResult } from './entities/vms-awb-result.entity';
 
 @Injectable()
-export class VmsService {
+export class VmsAwbResultService {
   constructor(
-    @InjectRepository(Vms3D, 'mssqlDB')
-    private readonly vmsRepository: Repository<Vms3D>,
+    @InjectRepository(VmsAwbResult, 'mssqlDB')
+    private readonly vmsAwbResultRepository: Repository<VmsAwbResult>,
   ) {}
 
-  create(createVmsDto: CreateVmsDto) {
-    return this.vmsRepository.save(createVmsDto);
+  create(CreateVmsAwbResultDto: CreateVmsAwbResultDto) {
+    return this.vmsAwbResultRepository.save(CreateVmsAwbResultDto);
   }
 
-  async findAll(query: Vms3D & BasicQueryParamDto) {
+  async findAll(query: VmsAwbResult & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -36,7 +39,7 @@ export class VmsService {
       findDate = LessThanOrEqual(createdAtTo);
     }
 
-    return await this.vmsRepository.find({
+    return await this.vmsAwbResultRepository.find({
       where: {
         AWB_NUMBER: query.AWB_NUMBER
           ? ILike(`%${query.AWB_NUMBER}%`)
@@ -49,7 +52,7 @@ export class VmsService {
   }
 
   async findOne(id: number) {
-    const result = await this.vmsRepository.findOne({
+    const result = await this.vmsAwbResultRepository.findOne({
       where: { id: id },
     });
     return result;
