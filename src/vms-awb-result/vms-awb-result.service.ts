@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { CreateVmsAwbResultDto } from './dto/create-vms-awb-result.dto';
+import { UpdateVmsAwbResultDto } from './dto/update-vms-awb-result.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Vms3D } from '../vms/entities/vms.entity';
 import {
   Between,
   FindOperator,
@@ -8,23 +11,23 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
+import { CreateVmsDto } from '../vms/dto/create-vms.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { Vms2d } from './entities/vms2d.entity';
-import { CreateVms2dDto } from './dto/create-vms2d.dto';
+import { VmsAwbResult } from './entities/vms-awb-result.entity';
 
 @Injectable()
-export class Vms2dService {
+export class VmsAwbResultService {
   constructor(
-    @InjectRepository(Vms2d, 'mssqlDB')
-    private readonly vms2dRepository: Repository<Vms2d>,
+    @InjectRepository(VmsAwbResult, 'mssqlDB')
+    private readonly vmsAwbResultRepository: Repository<VmsAwbResult>,
   ) {}
 
-  create(createVmsDto: CreateVms2dDto) {
-    return this.vms2dRepository.save(createVmsDto);
+  create(CreateVmsAwbResultDto: CreateVmsAwbResultDto) {
+    return this.vmsAwbResultRepository.save(CreateVmsAwbResultDto);
   }
 
-  async findAll(query: Vms2d & BasicQueryParamDto) {
+  async findAll(query: VmsAwbResult & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
     let findDate: FindOperator<Date>;
@@ -36,7 +39,7 @@ export class Vms2dService {
       findDate = LessThanOrEqual(createdAtTo);
     }
 
-    return await this.vms2dRepository.find({
+    return await this.vmsAwbResultRepository.find({
       where: {
         AWB_NUMBER: query.AWB_NUMBER
           ? ILike(`%${query.AWB_NUMBER}%`)
@@ -49,7 +52,7 @@ export class Vms2dService {
   }
 
   async findOne(id: number) {
-    const result = await this.vms2dRepository.findOne({
+    const result = await this.vmsAwbResultRepository.findOne({
       where: { id: id },
     });
     return result;

@@ -1,15 +1,8 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'VWMS_3D_RESULT_DATA' })
-export class Vms {
+export class Vms3D {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -18,28 +11,55 @@ export class Vms {
     description: '화물의 이름',
   })
   @Column({ name: 'AWB_NUMBER', type: 'nvarchar', length: 100, nullable: true })
-  name: string;
+  AWB_NUMBER: string;
 
   @ApiProperty({
-    example: '화물-001',
-    description: '화물의 이름',
+    example: 0,
+    description: '화물 분리 번호',
   })
   @Column({
-    name: 'SEPARATION_NUMBER',
+    name: 'SEPARATION_NO',
     type: 'int',
     nullable: true,
   })
-  separationNumber: boolean;
+  SEPARATION_NO: number;
 
+  @ApiProperty({
+    example: 0,
+    description: '측정 횟수',
+  })
+  @Column({
+    name: 'MEASUREMENT_COUNT',
+    type: 'int',
+    nullable: true,
+  })
+  MEASUREMENT_COUNT: number;
+
+  @ApiProperty({
+    example: '',
+    description: '파일 명',
+  })
   @Column({ name: 'FILE_NAME', type: 'nvarchar', length: 17, nullable: true })
   FILE_NAME: string;
+
+  @ApiProperty({
+    example: 0,
+    description: '설비ID',
+  })
+  @Column({
+    name: 'VWMS_ID',
+    type: 'nvarchar',
+    length: 20,
+    nullable: true,
+  })
+  VWMS_ID: string;
 
   @ApiProperty({
     example: '',
     description: '모델파일 경로',
   })
   @Column({ name: 'FILE_PATH', type: 'nvarchar', length: 1024, nullable: true })
-  modelPath: string;
+  FILE_PATH: string;
 
   @Column({
     name: 'FILE_EXTENSION',
@@ -58,52 +78,93 @@ export class Vms {
 
   @Column({
     name: 'RESULT_TYPE',
-    type: 'bit',
+    type: 'varchar',
+    length: 2,
     nullable: true,
   })
-  RESULT_TYPE: boolean;
-
-  @ApiProperty({
-    example: 1.0,
-    description: '워터볼륨',
-  })
-  @Column({ type: 'float', nullable: true })
-  waterVolume: number;
-
-  @ApiProperty({
-    example: 1.0,
-    description: '폭(x)',
-  })
-  @Column({ name: 'WIDTH', type: 'float', nullable: true })
-  width: number;
+  RESULT_TYPE: string;
 
   @ApiProperty({
     example: 1.0,
     description: '높이(y)',
   })
   @Column({ name: 'LENGTH', type: 'float', nullable: true })
-  length: number;
+  LENGTH: number;
+
+  @ApiProperty({
+    example: 1.0,
+    description: '폭(x)',
+  })
+  @Column({ name: 'WIDTH', type: 'float', nullable: true })
+  WIDTH: number;
 
   @ApiProperty({
     example: 1.0,
     description: '깊이(z)',
   })
   @Column({ name: 'HEIGHT', type: 'float', nullable: true })
-  depth: number;
+  HEIGHT: number;
 
   @ApiProperty({
     example: 1.0,
     description: '중량',
   })
   @Column({ name: 'WEIGHT', type: 'float', nullable: true })
-  weight: number;
+  WEIGHT: number;
 
   @ApiProperty({
-    example: 1.0,
-    description: '얼음무개',
+    example: 'F',
+    description: '측정상태',
   })
-  @Column({ type: 'int', nullable: true })
-  iceWeight: number;
+  @Column({ name: 'STATUS', type: 'text', nullable: true })
+  STATUS: string;
+
+  @ApiProperty({
+    example: 100,
+    description: '측정률',
+  })
+  @Column({
+    name: 'STATUS_RATE',
+    type: 'int',
+    nullable: true,
+  })
+  STATUS_RATE: number;
+
+  @ApiProperty({
+    example: '100',
+    description: '측정 상태 메시지',
+  })
+  @Column({
+    name: 'STATUS_DESC',
+    type: 'nvarchar',
+    length: 1000,
+    nullable: true,
+  })
+  STATUS_DESC: string;
+
+  @ApiProperty({
+    example: '100',
+    description: '생성자',
+  })
+  @Column({
+    name: 'CREATE_USER_ID',
+    type: 'varchar',
+    length: 10,
+    nullable: true,
+  })
+  CREATE_USER_ID: string;
+
+  @ApiProperty({
+    example: '100',
+    description: '생성일자',
+  })
+  @Column({
+    name: 'CREATE_DATE',
+    type: 'varchar',
+    length: 14,
+    nullable: true,
+  })
+  CREATE_DATE: string;
 
   // scc가 string으로 들어오는대신 ,로 구분되어진다고 가정
   @ApiProperty({
@@ -112,13 +173,4 @@ export class Vms {
   })
   @Column({ type: 'varchar', length: 500, nullable: true })
   Sccs: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date | null;
 }

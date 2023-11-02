@@ -43,19 +43,6 @@ export class AircraftScheduleController {
     );
   }
 
-  // @ApiOperation({
-  //   summary: '항공편에 항공기, 출발지, 도착지를 name으로 생성하기',
-  //   description: ' awb 없어도 됨',
-  // })
-  // @Post('/use/name')
-  // async createByName(
-  //   @Body() createAircraftScheduleDto: CreateAircraftScheduleByNameDto,
-  // ) {
-  //   return await this.aircraftScheduleService.createByName(
-  //     createAircraftScheduleDto,
-  //   );
-  // }
-
   @ApiQuery({ name: 'Aircraft', required: false, type: 'number' })
   @ApiQuery({ name: 'destination', required: false, type: 'string' })
   @ApiQuery({ name: 'departure', required: false, type: 'string' })

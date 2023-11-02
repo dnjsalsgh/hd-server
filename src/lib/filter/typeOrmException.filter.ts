@@ -2,6 +2,13 @@ import { Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { QueryFailedError, TypeORMError } from 'typeorm';
 
+/*
+  @Catch(TypeORMError)은
+  db의 통신 예외를 캐치하겠다는 뜻입니다.
+  만약 모든 예외를 캐치하고 싶다면
+
+  @Catch()로 적용하시면 됩니다.
+*/
 @Catch(TypeORMError)
 export class TypeOrmExceptionFilter extends BaseExceptionFilter {
   catch(exception: QueryFailedError | TypeORMError, host: ArgumentsHost) {

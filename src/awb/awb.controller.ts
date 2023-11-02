@@ -39,8 +39,9 @@ import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager } from 'typeorm';
-import { Vms } from '../vms/entities/vms.entity';
+import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
+import { InjectionSccDto } from './dto/injection-scc.dto';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -125,6 +126,20 @@ export class AwbController {
     return this.awbService.breakDownById(awbId, body, queryRunnerManager);
   }
 
+  @ApiOperation({
+    summary: 'scc 주입',
+    description: '존재하는 화물에 scc를 주입',
+  })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/injection/:awbId')
+  injectionScc(
+    @Param('awbId', ParseIntPipe) awbId: number,
+    @Body() body: InjectionSccDto,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.awbService.injectionScc(awbId, body, queryRunnerManager);
+  }
+
   @ApiQuery({ name: 'prefab', required: false, type: 'string' })
   @ApiQuery({ name: 'waterVolume', required: false, type: 'number' })
   @ApiQuery({ name: 'squareVolume', required: false, type: 'number' })
@@ -134,6 +149,7 @@ export class AwbController {
   @ApiQuery({ name: 'weight', required: false, type: 'number' })
   @ApiQuery({ name: 'isStructure', required: false, type: 'boolean' })
   @ApiQuery({ name: 'barcode', required: false, type: 'string' })
+  @ApiQuery({ name: 'separateNumber', required: false, type: 'number' })
   @ApiQuery({ name: 'destination', required: false, type: 'string' })
   @ApiQuery({ name: 'source', required: false, type: 'string' })
   @ApiQuery({ name: 'breakDown', required: false, type: 'boolean' })
@@ -242,7 +258,7 @@ export class AwbController {
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
   async createByPlcMatt(@Payload() data) {
     // vms 데이터 mqtt로 publish 하기 위함
-    // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
+    this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
   // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
@@ -252,11 +268,31 @@ export class AwbController {
       const oneVmsData = await this.fetchAwbData();
       const onVms2dData = await this.fetchAwb2dData();
 
-      if (!oneVmsData || oneVmsData.length === 0 || !oneVmsData.name) {
+      if (!oneVmsData) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 
       await this.createAwbDataInMssql(oneVmsData, onVms2dData);
+      await this.sendModelingCompleteSignal();
+
+      console.log('Modeling complete');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
+  @MessagePattern('hyundai/vms1/createFile1') // 구독하는 주제
+  async updateAwbByVmsDB(@Payload() data) {
+    try {
+      const oneVmsData = await this.fetchAwbData();
+      const onVms2dData = await this.fetchAwb2dData();
+
+      if (!oneVmsData) {
+        throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
+      }
+
+      await this.createAwbDataInMssql2(oneVmsData, onVms2dData);
       await this.sendModelingCompleteSignal();
 
       console.log('Modeling complete');
@@ -272,8 +308,12 @@ export class AwbController {
     return await this.awbService.getAwbByVms2d(1);
   }
 
-  private async createAwbDataInMssql(vms: Vms, vms2d: Vms2d) {
+  private async createAwbDataInMssql(vms: Vms3D, vms2d: Vms2d) {
     await this.awbService.createWithMssql(vms, vms2d);
+  }
+
+  private async createAwbDataInMssql2(vms: Vms3D, vms2d: Vms2d) {
+    await this.awbService.createWithMssql2(vms, vms2d);
   }
 
   private async sendModelingCompleteSignal() {

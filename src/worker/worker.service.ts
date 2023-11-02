@@ -39,7 +39,7 @@ export class WorkerService {
   })
   // 3d 모델 누락 스케줄러
   async missingAWBModelingFileHandlingLogic() {
-    if (this.configService.get<string>('SCHEDULE') === 'true') {
+    if (this.configService.get<string>('LOCAL_SCHEDULE') === 'true') {
       const missingAwbs = await this.awbService.getAwbNotCombineModelPath();
 
       for (const missingAwb of missingAwbs) {

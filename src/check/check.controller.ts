@@ -2,21 +2,19 @@ import { Controller, Get, Inject, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
-import { Vms } from '../vms/entities/vms.entity';
+import { Vms3D } from '../vms/entities/vms.entity';
 import * as dotenv from 'dotenv';
 import { MqttService } from '../mqtt.service';
 import { ApiOperation } from '@nestjs/swagger';
 import { checkPsServer } from '../lib/util/axios.util';
-import { HttpExceptionFilter } from '../lib/filter/httpExceptionFilter';
-
-dotenv.config();
+import { HttpExceptionFilter } from '../lib/filter/httpException.filter';
 
 @Controller('check')
 export class CheckController {
   constructor(
     @Inject('MQTT_SERVICE') private mqttClient: ClientProxy,
-    @InjectRepository(Vms, 'mssqlDB')
-    private readonly vmsRepository: Repository<Vms>,
+    @InjectRepository(Vms3D, 'mssqlDB')
+    private readonly vmsRepository: Repository<Vms3D>,
     private readonly mqttService: MqttService,
     private readonly dataSource: DataSource,
   ) {}

@@ -1,4 +1,4 @@
-  version: '3.9' # Docker Compose 버전 (필요에 따라 변경 가능)
+version: '3.9' # Docker Compose 버전 (필요에 따라 변경 가능)
 
 services:
   mssql:
@@ -99,7 +99,9 @@ services:
       dockerfile: Dockerfile
     environment:
       NODE_ENV: ${NODE_ENV}
-      SCHEDULE: 'true'
+      SCHEDULE: 'true' # 도커에서 돌가는 amr스케줄 실행 조건
+      IF_ACTIVE: 'true' # 도커에서 돌가는 asrs 데이터 수집 실행 조건
+      LOCAL_SCHEDULE: 'false' # 로컬에서 돌아가는 nas 파일 업로드 실행조건
       DATABASE_HOST: ${DATABASE_HOST} # Use host.docker.internal to refer to the host machine's IP
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USER: ${DATABASE_USER}

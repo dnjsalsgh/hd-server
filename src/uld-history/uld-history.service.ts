@@ -91,9 +91,7 @@ export class UldHistoryService {
     return result;
   }
 
-  /**
-   * uld 이력에서 uld_id를 기준으로 최신 안착대의 상태만 가져옴
-   */
+  // uld 이력에서 uld_id를 기준으로 최신 안착대의 상태만 가져옴
   async nowState(uldCode: string) {
     const targetUld = await this.uldRepository.findOne({
       where: { code: uldCode },

@@ -40,6 +40,13 @@ export class Awb {
   barcode: string;
 
   @ApiProperty({
+    example: 0,
+    description: '화물 분리 번호',
+  })
+  @Column({ type: 'int', nullable: false, default: 0 })
+  separateNumber: number;
+
+  @ApiProperty({
     example: '3d Model Name',
     description: '생성된 3D 모델링명',
   })
@@ -315,5 +322,22 @@ export const AwbAttribute = {
   rmComment: true,
   localTime: true,
   localInTerminal: true,
+  createdAt: true,
+};
+
+export const AwbSimpleAttribute = {
+  id: true,
+  barcode: true,
+  waterVolume: true,
+  squareVolume: true,
+  width: true,
+  length: true,
+  depth: true,
+  weight: true,
+  destination: true,
+  piece: true,
+  state: true,
+  simulation: true,
+  Scc: true,
   createdAt: true,
 };

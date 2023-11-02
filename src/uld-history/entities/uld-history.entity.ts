@@ -102,3 +102,14 @@ export class UldHistory {
   @ManyToOne(() => Awb, (awb) => awb.uldHistories)
   Awb: Relation<Awb> | number;
 }
+
+export const UldHistoryAttribute = {
+  id: true,
+  x: true,
+  y: true,
+  z: true,
+  pieceCount: true,
+  recommend: true,
+  worker: true,
+  createdAt: true,
+};
