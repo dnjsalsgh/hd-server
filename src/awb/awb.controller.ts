@@ -5,7 +5,6 @@ import {
   Get,
   Inject,
   NotFoundException,
-  OnModuleInit,
   Param,
   ParseIntPipe,
   Post,
@@ -30,11 +29,9 @@ import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
-import path from 'path';
 import console from 'console';
 import { ConfigService } from '@nestjs/config';
 import { take } from 'rxjs';
-import { findDuplicates } from '../lib/util/usefull.util';
 import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 import { TransactionManager } from '../lib/decorator/transaction.decorator';

@@ -37,6 +37,7 @@ import { CreateVms2dDto } from '../vms2d/dto/create-vms2d.dto';
 import { HttpExceptionFilter } from '../lib/filter/httpException.filter';
 import { AwbUtilService } from './awbUtil.service';
 import { InjectionSccDto } from './dto/injection-scc.dto';
+import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 
 @Injectable()
 export class AwbService {
@@ -49,6 +50,8 @@ export class AwbService {
     private readonly vmsRepository: Repository<Vms3D>,
     @InjectRepository(Vms2d, 'mssqlDB')
     private readonly vms2dRepository: Repository<Vms2d>,
+    @InjectRepository(VmsAwbResult, 'mssqlDB')
+    private readonly vmsAwbResultRepository: Repository<VmsAwbResult>,
     private dataSource: DataSource,
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
@@ -437,6 +440,7 @@ export class AwbService {
         await this.awbUtilService.insertAwb(queryRunner, awbDto);
       }
 
+      // TODO vms3d 테이블에서 scc가 오지 않습니다. VWVMS_AWB_RESULT 테이블에서 화물의 이름을 가지고 scc를 가져와야 합니다.
       if (vms.Sccs && existingAwb) {
         await this.awbUtilService.connectAwbWithScc(
           queryRunner,
