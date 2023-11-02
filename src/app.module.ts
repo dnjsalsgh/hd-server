@@ -38,7 +38,11 @@ import { CheckModule } from './check/check.module';
 import { AlarmModule } from './alarm/alarm.module';
 import { AwbReturnModule } from './awb-return/awb-return.module';
 
-import { mssqlConfig, postgresConfig } from './config/db.config';
+import {
+  mssqlConfig,
+  mssqlVmsConfig,
+  postgresConfig,
+} from './config/db.config';
 import { RedisModule } from './redis/redis.module';
 import { Vms2dModule } from './vms2d/vms2d.module';
 import { BasicModule } from './basic/basic.module';
@@ -57,6 +61,7 @@ import { BasicModule } from './basic/basic.module';
         return postgresConfig;
       },
     }),
+
     // MSSQL 연결 설정
     TypeOrmModule.forRootAsync({
       name: 'mssqlDB',
@@ -64,6 +69,15 @@ import { BasicModule } from './basic/basic.module';
         return mssqlConfig;
       },
     }),
+
+    // TODO vms 업체의 mssql 접근 옵션을 받아야함
+    // VWMS_AWB_RESULT mssql 연결 설정
+    // TypeOrmModule.forRootAsync({
+    //   name: 'mssqlVmsDB',
+    //   useFactory: async () => {
+    //     return mssqlVmsConfig;
+    //   },
+    // }),
 
     AmrModule,
     AmrChargerModule,
