@@ -46,6 +46,7 @@ import {
 import { RedisModule } from './redis/redis.module';
 import { Vms2dModule } from './vms2d/vms2d.module';
 import { BasicModule } from './basic/basic.module';
+import { VmsAwbResultModule } from './vms-awb-result/vms-awb-result.module';
 
 @Module({
   imports: [
@@ -103,8 +104,12 @@ import { BasicModule } from './basic/basic.module';
     AircraftScheduleModule,
     CommonCodeModule,
     AwbGroupModule,
+
     // mssql의 vms 테이블 설정
     VmsModule,
+    Vms2dModule,
+    VmsAwbResultModule,
+
     // mqtt 모듈설정
     MqttModule,
 
@@ -122,7 +127,6 @@ import { BasicModule } from './basic/basic.module';
     AlarmModule,
     AwbReturnModule,
     WorkerModule,
-    Vms2dModule,
     BasicModule,
   ],
   controllers: [AppController],
