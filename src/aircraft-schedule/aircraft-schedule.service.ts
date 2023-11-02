@@ -47,6 +47,7 @@ export class AircraftScheduleService {
     this.client
       .send(`hyundai/aircraftSchedule/insert`, insertResult)
       .subscribe();
+    return insertResult;
   }
 
   async createWithAwbs(createAircraftScheduleDto: CreateAircraftScheduleDto) {
