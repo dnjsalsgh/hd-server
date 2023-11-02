@@ -40,8 +40,13 @@ export class AircraftScheduleService {
     private dataSource: DataSource,
   ) {}
 
-  create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
-    return this.aircraftScheduleRepository.save(createAircraftScheduleDto);
+  async create(createAircraftScheduleDto: CreateAircraftScheduleDto) {
+    const insertResult = await this.aircraftScheduleRepository.save(
+      createAircraftScheduleDto,
+    );
+    this.client
+      .send(`hyundai/aircraftSchedule/insert`, insertResult)
+      .subscribe();
   }
 
   async createWithAwbs(createAircraftScheduleDto: CreateAircraftScheduleDto) {
