@@ -15,11 +15,12 @@ import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { Basic } from '../basic/entities/basic.entity';
 import { AwbUtilService } from '../awb/awbUtil.service';
+import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AwbGroup, Awb, AwbSccJoin, Scc, Basic]),
-    TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
+    TypeOrmModule.forFeature([Vms3D, Vms2d, VmsAwbResult], 'mssqlDB'),
     MulterModule.register({ dest: './upload' }),
     // mqtt 모듈설정
     MqttModule,
