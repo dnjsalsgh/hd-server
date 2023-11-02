@@ -24,7 +24,7 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
 import { CommonCode } from '../common-code/entities/common-code.entity';
 import { AwbGroup } from '../awb-group/entities/awb-group.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { Vms } from '../vms/entities/vms.entity';
+import { Vms3D } from '../vms/entities/vms.entity';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { Alarm } from '../alarm/entities/alarm.entity';
 import { AwbReturn } from '../awb-return/entities/awb-return.entity';
@@ -83,7 +83,7 @@ const mssqlConfig: TypeOrmModuleOptions = {
   username: process.env.MSSQL_DATABASE_USER,
   password: process.env.MSSQL_DATABASE_PASS,
   database: process.env.MSSQL_DATABASE_NAME,
-  entities: [Vms, Vms2d, CommonCode, Hacs],
+  entities: [Vms3D, Vms2d, CommonCode, Hacs],
   synchronize: process.env.NODE_ENV === 'dev', // 개발 환경에서만 사용하거나 자동 마이그레이션을 사용하지 않을 경우 false로 변경
   options: { trustServerCertificate: true },
   logging: false,

@@ -27,7 +27,7 @@ import { CreateAircraftScheduleDto } from '../aircraft-schedule/dto/create-aircr
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
-import { Vms } from '../vms/entities/vms.entity';
+import { Vms3D } from '../vms/entities/vms.entity';
 import { CreateAwbWithAircraftDto } from '../awb/dto/create-awb-with-aircraft.dto';
 import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
@@ -45,8 +45,8 @@ export class AwbService {
     private readonly awbRepository: Repository<Awb>,
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
-    @InjectRepository(Vms, 'mssqlDB')
-    private readonly vmsRepository: Repository<Vms>,
+    @InjectRepository(Vms3D, 'mssqlDB')
+    private readonly vmsRepository: Repository<Vms3D>,
     @InjectRepository(Vms2d, 'mssqlDB')
     private readonly vms2dRepository: Repository<Vms2d>,
     private dataSource: DataSource,
@@ -347,7 +347,7 @@ export class AwbService {
   }
 
   // mssql에서 vms 정보를 가져와서 등록하기 위한 메서드
-  async createWithMssql(vms: Vms, vms2d: Vms2d) {
+  async createWithMssql(vms: Vms3D, vms2d: Vms2d) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
@@ -412,7 +412,7 @@ export class AwbService {
   }
 
   // [예약된 화물] 상황일 때 vms에서 온 데이터 중 처음은 update, 분리된 화물은 insert 하기 위한 메서드
-  async createWithMssql2(vms: Vms, vms2d: Vms2d) {
+  async createWithMssql2(vms: Vms3D, vms2d: Vms2d) {
     const queryRunner = this.awbUtilService.getQueryRunner();
     await queryRunner.connect();
 
@@ -455,7 +455,7 @@ export class AwbService {
   }
 
   // 누락된 vms를 update하기 위한 로직
-  async preventMissingData(vms: Vms, vms2d: Vms2d) {
+  async preventMissingData(vms: Vms3D, vms2d: Vms2d) {
     try {
       const createAwbDto: Partial<CreateAwbDto> = {
         barcode: vms.AWB_NUMBER,
@@ -489,7 +489,7 @@ export class AwbService {
   }
 
   // vms의 3d 모델링 db의 파일 경로로 파일 업로드 하는 메서드
-  protected async fileUpload(vms: Vms) {
+  protected async fileUpload(vms: Vms3D) {
     const file = `${vms.FILE_PATH}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(

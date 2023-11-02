@@ -39,7 +39,7 @@ import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager } from 'typeorm';
-import { Vms } from '../vms/entities/vms.entity';
+import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 
@@ -308,11 +308,11 @@ export class AwbController {
     return await this.awbService.getAwbByVms2d(1);
   }
 
-  private async createAwbDataInMssql(vms: Vms, vms2d: Vms2d) {
+  private async createAwbDataInMssql(vms: Vms3D, vms2d: Vms2d) {
     await this.awbService.createWithMssql(vms, vms2d);
   }
 
-  private async createAwbDataInMssql2(vms: Vms, vms2d: Vms2d) {
+  private async createAwbDataInMssql2(vms: Vms3D, vms2d: Vms2d) {
     await this.awbService.createWithMssql2(vms, vms2d);
   }
 

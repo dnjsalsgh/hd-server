@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
-import { Vms } from './entities/vms.entity';
+import { Vms3D } from './entities/vms.entity';
 import { VmsService } from './vms.service';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateVmsDto } from './dto/create-vms.dto';
@@ -22,7 +22,7 @@ export class VmsController {
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
   @Get()
-  findAll(@Query() query: Vms & BasicQueryParamDto) {
+  findAll(@Query() query: Vms3D & BasicQueryParamDto) {
     return this.vmsService.findAll(query);
   }
 }
