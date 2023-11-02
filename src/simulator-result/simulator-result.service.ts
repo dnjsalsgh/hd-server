@@ -591,17 +591,23 @@ export class SimulatorResultService {
       // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
       // ps에 보낼 Awb 정보들 모아두는 배열
       const Awbs = [];
+      console.time('asrs setting part');
       this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
+      console.timeEnd('asrs setting part');
 
       // ps에 보낼 Uld정보를 모아두는
       const Ulds = [];
+      console.time('uld setting part');
       await this.setUldStateByUldCode(apiRequest, Ulds);
+      console.timeEnd('uld setting part');
       if (Ulds.length <= 0)
         throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
 
       // 안착대 현재 상황 묶음
       const palletRack = [];
+      console.time('skidPlatform setting part');
       this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+      console.timeEnd('skidPlatform setting part');
 
       // uld의 현재 상황 묶음
       const currentAWBsInULD = [];
@@ -615,9 +621,11 @@ export class SimulatorResultService {
         palletRack: palletRack,
       };
 
+      console.time('ps Call part');
       const psResult = await getAWBinPalletRack(
         packageSimulatorCallRequestObject,
       );
+      console.timeEnd('ps Call part');
 
       // 안착대 추천도 결과를 mqtt에 전송
       this.client
