@@ -30,6 +30,7 @@ import { Alarm } from '../alarm/entities/alarm.entity';
 import { AwbReturn } from '../awb-return/entities/awb-return.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
+import process from 'process';
 
 const postgresConfig: TypeOrmModuleOptions = {
   // PostgreSQL 연결 설정...
@@ -68,7 +69,7 @@ const postgresConfig: TypeOrmModuleOptions = {
     AwbReturn,
   ],
   // autoLoadEntities: true,  [버그있어서 사용 지양]
-  logging: false, // 쿼리 보여주는 옵션
+  logging: process.env.LOGGING === 'true', // 쿼리 보여주는 옵션
   synchronize: process.env.NODE_ENV === 'dev', // dev 환경일 때만 true
   namingStrategy: new SnakeNamingStrategy(), // db column을 snake_case로 변경
   useUTC: false,

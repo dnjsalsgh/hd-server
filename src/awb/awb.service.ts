@@ -38,6 +38,7 @@ import { HttpExceptionFilter } from '../lib/filter/httpException.filter';
 import { AwbUtilService } from './awbUtil.service';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
+import { CreateVmsAwbResultDto } from '../vms-awb-result/dto/create-vms-awb-result.dto';
 
 @Injectable()
 export class AwbService {
@@ -192,7 +193,7 @@ export class AwbService {
         LENGTH: awbDto.length,
         HEIGHT: awbDto.depth,
         WEIGHT: awbDto.weight,
-        Sccs: scc.join(','),
+        // Sccs: scc.join(','),
       };
       const insertVmsResult = this.vmsRepository.save(createVmsDto);
       const createVms2Dto: CreateVms2dDto = {
@@ -205,9 +206,18 @@ export class AwbService {
       };
       const insertVms2dResult = this.vms2dRepository.save(createVms2Dto);
 
-      const [vmsResult, vms2dResult] = await Promise.allSettled([
+      // scc 테이블 넣는 작업
+      const createVmsAwbResult: Partial<CreateVmsAwbResultDto> = {
+        AWB_NUMBER: awbDto.barcode,
+        SPCL_CGO_CD_INFO: scc ? scc.join(',') : null,
+      };
+      const insertVmsAwbResultResult =
+        this.vmsAwbResultRepository.save(createVmsAwbResult);
+
+      const [vmsResult, vms2dResult, vmsAwbResult] = await Promise.allSettled([
         insertVmsResult,
         insertVms2dResult,
+        insertVmsAwbResultResult,
       ]);
 
       // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,
@@ -414,16 +424,18 @@ export class AwbService {
     }
   }
 
-  // [예약된 화물] 상황일 때 vms에서 온 데이터 중 처음은 update, 분리된 화물은 insert 하기 위한 메서드
-  async createWithMssql2(vms: Vms3D, vms2d: Vms2d) {
+  // vms에서 온 데이터 중 처음은 update, 분리된 화물은 insert 하기 위한 메서드
+  async createWithMssql2(vms: Vms3D, vms2d: Vms2d, sccData: VmsAwbResult) {
     const queryRunner = this.awbUtilService.getQueryRunner();
     await queryRunner.connect();
 
     try {
+      let awbIdInDb: number;
       await queryRunner.startTransaction();
 
       // vms에서 온 데이터 세팅
       const awbDto = await this.awbUtilService.prepareAwbDto(vms, vms2d);
+
       const existingAwb = await this.awbUtilService.findExistingAwb(
         queryRunner,
         awbDto.barcode,
@@ -431,23 +443,28 @@ export class AwbService {
 
       // 예약된 화물(separateNO가 0이라 가정)은 awb에 저장되어 있으니 update, 그 외에는 insert
       if (existingAwb && vms.SEPARATION_NO === 0) {
-        await this.awbUtilService.updateAwb(
+        awbIdInDb = await this.awbUtilService.updateAwb(
           queryRunner,
           existingAwb.id,
           awbDto,
         );
       } else {
-        await this.awbUtilService.insertAwb(queryRunner, awbDto);
+        const insertedAwb = await this.awbUtilService.insertAwb(
+          queryRunner,
+          awbDto,
+        );
+        awbIdInDb = insertedAwb.id;
       }
 
-      // TODO vms3d 테이블에서 scc가 오지 않습니다. VWVMS_AWB_RESULT 테이블에서 화물의 이름을 가지고 scc를 가져와야 합니다.
-      if (vms.Sccs && existingAwb) {
+      // scc 테이블에서 가져온 데이터를 입력
+      if (sccData && awbIdInDb) {
         await this.awbUtilService.connectAwbWithScc(
           queryRunner,
-          vms,
-          existingAwb,
+          sccData.SPCL_CGO_CD_INFO,
+          awbIdInDb,
         );
-        await this.awbUtilService.sendMqttMessage(existingAwb);
+        const Awb = await this.findOne(awbIdInDb);
+        await this.awbUtilService.sendMqttMessage(Awb);
       }
 
       await queryRunner.commitTransaction();
@@ -775,6 +792,15 @@ export class AwbService {
       take: 1,
     });
     return awbResult;
+  }
+
+  // awbNumber로 scc 테이블에 있는 정보 가져오기
+  async getSccByAwbNumber(name: string) {
+    const [result] = await this.vmsAwbResultRepository.find({
+      order: orderByUtil(null),
+      where: { AWB_NUMBER: name },
+    });
+    return result;
   }
 
   /**

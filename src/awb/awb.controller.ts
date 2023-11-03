@@ -39,6 +39,7 @@ import { EntityManager } from 'typeorm';
 import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { InjectionSccDto } from './dto/injection-scc.dto';
+import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -289,7 +290,9 @@ export class AwbController {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 
-      await this.createAwbDataInMssql2(oneVmsData, onVms2dData);
+      const sccData = await this.fetchSccData(oneVmsData);
+
+      await this.createAwbDataInMssql2(oneVmsData, onVms2dData, sccData);
       await this.sendModelingCompleteSignal();
 
       console.log('Modeling complete');
@@ -304,13 +307,21 @@ export class AwbController {
   private async fetchAwb2dData() {
     return await this.awbService.getAwbByVms2d(1);
   }
+  private async fetchSccData(vms: Vms3D) {
+    const AWB_NUMBER = vms.AWB_NUMBER;
+    return await this.awbService.getSccByAwbNumber(AWB_NUMBER);
+  }
 
   private async createAwbDataInMssql(vms: Vms3D, vms2d: Vms2d) {
     await this.awbService.createWithMssql(vms, vms2d);
   }
 
-  private async createAwbDataInMssql2(vms: Vms3D, vms2d: Vms2d) {
-    await this.awbService.createWithMssql2(vms, vms2d);
+  private async createAwbDataInMssql2(
+    vms: Vms3D,
+    vms2d: Vms2d,
+    sccData: VmsAwbResult,
+  ) {
+    await this.awbService.createWithMssql2(vms, vms2d, sccData);
   }
 
   private async sendModelingCompleteSignal() {
