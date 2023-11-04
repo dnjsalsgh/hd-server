@@ -19,5 +19,5 @@ export class CreateVmsDto {
   CREATE_DATE?: string;
   // 테스트용
   waterVolume: number;
-  Sccs: string;
+  Sccs?: string;
 }

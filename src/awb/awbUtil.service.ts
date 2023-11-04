@@ -51,7 +51,7 @@ export class AwbUtilService {
     return awbDto;
   }
 
-  async findExistingAwb(queryRunner, barcode) {
+  async findExistingAwb(queryRunner, barcode: string): Promise<Awb> {
     const [existingAwb] = await queryRunner.manager.getRepository(Awb).find({
       where: { barcode: barcode },
       order: orderByUtil(null),
@@ -60,24 +60,30 @@ export class AwbUtilService {
     return existingAwb;
   }
 
-  async updateAwb(queryRunner, id, awbDto) {
-    return queryRunner.manager.getRepository(Awb).update(id, awbDto);
+  async updateAwb(queryRunner, id, awbDto): Promise<number> {
+    await queryRunner.manager.getRepository(Awb).update(id, awbDto);
+    return id;
   }
 
-  async insertAwb(queryRunner, awbDto) {
-    return queryRunner.manager.getRepository(Awb).save(awbDto);
+  async insertAwb(queryRunner, awbDto): Promise<Awb> {
+    const insertedAwbResult = await queryRunner.manager
+      .getRepository(Awb)
+      .save(awbDto);
+    return insertedAwbResult;
   }
 
-  async connectAwbWithScc(queryRunner, vms, existingAwb) {
-    const sccResult = await this.sccService.findByNames(vms.Sccs.split(','));
-    const joinParam = sccResult.map((item) => ({
-      Awb: existingAwb.id,
-      Scc: item.id,
-    }));
-    return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+  async connectAwbWithScc(queryRunner, sccData: string, awbId: number) {
+    if (sccData) {
+      const sccResult = await this.sccService.findByNames(sccData.split(','));
+      const joinParam = sccResult.map((item) => ({
+        Awb: awbId,
+        Scc: item.id,
+      }));
+      return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+    }
   }
 
-  async sendMqttMessage(existingAwb) {
+  async sendMqttMessage(existingAwb: any) {
     return this.mqttService.sendMqttMessage(`hyundai/vms1/create`, existingAwb);
   }
 
@@ -110,6 +116,7 @@ export class AwbUtilService {
   getQueryRunner() {
     return this.dataSource.createQueryRunner();
   }
+
   async findSccByCodeList(sccList: string[]) {
     return this.sccRepository.find({
       where: { code: In(sccList) },
