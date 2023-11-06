@@ -3,8 +3,8 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
-  HttpStatus,
 } from '@nestjs/common';
+import { sendSlackMessage } from '../util/axios.util';
 
 /*
   @Catch(HttpException)은
@@ -46,6 +46,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message: err.message ?? exception.message, // class-validator가 발생시킨 에러, 내가 발생시킨 error
     };
 
+    const slackMessage = {
+      fallback: 'Http Error',
+
+      text: exception,
+      pretext: 'httpException.filter.ts 에서 나오는 에러입니다.',
+
+      color: 'warning', // 'good', 'warning', 'danger' 또는 16진수 색상 코드 중 하나일 수 있습니다.
+
+      // 메시지의 테이블에 필드가 표시됩니다.
+      fields: [
+        {
+          title: '에러 입니다.', // 제목에 태그가 포함되어 있지 않을 수 있으며 자동으로 이스케이프됩니다,
+          value: JSON.stringify(json),
+          short: false, // `value`가 다른 값과 나란히 표시될 정도로 짧은지를 나타내는 옵션 플래그
+        },
+      ],
+    };
+    sendSlackMessage(slackMessage);
     response.status(status).json(json);
   }
 }
