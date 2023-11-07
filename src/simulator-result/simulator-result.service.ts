@@ -64,6 +64,7 @@ import { UldHistory } from '../uld-history/entities/uld-history.entity';
 import { UserSelectResult } from './dto/user-select-output';
 import { AWBGroupResult } from './dto/ps-output.dto';
 import { PsAllRequest } from './dto/ps-all-input.dto';
+import { PsAllResponse, PsAllResult } from './dto/ps-all-output.dto';
 
 @Injectable()
 export class SimulatorResultService {

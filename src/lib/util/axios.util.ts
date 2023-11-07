@@ -4,6 +4,7 @@ import { PsApiResponse } from '../../simulator-result/dto/ps-output.dto';
 import { HttpException } from '@nestjs/common';
 import { userSelectOutput } from '../../simulator-result/dto/user-select-output';
 import { awbInPalletRackResult } from '../../simulator-result/dto/get-Awb-in-palletPack.dto';
+import { PsAllResponse } from '../../simulator-result/dto/ps-all-output.dto';
 
 export const checkPsServer = async (): Promise<PsApiResponse> => {
   try {
