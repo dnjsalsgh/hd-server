@@ -197,9 +197,9 @@ export class AwbService {
       };
       const insertVmsResult = this.vmsRepository.save(createVmsDto);
       const createVms2Dto: CreateVms2dDto = {
-        name: awbDto.barcode,
+        AWB_NUMBER: awbDto.barcode,
         FILE_NAME: awbDto.barcode,
-        modelPath: process.env.NAS_PATH_2D,
+        FILE_PATH: process.env.NAS_PATH_2D,
         FILE_EXTENSION: 'png',
         FILE_SIZE: 0,
         CREATE_USER_ID: '',

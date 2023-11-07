@@ -118,12 +118,4 @@ export class Vms2d {
     nullable: true,
   })
   CREATE_DATE: string;
-
-  // scc가 string으로 들어오는대신 ,로 구분되어진다고 가정
-  @ApiProperty({
-    example: ['REG', 'GEN'],
-    description: 'scc들',
-  })
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  Sccs: string;
 }

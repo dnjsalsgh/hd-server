@@ -1,8 +1,9 @@
 export class CreateVms2dDto {
-  name: string;
+  AWB_NUMBER: string;
   FILE_NAME: string;
-  modelPath: string;
+  FILE_PATH: string;
   FILE_EXTENSION: string;
   FILE_SIZE: number;
-  CREATE_USER_ID: string;
+  RESULT_TYPE?: string;
+  CREATE_USER_ID?: string;
 }
