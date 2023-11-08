@@ -34,11 +34,12 @@ import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { CreateVmsDto } from '../vms/dto/create-vms.dto';
 import { CreateVms2dDto } from '../vms2d/dto/create-vms2d.dto';
-import { HttpExceptionFilter } from '../lib/filter/httpException.filter';
 import { AwbUtilService } from './awbUtil.service';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { CreateVmsAwbResultDto } from '../vms-awb-result/dto/create-vms-awb-result.dto';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class AwbService {
@@ -175,38 +176,48 @@ export class AwbService {
   // vms에 데이터를 넣고 awb 테이블에 데이터를 넣는 메서드(디모아측 insert를 대신 테스트 하기 위한용도)
   async createIntegrate(createAwbDto: CreateAwbDto) {
     const { scc, ...awbDto } = createAwbDto;
+    const randomeString = uuidv4().split('-')[0];
 
     try {
       // 서버 내부적으로 body 데이터 기반으로 태스트용 디모아DB에 VMS 생성
       const createVmsDto: CreateVmsDto = {
+        VWMS_ID: randomeString,
         AWB_NUMBER: awbDto.barcode,
         SEPARATION_NO: awbDto.separateNumber,
         MEASUREMENT_COUNT: 0,
         FILE_NAME: awbDto.barcode,
-        VWMS_ID: '',
         FILE_PATH: process.env.NAS_PATH,
         FILE_EXTENSION: 'fbx',
         FILE_SIZE: 0,
         RESULT_TYPE: 'C',
-        waterVolume: awbDto.waterVolume,
+        WATER_VOLUME: awbDto.waterVolume,
+        CUBIC_VOLUME: awbDto.squareVolume,
         WIDTH: awbDto.width,
         LENGTH: awbDto.length,
         HEIGHT: awbDto.depth,
         WEIGHT: awbDto.weight,
+        CREATE_USER_ID: '',
+        CREATE_DATE: dayjs().format('YYYYMMDD'),
       };
       const insertVmsResult = this.vmsRepository.save(createVmsDto);
+
       const createVms2Dto: CreateVms2dDto = {
+        VWMS_ID: randomeString,
         AWB_NUMBER: awbDto.barcode,
+        SEPARATION_NO: awbDto.separateNumber,
         FILE_NAME: awbDto.barcode,
         FILE_PATH: process.env.NAS_PATH_2D,
         FILE_EXTENSION: 'png',
         FILE_SIZE: 0,
+        CALIBRATION_ID: '',
         CREATE_USER_ID: '',
+        CREATE_DATE: dayjs().format('YYYYMMDD'),
       };
       const insertVms2dResult = this.vms2dRepository.save(createVms2Dto);
 
       // scc 테이블 넣는 작업
       const createVmsAwbResult: Partial<CreateVmsAwbResultDto> = {
+        VWMS_ID: randomeString,
         AWB_NUMBER: awbDto.barcode,
         SPCL_CGO_CD_INFO: scc ? scc.join(',') : null,
       };
@@ -222,7 +233,7 @@ export class AwbService {
       // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,
       // 서버 내부적으로 디모아DB에 담긴 vms 파일을 읽어오기
       // 읽어온 vms 파일을 result 형태로 mqtt(hyundai/vms1/create)로 전송
-      await this.mqttService.sendMqttMessage(`hyundai/vms1/createFile1`, {});
+      this.mqttService.sendMqttMessage(`hyundai/vms1/createFile`, {});
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
@@ -358,73 +369,8 @@ export class AwbService {
     // }
   }
 
-  // mssql에서 vms 정보를 가져와서 등록하기 위한 메서드
-  async createWithMssql(vms: Vms3D, vms2d: Vms2d) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-
-    try {
-      await queryRunner.startTransaction();
-
-      const createAwbDto: Partial<CreateAwbDto> = {
-        barcode: vms.AWB_NUMBER,
-        width: vms.WIDTH,
-        length: vms.LENGTH,
-        depth: vms.HEIGHT,
-        weight: vms.WEIGHT,
-        state: 'invms',
-      };
-
-      // vms에서 nas 경로를 읽어서 파일 저장하는 부분
-      if (vms && vms.FILE_PATH) {
-        try {
-          const filePath = await this.fileUpload(vms);
-          createAwbDto.modelPath = filePath;
-        } catch (error) {
-          // throw new NotFoundException(error); 파일이 없더라도 화물 생성되게
-        }
-      }
-
-      // vms에서 png 파일을 저장하고 연결하는 부분
-      if (vms2d && vms2d.FILE_PATH) {
-        try {
-          const filePath2d = await this.fileUpload2d(vms2d);
-          createAwbDto.path = filePath2d;
-        } catch (error) {
-          // throw new NotFoundException(error); 파일이 없더라도 화물 생성되게
-        }
-      }
-
-      const awbResult = await queryRunner.manager
-        .getRepository(Awb)
-        .save(createAwbDto);
-
-      if (vms.Sccs && awbResult) {
-        const sccResult = await this.sccService.findByNames(
-          vms.Sccs.split(','),
-        );
-        // 5. awb와 scc를 연결해주기 위한 작업
-        const joinParam = sccResult.map((item) => {
-          return {
-            Awb: awbResult.id,
-            Scc: item.id,
-          };
-        });
-        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
-      }
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      await queryRunner.release();
-      throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
   // vms에서 온 데이터 중 처음은 update, 분리된 화물은 insert 하기 위한 메서드
-  async createWithMssql2(vms: Vms3D, vms2d: Vms2d, sccData: VmsAwbResult) {
+  async createWithMssql(vms: Vms3D, vms2d: Vms2d, sccData: VmsAwbResult) {
     const queryRunner = this.awbUtilService.getQueryRunner();
     await queryRunner.connect();
 
@@ -751,7 +697,7 @@ export class AwbService {
   // vms에서 개수만큼 꺼내오는 메서드
   async getAwbByVms(takeNumber: number) {
     const [result] = await this.vmsRepository.find({
-      order: orderByUtil(null),
+      order: orderByUtil('-CREATE_DATE'),
       take: takeNumber,
     });
     return result;
@@ -769,7 +715,7 @@ export class AwbService {
   // vms2d에서 개수만큼 찾아오는 메서드
   async getAwbByVms2d(takeNumber: number) {
     const [result] = await this.vms2dRepository.find({
-      order: orderByUtil(null),
+      order: orderByUtil('-CREATE_DATE'),
       take: takeNumber,
     });
     return result;
@@ -796,7 +742,7 @@ export class AwbService {
   // awbNumber로 scc 테이블에 있는 정보 가져오기
   async getSccByAwbNumber(name: string) {
     const [result] = await this.vmsAwbResultRepository.find({
-      order: orderByUtil(null),
+      order: orderByUtil('-RECEIVED_DATE'),
       where: { AWB_NUMBER: name },
     });
     return result;

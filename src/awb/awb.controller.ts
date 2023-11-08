@@ -261,26 +261,6 @@ export class AwbController {
 
   // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
-  async updateFileByMqttSignal(@Payload() data) {
-    try {
-      const oneVmsData = await this.fetchAwbData();
-      const onVms2dData = await this.fetchAwb2dData();
-
-      if (!oneVmsData) {
-        throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
-      }
-
-      await this.createAwbDataInMssql(oneVmsData, onVms2dData);
-      await this.sendModelingCompleteSignal();
-
-      console.log('Modeling complete');
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-
-  // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
-  @MessagePattern('hyundai/vms1/createFile1') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
     try {
       const oneVmsData = await this.fetchAwbData();
@@ -292,7 +272,7 @@ export class AwbController {
 
       const sccData = await this.fetchSccData(oneVmsData);
 
-      await this.createAwbDataInMssql2(oneVmsData, onVms2dData, sccData);
+      await this.createAwbDataInMssql(oneVmsData, onVms2dData, sccData);
       await this.sendModelingCompleteSignal();
 
       console.log('Modeling complete');
@@ -314,16 +294,12 @@ export class AwbController {
     return await this.awbService.getSccByAwbNumber(AWB_NUMBER);
   }
 
-  private async createAwbDataInMssql(vms: Vms3D, vms2d: Vms2d) {
-    await this.awbService.createWithMssql(vms, vms2d);
-  }
-
-  private async createAwbDataInMssql2(
+  private async createAwbDataInMssql(
     vms: Vms3D,
     vms2d: Vms2d,
     sccData: VmsAwbResult,
   ) {
-    await this.awbService.createWithMssql2(vms, vms2d, sccData);
+    await this.awbService.createWithMssql(vms, vms2d, sccData);
   }
 
   private async sendModelingCompleteSignal() {

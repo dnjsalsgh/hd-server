@@ -38,17 +38,6 @@ export class Vms2d {
   })
   SEPARATION_NO: number;
 
-  // @ApiProperty({
-  //   example: 0,
-  //   description: '측정 횟수',
-  // })
-  // @Column({
-  //   name: 'MEASUREMENT_COUNT',
-  //   type: 'int',
-  //   nullable: true,
-  // })
-  // MEASUREMENT_COUNT: number;
-
   @ApiProperty({
     example: '',
     description: '파일 명',

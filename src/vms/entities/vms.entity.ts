@@ -38,17 +38,6 @@ export class Vms3D {
   })
   SEPARATION_NO: number;
 
-  // @ApiProperty({
-  //   example: 0,
-  //   description: '측정 횟수',
-  // })
-  // @Column({
-  //   name: 'MEASUREMENT_COUNT',
-  //   type: 'int',
-  //   nullable: true,
-  // })
-  // MEASUREMENT_COUNT: number;
-
   @ApiProperty({
     example: '',
     description: '파일 명',
@@ -120,6 +109,20 @@ export class Vms3D {
   WEIGHT: number;
 
   @ApiProperty({
+    example: 1.0,
+    description: '화물 워터 볼륨',
+  })
+  @Column({ name: 'WATER_VOLUME', type: 'float', nullable: true })
+  WATER_VOLUME: number;
+
+  @ApiProperty({
+    example: 1.0,
+    description: '화물 큐빅 볼륨',
+  })
+  @Column({ name: 'CUBIC_VOLUME', type: 'float', nullable: true })
+  CUBIC_VOLUME: number;
+
+  @ApiProperty({
     example: 'F',
     description: '측정상태',
   })
@@ -174,10 +177,10 @@ export class Vms3D {
   CREATE_DATE: string;
 
   // scc가 string으로 들어오는대신 ,로 구분되어진다고 가정
-  @ApiProperty({
-    example: ['REG', 'GEN'],
-    description: 'scc들',
-  })
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  Sccs: string;
+  // @ApiProperty({
+  //   example: ['REG', 'GEN'],
+  //   description: 'scc들',
+  // })
+  // @Column({ type: 'varchar', length: 500, nullable: true })
+  // Sccs: string;
 }
