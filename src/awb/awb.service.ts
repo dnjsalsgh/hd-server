@@ -226,7 +226,7 @@ export class AwbService {
         VWMS_ID: randomeString,
         AWB_NUMBER: awbDto.barcode,
         SPCL_CGO_CD_INFO: scc ? scc.join(',') : null,
-        CGO_NDS: 'Y',
+        // CGO_NDS: 'Y', nds 칼럼 넣기 옵션
         RECEIVED_USER_ID: '',
         RECEIVED_DATE: createDate,
       };
