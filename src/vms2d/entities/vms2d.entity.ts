@@ -3,9 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'VWMS_2D_RAW_DATA' })
 export class Vms2d {
-  // @PrimaryGeneratedColumn()
-  // id: number;
-
   @ApiProperty({
     example: 0,
     description: '설비ID',

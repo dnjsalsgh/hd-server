@@ -304,9 +304,11 @@ export class AwbController {
   private async fetchAwbData() {
     return await this.awbService.getAwbByVms(1);
   }
+
   private async fetchAwb2dData() {
     return await this.awbService.getAwbByVms2d(1);
   }
+
   private async fetchSccData(vms: Vms3D) {
     const AWB_NUMBER = vms.AWB_NUMBER;
     return await this.awbService.getSccByAwbNumber(AWB_NUMBER);

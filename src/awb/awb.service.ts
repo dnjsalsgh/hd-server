@@ -193,7 +193,6 @@ export class AwbService {
         LENGTH: awbDto.length,
         HEIGHT: awbDto.depth,
         WEIGHT: awbDto.weight,
-        // Sccs: scc.join(','),
       };
       const insertVmsResult = this.vmsRepository.save(createVmsDto);
       const createVms2Dto: CreateVms2dDto = {
