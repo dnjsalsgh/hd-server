@@ -775,7 +775,7 @@ export class AwbService {
     return awbResult;
   }
 
-  // awbNumber로 scc 테이블에 있는 정보 가져오기
+  // awbNumber로 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
   async getSccByAwbNumber(name: string) {
     const [result] = await this.vmsAwbResultRepository.find({
       order: orderByUtil('-RECEIVED_DATE'),
