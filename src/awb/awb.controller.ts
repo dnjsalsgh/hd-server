@@ -271,7 +271,7 @@ export class AwbController {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
       const vmsAwbHistoryData = await this.fetchVmsAwbHistoryData(vms3Ddata);
-      const sccData = await this.fetchSccData(vms3Ddata);
+      const sccData = await this.fetchVmsAwbResultData(vms3Ddata);
 
       await this.createAwbDataInMssql(
         vms3Ddata,
@@ -300,7 +300,7 @@ export class AwbController {
     return await this.awbService.getLastAwbByAwbNumber(AWB_NUMBER);
   }
 
-  private async fetchSccData(vms: Vms3D) {
+  private async fetchVmsAwbResultData(vms: Vms3D) {
     const AWB_NUMBER = vms.AWB_NUMBER;
     return await this.awbService.getSccByAwbNumber(AWB_NUMBER);
   }

@@ -182,7 +182,7 @@ export class AwbService {
     const { scc, ...awbDto } = createAwbDto;
     const randomeString = uuidv4().split('-')[0];
     const randomAwbPiece = Math.floor(Math.random() * 1000) + 1;
-    const createDate = dayjs().format('YYYYMMDDhhmmss');
+    const createDate = dayjs().format('YYYYMMDDHHmmss');
 
     try {
       // 서버 내부적으로 body 데이터 기반으로 태스트용 디모아DB에 VMS 생성
@@ -226,6 +226,7 @@ export class AwbService {
         VWMS_ID: randomeString,
         AWB_NUMBER: awbDto.barcode,
         SPCL_CGO_CD_INFO: scc ? scc.join(',') : null,
+        CGO_NDS: 'Y',
         RECEIVED_USER_ID: '',
         RECEIVED_DATE: createDate,
       };
@@ -416,6 +417,8 @@ export class AwbService {
         queryRunner,
         awbDto.barcode,
       );
+      console.log('vms = ', vms);
+      console.log('existingAwb = ', existingAwb);
 
       // 예약된 화물(separateNO가 0이라 가정)은 awb에 저장되어 있으니 update, 그 외에는 insert
       if (existingAwb && vms.SEPARATION_NO === 0) {
@@ -436,7 +439,7 @@ export class AwbService {
       if (sccData && awbIdInDb) {
         await this.awbUtilService.connectAwbWithScc(
           queryRunner,
-          sccData.SPCL_CGO_CD_INFO,
+          sccData,
           awbIdInDb,
         );
         const Awb = await this.findOne(awbIdInDb);

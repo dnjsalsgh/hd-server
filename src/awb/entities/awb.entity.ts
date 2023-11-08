@@ -26,6 +26,7 @@ import { Scc } from '../../scc/entities/scc.entity';
 import { SimulatorResult } from '../../simulator-result/entities/simulator-result.entity';
 import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 import { AwbReturn } from '../../awb-return/entities/awb-return.entity';
+import dayjs from 'dayjs';
 
 @Entity()
 export class Awb {
@@ -213,7 +214,57 @@ export class Awb {
   })
   @Column({ type: 'varchar', length: 5000, nullable: true })
   localInTerminal: string;
-  // ============v0.2 추가 끝=================
+
+  // vms 데이터 확정으로 인한 칼럼 추가
+  @ApiProperty({
+    example: false,
+    description: '유령화물 유무 판단',
+  })
+  @Column({ type: 'boolean', nullable: true, default: false })
+  ghost: boolean;
+
+  // @ApiProperty({
+  //   example: false,
+  //   description: '화물을 적재시 다른 화물을 위에 적재하지 말라는 옵션',
+  // })
+  // @Column({ type: 'boolean', nullable: true, default: false })
+  // ndsFromVms: boolean;
+
+  @ApiProperty({
+    example: false,
+    description:
+      '전용팔레트 감지여부 (모델링파일 자체는 대한항공 팔레트를 제거하여 생성)',
+  })
+  @Column({ type: 'boolean', nullable: true, default: false })
+  gSkidOn: boolean;
+
+  @ApiProperty({
+    example: 1,
+    description: '예약 전체 수량',
+  })
+  @Column({ type: 'int', nullable: true })
+  awbTotalPiece: number;
+
+  @ApiProperty({
+    example: false,
+    description: '전체 화물 입고 여부',
+  })
+  @Column({ type: 'boolean', nullable: true, default: false })
+  allAwbReceive: boolean;
+
+  @ApiProperty({
+    example: 'VN762',
+    description: '인입 담당자',
+  })
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  receivedUser: string;
+
+  @ApiProperty({
+    example: dayjs().format('YYYYMMDDhhmmss'),
+    description: '전체입고 일자',
+  })
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  receivedDate: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -322,6 +373,13 @@ export const AwbAttribute = {
   rmComment: true,
   localTime: true,
   localInTerminal: true,
+  ghost: true, // vms 데이터 확정으로 인한 칼럼 추가
+  ndsFromVms: true, // vms 데이터 확정으로 인한 칼럼 추가
+  gSkidOn: true, // vms 데이터 확정으로 인한 칼럼 추가
+  awbTotalPiece: true, // vms 데이터 확정으로 인한 칼럼 추가
+  allAwbReceive: true, // vms 데이터 확정으로 인한 칼럼 추가
+  receivedUser: true, // vms 데이터 확정으로 인한 칼럼 추가
+  receivedDate: true, // vms 데이터 확정으로 인한 칼럼 추가
   createdAt: true,
 };
 

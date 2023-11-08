@@ -13,6 +13,7 @@ import { Scc } from '../scc/entities/scc.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
+import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 
 @Injectable()
 export class AwbUtilService {
@@ -91,15 +92,23 @@ export class AwbUtilService {
     return insertedAwbResult;
   }
 
-  async connectAwbWithScc(queryRunner, sccData: string, awbId: number) {
-    if (sccData) {
-      const sccResult = await this.sccService.findByNames(sccData.split(','));
-      const joinParam = sccResult.map((item) => ({
-        Awb: awbId,
-        Scc: item.id,
-      }));
-      return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+  async connectAwbWithScc(queryRunner, sccData: VmsAwbResult, awbId: number) {
+    if (!sccData?.SPCL_CGO_CD_INFO) {
+      return;
     }
+
+    const sccList = sccData.SPCL_CGO_CD_INFO.split(',');
+    let sccResult = await this.sccService.findByNames(sccList);
+
+    if (sccData.CGO_NDS === 'Y') {
+      const [ndsInfo] = await this.sccService.findByName('NDS');
+      sccResult = [...sccResult, ndsInfo];
+    }
+    const joinParam = sccResult.map((item) => ({
+      Awb: awbId,
+      Scc: item.id,
+    }));
+    return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
   }
 
   async sendMqttMessage(existingAwb: any) {
