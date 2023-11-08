@@ -6,6 +6,7 @@ import {
   Between,
   DataSource,
   EntityManager,
+  Equal,
   FindOperator,
   ILike,
   In,
@@ -38,10 +39,12 @@ import { AwbUtilService } from './awbUtil.service';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { CreateVmsAwbResultDto } from '../vms-awb-result/dto/create-vms-awb-result.dto';
-import { v4 as uuidv4 } from 'uuid';
-import dayjs from 'dayjs';
 import { CreateVmsAwbHistoryDto } from '../vms-awb-history/dto/create-vms-awb-history.dto';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
+import csv from 'csv';
+import fs from 'fs';
 
 @Injectable()
 export class AwbService {
@@ -526,6 +529,9 @@ export class AwbService {
 
     const searchResult = await this.awbRepository.find({
       where: {
+        AirCraftSchedule: query.AirCraftSchedule
+          ? Equal(+query.AirCraftSchedule)
+          : undefined,
         prefab: query.prefab,
         waterVolume: query.waterVolume,
         squareVolume: query.squareVolume,
@@ -561,6 +567,61 @@ export class AwbService {
       },
     });
 
+    return searchResult;
+  }
+
+  async printCsv(query: Awb & BasicQueryParamDto) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+
+    const searchResult = await this.awbRepository.find({
+      where: {
+        AirCraftSchedule: query.AirCraftSchedule
+          ? Equal(+query.AirCraftSchedule)
+          : undefined,
+        simulation: query.simulation,
+        createdAt: findDate,
+      },
+      order: orderByUtil(query.order),
+      take: query.limit,
+      skip: query.offset,
+      relations: {
+        Scc: true,
+      },
+    });
+
+    const csvData = [];
+    for (const [i, awb] of searchResult.entries()) {
+      const sccString = awb.Scc.map((scc) => scc.code).join('+');
+      const data = {
+        id: i,
+        name: awb.barcode,
+        POU: awb.destination,
+        width: awb.width,
+        length: awb.length,
+        depth: awb.depth,
+        waterVolume: awb.waterVolume,
+        weight: awb.weight,
+        SCCs: sccString,
+        state: 'saved',
+        rate: '',
+      };
+      csvData.push(data);
+    }
+    const csvResult = this.fileService.jsonToCSV(csvData);
+    await this.fileService.makeCsvFile(
+      csvResult,
+      // `${new Date().toISOString()}.csv`,
+      `${dayjs().format('YYYY-MM-DD HH-mm-ss')}.csv`,
+    );
     return searchResult;
   }
 

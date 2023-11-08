@@ -156,7 +156,6 @@ export class AwbController {
   @ApiQuery({ name: 'state', required: false, type: 'string' })
   @ApiQuery({ name: 'parent', required: false, type: 'number' })
   @ApiQuery({ name: 'modelPath', required: false, type: 'string' })
-  @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
   @ApiQuery({ name: 'dataCapacity', required: false, type: 'number' })
   @ApiQuery({ name: 'flight', required: false, type: 'string' })
   @ApiQuery({ name: 'from', required: false, type: 'string' })
@@ -172,9 +171,25 @@ export class AwbController {
   @ApiQuery({ name: 'createdAtTo', required: false })
   @ApiQuery({ name: 'order', required: false })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'AirCraftSchedule', required: false, type: 'number' })
   @Get()
   findAll(@Query() query: Awb & BasicQueryParamDto) {
     return this.awbService.findAll(query);
+  }
+
+  @ApiOperation({
+    summary: '항공편(AirCraftSchedule) 안에 있는 화물을 csv로 export',
+    description: '항공편id를 기준으로 안에 있는 화물을 csv로 export',
+  })
+  @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'AirCraftSchedule', required: false, type: 'number' })
+  @Get('/print-csv')
+  printCsv(@Query() query: Awb & BasicQueryParamDto) {
+    return this.awbService.printCsv(query);
   }
 
   @ApiOperation({ summary: '해포화물 검색' })
