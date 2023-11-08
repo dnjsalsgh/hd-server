@@ -7,7 +7,7 @@ import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-hist
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { MqttModule } from '../mqtt.module';
 import { ConfigModule } from '@nestjs/config';
-import { mssqlConfig, postgresConfig } from '../config/db.config';
+import { dimoaConfig, mssqlConfig, postgresConfig } from '../config/db.config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HacsModule } from '../hacs/hacs.module';
 import { AmrService } from '../amr/amr.service';
@@ -31,18 +31,27 @@ import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
     ConfigModule.forRoot({
       isGlobal: true, // 전역으로 사용하기
     }),
-    // // DB 연결
+
     // PostgreSQL 연결 설정
     TypeOrmModule.forRootAsync({
       useFactory: async () => {
         return postgresConfig;
       },
     }),
+
     // MSSQL 연결 설정
     TypeOrmModule.forRootAsync({
       name: 'mssqlDB',
       useFactory: async () => {
         return mssqlConfig;
+      },
+    }),
+
+    // 디모아 연결 설정
+    TypeOrmModule.forRootAsync({
+      name: 'dimoaDB',
+      useFactory: async () => {
+        return dimoaConfig;
       },
     }),
 
@@ -66,7 +75,8 @@ import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
       Scc,
       Basic,
     ]),
-    TypeOrmModule.forFeature([Hacs, Vms3D, Vms2d, VmsAwbResult], 'mssqlDB'),
+    TypeOrmModule.forFeature([Vms3D, Vms2d, Hacs], 'mssqlDB'),
+    TypeOrmModule.forFeature([VmsAwbResult], 'dimoaDB'),
     MulterModule.register({ dest: './upload' }),
   ],
   providers: [

@@ -19,7 +19,8 @@ import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Awb, AwbSccJoin, Scc, Basic]),
-    TypeOrmModule.forFeature([Vms3D, Vms2d, VmsAwbResult], 'mssqlDB'),
+    TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
+    TypeOrmModule.forFeature([VmsAwbResult], 'dimoaDB'),
     MulterModule.register({ dest: './upload' }),
     // mqtt 모듈설정
     MqttModule,

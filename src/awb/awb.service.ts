@@ -52,7 +52,7 @@ export class AwbService {
     private readonly vmsRepository: Repository<Vms3D>,
     @InjectRepository(Vms2d, 'mssqlDB')
     private readonly vms2dRepository: Repository<Vms2d>,
-    @InjectRepository(VmsAwbResult, 'mssqlDB')
+    @InjectRepository(VmsAwbResult, 'dimoaDB')
     private readonly vmsAwbResultRepository: Repository<VmsAwbResult>,
     private dataSource: DataSource,
     private readonly fileService: FileService,

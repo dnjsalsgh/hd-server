@@ -16,7 +16,7 @@ import { VmsAwbResult } from './entities/vms-awb-result.entity';
 @Injectable()
 export class VmsAwbResultService {
   constructor(
-    @InjectRepository(VmsAwbResult, 'mssqlDB')
+    @InjectRepository(VmsAwbResult, 'dimoaDB')
     private readonly vmsAwbResultRepository: Repository<VmsAwbResult>,
   ) {}
 
