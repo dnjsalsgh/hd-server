@@ -11,19 +11,27 @@ import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
 import { Scc } from '../scc/entities/scc.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
+import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Injectable()
 export class AwbUtilService {
   constructor(
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
+    @InjectRepository(AircraftSchedule)
+    private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
     private dataSource: DataSource,
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
     private readonly sccService: SccService,
   ) {}
 
-  async prepareAwbDto(vms: Vms3D, vms2d: Vms2d) {
+  async prepareAwbDto(vms: Vms3D, vms2d: Vms2d, vmsAwbHistory: VmsAwbHistory) {
+    const scheduleId = vmsAwbHistory?.FLIGHT_NUMBER
+      ? await this.findSchedule(vmsAwbHistory.FLIGHT_NUMBER)
+      : null;
+
     const awbDto: Partial<CreateAwbDto> = {
       barcode: vms.AWB_NUMBER,
       separateNumber: vms.SEPARATION_NO,
@@ -31,7 +39,9 @@ export class AwbUtilService {
       length: vms.LENGTH,
       depth: vms.HEIGHT,
       weight: vms.WEIGHT,
+      piece: vmsAwbHistory?.CGO_PC ?? 1,
       state: 'invms',
+      AirCraftSchedule: scheduleId,
     };
 
     if (vms && vms.FILE_PATH) {
@@ -58,6 +68,15 @@ export class AwbUtilService {
     });
 
     return existingAwb;
+  }
+
+  async findSchedule(code: string): Promise<AircraftSchedule> {
+    const [aircraftSchedule] = await this.aircraftScheduleRepository.find({
+      where: { code: code },
+      order: orderByUtil(null),
+      take: 1,
+    });
+    return aircraftSchedule;
   }
 
   async updateAwb(queryRunner, id, awbDto): Promise<number> {

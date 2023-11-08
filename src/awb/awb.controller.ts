@@ -40,6 +40,7 @@ import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
+import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -263,16 +264,21 @@ export class AwbController {
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
     try {
-      const oneVmsData = await this.fetchAwbData();
-      const onVms2dData = await this.fetchAwb2dData();
+      const vms3Ddata = await this.fetchAwbData();
+      const vms2dData = await this.fetchAwb2dData();
 
-      if (!oneVmsData) {
+      if (!vms3Ddata) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
+      const vmsAwbHistoryData = await this.fetchVmsAwbHistoryData(vms3Ddata);
+      const sccData = await this.fetchSccData(vms3Ddata);
 
-      const sccData = await this.fetchSccData(oneVmsData);
-
-      await this.createAwbDataInMssql(oneVmsData, onVms2dData, sccData);
+      await this.createAwbDataInMssql(
+        vms3Ddata,
+        vms2dData,
+        sccData,
+        vmsAwbHistoryData,
+      );
       await this.sendModelingCompleteSignal();
 
       console.log('Modeling complete');
@@ -289,6 +295,11 @@ export class AwbController {
     return await this.awbService.getAwbByVms2d(1);
   }
 
+  private async fetchVmsAwbHistoryData(vms: Vms3D) {
+    const AWB_NUMBER = vms.AWB_NUMBER;
+    return await this.awbService.getLastAwbByAwbNumber(AWB_NUMBER);
+  }
+
   private async fetchSccData(vms: Vms3D) {
     const AWB_NUMBER = vms.AWB_NUMBER;
     return await this.awbService.getSccByAwbNumber(AWB_NUMBER);
@@ -298,8 +309,9 @@ export class AwbController {
     vms: Vms3D,
     vms2d: Vms2d,
     sccData: VmsAwbResult,
+    vmsAwbHistory: VmsAwbHistory,
   ) {
-    await this.awbService.createWithMssql(vms, vms2d, sccData);
+    await this.awbService.createWithMssql(vms, vms2d, sccData, vmsAwbHistory);
   }
 
   private async sendModelingCompleteSignal() {

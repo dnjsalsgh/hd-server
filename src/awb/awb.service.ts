@@ -181,6 +181,7 @@ export class AwbService {
   async createIntegrate(createAwbDto: CreateAwbDto) {
     const { scc, ...awbDto } = createAwbDto;
     const randomeString = uuidv4().split('-')[0];
+    const randomAwbPiece = Math.floor(Math.random() * 1000) + 1;
     const createDate = dayjs().format('YYYYMMDDhhmmss');
 
     try {
@@ -236,6 +237,8 @@ export class AwbService {
         VWMS_ID: randomeString,
         AWB_NUMBER: awbDto.barcode,
         SEPARATION_NO: awbDto.separateNumber,
+        FLIGHT_NUMBER: randomeString,
+        CGO_PC: randomAwbPiece,
         OUT_USER_ID: '',
         OUT_DATE: createDate,
       };
@@ -389,7 +392,12 @@ export class AwbService {
   }
 
   // vms에서 온 데이터 중 처음은 update, 분리된 화물은 insert 하기 위한 메서드
-  async createWithMssql(vms: Vms3D, vms2d: Vms2d, sccData: VmsAwbResult) {
+  async createWithMssql(
+    vms: Vms3D,
+    vms2d: Vms2d,
+    sccData: VmsAwbResult,
+    vmsAwbHistory: VmsAwbHistory,
+  ) {
     const queryRunner = this.awbUtilService.getQueryRunner();
     await queryRunner.connect();
 
@@ -398,7 +406,11 @@ export class AwbService {
       await queryRunner.startTransaction();
 
       // vms에서 온 데이터 세팅
-      const awbDto = await this.awbUtilService.prepareAwbDto(vms, vms2d);
+      const awbDto = await this.awbUtilService.prepareAwbDto(
+        vms,
+        vms2d,
+        vmsAwbHistory,
+      );
 
       const existingAwb = await this.awbUtilService.findExistingAwb(
         queryRunner,
@@ -762,6 +774,15 @@ export class AwbService {
   async getSccByAwbNumber(name: string) {
     const [result] = await this.vmsAwbResultRepository.find({
       order: orderByUtil('-RECEIVED_DATE'),
+      where: { AWB_NUMBER: name },
+    });
+    return result;
+  }
+
+  // awbNumber로 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
+  async getLastAwbByAwbNumber(name: string) {
+    const [result] = await this.vmsAwbHistoryRepository.find({
+      order: orderByUtil('-OUT_DATE'),
       where: { AWB_NUMBER: name },
     });
     return result;

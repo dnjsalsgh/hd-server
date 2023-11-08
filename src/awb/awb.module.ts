@@ -16,10 +16,11 @@ import { Basic } from '../basic/entities/basic.entity';
 import { AwbUtilService } from './awbUtil.service';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
+import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Awb, AwbSccJoin, Scc, Basic]),
+    TypeOrmModule.forFeature([Awb, AwbSccJoin, Scc, Basic, AircraftSchedule]),
     TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
     TypeOrmModule.forFeature([VmsAwbResult, VmsAwbHistory], 'dimoaDB'),
     MulterModule.register({ dest: './upload' }),
