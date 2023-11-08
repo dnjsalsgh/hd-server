@@ -35,6 +35,12 @@ export class CreateAwbDto extends PickType(Awb, [
   // 'localInTerminal',
   'AwbGroup',
   // 'AirCraftSchedule',
+  'ghost',
+  'gSkidOn',
+  'awbTotalPiece',
+  'allAwbReceive',
+  'receivedUser',
+  'receivedDate',
 ]) {
   @ApiProperty({
     example: '["GEN","EAT"]',

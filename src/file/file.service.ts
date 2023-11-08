@@ -7,11 +7,13 @@ export class FileService {
   private readonly currentScriptPath: string;
   private readonly modifiedPath: string;
   private readonly uploadsDirectory: string;
+  private readonly csvDirectory: string;
 
   constructor() {
     this.currentScriptPath = path.dirname(require.resolve('../../src/main.ts'));
     this.modifiedPath = this.currentScriptPath.replace(/\\src$/, '');
     this.uploadsDirectory = path.join(this.modifiedPath, 'upload');
+    this.csvDirectory = path.join(this.modifiedPath, 'csv');
   }
 
   private async handleError(error: any) {
@@ -60,5 +62,30 @@ export class FileService {
     } catch (error) {
       await this.handleError(error);
     }
+  }
+
+  async makeCsvFile(fileContent: Buffer | string, fileName: string) {
+    try {
+      // uploads 폴더가 없으면 생성
+      await fs.mkdir(this.csvDirectory, { recursive: true });
+
+      // 파일 저장 경로
+      const filePath = path.join(this.csvDirectory, fileName);
+
+      // 파일 저장
+      await fs.writeFile(filePath, fileContent);
+    } catch (error) {
+      // await this.handleError(error);
+    }
+  }
+
+  jsonToCSV(jsonData: Array<Record<string, unknown>>): string {
+    const titles = Object.keys(jsonData[0]);
+
+    const csvRows = jsonData.map((row) => {
+      return titles.map((title) => row[title]).join(',');
+    });
+
+    return [titles.join(','), ...csvRows].join('\r\n');
   }
 }

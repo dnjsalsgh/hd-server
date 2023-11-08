@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { VmsAwbResult } from './entities/vms-awb-result.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([VmsAwbResult], 'mssqlDB')],
-  controllers: [VmsAwbResultController],
+  imports: [TypeOrmModule.forFeature([VmsAwbResult], 'dimoaDB')],
   providers: [VmsAwbResultService],
+  exports: [VmsAwbResultModule],
 })
 export class VmsAwbResultModule {}

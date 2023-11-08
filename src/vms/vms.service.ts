@@ -49,9 +49,9 @@ export class VmsService {
   }
 
   async findOne(id: number) {
-    const result = await this.vmsRepository.findOne({
-      where: { id: id },
-    });
-    return result;
+    // const result = await this.vmsRepository.findOne({
+    // where: { id: id },
+    // });
+    // return result;
   }
 }

@@ -39,6 +39,7 @@ import { AlarmModule } from './alarm/alarm.module';
 import { AwbReturnModule } from './awb-return/awb-return.module';
 
 import {
+  dimoaConfig,
   mssqlConfig,
   mssqlVmsConfig,
   postgresConfig,
@@ -55,7 +56,6 @@ import { VmsAwbResultModule } from './vms-awb-result/vms-awb-result.module';
       isGlobal: true, // 전역으로 사용하기
     }),
 
-    // DB 연결
     // PostgreSQL 연결 설정
     TypeOrmModule.forRootAsync({
       useFactory: async () => {
@@ -71,14 +71,12 @@ import { VmsAwbResultModule } from './vms-awb-result/vms-awb-result.module';
       },
     }),
 
-    // TODO vms 업체의 mssql 접근 옵션을 받아야함
-    // VWMS_AWB_RESULT mssql 연결 설정
-    // TypeOrmModule.forRootAsync({
-    //   name: 'mssqlVmsDB',
-    //   useFactory: async () => {
-    //     return mssqlVmsConfig;
-    //   },
-    // }),
+    TypeOrmModule.forRootAsync({
+      name: 'dimoaDB',
+      useFactory: async () => {
+        return dimoaConfig;
+      },
+    }),
 
     AmrModule,
     AmrChargerModule,

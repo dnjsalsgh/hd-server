@@ -40,6 +40,7 @@ import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
+import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -155,7 +156,6 @@ export class AwbController {
   @ApiQuery({ name: 'state', required: false, type: 'string' })
   @ApiQuery({ name: 'parent', required: false, type: 'number' })
   @ApiQuery({ name: 'modelPath', required: false, type: 'string' })
-  @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
   @ApiQuery({ name: 'dataCapacity', required: false, type: 'number' })
   @ApiQuery({ name: 'flight', required: false, type: 'string' })
   @ApiQuery({ name: 'from', required: false, type: 'string' })
@@ -171,9 +171,25 @@ export class AwbController {
   @ApiQuery({ name: 'createdAtTo', required: false })
   @ApiQuery({ name: 'order', required: false })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'AirCraftSchedule', required: false, type: 'number' })
   @Get()
   findAll(@Query() query: Awb & BasicQueryParamDto) {
     return this.awbService.findAll(query);
+  }
+
+  @ApiOperation({
+    summary: '항공편(AirCraftSchedule) 안에 있는 화물을 csv로 export',
+    description: '항공편id를 기준으로 안에 있는 화물을 csv로 export',
+  })
+  @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'createdAtFrom', required: false })
+  @ApiQuery({ name: 'createdAtTo', required: false })
+  @ApiQuery({ name: 'order', required: false })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'AirCraftSchedule', required: false, type: 'number' })
+  @Get('/print-csv')
+  printCsv(@Query() query: Awb & BasicQueryParamDto) {
+    return this.awbService.printCsv(query);
   }
 
   @ApiOperation({ summary: '해포화물 검색' })
@@ -261,38 +277,23 @@ export class AwbController {
 
   // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
-  async updateFileByMqttSignal(@Payload() data) {
-    try {
-      const oneVmsData = await this.fetchAwbData();
-      const onVms2dData = await this.fetchAwb2dData();
-
-      if (!oneVmsData) {
-        throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
-      }
-
-      await this.createAwbDataInMssql(oneVmsData, onVms2dData);
-      await this.sendModelingCompleteSignal();
-
-      console.log('Modeling complete');
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-
-  // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
-  @MessagePattern('hyundai/vms1/createFile1') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
     try {
-      const oneVmsData = await this.fetchAwbData();
-      const onVms2dData = await this.fetchAwb2dData();
+      const vms3Ddata = await this.fetchAwbData();
+      const vms2dData = await this.fetchAwb2dData();
 
-      if (!oneVmsData) {
+      if (!vms3Ddata) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
+      const vmsAwbHistoryData = await this.fetchVmsAwbHistoryData(vms3Ddata);
+      const sccData = await this.fetchVmsAwbResultData(vms3Ddata);
 
-      const sccData = await this.fetchSccData(oneVmsData);
-
-      await this.createAwbDataInMssql2(oneVmsData, onVms2dData, sccData);
+      await this.createAwbDataInMssql(
+        vms3Ddata,
+        vms2dData,
+        sccData,
+        vmsAwbHistoryData,
+      );
       await this.sendModelingCompleteSignal();
 
       console.log('Modeling complete');
@@ -304,24 +305,28 @@ export class AwbController {
   private async fetchAwbData() {
     return await this.awbService.getAwbByVms(1);
   }
+
   private async fetchAwb2dData() {
     return await this.awbService.getAwbByVms2d(1);
   }
-  private async fetchSccData(vms: Vms3D) {
+
+  private async fetchVmsAwbHistoryData(vms: Vms3D) {
+    const AWB_NUMBER = vms.AWB_NUMBER;
+    return await this.awbService.getLastAwbByAwbNumber(AWB_NUMBER);
+  }
+
+  private async fetchVmsAwbResultData(vms: Vms3D) {
     const AWB_NUMBER = vms.AWB_NUMBER;
     return await this.awbService.getSccByAwbNumber(AWB_NUMBER);
   }
 
-  private async createAwbDataInMssql(vms: Vms3D, vms2d: Vms2d) {
-    await this.awbService.createWithMssql(vms, vms2d);
-  }
-
-  private async createAwbDataInMssql2(
+  private async createAwbDataInMssql(
     vms: Vms3D,
     vms2d: Vms2d,
     sccData: VmsAwbResult,
+    vmsAwbHistory: VmsAwbHistory,
   ) {
-    await this.awbService.createWithMssql2(vms, vms2d, sccData);
+    await this.awbService.createWithMssql(vms, vms2d, sccData, vmsAwbHistory);
   }
 
   private async sendModelingCompleteSignal() {

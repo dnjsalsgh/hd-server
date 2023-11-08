@@ -45,7 +45,7 @@ interface UnpackItem {
   name: string;
 }
 
-interface PsAllResult {
+export interface PsAllResult {
   AWBInfoList: AWBInfo[];
   AWBsSquareVolume: number;
   AWBsWaterVolume: number;
@@ -59,7 +59,7 @@ interface PsAllResult {
   waterVolumeRatio: string;
 }
 
-interface PsAllResponse {
+export interface PsAllResponse {
   code: number;
   mode: boolean;
   result: PsAllResult[];
