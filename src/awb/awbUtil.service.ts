@@ -28,7 +28,12 @@ export class AwbUtilService {
     private readonly sccService: SccService,
   ) {}
 
-  async prepareAwbDto(vms: Vms3D, vms2d: Vms2d, vmsAwbHistory: VmsAwbHistory) {
+  async prepareAwbDto(
+    vms: Vms3D,
+    vms2d: Vms2d,
+    vmsAwbResult: VmsAwbResult,
+    vmsAwbHistory: VmsAwbHistory,
+  ) {
     const scheduleId = vmsAwbHistory?.FLIGHT_NUMBER
       ? await this.findSchedule(vmsAwbHistory.FLIGHT_NUMBER)
       : null;
@@ -43,6 +48,11 @@ export class AwbUtilService {
       piece: vmsAwbHistory?.CGO_PC ?? 1,
       state: 'invms',
       AirCraftSchedule: scheduleId,
+      gSkidOn: vmsAwbHistory.G_SKID_ON === 'Y',
+      awbTotalPiece: vmsAwbResult.CGO_TOTAL_PC,
+      allAwbReceive: vmsAwbResult.ALL_PART_RECEIVED === 'Y',
+      receivedUser: vmsAwbResult.RECEIVED_USER_ID,
+      receivedDate: vmsAwbResult.RECEIVED_DATE,
     };
 
     if (vms && vms.FILE_PATH) {

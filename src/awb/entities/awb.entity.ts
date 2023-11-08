@@ -374,7 +374,7 @@ export const AwbAttribute = {
   localTime: true,
   localInTerminal: true,
   ghost: true, // vms 데이터 확정으로 인한 칼럼 추가
-  ndsFromVms: true, // vms 데이터 확정으로 인한 칼럼 추가
+  // ndsFromVms: true, // vms 데이터 확정으로 인한 칼럼 추가
   gSkidOn: true, // vms 데이터 확정으로 인한 칼럼 추가
   awbTotalPiece: true, // vms 데이터 확정으로 인한 칼럼 추가
   allAwbReceive: true, // vms 데이터 확정으로 인한 칼럼 추가

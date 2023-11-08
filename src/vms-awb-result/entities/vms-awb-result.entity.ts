@@ -131,7 +131,7 @@ export class VmsAwbResult {
     type: 'int',
     nullable: true,
   })
-  CGO_TOTAL_PC: string;
+  CGO_TOTAL_PC: number;
 
   @ApiProperty({
     example: 0,

@@ -202,7 +202,7 @@ export class AwbService {
         LENGTH: awbDto.length,
         HEIGHT: awbDto.depth,
         WEIGHT: awbDto.weight,
-        CREATE_USER_ID: '',
+        CREATE_USER_ID: randomeString,
         CREATE_DATE: createDate,
       };
       const insertVmsResult = this.vmsRepository.save(createVmsDto);
@@ -215,8 +215,8 @@ export class AwbService {
         FILE_PATH: process.env.NAS_PATH_2D,
         FILE_EXTENSION: 'png',
         FILE_SIZE: 0,
-        CALIBRATION_ID: '',
-        CREATE_USER_ID: '',
+        CALIBRATION_ID: randomeString,
+        CREATE_USER_ID: randomeString,
         CREATE_DATE: createDate,
       };
       const insertVms2dResult = this.vms2dRepository.save(createVms2Dto);
@@ -226,8 +226,10 @@ export class AwbService {
         VWMS_ID: randomeString,
         AWB_NUMBER: awbDto.barcode,
         SPCL_CGO_CD_INFO: scc ? scc.join(',') : null,
+        CGO_TOTAL_PC: randomAwbPiece,
         // CGO_NDS: 'Y', nds 칼럼 넣기 옵션
-        RECEIVED_USER_ID: '',
+        ALL_PART_RECEIVED: 'Y',
+        RECEIVED_USER_ID: randomeString,
         RECEIVED_DATE: createDate,
       };
       const insertVmsAwbResultResult =
@@ -240,7 +242,8 @@ export class AwbService {
         SEPARATION_NO: awbDto.separateNumber,
         FLIGHT_NUMBER: randomeString,
         CGO_PC: randomAwbPiece,
-        OUT_USER_ID: '',
+        G_SKID_ON: 'Y',
+        OUT_USER_ID: randomeString,
         OUT_DATE: createDate,
       };
       const insertVmsAwbHisotryResult =
@@ -410,6 +413,7 @@ export class AwbService {
       const awbDto = await this.awbUtilService.prepareAwbDto(
         vms,
         vms2d,
+        sccData,
         vmsAwbHistory,
       );
 
@@ -417,8 +421,6 @@ export class AwbService {
         queryRunner,
         awbDto.barcode,
       );
-      console.log('vms = ', vms);
-      console.log('existingAwb = ', existingAwb);
 
       // 예약된 화물(separateNO가 0이라 가정)은 awb에 저장되어 있으니 update, 그 외에는 insert
       if (existingAwb && vms.SEPARATION_NO === 0) {
