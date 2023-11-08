@@ -7,7 +7,7 @@ import { VmsAwbHistory } from './entities/vms-awb-history.entity';
 @Injectable()
 export class VmsAwbHistoryService {
   constructor(
-    @InjectRepository(VmsAwbHistory, 'mssqlDB')
+    @InjectRepository(VmsAwbHistory, 'dimoaDB')
     private readonly vmsAwbHistoryRepository: Repository<VmsAwbHistory>,
   ) {}
 

@@ -40,6 +40,8 @@ import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { CreateVmsAwbResultDto } from '../vms-awb-result/dto/create-vms-awb-result.dto';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
+import { CreateVmsAwbHistoryDto } from '../vms-awb-history/dto/create-vms-awb-history.dto';
+import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 
 @Injectable()
 export class AwbService {
@@ -54,6 +56,8 @@ export class AwbService {
     private readonly vms2dRepository: Repository<Vms2d>,
     @InjectRepository(VmsAwbResult, 'dimoaDB')
     private readonly vmsAwbResultRepository: Repository<VmsAwbResult>,
+    @InjectRepository(VmsAwbHistory, 'dimoaDB')
+    private readonly vmsAwbHistoryRepository: Repository<VmsAwbHistory>,
     private dataSource: DataSource,
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
@@ -177,6 +181,7 @@ export class AwbService {
   async createIntegrate(createAwbDto: CreateAwbDto) {
     const { scc, ...awbDto } = createAwbDto;
     const randomeString = uuidv4().split('-')[0];
+    const createDate = dayjs().format('YYYYMMDDhhmmss');
 
     try {
       // 서버 내부적으로 body 데이터 기반으로 태스트용 디모아DB에 VMS 생성
@@ -197,7 +202,7 @@ export class AwbService {
         HEIGHT: awbDto.depth,
         WEIGHT: awbDto.weight,
         CREATE_USER_ID: '',
-        CREATE_DATE: dayjs().format('YYYYMMDD'),
+        CREATE_DATE: createDate,
       };
       const insertVmsResult = this.vmsRepository.save(createVmsDto);
 
@@ -211,23 +216,37 @@ export class AwbService {
         FILE_SIZE: 0,
         CALIBRATION_ID: '',
         CREATE_USER_ID: '',
-        CREATE_DATE: dayjs().format('YYYYMMDD'),
+        CREATE_DATE: createDate,
       };
       const insertVms2dResult = this.vms2dRepository.save(createVms2Dto);
 
-      // scc 테이블 넣는 작업
+      // VWMV_AWB_RESULT 테이블 넣는 작업
       const createVmsAwbResult: Partial<CreateVmsAwbResultDto> = {
         VWMS_ID: randomeString,
         AWB_NUMBER: awbDto.barcode,
         SPCL_CGO_CD_INFO: scc ? scc.join(',') : null,
+        RECEIVED_USER_ID: '',
+        RECEIVED_DATE: createDate,
       };
       const insertVmsAwbResultResult =
         this.vmsAwbResultRepository.save(createVmsAwbResult);
+
+      // VWMV_AWB_HISTORY 테이블 넣는 작업
+      const createVmsAwbHistory: Partial<CreateVmsAwbHistoryDto> = {
+        VWMS_ID: randomeString,
+        AWB_NUMBER: awbDto.barcode,
+        SEPARATION_NO: awbDto.separateNumber,
+        OUT_USER_ID: '',
+        OUT_DATE: createDate,
+      };
+      const insertVmsAwbHisotryResult =
+        this.vmsAwbHistoryRepository.save(createVmsAwbHistory);
 
       const [vmsResult, vms2dResult, vmsAwbResult] = await Promise.allSettled([
         insertVmsResult,
         insertVms2dResult,
         insertVmsAwbResultResult,
+        insertVmsAwbHisotryResult,
       ]);
 
       // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,

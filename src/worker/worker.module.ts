@@ -24,6 +24,7 @@ import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { Basic } from '../basic/entities/basic.entity';
 import { AwbUtilService } from '../awb/awbUtil.service';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
+import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 
 @Module({
   imports: [
@@ -76,7 +77,7 @@ import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
       Basic,
     ]),
     TypeOrmModule.forFeature([Vms3D, Vms2d, Hacs], 'mssqlDB'),
-    TypeOrmModule.forFeature([VmsAwbResult], 'dimoaDB'),
+    TypeOrmModule.forFeature([VmsAwbResult, VmsAwbHistory], 'dimoaDB'),
     MulterModule.register({ dest: './upload' }),
   ],
   providers: [

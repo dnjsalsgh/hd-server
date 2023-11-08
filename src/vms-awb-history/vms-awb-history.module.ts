@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { VmsAwbHistory } from './entities/vms-awb-history.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([VmsAwbHistory], 'mssqlDB')],
+  imports: [TypeOrmModule.forFeature([VmsAwbHistory], 'dimoaDB')],
   controllers: [VmsAwbHistoryController],
   providers: [VmsAwbHistoryService],
   exports: [VmsAwbHistoryModule],
