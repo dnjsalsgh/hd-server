@@ -1,58 +1,68 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'VWMS_2D_RAW_DATA' })
 export class Vms2d {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
+
+  @ApiProperty({
+    example: 0,
+    description: '설비ID',
+  })
+  @PrimaryColumn({
+    name: 'VWMS_ID',
+    type: 'nvarchar',
+    length: 20,
+    nullable: false,
+  })
+  VWMS_ID: string;
 
   @ApiProperty({
     example: '화물-001',
     description: '화물의 이름',
   })
-  @Column({ name: 'AWB_NUMBER', type: 'nvarchar', length: 100, nullable: true })
+  @PrimaryColumn({
+    name: 'AWB_NUMBER',
+    type: 'nvarchar',
+    length: 100,
+    nullable: false,
+  })
   AWB_NUMBER: string;
 
   @ApiProperty({
     example: 0,
     description: '화물 분리 번호',
   })
-  @Column({
+  @PrimaryColumn({
     name: 'SEPARATION_NO',
     type: 'int',
-    nullable: true,
+    nullable: false,
   })
   SEPARATION_NO: number;
 
-  @ApiProperty({
-    example: 0,
-    description: '측정 횟수',
-  })
-  @Column({
-    name: 'MEASUREMENT_COUNT',
-    type: 'int',
-    nullable: true,
-  })
-  MEASUREMENT_COUNT: number;
+  // @ApiProperty({
+  //   example: 0,
+  //   description: '측정 횟수',
+  // })
+  // @Column({
+  //   name: 'MEASUREMENT_COUNT',
+  //   type: 'int',
+  //   nullable: true,
+  // })
+  // MEASUREMENT_COUNT: number;
 
   @ApiProperty({
     example: '',
     description: '파일 명',
   })
-  @Column({ name: 'FILE_NAME', type: 'nvarchar', length: 17, nullable: true })
-  FILE_NAME: string;
-
-  @ApiProperty({
-    example: 0,
-    description: '설비ID',
-  })
-  @Column({
-    name: 'VWMS_ID',
+  @PrimaryColumn({
+    name: 'FILE_NAME',
     type: 'nvarchar',
-    length: 20,
-    nullable: true,
+    length: 17,
+    nullable: false,
   })
-  VWMS_ID: string;
+  FILE_NAME: string;
 
   @ApiProperty({
     example: '',

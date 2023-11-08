@@ -38,9 +38,9 @@ export class VmsAwbResultService {
   }
 
   async findOne(id: number) {
-    const result = await this.vmsAwbResultRepository.findOne({
-      where: { id: id },
-    });
-    return result;
+    // const result = await this.vmsAwbResultRepository.findOne({
+    //   where: { id: id },
+    // });
+    // return result;
   }
 }

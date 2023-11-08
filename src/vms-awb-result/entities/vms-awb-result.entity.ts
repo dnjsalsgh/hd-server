@@ -1,20 +1,20 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'VWMS_AWB_RESULT' })
 export class VmsAwbResult {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
 
   @ApiProperty({
     example: 0,
     description: '설비ID',
   })
-  @Column({
+  @PrimaryColumn({
     name: 'VWMS_ID',
     type: 'nvarchar',
     length: 20,
-    nullable: true,
+    nullable: false,
   })
   VWMS_ID: string;
 
@@ -22,7 +22,12 @@ export class VmsAwbResult {
     example: '화물-001',
     description: '화물의 이름',
   })
-  @Column({ name: 'AWB_NUMBER', type: 'nvarchar', length: 100, nullable: true })
+  @PrimaryColumn({
+    name: 'AWB_NUMBER',
+    type: 'nvarchar',
+    length: 100,
+    nullable: false,
+  })
   AWB_NUMBER: string;
 
   // @ApiProperty({
