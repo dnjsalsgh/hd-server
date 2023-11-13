@@ -854,6 +854,16 @@ export class AwbService {
     return result;
   }
 
+  // awb의 scc만 가져오는 메서드
+  async getScc(awbId: number) {
+    const queryRunner = this.awbUtilService.getQueryRunner();
+    const searchResult = await this.awbUtilService.findSccInAwb(
+      queryRunner,
+      awbId,
+    );
+    return searchResult;
+  }
+
   /**
    * 엣지에서 보내주는 vms 데이터 중 누락된 데이터를 다시 저장하기 위한 로직
    * @param vmsMissCount edge에서 보내주는 지금까지 보내준 vms의 총 개수
