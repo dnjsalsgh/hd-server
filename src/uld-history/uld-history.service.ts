@@ -96,32 +96,16 @@ export class UldHistoryService {
     }
     return await this.uldHistoryRepository.find({
       select: {
-        // BuildUpOrder: {
-        //   ...BuildUpOrderAttribute,
-        //   SkidPlatform: SkidPlatformAttribute,
-        //   Uld: UldAttribute,
-        //   Awb: AwbAttribute,
-        // },
-        // buildUpOrder에 중복되는 내용이라 생략
         SkidPlatform: SkidPlatformAttribute,
         Uld: UldAttribute,
         Awb: AwbAttribute,
       },
       relations: {
-        // BuildUpOrder: {
-        //   SkidPlatform: true,
-        //   Uld: true,
-        //   Awb: true,
-        // },
         SkidPlatform: true,
         Uld: true,
         Awb: true,
       },
       where: {
-        // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
-        // BuildUpOrder: query.BuildUpOrder
-        //   ? Equal(+query.BuildUpOrder)
-        //   : undefined,
         SkidPlatform: query.SkidPlatform
           ? Equal(+query.SkidPlatform)
           : undefined,
