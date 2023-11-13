@@ -35,45 +35,51 @@ export class UldHistoryService {
   async create(createUldHistoryDto: CreateUldHistoryDto) {
     const queryRunner = this.dataSource.createQueryRunner();
 
-    const insertResult = await this.saveUldHistory(createUldHistoryDto);
+    const savedHistory = this.saveHistory(createUldHistoryDto);
 
     if (createUldHistoryDto.Awb) {
-      await this.injectSccToUldFromAwb(createUldHistoryDto, queryRunner);
+      this.injectScc(createUldHistoryDto, queryRunner);
     }
 
-    this.sendMqttMessage(`hyundai/uldHistory/insert`, insertResult);
+    this.publishMqttMessage(`hyundai/uldHistory/insert`, savedHistory);
 
-    return insertResult;
+    return savedHistory;
   }
 
-  // uldHistory를 입력하는 메서드
-  async saveUldHistory(createUldHistoryDto: CreateUldHistoryDto) {
+  async saveHistory(createUldHistoryDto) {
     return await this.uldHistoryRepository.save(createUldHistoryDto);
   }
 
-  // Awb에 있는 Scc를 uld에 주입하는 메서드
-  async injectSccToUldFromAwb(
-    createUldHistoryDto: CreateUldHistoryDto,
-    queryRunner,
-  ) {
+  // uld에 scc를 주입하는 메서드
+  async injectScc(createUldHistoryDto, queryRunner) {
     const targetAwbId = +createUldHistoryDto.Awb;
     const targetUldId = +createUldHistoryDto.Uld;
+    const sccList = await this.retrieveSccList(queryRunner, targetAwbId);
 
-    const sccListInAwb = await this.findSccInAwb(queryRunner, targetAwbId);
-
-    if (sccListInAwb.Scc.length <= 0) {
-      console.error('scc가 존재하지 않으므로 join 로직 미실행');
-      return;
+    if (sccList.length > 0) {
+      this.performSccInjection(targetUldId, sccList);
     }
-    const sccList: UldSccInjectionDto = {
-      Scc: sccListInAwb.Scc.map((v) => v.id),
-    };
-
-    await this.uldService.injectionScc(targetUldId, sccList);
   }
 
-  // mqtt 메세지를 발행하는 메서드
-  sendMqttMessage(topic, message) {
+  // Awb에 scc가 있는지 검색하는 메서드
+  async retrieveSccList(queryRunner, targetAwbId) {
+    const sccList = await this.findSccInAwb(queryRunner, targetAwbId);
+    if (sccList.Scc.length > 0) {
+      return sccList.Scc.map((v) => v.id);
+    } else {
+      console.error('scc가 존재하지 않습니다.');
+      return [];
+    }
+  }
+
+  // 실제로 uld에 scc를 넣는 로직
+  async performSccInjection(targetUldId, sccList) {
+    const sccInjectionDto: UldSccInjectionDto = { Scc: sccList };
+    await this.uldService.injectionScc(targetUldId, sccInjectionDto);
+  }
+
+  // mqtt 메세지 발행 로직
+  publishMqttMessage(topic, message) {
     this.client.send(topic, message).subscribe();
   }
 
