@@ -11,19 +11,33 @@ import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
 import { Scc } from '../scc/entities/scc.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
+import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
+import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 
 @Injectable()
 export class AwbUtilService {
   constructor(
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
+    @InjectRepository(AircraftSchedule)
+    private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
     private dataSource: DataSource,
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
     private readonly sccService: SccService,
   ) {}
 
-  async prepareAwbDto(vms: Vms3D, vms2d: Vms2d) {
+  async prepareAwbDto(
+    vms: Vms3D,
+    vms2d: Vms2d,
+    vmsAwbResult: VmsAwbResult,
+    vmsAwbHistory: VmsAwbHistory,
+  ) {
+    const scheduleId = vmsAwbHistory?.FLIGHT_NUMBER
+      ? await this.findSchedule(vmsAwbHistory.FLIGHT_NUMBER)
+      : null;
+
     const awbDto: Partial<CreateAwbDto> = {
       barcode: vms.AWB_NUMBER,
       separateNumber: vms.SEPARATION_NO,
@@ -31,7 +45,14 @@ export class AwbUtilService {
       length: vms.LENGTH,
       depth: vms.HEIGHT,
       weight: vms.WEIGHT,
+      piece: vmsAwbHistory?.CGO_PC ?? 1,
       state: 'invms',
+      AirCraftSchedule: scheduleId,
+      gSkidOn: vmsAwbHistory.G_SKID_ON === 'Y',
+      awbTotalPiece: vmsAwbResult.CGO_TOTAL_PC,
+      allAwbReceive: vmsAwbResult.ALL_PART_RECEIVED === 'Y',
+      receivedUser: vmsAwbResult.RECEIVED_USER_ID,
+      receivedDate: vmsAwbResult.RECEIVED_DATE,
     };
 
     if (vms && vms.FILE_PATH) {
@@ -51,7 +72,7 @@ export class AwbUtilService {
     return awbDto;
   }
 
-  async findExistingAwb(queryRunner, barcode) {
+  async findExistingAwb(queryRunner, barcode: string): Promise<Awb> {
     const [existingAwb] = await queryRunner.manager.getRepository(Awb).find({
       where: { barcode: barcode },
       order: orderByUtil(null),
@@ -60,24 +81,59 @@ export class AwbUtilService {
     return existingAwb;
   }
 
-  async updateAwb(queryRunner, id, awbDto) {
-    return queryRunner.manager.getRepository(Awb).update(id, awbDto);
+  async findSccInAwb(queryRunner, awbId: number) {
+    const [searchResult] = await queryRunner.manager.getRepository(Awb).find({
+      where: { id: awbId },
+      relations: {
+        Scc: true,
+      },
+    });
+
+    return searchResult;
   }
 
-  async insertAwb(queryRunner, awbDto) {
-    return queryRunner.manager.getRepository(Awb).save(awbDto);
+  async findSchedule(code: string): Promise<AircraftSchedule> {
+    const [aircraftSchedule] = await this.aircraftScheduleRepository.find({
+      where: { code: code },
+      order: orderByUtil(null),
+      take: 1,
+    });
+    return aircraftSchedule;
   }
 
-  async connectAwbWithScc(queryRunner, vms, existingAwb) {
-    const sccResult = await this.sccService.findByNames(vms.Sccs.split(','));
+  async updateAwb(queryRunner, id, awbDto): Promise<number> {
+    await queryRunner.manager.getRepository(Awb).update(id, awbDto);
+    return id;
+  }
+
+  async insertAwb(queryRunner, awbDto): Promise<Awb> {
+    const insertedAwbResult = await queryRunner.manager
+      .getRepository(Awb)
+      .save(awbDto);
+    return insertedAwbResult;
+  }
+
+  async connectAwbWithScc(queryRunner, sccData: VmsAwbResult, awbId: number) {
+    if (!sccData?.SPCL_CGO_CD_INFO) {
+      return;
+    }
+
+    const sccList = sccData.SPCL_CGO_CD_INFO.split(',');
+    let sccResult = await this.sccService.findByNames(sccList);
+
+    // CGO_NDS는 vms에서 자체생성한 scc
+    if (sccData.CGO_NDS === 'Y') {
+      const [ndsInfo] = await this.sccService.findByName('NDS');
+      sccResult = [...sccResult, ndsInfo];
+    }
     const joinParam = sccResult.map((item) => ({
-      Awb: existingAwb.id,
+      Awb: awbId,
       Scc: item.id,
     }));
     return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
   }
 
-  async sendMqttMessage(existingAwb) {
+  async sendMqttMessage(existingAwb: any) {
     return this.mqttService.sendMqttMessage(`hyundai/vms1/create`, existingAwb);
   }
 
@@ -110,6 +166,7 @@ export class AwbUtilService {
   getQueryRunner() {
     return this.dataSource.createQueryRunner();
   }
+
   async findSccByCodeList(sccList: string[]) {
     return this.sccRepository.find({
       where: { code: In(sccList) },

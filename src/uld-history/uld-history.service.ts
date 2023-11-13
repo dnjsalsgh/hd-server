@@ -4,6 +4,7 @@ import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
+  DataSource,
   Equal,
   FindOperator,
   LessThanOrEqual,
@@ -12,10 +13,12 @@ import {
 } from 'typeorm';
 import { UldHistory } from './entities/uld-history.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
-import { AwbAttribute } from '../awb/entities/awb.entity';
+import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
 import { Uld, UldAttribute } from '../uld/entities/uld.entity';
 import { ClientProxy } from '@nestjs/microservices';
+import { UldService } from '../uld/uld.service';
+import { UldSccInjectionDto } from '../uld/dto/uld-sccInjection.dto';
 
 @Injectable()
 export class UldHistoryService {
@@ -25,14 +28,50 @@ export class UldHistoryService {
     @InjectRepository(Uld)
     private readonly uldRepository: Repository<Uld>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
+    private dataSource: DataSource,
+    private readonly uldService: UldService,
   ) {}
-  async create(createUldHistoryDto: CreateUldHistoryDto) {
-    const result = await this.uldHistoryRepository.create(createUldHistoryDto);
 
-    const insertResult = await this.uldHistoryRepository.save(result);
-    // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
-    this.client.send(`hyundai/uldHistory/insert`, insertResult).subscribe();
-    return result;
+  async create(createUldHistoryDto: CreateUldHistoryDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    const insertResult = await this.saveUldHistory(createUldHistoryDto);
+
+    if (createUldHistoryDto.Awb) {
+      await this.injectSccToUldFromAwb(createUldHistoryDto, queryRunner);
+    }
+
+    this.sendMqttMessage(`hyundai/uldHistory/insert`, insertResult);
+
+    return insertResult;
+  }
+
+  async saveUldHistory(createUldHistoryDto: CreateUldHistoryDto) {
+    return await this.uldHistoryRepository.save(createUldHistoryDto);
+  }
+
+  async injectSccToUldFromAwb(
+    createUldHistoryDto: CreateUldHistoryDto,
+    queryRunner,
+  ) {
+    const targetAwbId = +createUldHistoryDto.Awb;
+    const targetUldId = +createUldHistoryDto.Uld;
+
+    const sccListInAwb = await this.findSccInAwb(queryRunner, targetAwbId);
+
+    if (sccListInAwb.Scc.length <= 0) {
+      console.error('scc가 존재하지 않으므로 join 로직 미실행');
+      return;
+    }
+    const sccList: UldSccInjectionDto = {
+      Scc: sccListInAwb.Scc.map((v) => v.id),
+    };
+
+    await this.uldService.injectionScc(targetUldId, sccList);
+  }
+
+  sendMqttMessage(topic, message) {
+    this.client.send(topic, message).subscribe();
   }
 
   async findAll(query: UldHistory & BasicQueryParamDto) {
@@ -113,5 +152,16 @@ export class UldHistoryService {
 
   remove(id: number) {
     return this.uldHistoryRepository.delete(id);
+  }
+
+  async findSccInAwb(queryRunner, awbId: number): Promise<Awb> {
+    const [searchResult] = await queryRunner.manager.getRepository(Awb).find({
+      where: { id: awbId },
+      relations: {
+        Scc: true,
+      },
+    });
+
+    return searchResult;
   }
 }

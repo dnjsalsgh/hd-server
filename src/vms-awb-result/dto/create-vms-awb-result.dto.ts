@@ -8,7 +8,7 @@ export class CreateVmsAwbResultDto {
   AGENT_CODE: string;
   AGENT_ENGLISH_NAME: string;
   COMMODITY_DESC: string;
-  CGO_TOTAL_PC: string;
+  CGO_TOTAL_PC: number;
   CGO_NDS: string;
   ALL_PART_RECEIVED: string;
   RECEIVED_USER_ID: string;

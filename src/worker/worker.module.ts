@@ -7,7 +7,7 @@ import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-hist
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { MqttModule } from '../mqtt.module';
 import { ConfigModule } from '@nestjs/config';
-import { mssqlConfig, postgresConfig } from '../config/db.config';
+import { dimoaConfig, mssqlConfig, postgresConfig } from '../config/db.config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HacsModule } from '../hacs/hacs.module';
 import { AmrService } from '../amr/amr.service';
@@ -23,6 +23,9 @@ import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { Basic } from '../basic/entities/basic.entity';
 import { AwbUtilService } from '../awb/awbUtil.service';
+import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
+import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
+import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Module({
   imports: [
@@ -30,18 +33,27 @@ import { AwbUtilService } from '../awb/awbUtil.service';
     ConfigModule.forRoot({
       isGlobal: true, // 전역으로 사용하기
     }),
-    // // DB 연결
+
     // PostgreSQL 연결 설정
     TypeOrmModule.forRootAsync({
       useFactory: async () => {
         return postgresConfig;
       },
     }),
+
     // MSSQL 연결 설정
     TypeOrmModule.forRootAsync({
       name: 'mssqlDB',
       useFactory: async () => {
         return mssqlConfig;
+      },
+    }),
+
+    // 디모아 연결 설정
+    TypeOrmModule.forRootAsync({
+      name: 'dimoaDB',
+      useFactory: async () => {
+        return dimoaConfig;
       },
     }),
 
@@ -64,8 +76,10 @@ import { AwbUtilService } from '../awb/awbUtil.service';
       AwbSccJoin,
       Scc,
       Basic,
+      AircraftSchedule,
     ]),
-    TypeOrmModule.forFeature([Hacs, Vms3D, Vms2d], 'mssqlDB'),
+    TypeOrmModule.forFeature([Vms3D, Vms2d, Hacs], 'mssqlDB'),
+    TypeOrmModule.forFeature([VmsAwbResult, VmsAwbHistory], 'dimoaDB'),
     MulterModule.register({ dest: './upload' }),
   ],
   providers: [

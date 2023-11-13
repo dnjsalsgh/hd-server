@@ -64,6 +64,7 @@ import { UldHistory } from '../uld-history/entities/uld-history.entity';
 import { UserSelectResult } from './dto/user-select-output';
 import { AWBGroupResult } from './dto/ps-output.dto';
 import { PsAllRequest } from './dto/ps-all-input.dto';
+import { PsAllResponse, PsAllResult } from './dto/ps-all-output.dto';
 
 @Injectable()
 export class SimulatorResultService {
@@ -177,9 +178,9 @@ export class SimulatorResultService {
           };
         });
 
-        /**
-         * 시뮬레이션 결과,이력을 저장하기 위한 부분 start
-         */
+        // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
+        this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
+
         const simulatorResultBody: CreateSimulatorResultDto = {
           startDate: new Date(),
           endDate: new Date(),
@@ -219,9 +220,6 @@ export class SimulatorResultService {
 
         // 3. awbjoin 테이블, 이력 테이블 함께 저장
         await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳
-
-        // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
-        this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
 
         // 1-3. 최적 불출순서를 자동창고(ASRS) PLC에 write 완료했다는 신호
         this.client
@@ -346,9 +344,9 @@ export class SimulatorResultService {
           };
         });
 
-        /**
-         * 시뮬레이션 결과,이력을 저장하기 위한 부분 start
-         */
+        // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
+        this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
+
         const simulatorResultBody: CreateSimulatorResultDto = {
           startDate: new Date(),
           endDate: new Date(),
@@ -388,9 +386,6 @@ export class SimulatorResultService {
 
         // 3. awbjoin 테이블, 이력 테이블 함께 저장
         await Promise.all([joinResult, historyResult, buildUpOrderResult]); // 실제로 쿼리 날아가는곳
-
-        // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
-        this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
 
         // 1-3. 최적 불출순서를 자동창고(ASRS) PLC에 write 완료했다는 신호
         this.client
@@ -465,22 +460,10 @@ export class SimulatorResultService {
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
       if (asrsOutOrderResult) {
         // 자동창고 작업지시를 객체형태로 mqtt에 publish하기 위한 find 과정
-        const asrsResult = await queryRunner.manager
-          .getRepository(AsrsOutOrder)
-          .find({
-            relations: {
-              Asrs: true,
-              Awb: true,
-            },
-            select: {
-              Asrs: { id: true, name: true },
-              Awb: { id: true, barcode: true },
-            },
-            where: {
-              id: In(asrsOutOrderResult.identifiers.map((v) => v.id)),
-            },
-            order: { order: 'asc' },
-          });
+        const asrsResult = await this.getAsrsResult(
+          queryRunner,
+          asrsOutOrderResult,
+        );
 
         // 불출순서를 mqtt에 배열로 보내기위해 전처리 과정
         const asrsOutOrder = asrsResult.map((asrsOutOrderElement) => {
@@ -493,20 +476,9 @@ export class SimulatorResultService {
           };
         });
 
-        // asrs의 출고이력을 저장하기 위함
-        const asrsHistoryBody: CreateAsrsHistoryDto = {
-          Asrs: (asrsResult[0].Asrs as Asrs).id,
-          Awb: (asrsResult[0].Awb as Awb).id,
-          inOutType: 'out',
-          count: 1,
-        };
-        await queryRunner.manager
-          .getRepository(AsrsHistory)
-          .save(asrsHistoryBody as AsrsHistory);
+        // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
+        this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
 
-        /**
-         * 시뮬레이션 결과,이력을 저장하기 위한 부분 start
-         */
         const simulatorResultBody: CreateSimulatorResultDto = {
           startDate: new Date(),
           endDate: new Date(),
@@ -556,9 +528,6 @@ export class SimulatorResultService {
 
         // 3. awbjoin 테이블, 이력 테이블 함께 저장
         await Promise.all([joinResult, historyResult]); // 실제로 쿼리 날아가는곳
-
-        // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
-        this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
 
         // 1-3. 최적 불출순서를 자동창고(ASRS) PLC에 write 완료했다는 신호
         this.client
@@ -730,9 +699,6 @@ export class SimulatorResultService {
           };
         });
 
-        /**
-         * 시뮬레이션 결과,이력을 저장하기 위한 부분 start
-         */
         const simulatorResultBody: CreateSimulatorResultDto = {
           startDate: new Date(),
           endDate: new Date(),

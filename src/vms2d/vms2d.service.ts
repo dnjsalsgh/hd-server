@@ -49,9 +49,9 @@ export class Vms2dService {
   }
 
   async findOne(id: number) {
-    const result = await this.vms2dRepository.findOne({
-      where: { id: id },
-    });
-    return result;
+    // const result = await this.vms2dRepository.findOne({
+    //   where: { id: id },
+    // });
+    // return result;
   }
 }

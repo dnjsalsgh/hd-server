@@ -96,6 +96,13 @@ export class SccService {
     return sccResult;
   }
 
+  async findByName(sccName: string) {
+    const sccResult = await this.sccRepository.find({
+      where: { code: sccName },
+    });
+    return sccResult;
+  }
+
   async findOne(id: number) {
     return await this.sccRepository.find({
       where: { id: id },
