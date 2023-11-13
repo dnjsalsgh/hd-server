@@ -46,10 +46,12 @@ export class UldHistoryService {
     return insertResult;
   }
 
+  // uldHistory를 입력하는 메서드
   async saveUldHistory(createUldHistoryDto: CreateUldHistoryDto) {
     return await this.uldHistoryRepository.save(createUldHistoryDto);
   }
 
+  // Awb에 있는 Scc를 uld에 주입하는 메서드
   async injectSccToUldFromAwb(
     createUldHistoryDto: CreateUldHistoryDto,
     queryRunner,
@@ -70,6 +72,7 @@ export class UldHistoryService {
     await this.uldService.injectionScc(targetUldId, sccList);
   }
 
+  // mqtt 메세지를 발행하는 메서드
   sendMqttMessage(topic, message) {
     this.client.send(topic, message).subscribe();
   }
