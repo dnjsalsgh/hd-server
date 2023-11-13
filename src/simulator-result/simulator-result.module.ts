@@ -20,6 +20,9 @@ import { Asrs } from '../asrs/entities/asrs.entity';
 import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
 import { RedisService } from '../redis/redis.service';
 import { redisCustomProvider } from '../redis/redisCustomProvider';
+import { UldType } from '../uld-type/entities/uld-type.entity';
+import { UldService } from '../uld/uld.service';
+import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
 
 @Module({
   imports: [
@@ -36,6 +39,8 @@ import { redisCustomProvider } from '../redis/redisCustomProvider';
       BuildUpOrder,
       UldHistory,
       Uld,
+      UldType,
+      UldSccJoin,
       Awb,
       Asrs,
       SkidPlatform,
@@ -50,6 +55,7 @@ import { redisCustomProvider } from '../redis/redisCustomProvider';
     AsrsHistoryService,
     SkidPlatformHistoryService,
     UldHistoryService,
+    UldService,
     RedisService,
     ...redisCustomProvider,
   ],
