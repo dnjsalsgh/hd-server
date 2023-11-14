@@ -1,16 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Hacs {
-  @PrimaryGeneratedColumn()
-  private id: number;
-
   @ApiProperty({
     example: 1,
     description: '로봇번호',
   })
-  @Column({ type: 'varchar', nullable: false })
+  @PrimaryColumn({ name: 'AMR_ID', type: 'varchar', nullable: false })
   public Amrld: number;
 
   @ApiProperty({
@@ -65,6 +62,7 @@ export class Hacs {
   })
   @Column({ nullable: true })
   public ErrorCode: number;
+
   @ApiProperty({
     example: 'test error message',
     description: '에러메시지',
@@ -78,6 +76,7 @@ export class Hacs {
   })
   @Column({ nullable: true })
   public CurState: string;
+
   @ApiProperty({
     example: 0,
     description: '일시정지 상태(업=1, 다운=0)',
@@ -99,12 +98,14 @@ export class Hacs {
   })
   @Column({ nullable: true })
   public TurnTableStatus: number;
+
   @ApiProperty({
     example: 74,
     description: '배터리SOC',
   })
   @Column({ nullable: true })
   public SOC: number;
+
   @ApiProperty({
     example:
       '{Cmd":"GB","BCellVolt":39576,"BPackVolt":40000,"BPackCurrent":1000,"BChargeVolt":40000,"BTemperature":31,"Battery":81,"BError":0,"BWarning":0}',
@@ -112,12 +113,14 @@ export class Hacs {
   })
   @Column({ nullable: true })
   public SOH: string;
+
   @ApiProperty({
     example: 1,
     description: '파레트no',
   })
   @Column({ nullable: true })
   public PLTNo: number;
+
   @ApiProperty({
     example: null,
     description: '파레트 타입',
@@ -167,24 +170,28 @@ export class Hacs {
   })
   @Column({ nullable: true })
   public Prog: number;
+
   @ApiProperty({
     example: new Date(),
     description: '도착예상시간',
   })
   @Column({ nullable: true })
   public DestTime: Date;
+
   @ApiProperty({
     example: new Date(),
     description: '미션할당시간',
   })
   @Column({ nullable: true })
   public CreationTime: Date;
+
   @ApiProperty({
     example: new Date(),
     description: '미션시작시간',
   })
   @Column({ nullable: true })
   public StartTime: Date;
+
   @ApiProperty({
     example: new Date(),
     description: '미션종료시간',
@@ -198,18 +205,21 @@ export class Hacs {
   })
   @Column({ nullable: true })
   public TravelDist: number;
+
   @ApiProperty({
     example: 13.0,
     description: '누적운행시간',
   })
   @Column({ nullable: true })
   public OprTime: number;
+
   @ApiProperty({
     example: 14.0,
     description: '누적정지시간',
   })
   @Column({ nullable: true })
   public StopTime: number;
+
   @ApiProperty({
     example: 74,
     description: '충전시작 배터리량',
@@ -218,29 +228,36 @@ export class Hacs {
   public StartBatteryLevel: number;
 
   @ApiProperty({
-    example: 10.3,
-    description: '충전기의 X좌표',
+    example: true,
+    description: '스키드 감지',
   })
-  @Column({ type: 'float', nullable: true })
-  public ChargeX: number;
+  @Column({ nullable: true })
+  public Skid: boolean;
 
-  @ApiProperty({
-    example: 11.3,
-    description: '충전기의 X좌표',
-  })
-  @Column({ type: 'float', nullable: true })
-  public ChargeY: number;
+  // @ApiProperty({
+  //   example: 10.3,
+  //   description: '충전기의 X좌표',
+  // })
+  // @Column({ type: 'float', nullable: true })
+  // public ChargeX: number;
+  //
+  // @ApiProperty({
+  //   example: 11.3,
+  //   description: '충전기의 X좌표',
+  // })
+  // @Column({ type: 'float', nullable: true })
+  // public ChargeY: number;
+  //
+  // @ApiProperty({
+  //   example: 9.3,
+  //   description: '충전기의 X좌표',
+  // })
+  // @Column({ type: 'float', nullable: true })
+  // public ChargeZ: number;
 
-  @ApiProperty({
-    example: 9.3,
-    description: '충전기의 X좌표',
-  })
-  @Column({ type: 'float', nullable: true })
-  public ChargeZ: number;
-
-  @ApiProperty({
-    example: '인입용',
-    description: '인입용, 인출용 구분',
-  })
-  distinguish: string;
+  // @ApiProperty({
+  //   example: '인입용',
+  //   description: '인입용, 인출용 구분',
+  // })
+  // distinguish: string;
 }

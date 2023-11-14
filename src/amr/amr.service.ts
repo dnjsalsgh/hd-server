@@ -71,7 +71,7 @@ export class AmrService {
       startBatteryLevel: body.StartBatteryLevel, // 충전을 시작할 때만 입력하기
       // lastBatteryLevel: body.LastBatteryLevel,
       simulation: true,
-      distinguish: body.distinguish, // 인입용 인출용 구분
+      // distinguish: body.distinguish, // 인입용 인출용 구분
     };
 
     const amrChargerBody: CreateAmrChargerDto = {
@@ -221,7 +221,7 @@ export class AmrService {
       startBatteryLevel: amrData?.StartBatteryLevel, // 충전을 시작할 때만 입력하기
       // lastBatteryLevel: amrData.LastBatteryLevel,
       simulation: true,
-      distinguish: amrData?.distinguish, // 인입용 인출용 구분
+      // distinguish: amrData?.distinguish, // 인입용 인출용 구분
     };
     console.log('amrBody = ', amrBody);
 
