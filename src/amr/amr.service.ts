@@ -213,7 +213,7 @@ export class AmrService {
       // ACSMode: amrData.ACSMode === 1,
       mode: amrData?.Mode,
       // errorLevel: amrData.ErrorLevel,
-      errorCode: amrData?.ErrorCode?.toString(),
+      errorCode: amrData?.ErrorCode?.toString() || '',
       soc: amrData?.SOC,
       travelDist: amrData?.TravelDist, // 누적이동거리(m)
       oprTime: amrData?.OprTime, // 누적운행시간(M)
@@ -223,6 +223,7 @@ export class AmrService {
       simulation: true,
       distinguish: amrData?.distinguish, // 인입용 인출용 구분
     };
+    console.log('amrBody = ', amrBody);
 
     const amrChargerBody: CreateAmrChargerDto = {
       name: amrData.Amrld.toString(),

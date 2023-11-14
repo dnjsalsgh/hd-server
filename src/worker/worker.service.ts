@@ -3,10 +3,8 @@ import { Cron, Interval } from '@nestjs/schedule';
 import { AmrService } from '../amr/amr.service';
 import { LoggerService } from '../lib/logger/logger.service';
 import { AwbService } from '../awb/awb.service';
-import path from 'path';
 import console from 'console';
 import { FileService } from '../file/file.service';
-import { Awb } from '../awb/entities/awb.entity';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
