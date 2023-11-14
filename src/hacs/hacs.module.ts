@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Hacs } from './entities/hacs.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Hacs], 'mssqlDB')],
+  imports: [TypeOrmModule.forFeature([Hacs], 'amrDB')],
   controllers: [HacsController],
   providers: [HacsService],
 })

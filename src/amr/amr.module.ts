@@ -12,7 +12,7 @@ import { LoggerService } from '../lib/logger/logger.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Amr, AmrCharger, AmrChargeHistory]),
-    TypeOrmModule.forFeature([Hacs], 'mssqlDB'),
+    TypeOrmModule.forFeature([Hacs], 'amrDB'),
     // mqtt 모듈설정
     MqttModule,
   ],

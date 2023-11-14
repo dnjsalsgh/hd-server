@@ -35,7 +35,7 @@ export class AmrService {
     private readonly amrChargeHistoryRepository: Repository<AmrChargeHistory>,
     private dataSource: DataSource,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
-    @InjectRepository(Hacs, 'mssqlDB')
+    @InjectRepository(Hacs, 'amrDB')
     private readonly hacsRepository: Repository<Hacs>,
     private readonly loggerService: LoggerService,
   ) {}
