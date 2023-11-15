@@ -136,7 +136,7 @@ export class Amr {
     description: '데이터 업데이트 일자',
   })
   @Column({ nullable: true })
-  logDT: Date;
+  logDT: string;
 
   @ApiProperty({
     example: '인입용',

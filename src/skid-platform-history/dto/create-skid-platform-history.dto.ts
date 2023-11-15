@@ -11,6 +11,7 @@ export class CreateSkidPlatformHistoryDto extends PickType(
     // 'Awb',
     'inOutType',
     'count',
+    'totalCount',
   ],
 ) {
   @ApiProperty({

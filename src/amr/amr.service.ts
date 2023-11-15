@@ -57,7 +57,7 @@ export class AmrService {
     // 1. make params by MS-SQL DBMS
     const amrBody: CreateAmrDto = {
       name: body.Amrld.toString(), // 로봇 번호
-      logDT: new Date(body.LogDT), // 데이터 업데이트 일자
+      logDT: new Date(body.LogDT).toISOString(), // 데이터 업데이트 일자
       charging: body.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
       // prcsCD: body.PrcsCD,
       // ACSMode: body.ACSMode === 1,
@@ -198,17 +198,21 @@ export class AmrService {
    */
   async createAmrByMssql() {
     const [amrData] = await this.hacsRepository.find({
-      order: orderByUtil(null),
+      order: { LogDT: 'DESC' },
       take: 1, // 최소한만 가져오려고 함(100 개)
     });
+
+    if (!amrData) {
+      return;
+    }
 
     // amr실시간 데이터 mqtt로 publish 하기 위함
     this.client.send(`hyundai/amr/realData`, amrData).pipe(take(1)).subscribe();
 
     const amrBody: CreateAmrDto = {
-      name: amrData.Amrld.toString(), // 로봇 번호
-      logDT: new Date(amrData.LogDT) || new Date(), // 데이터 업데이트 일자
-      charging: amrData.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
+      name: amrData?.Amrld?.toString() || '', // 로봇 번호
+      logDT: amrData?.LogDT || new Date().toISOString(), // 데이터 업데이트 일자
+      charging: amrData?.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
       // prcsCD: amrData.PrcsCD,
       // ACSMode: amrData.ACSMode === 1,
       mode: amrData?.Mode,
@@ -223,7 +227,6 @@ export class AmrService {
       simulation: true,
       // distinguish: amrData?.distinguish, // 인입용 인출용 구분
     };
-    console.log('amrBody = ', amrBody);
 
     const amrChargerBody: CreateAmrChargerDto = {
       name: amrData.Amrld.toString(),
@@ -351,7 +354,7 @@ export class AmrService {
         startBatteryLevel: startBatteryLevel,
         // lastBatteryLevel: lastBatteryLevel,
         simulation: simulation,
-        logDT: logDT,
+        logDT: logDT.toISOString(),
         distinguish: distinguish,
         createdAt: findDate,
       },
