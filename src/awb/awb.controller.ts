@@ -203,6 +203,12 @@ export class AwbController {
     return this.awbService.findOne(+id);
   }
 
+  @ApiOperation({ summary: 'awbId로 scc들 검색' })
+  @Get('scc/:awbId')
+  getScc(@Param('awbId') awbId: string) {
+    return this.awbService.getScc(+awbId);
+  }
+
   @Put(':id')
   update(@Param('id') id: string, @Body() updateAwbDto: UpdateAwbDto) {
     return this.awbService.update(+id, updateAwbDto);

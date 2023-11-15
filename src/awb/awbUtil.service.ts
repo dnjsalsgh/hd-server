@@ -81,6 +81,17 @@ export class AwbUtilService {
     return existingAwb;
   }
 
+  async findSccInAwb(queryRunner, awbId: number) {
+    const [searchResult] = await queryRunner.manager.getRepository(Awb).find({
+      where: { id: awbId },
+      relations: {
+        Scc: true,
+      },
+    });
+
+    return searchResult;
+  }
+
   async findSchedule(code: string): Promise<AircraftSchedule> {
     const [aircraftSchedule] = await this.aircraftScheduleRepository.find({
       where: { code: code },
@@ -110,6 +121,7 @@ export class AwbUtilService {
     const sccList = sccData.SPCL_CGO_CD_INFO.split(',');
     let sccResult = await this.sccService.findByNames(sccList);
 
+    // CGO_NDS는 vms에서 자체생성한 scc
     if (sccData.CGO_NDS === 'Y') {
       const [ndsInfo] = await this.sccService.findByName('NDS');
       sccResult = [...sccResult, ndsInfo];

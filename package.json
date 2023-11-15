@@ -1,6 +1,6 @@
 {
   "name": "hd-auto-logistic-server",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "author": "",
   "private": true,
@@ -15,6 +15,8 @@
     "reload:all": "npm-run-all --parallel build reload",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
+    "startb": "nest start -b swc",
+    "startbw": "nest start -b swc -w",
     "start:dev-backup": "nest start --watch",
     "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch",
     "sim": "nest build --webpack --webpackPath webpack-hmr.config.js --watch",
