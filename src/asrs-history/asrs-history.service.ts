@@ -41,6 +41,17 @@ export class AsrsHistoryService {
     }
   }
 
+  async createList(createAsrsHistoryDto: CreateAsrsHistoryDto[]) {
+    try {
+      const insertResult = await this.asrsHistoryRepository.save(
+        createAsrsHistoryDto,
+      );
+      return insertResult;
+    } catch (error) {
+      throw new TypeOrmExceptionFilter(error);
+    }
+  }
+
   /**
    * 창고 이력에서 asrs_id를 기준으로 최신 안착대의 상태만 가져옴
    */

@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
   DataSource,
+  EntityManager,
   Equal,
   FindOperator,
   LessThanOrEqual,
@@ -32,8 +33,11 @@ export class UldHistoryService {
     private readonly uldService: UldService,
   ) {}
 
-  async create(createUldHistoryDto: CreateUldHistoryDto) {
-    const queryRunner = this.dataSource.createQueryRunner();
+  async create(
+    createUldHistoryDto: CreateUldHistoryDto,
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
 
     const savedHistory = this.saveHistory(createUldHistoryDto);
 

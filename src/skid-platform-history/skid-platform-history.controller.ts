@@ -88,11 +88,6 @@ export class SkidPlatformHistoryController {
     return this.skidPlatformHistoryService.findOne(+id);
   }
 
-  @Get('/virtual/:id')
-  findOneBySkidPlatform(@Param('id') id: string) {
-    return this.skidPlatformHistoryService.findOneBySkitPlatform(+id);
-  }
-
   @Put(':id')
   update(
     @Param('id') id: string,

@@ -107,8 +107,8 @@ export class AircraftScheduleService {
         Aircraft: AircraftAttribute,
         Awbs: AwbSimpleAttribute,
         Ulds: {
-          UldType: UldTypeAttribute,
           ...UldAttribute,
+          UldType: UldTypeAttribute,
           uldHistories: {
             ...UldHistoryAttribute,
             Awb: { ...AwbSimpleAttribute, Scc: SccAttribute },
