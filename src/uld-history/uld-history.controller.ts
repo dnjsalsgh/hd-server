@@ -40,6 +40,22 @@ export class UldHistoryController {
     );
   }
 
+  @ApiOperation({
+    summary: '[태스트용] uld의 이력을 list 형태로 넣기 위함',
+    description: 'uld의 이력을 list 형태로 넣기 위함',
+  })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/list')
+  createList(
+    @Body() createUldHistoryDto: CreateUldHistoryDto[],
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.uldHistoryService.createList(
+      createUldHistoryDto,
+      queryRunnerManager,
+    );
+  }
+
   @ApiQuery({ name: 'BuildUpOrder', required: false, type: 'number' })
   @ApiQuery({ name: 'SkidPlatform', required: false, type: 'number' })
   @ApiQuery({ name: 'Uld', required: false, type: 'number' })
