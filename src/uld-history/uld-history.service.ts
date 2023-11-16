@@ -42,7 +42,7 @@ export class UldHistoryService {
     const savedHistory = this.saveHistory(createUldHistoryDto);
 
     if (createUldHistoryDto.Awb) {
-      this.injectScc(createUldHistoryDto, queryRunner);
+      await this.injectScc(createUldHistoryDto, queryRunner);
     }
 
     this.publishMqttMessage(`hyundai/uldHistory/insert`, savedHistory);
@@ -61,7 +61,7 @@ export class UldHistoryService {
     const sccList = await this.retrieveSccList(queryRunner, targetAwbId);
 
     if (sccList.length > 0) {
-      this.performSccInjection(targetUldId, sccList);
+      await this.performSccInjection(targetUldId, sccList);
     }
   }
 
@@ -85,6 +85,25 @@ export class UldHistoryService {
   // mqtt 메세지 발행 로직
   publishMqttMessage(topic, message) {
     this.client.send(topic, message).subscribe();
+  }
+
+  async createList(
+    createUldHistoryDtoList: CreateUldHistoryDto[],
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
+
+    const savedHistory = await this.saveHistory(createUldHistoryDtoList);
+
+    for (const createUldHistoryDto of createUldHistoryDtoList) {
+      if (createUldHistoryDto.Awb) {
+        await this.injectScc(createUldHistoryDto, queryRunner);
+      }
+    }
+
+    this.publishMqttMessage(`hyundai/uldHistory/insert`, savedHistory);
+
+    return savedHistory;
   }
 
   async findAll(query: UldHistory & BasicQueryParamDto) {
