@@ -53,6 +53,8 @@ export class AwbUtilService {
       allAwbReceive: vmsAwbResult.ALL_PART_RECEIVED === 'Y',
       receivedUser: vmsAwbResult.RECEIVED_USER_ID,
       receivedDate: vmsAwbResult.RECEIVED_DATE,
+      modelPath: null,
+      path: null,
     };
 
     if (vms && vms.FILE_PATH) {
