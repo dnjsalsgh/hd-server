@@ -74,9 +74,23 @@ export class SkidPlatformHistoryController {
     return this.skidPlatformHistoryService.nowState();
   }
 
+  @ApiOperation({
+    summary: '안착대의 현재 상태를 가져오기(inOutType이 out 이면 빈 안착대)',
+    description: '안착대id로 이력의 최신본만 가져오기',
+  })
+  @Get('/virtual/now')
+  StatusOfVirtualSkidplatform() {
+    return this.skidPlatformHistoryService.nowVirtualState();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.skidPlatformHistoryService.findOne(+id);
+  }
+
+  @Get('/virtual/:id')
+  findOneBySkidPlatform(@Param('id') id: string) {
+    return this.skidPlatformHistoryService.findOneBySkitPlatform(+id);
   }
 
   @Put(':id')

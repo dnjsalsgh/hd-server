@@ -17,7 +17,7 @@ import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity'
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 @Entity()
-@Unique(['inOutType', 'Awb', 'SkidPlatform'])
+@Unique(['inOutType', 'Awb', 'SkidPlatform', 'count', 'totalCount'])
 export class SkidPlatformHistory {
   @PrimaryGeneratedColumn()
   id: number;
@@ -34,11 +34,18 @@ export class SkidPlatformHistory {
 
   @ApiProperty({
     example: 0,
-    description: '창고안의 개수',
+    description: '안착대안 현재화물개수',
   })
   @IsNumber()
   @Column({ type: 'int', nullable: false, default: 0 })
   count: number;
+
+  @ApiProperty({
+    example: 0,
+    description: '안착대안 전체화물 개수',
+  })
+  @Column({ type: 'int', nullable: false, default: 0 })
+  totalCount: number;
 
   @CreateDateColumn()
   createdAt: Date;
