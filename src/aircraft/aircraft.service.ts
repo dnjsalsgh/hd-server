@@ -58,10 +58,10 @@ export class AircraftService {
   }
 
   update(id: number, updateAircraftDto: UpdateAircraftDto) {
-    return `This action updates a #${id} aircraft`;
+    return this.aircraftRepository.update(id, updateAircraftDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} aircraft`;
+    return this.aircraftRepository.delete(id);
   }
 }
