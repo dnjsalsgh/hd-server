@@ -653,7 +653,7 @@ export class AwbService {
   // awb의 상태를 변경하는 메서드
   updateState(id: number, state: string, updateAwbDto?: UpdateAwbDto) {
     if (state) updateAwbDto.state = state;
-    this.awbRepository.update({ parent: id }, updateAwbDto);
+    // this.awbRepository.update({ parent: id }, updateAwbDto);
     return this.awbRepository.update(id, updateAwbDto);
   }
 
