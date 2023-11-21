@@ -82,6 +82,13 @@ export class SkidPlatform {
   @Column({ type: 'boolean', nullable: true })
   simulation: boolean;
 
+  @ApiProperty({
+    example: false,
+    description: '가상포트',
+  })
+  @Column({ type: 'boolean', nullable: true })
+  virtual: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

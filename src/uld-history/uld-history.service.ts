@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
 import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -151,6 +151,11 @@ export class UldHistoryService {
     const targetUld = await this.uldRepository.findOne({
       where: { code: uldCode },
     });
+
+    if (!targetUld) {
+      throw new NotFoundException('uld가 없습니다.');
+    }
+
     const uldHistory = await this.uldHistoryRepository
       .createQueryBuilder('uh')
       .leftJoinAndSelect('uh.Awb', 'Awb')
