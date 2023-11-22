@@ -45,6 +45,8 @@ import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import csv from 'csv';
 import fs from 'fs';
+import { PrepareBreakDownAwbDto } from './dto/prepare-break-down-awb.dto';
+import { breakDownRequest } from '../lib/util/axios.util';
 
 @Injectable()
 export class AwbService {
@@ -754,6 +756,12 @@ export class AwbService {
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
+  }
+
+  // ps에 해포 보내기
+  async breakDownForPs(prepareBreakDownAwbDto: PrepareBreakDownAwbDto) {
+    console.log('prepareBreakDownAwbDto = ', prepareBreakDownAwbDto);
+    await breakDownRequest(prepareBreakDownAwbDto);
   }
 
   remove(id: number) {

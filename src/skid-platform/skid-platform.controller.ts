@@ -48,6 +48,7 @@ export class SkidPlatformController {
   }
 
   @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'virtual', required: false, type: 'boolean' })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })

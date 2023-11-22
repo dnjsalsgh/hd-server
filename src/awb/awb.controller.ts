@@ -41,6 +41,7 @@ import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
+import { PrepareBreakDownAwbDto } from './dto/prepare-break-down-awb.dto';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -137,6 +138,15 @@ export class AwbController {
     @TransactionManager() queryRunnerManager: EntityManager,
   ) {
     return this.awbService.injectionScc(awbId, body, queryRunnerManager);
+  }
+
+  @ApiOperation({
+    summary: 'ps에 화물 해포 요청',
+    description: 'ps에 화물 해포 요청보네기, piece 수만큼 화물이 해포될 예정',
+  })
+  @Post('/break-down')
+  breakDownEvent(@Body() body: PrepareBreakDownAwbDto) {
+    return this.awbService.breakDownForPs(body);
   }
 
   @ApiQuery({ name: 'prefab', required: false, type: 'string' })
