@@ -52,7 +52,7 @@ export class AmrController {
   @ApiQuery({ name: 'startBatteryLevel', required: false, type: 'number' })
   @ApiQuery({ name: 'lastBatteryLevel', required: false, type: 'number' })
   @ApiQuery({ name: 'simulation', required: false, type: 'boolean' })
-  @ApiQuery({ name: 'logDT', required: false, type: 'Date' })
+  @ApiQuery({ name: 'logDT', required: false, type: 'string' })
   @ApiQuery({ name: 'distinguish', required: false, type: 'string' })
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })
@@ -78,7 +78,7 @@ export class AmrController {
     @Query('startBatteryLevel') startBatteryLevel?: number,
     @Query('lastBatteryLevel') lastBatteryLevel?: number,
     @Query('simulation') simulation?: boolean,
-    @Query('logDT') logDT?: Date,
+    @Query('logDT') logDT?: string,
     @Query('distinguish') distinguish?: string,
     @Query('createdAtFrom') createdAtFrom?: Date,
     @Query('createdAtTo') createdAtTo?: Date,

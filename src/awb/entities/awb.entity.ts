@@ -159,7 +159,7 @@ export class Awb {
   parent: number;
 
   @ApiProperty({
-    example: '',
+    example: null,
     description: '모델파일 경로',
   })
   @Column({ type: 'varchar', length: 5000, nullable: true })
@@ -174,7 +174,7 @@ export class Awb {
 
   // ============v0.2 추가=================
   @ApiProperty({
-    example: '/c/file/xxx',
+    example: null,
     description: '이미지 경로',
   })
   @Column({ type: 'varchar', length: 5000, nullable: true })

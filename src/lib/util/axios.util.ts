@@ -135,3 +135,21 @@ export const sendSlackMessage = async (input: any) => {
     // throw new HttpException(`slack 연동이 안되었습니다.${error}`, 404); // 에러 처리
   }
 };
+
+export const breakDownRequest = async (input: any) => {
+  try {
+    const response = await axios.post(
+      `${process.env.PS_SERVER}/break-down`,
+      input,
+      {
+        headers: {
+          'Content-Type': 'application/json', // JSON 형식의 데이터 전송
+        },
+      },
+    );
+    const data = response.data; // 응답 데이터 가져오기
+    return data;
+  } catch (error) {
+    // throw new HttpException(`ps 정보를 받아오지 못했습니다.${error}`, 404); // 에러 처리
+  }
+};

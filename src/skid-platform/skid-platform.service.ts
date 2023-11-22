@@ -75,6 +75,7 @@ export class SkidPlatformService {
       where: {
         name: query.name ? ILike(`%${query.name}%`) : undefined,
         simulation: query.simulation,
+        virtual: query.virtual,
         createdAt: findDate,
       },
       order: orderByUtil(query.order),
