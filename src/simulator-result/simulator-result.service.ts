@@ -924,20 +924,27 @@ export class SimulatorResultService {
           code: apiRequest.UldCode ? Equal(apiRequest.UldCode) : undefined,
         },
       });
-      // Uld주입하기
-      if (uldResult) {
-        const { id, code, UldType } = uldResult;
-        const { width, length, depth, vertexCord } = UldType as UldType;
-        Ulds.push({
-          id,
-          code,
-          width,
-          length,
-          depth,
-          uldType: typeof UldType === 'object' ? UldType.code : null,
-          vertexCord,
-        });
+
+      if (!uldResult) {
+        return new NotFoundException('uld가 없습니다.');
       }
+
+      // Uld주입하기
+      const { id, code, UldType } = uldResult;
+      const { width, length, depth, vertexCord } = UldType as UldType;
+      if (typeof UldType === 'object' && UldType.code.includes('_')) {
+        UldType.code = UldType.code.split('_')[0];
+      }
+
+      Ulds.push({
+        id,
+        code,
+        width,
+        length,
+        depth,
+        uldType: typeof UldType === 'object' ? UldType.code : null,
+        vertexCord,
+      });
     } catch (e) {
       throw new NotFoundException(e);
     }

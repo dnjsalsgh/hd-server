@@ -7,7 +7,12 @@ import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-hist
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { MqttModule } from '../mqtt.module';
 import { ConfigModule } from '@nestjs/config';
-import { dimoaConfig, mssqlConfig, postgresConfig } from '../config/db.config';
+import {
+  amrConfig,
+  dimoaConfig,
+  mssqlConfig,
+  postgresConfig,
+} from '../config/db.config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HacsModule } from '../hacs/hacs.module';
 import { AmrService } from '../amr/amr.service';
@@ -57,6 +62,14 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
       },
     }),
 
+    // amr업체 연결 설정
+    TypeOrmModule.forRootAsync({
+      name: 'amrDB',
+      useFactory: async () => {
+        return amrConfig;
+      },
+    }),
+
     // mqtt 모듈설정
     MqttModule,
 
@@ -78,8 +91,9 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
       Basic,
       AircraftSchedule,
     ]),
-    TypeOrmModule.forFeature([Vms3D, Vms2d, Hacs], 'mssqlDB'),
+    TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
     TypeOrmModule.forFeature([VmsAwbResult, VmsAwbHistory], 'dimoaDB'),
+    TypeOrmModule.forFeature([Hacs], 'amrDB'),
     MulterModule.register({ dest: './upload' }),
   ],
   providers: [

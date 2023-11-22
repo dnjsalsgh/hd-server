@@ -9,7 +9,7 @@ import { Hacs } from './entities/hacs.entity';
 @Injectable()
 export class HacsService {
   constructor(
-    @InjectRepository(Hacs, 'mssqlDB')
+    @InjectRepository(Hacs, 'amrDB')
     private readonly hacsRepository: Repository<Hacs>,
   ) {}
 

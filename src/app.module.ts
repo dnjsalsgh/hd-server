@@ -39,6 +39,7 @@ import { AlarmModule } from './alarm/alarm.module';
 import { AwbReturnModule } from './awb-return/awb-return.module';
 
 import {
+  amrConfig,
   dimoaConfig,
   mssqlConfig,
   mssqlVmsConfig,
@@ -75,6 +76,14 @@ import { VmsAwbResultModule } from './vms-awb-result/vms-awb-result.module';
       name: 'dimoaDB',
       useFactory: async () => {
         return dimoaConfig;
+      },
+    }),
+
+    // amr업체 연결 설정
+    TypeOrmModule.forRootAsync({
+      name: 'amrDB',
+      useFactory: async () => {
+        return amrConfig;
       },
     }),
 

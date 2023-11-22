@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UldHistoryService } from './uld-history.service';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
@@ -14,6 +15,9 @@ import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { UldHistory } from './entities/uld-history.entity';
+import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
+import { TransactionManager } from '../lib/decorator/transaction.decorator';
+import { EntityManager } from 'typeorm';
 
 @Controller('uld-history')
 @ApiTags('[Uld 이력]uld-history')
@@ -24,9 +28,32 @@ export class UldHistoryController {
     summary: 'uld 안에 화물이 입력되면 호출하는 api',
     description: '[사용법] Uld: 목표 uldId, Awb: 사용된 awbId',
   })
+  @UseInterceptors(TransactionInterceptor)
   @Post()
-  create(@Body() createUldHistoryDto: CreateUldHistoryDto) {
-    return this.uldHistoryService.create(createUldHistoryDto);
+  create(
+    @Body() createUldHistoryDto: CreateUldHistoryDto,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.uldHistoryService.create(
+      createUldHistoryDto,
+      queryRunnerManager,
+    );
+  }
+
+  @ApiOperation({
+    summary: '[태스트용] uld의 이력을 list 형태로 넣기 위함',
+    description: 'uld의 이력을 list 형태로 넣기 위함',
+  })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/list')
+  createList(
+    @Body() createUldHistoryDto: CreateUldHistoryDto[],
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.uldHistoryService.createList(
+      createUldHistoryDto,
+      queryRunnerManager,
+    );
   }
 
   @ApiQuery({ name: 'BuildUpOrder', required: false, type: 'number' })

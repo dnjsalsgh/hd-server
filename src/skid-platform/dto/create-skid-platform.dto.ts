@@ -11,4 +11,5 @@ export class CreateSkidPlatformDto extends PickType(SkidPlatform, [
   'y',
   'z',
   'simulation',
+  'virtual',
 ]) {}

@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
 import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
   DataSource,
+  EntityManager,
   Equal,
   FindOperator,
   LessThanOrEqual,
@@ -32,13 +33,16 @@ export class UldHistoryService {
     private readonly uldService: UldService,
   ) {}
 
-  async create(createUldHistoryDto: CreateUldHistoryDto) {
-    const queryRunner = this.dataSource.createQueryRunner();
+  async create(
+    createUldHistoryDto: CreateUldHistoryDto,
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
 
     const savedHistory = this.saveHistory(createUldHistoryDto);
 
     if (createUldHistoryDto.Awb) {
-      this.injectScc(createUldHistoryDto, queryRunner);
+      await this.injectScc(createUldHistoryDto, queryRunner);
     }
 
     this.publishMqttMessage(`hyundai/uldHistory/insert`, savedHistory);
@@ -57,7 +61,7 @@ export class UldHistoryService {
     const sccList = await this.retrieveSccList(queryRunner, targetAwbId);
 
     if (sccList.length > 0) {
-      this.performSccInjection(targetUldId, sccList);
+      await this.performSccInjection(targetUldId, sccList);
     }
   }
 
@@ -83,6 +87,25 @@ export class UldHistoryService {
     this.client.send(topic, message).subscribe();
   }
 
+  async createList(
+    createUldHistoryDtoList: CreateUldHistoryDto[],
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
+
+    const savedHistory = await this.saveHistory(createUldHistoryDtoList);
+
+    for (const createUldHistoryDto of createUldHistoryDtoList) {
+      if (createUldHistoryDto.Awb) {
+        await this.injectScc(createUldHistoryDto, queryRunner);
+      }
+    }
+
+    this.publishMqttMessage(`hyundai/uldHistory/insert`, savedHistory);
+
+    return savedHistory;
+  }
+
   async findAll(query: UldHistory & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
@@ -96,32 +119,16 @@ export class UldHistoryService {
     }
     return await this.uldHistoryRepository.find({
       select: {
-        // BuildUpOrder: {
-        //   ...BuildUpOrderAttribute,
-        //   SkidPlatform: SkidPlatformAttribute,
-        //   Uld: UldAttribute,
-        //   Awb: AwbAttribute,
-        // },
-        // buildUpOrder에 중복되는 내용이라 생략
         SkidPlatform: SkidPlatformAttribute,
         Uld: UldAttribute,
         Awb: AwbAttribute,
       },
       relations: {
-        // BuildUpOrder: {
-        //   SkidPlatform: true,
-        //   Uld: true,
-        //   Awb: true,
-        // },
         SkidPlatform: true,
         Uld: true,
         Awb: true,
       },
       where: {
-        // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
-        // BuildUpOrder: query.BuildUpOrder
-        //   ? Equal(+query.BuildUpOrder)
-        //   : undefined,
         SkidPlatform: query.SkidPlatform
           ? Equal(+query.SkidPlatform)
           : undefined,
@@ -144,6 +151,11 @@ export class UldHistoryService {
     const targetUld = await this.uldRepository.findOne({
       where: { code: uldCode },
     });
+
+    if (!targetUld) {
+      throw new NotFoundException('uld가 없습니다.');
+    }
+
     const uldHistory = await this.uldHistoryRepository
       .createQueryBuilder('uh')
       .leftJoinAndSelect('uh.Awb', 'Awb')

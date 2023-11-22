@@ -2,7 +2,6 @@ import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Awb } from '../entities/awb.entity';
 import { Scc } from '../../scc/entities/scc.entity';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
-import { Column } from 'typeorm';
 import { AwbGroup } from '../../awb-group/entities/awb-group.entity';
 
 export class CreateAwbWithAircraftDto extends PickType(Awb, [

@@ -31,12 +31,10 @@ export class AsrsHistoryController {
   })
   @Post('/list')
   async createList(@Body() createAsrsHistoryDtos: CreateAsrsHistoryDto[]) {
-    const insertResults = [];
-    for (const asrsHistoryDto of createAsrsHistoryDtos) {
-      const insertResult = await this.asrsHistoryService.create(asrsHistoryDto);
-      insertResults.push(insertResult);
-    }
-    return insertResults;
+    const insertResultList = await this.asrsHistoryService.createList(
+      createAsrsHistoryDtos,
+    );
+    return insertResultList;
   }
 
   @ApiQuery({ name: 'Asrs', required: false, type: 'number' })

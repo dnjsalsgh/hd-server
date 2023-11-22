@@ -7,7 +7,7 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { take } from 'rxjs';
+import { pipe, take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
@@ -43,12 +43,17 @@ export class SkidPlatformHistoryService {
     private dataSource: DataSource,
     private redisService: RedisService,
   ) {}
+
   async create(createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto) {
-    const historyResult = await this.skidPlatformHistoryRepository.save(
-      createSkidPlatformHistoryDto as SkidPlatformHistory,
+    const historyData = await this.getProcessedData(
+      createSkidPlatformHistoryDto,
     );
 
+    const historyResult = await this.skidPlatformHistoryRepository.save(
+      historyData as SkidPlatformHistory,
+    );
     const skidPlatformNowState = await this.nowState();
+
     // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
     this.client
       .send(`hyundai/skidPlatform/insert`, {
@@ -59,6 +64,40 @@ export class SkidPlatformHistoryService {
       .pipe(take(1))
       .subscribe();
     return historyResult;
+  }
+
+  private async getProcessedData(historyData: CreateSkidPlatformHistoryDto) {
+    const existingHistory = await this.findExistingHistory(historyData);
+
+    if (!existingHistory) {
+      historyData.totalCount = historyData.count;
+      return historyData;
+    }
+    this.updateHistoryData(existingHistory, historyData);
+
+    return historyData;
+  }
+
+  private async findExistingHistory(historyData: CreateSkidPlatformHistoryDto) {
+    return this.findHistoryByPlatform(
+      historyData.SkidPlatform,
+      historyData.Awb,
+    );
+  }
+
+  private updateHistoryData(
+    existingHistory: SkidPlatformHistory,
+    historyData: CreateSkidPlatformHistoryDto,
+  ) {
+    historyData.totalCount = existingHistory.totalCount;
+
+    if (historyData.inOutType === 'out') {
+      historyData.count = existingHistory.count - historyData.count;
+    }
+
+    if (historyData.inOutType === 'in') {
+      historyData.count = (existingHistory.Awb as Awb).piece;
+    }
   }
 
   async findAll(query: SkidPlatformHistory & BasicQueryParamDto) {
@@ -106,12 +145,47 @@ export class SkidPlatformHistoryService {
           : undefined,
         createdAt: findDate,
       },
+      order: orderByUtil(query.order),
+      take: query.limit,
+      skip: query.offset,
     });
   }
 
   async findOne(id: number) {
     const result = await this.skidPlatformHistoryRepository.findOne({
       where: { id: id },
+      select: {
+        Awb: AwbAttribute,
+        Asrs: AsrsAttribute,
+        SkidPlatform: SkidPlatformAttribute,
+        AsrsOutOrder: {
+          ...AsrsOutOrderAttribute,
+          Awb: AwbAttribute,
+          Asrs: AsrsAttribute,
+          SkidPlatform: SkidPlatformAttribute,
+        },
+      },
+      relations: {
+        Awb: true,
+        Asrs: true,
+        SkidPlatform: true,
+        AsrsOutOrder: {
+          Awb: true,
+          Asrs: true,
+          SkidPlatform: true,
+        },
+      },
+      order: orderByUtil(null),
+    });
+    return result;
+  }
+
+  async findHistoryByPlatform(skidPlatformId: number, awbId: number) {
+    const [result] = await this.skidPlatformHistoryRepository.find({
+      where: {
+        SkidPlatform: skidPlatformId ? Equal(+skidPlatformId) : undefined,
+        Awb: awbId ? Equal(+awbId) : undefined,
+      },
       select: {
         Awb: AwbAttribute,
         Asrs: AsrsAttribute,
@@ -155,8 +229,24 @@ export class SkidPlatformHistoryService {
     return skidPlatfromState.filter((v) => v.inOutType === 'in');
   }
 
+  // 안착대 이력에서 skid_platform_id를 기준으로 가상포트의 최신 안착대의 상태만 가져옴
+  async nowVirtualState() {
+    const virtualState = await this.skidPlatformHistoryRepository
+      .createQueryBuilder('sph')
+      .distinctOn(['sph.skid_platform_id'])
+      .leftJoinAndSelect('sph.SkidPlatform', 'SkidPlatform')
+      .leftJoinAndSelect('sph.Asrs', 'Asrs')
+      .leftJoinAndSelect('sph.Awb', 'Awb')
+      .leftJoinAndSelect('Awb.Scc', 'Scc') // awb의 Scc를 반환합니다.
+      // .where('sph.inOutType = :type', { type: 'in' })
+      .orderBy('sph.skid_platform_id')
+      .addOrderBy('sph.id', 'DESC')
+      .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
+    return virtualState;
+  }
+
   /**
-   * 안착대 이력에서 asrs_id를 기준으로 최신 안착대의 'in' 상태인거 모두 삭제
+   * 안착대 이력에서 skidPlatform_id를 기준으로 최신 안착대의 'in' 상태인거 모두 삭제
    */
   async resetSkidPlatform() {
     const skidPlatfromState = await this.skidPlatformHistoryRepository
