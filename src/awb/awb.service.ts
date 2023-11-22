@@ -661,12 +661,12 @@ export class AwbService {
 
   // 해포
   async breakDown(
-    parentName: string,
+    parentId: number,
     createAwbDtos: CreateAwbDto[],
     queryRunnerManager: EntityManager,
   ) {
     const parentCargo = await this.awbRepository.findOne({
-      where: { barcode: parentName },
+      where: { id: parentId },
     });
     // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
     if (
@@ -689,26 +689,27 @@ export class AwbService {
           .getRepository(Awb)
           .save(subAwb);
 
-        const sccResult = await queryRunner.manager
-          .getRepository(Scc)
-          .upsert(subAwb.scc, ['name']);
+        if (awbResult && awbResult.scc && awbResult.id) {
+          // 4. 입력된 scc찾기
+          const sccResult = await this.sccRepository.find({
+            where: { code: In(awbResult.scc) },
+          });
 
-        // awb와 scc를 연결해주기 위한 작업
-        const joinParam = sccResult.identifiers.map((item) => {
-          return {
-            Awb: awbResult.id,
-            Scc: item.id,
-          };
-        });
-
-        // 2-2. Scc join에 등록
-        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+          // 5. awb와 scc를 연결해주기 위한 작업
+          const joinParam = sccResult.map((item) => {
+            return {
+              Awb: awbResult.id,
+              Scc: item.id,
+            };
+          });
+          await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+        }
       }
 
       // 2-3. 부모 화물 breakDown: True로 상태 변경
       await queryRunner.manager
         .getRepository(Awb)
-        .update({ barcode: parentName }, { breakDown: true });
+        .update({ id: parentId }, { breakDown: true });
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
@@ -760,7 +761,6 @@ export class AwbService {
 
   // ps에 해포 보내기
   async breakDownForPs(prepareBreakDownAwbDto: PrepareBreakDownAwbDto) {
-    console.log('prepareBreakDownAwbDto = ', prepareBreakDownAwbDto);
     await breakDownRequest(prepareBreakDownAwbDto);
   }
 
