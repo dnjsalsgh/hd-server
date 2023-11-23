@@ -5,6 +5,7 @@ import { HttpException } from '@nestjs/common';
 import { userSelectOutput } from '../../simulator-result/dto/user-select-output';
 import { awbInPalletRackResult } from '../../simulator-result/dto/get-Awb-in-palletPack.dto';
 import { PsAllResponse } from '../../simulator-result/dto/ps-all-output.dto';
+import { PrepareBreakDownAwbDto } from '../../awb/dto/prepare-break-down-awb.dto';
 
 export const checkPsServer = async (): Promise<PsApiResponse> => {
   try {
@@ -138,7 +139,7 @@ export const sendSlackMessage = async (input: any) => {
 
 export const breakDownRequest = async (input: any) => {
   try {
-    const response = await axios.post(
+    const response = await axios.post<PrepareBreakDownAwbDto[]>(
       `${process.env.PS_SERVER}/break-down`,
       input,
       {

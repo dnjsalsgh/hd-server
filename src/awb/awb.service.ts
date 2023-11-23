@@ -760,8 +760,12 @@ export class AwbService {
   }
 
   // ps에 해포 보내기
-  async breakDownForPs(prepareBreakDownAwbDto: PrepareBreakDownAwbDto) {
-    await breakDownRequest(prepareBreakDownAwbDto);
+  async breakDownForPs(
+    prepareBreakDownAwbDto: PrepareBreakDownAwbDto,
+    queryRunnerManager: EntityManager,
+  ) {
+    const awbList = await breakDownRequest(prepareBreakDownAwbDto);
+    this.breakDown(awbList[0].id, awbList, queryRunnerManager);
   }
 
   remove(id: number) {
