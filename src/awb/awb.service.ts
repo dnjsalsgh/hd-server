@@ -765,7 +765,7 @@ export class AwbService {
     queryRunnerManager: EntityManager,
   ) {
     const awbList = await breakDownRequest(prepareBreakDownAwbDto);
-    this.breakDown(awbList[0].id, awbList, queryRunnerManager);
+    await this.breakDown(awbList[0].id, awbList, queryRunnerManager);
   }
 
   remove(id: number) {
