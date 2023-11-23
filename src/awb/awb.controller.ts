@@ -145,7 +145,7 @@ export class AwbController {
     description: 'ps에 화물 해포 요청보네기, piece 수만큼 화물이 해포될 예정',
   })
   @UseInterceptors(TransactionInterceptor)
-  @Get('/break-down/for-ps')
+  @Post('/break-down/for-ps')
   breakDownEvent(
     @Body() body: PrepareBreakDownAwbDto,
     @TransactionManager() queryRunnerManager: EntityManager,
