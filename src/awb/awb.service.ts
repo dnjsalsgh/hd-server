@@ -671,7 +671,7 @@ export class AwbService {
     // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
     if (
       !parentCargo &&
-      parentCargo.parent !== 0 &&
+      (parentCargo.parent !== 0 || parentCargo.parent === null) &&
       parentCargo.breakDown === false
     ) {
       throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
