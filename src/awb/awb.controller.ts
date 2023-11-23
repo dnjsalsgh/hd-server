@@ -144,9 +144,13 @@ export class AwbController {
     summary: 'ps에 화물 해포 요청',
     description: 'ps에 화물 해포 요청보네기, piece 수만큼 화물이 해포될 예정',
   })
+  @UseInterceptors(TransactionInterceptor)
   @Post('/break-down/for-ps')
-  breakDownEvent(@Body() body: PrepareBreakDownAwbDto) {
-    return this.awbService.breakDownForPs(body);
+  breakDownEvent(
+    @Body() body: PrepareBreakDownAwbDto,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.awbService.breakDownForPs(body, queryRunnerManager);
   }
 
   @ApiQuery({ name: 'prefab', required: false, type: 'string' })

@@ -22,6 +22,16 @@ export class BasicController {
     return this.basicService.create(createBasicDto);
   }
 
+  @Post('test/raw/insert/query')
+  sendInsertQueryAtMssql(@Body() createBasicDto: CreateBasicDto) {
+    return this.basicService.sendInsertQueryAtMssql();
+  }
+
+  @Get('test/raw/select/query')
+  sendSelectQueryAtMssql() {
+    return this.basicService.sendSelectQueryAtMssql();
+  }
+
   @Get()
   findAll() {
     return this.basicService.findAll();
