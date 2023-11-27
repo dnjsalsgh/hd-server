@@ -821,9 +821,6 @@ export class SimulatorResultService {
 
     // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
     const asrsStateArray = await this.asrsHistoryService.nowState();
-    // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
-    const skidPlatformStateArray =
-      await this.skidPlatformHistoryService.nowState();
     // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const uldStateArray = await this.uldHistoryService.nowState(
       apiRequest.UldCode,
@@ -840,10 +837,6 @@ export class SimulatorResultService {
     if (Ulds.length <= 0)
       throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
 
-    // 안착대 현재 상황 묶음
-    // const palletRack = [];
-    // this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
-
     // uld의 현재 상황 묶음
     const currentAWBsInULD = [];
     this.setCurrentAwbInUld(uldStateArray, currentAWBsInULD);
@@ -852,6 +845,11 @@ export class SimulatorResultService {
     if (!apiRequest.awbId) {
       throw new HttpException('awb 정보를 찾아오지 못했습니다', 400);
     }
+
+    if (typeof apiRequest.awbId !== 'number') {
+      throw new HttpException('awbId를 입력해주세요.', 400);
+    }
+
     const awbInfo = await this.awbUtilService.findExistingAwbById(
       queryRunner,
       apiRequest.awbId,
@@ -871,17 +869,91 @@ export class SimulatorResultService {
     };
     const packageSimulatorCallRequestObject = {
       mode: false,
-      Awbs: Awbs,
+      // Awbs: Awbs,
       Ulds: Ulds,
       currentAWBsInULD: currentAWBsInULD,
       // palletRack: palletRack,
       inputAWB: inputAWB,
     };
-    return packageSimulatorCallRequestObject;
     this.client
       .send('hyundai/ps/input', packageSimulatorCallRequestObject)
       .pipe()
       .subscribe();
+    return packageSimulatorCallRequestObject;
+    // const psResult = await getUserSelect(packageSimulatorCallRequestObject); // ps 콜
+    // this.client.send('hyundai/ps/result', psResult).pipe(take(1)).subscribe();
+
+    // ps의 결과가 Failure로 올 때 예외 처리
+    // if (psResult.inputState !== 'Success') {
+    //   return psResult;
+    // }
+  }
+
+  // 해포된 화물이 uld안에 들어갈 수 있는지 확인하기 위한 메서드(awb List 용도)
+  async uldDeployCheckerList(
+    apiRequest: UldDeployCheckerRequest,
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
+    const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
+
+    // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const uldStateArray = await this.uldHistoryService.nowState(
+      apiRequest.UldCode,
+    );
+
+    // ps에 보낼 Uld정보를 모아두는
+    const Ulds = [];
+    await this.setUldStateByUldCode(apiRequest, Ulds);
+    if (Ulds.length <= 0)
+      throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
+
+    // uld의 현재 상황 묶음
+    const currentAWBsInULD = [];
+    this.setCurrentAwbInUld(uldStateArray, currentAWBsInULD);
+
+    // 화물검색
+    if (!apiRequest.awbId) {
+      throw new HttpException('awb 정보를 찾아오지 못했습니다', 400);
+    }
+
+    if (typeof apiRequest.awbId === 'number') {
+      throw new HttpException('awbId의 배열을 입력해주세요.', 400);
+    }
+
+    const awbInfoList = await this.awbUtilService.findExistingAwbListById(
+      queryRunner,
+      apiRequest.awbId,
+    );
+
+    // TODO: map 형태로 바꿔서 [{awbId: true/false}] 형태로 나오게 바꾸기
+    awbInfoList.forEach((awbInfo) => {
+      // 사용자가 넣는 화물
+      const inputAWB = {
+        // palletRackId: apiRequest.palletRackId,
+        barcode: awbInfo.barcode,
+        width: awbInfo.width,
+        length: awbInfo.length,
+        depth: awbInfo.depth,
+        waterVolume: awbInfo.waterVolume,
+        weight: awbInfo.weight,
+        destination: awbInfo.destination,
+        SCCs: awbInfo.Scc.map((s) => s.code),
+      };
+
+      const packageSimulatorCallRequestObject = {
+        mode: false,
+        Ulds: Ulds,
+        currentAWBsInULD: currentAWBsInULD,
+        inputAWB: inputAWB,
+      };
+
+      this.client
+        .send('hyundai/ps/input', packageSimulatorCallRequestObject)
+        .pipe()
+        .subscribe();
+    });
+    // return packageSimulatorCallRequestObject;
     // const psResult = await getUserSelect(packageSimulatorCallRequestObject); // ps 콜
     // this.client.send('hyundai/ps/result', psResult).pipe(take(1)).subscribe();
 

@@ -160,6 +160,24 @@ export class SimulatorResultController {
     );
   }
 
+  @ApiOperation({
+    summary: 'uld안에 화물들이 들어갈 수 있는지 확인하는 api',
+    description:
+      'uld안에 화물들이 들어갈 수 있는지 확인, awbId에 리스트를 넣으면 됨',
+  })
+  @ApiBody({ type: UldDeployCheckerRequest })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/uld-deploy-checker/list')
+  uldDeployCheckerList(
+    @Body() body: UldDeployCheckerRequest,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.simulatorResultService.uldDeployCheckerList(
+      body,
+      queryRunnerManager,
+    );
+  }
+
   @ApiQuery({ name: 'Uld', required: false, type: 'number' })
   @ApiQuery({ name: 'loadRate', required: false })
   @ApiQuery({ name: 'version', required: false })

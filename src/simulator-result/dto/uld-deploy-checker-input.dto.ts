@@ -64,5 +64,5 @@ export class UldDeployCheckerRequest {
     example: 1653,
     description: '사용자가 선택한 Awb의 Id',
   })
-  awbId: number;
+  awbId: number | number[];
 }
