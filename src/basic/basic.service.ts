@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateBasicDto } from './dto/create-basic.dto';
 import { UpdateBasicDto } from './dto/update-basic.dto';
 import sql from 'mssql';
+import { Vms3D } from '../vms/entities/vms.entity';
 
 @Injectable()
 export class BasicService {
@@ -14,9 +15,12 @@ export class BasicService {
     return searchResult;
   }
 
-  sendSelectQueryAtMssql() {
-    const insertQuery = `SELECT * FROM VWMS_3D_RESULT_DATA`;
-    this.selectQuery(insertQuery);
+  async sendSelectQueryAtMssql() {
+    const selectQuery = `select top(1) * from VWMS_3D_RESULT_DATA order by CREATE_DATE desc;`;
+    // const selectQuery = `select top(1) * from VWMS_2D_RAW_DATA order by CREATE_DATE desc;`;
+    // const selectQuery = `select top(1) * from VWMS_AWB_RESULT order by RECEIVED_DATE desc;`;
+    // const selectQuery = `select top(1) * from VWMS_AWB_HISTORY order by OUT_DATE desc;`
+    return await this.selectQuery(selectQuery);
   }
 
   private async selectQuery(query: string) {
@@ -34,9 +38,10 @@ export class BasicService {
       });
 
       // query 메소드를 이용하여 쿼리 실행
-      const result = await pool.request().query(query);
+      const result = await pool.request().query<Vms3D>(query);
 
       console.log(result);
+      return result?.recordset[0];
     } catch (err) {
       // 에러 처리
       console.error('SQL error', err);

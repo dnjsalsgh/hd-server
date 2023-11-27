@@ -66,7 +66,6 @@ const size: {
   image: 5 * 1024 * 1024,
 };
 
-// =TODO 파일업로드 무조건 files/attach에 저장되는 문제
 // 단일 파일 업로드
 export const uploadFile = (
   paramName: string,

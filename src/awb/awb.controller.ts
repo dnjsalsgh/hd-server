@@ -41,7 +41,7 @@ import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
-import { PrepareBreakDownAwbDto } from './dto/prepare-break-down-awb.dto';
+import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -93,6 +93,19 @@ export class AwbController {
   }
 
   @ApiOperation({
+    summary: 'ps에 화물 해포 요청',
+    description: 'ps에 화물 해포 요청보네기, piece 수만큼 화물이 해포될 예정',
+  })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/break-down/for-ps')
+  breakDownEvent(
+    @Body() body: PrepareBreakDownAwbInputDto,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.awbService.breakDownForPs(body, queryRunnerManager);
+  }
+
+  @ApiOperation({
     summary: '해포 실행',
     description:
       '부모 화물의 Id을 parameter로 넣고, body에 자식 awb를 배열형태로 입력합니다.',
@@ -140,19 +153,7 @@ export class AwbController {
     return this.awbService.injectionScc(awbId, body, queryRunnerManager);
   }
 
-  @ApiOperation({
-    summary: 'ps에 화물 해포 요청',
-    description: 'ps에 화물 해포 요청보네기, piece 수만큼 화물이 해포될 예정',
-  })
-  @UseInterceptors(TransactionInterceptor)
-  @Post('/break-down/for-ps')
-  breakDownEvent(
-    @Body() body: PrepareBreakDownAwbDto,
-    @TransactionManager() queryRunnerManager: EntityManager,
-  ) {
-    return this.awbService.breakDownForPs(body, queryRunnerManager);
-  }
-
+  @ApiQuery({ name: 'ghost', required: false, type: 'boolean' })
   @ApiQuery({ name: 'prefab', required: false, type: 'string' })
   @ApiQuery({ name: 'waterVolume', required: false, type: 'number' })
   @ApiQuery({ name: 'squareVolume', required: false, type: 'number' })

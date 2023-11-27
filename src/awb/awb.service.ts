@@ -43,10 +43,10 @@ import { CreateVmsAwbHistoryDto } from '../vms-awb-history/dto/create-vms-awb-hi
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
-import csv from 'csv';
-import fs from 'fs';
-import { PrepareBreakDownAwbDto } from './dto/prepare-break-down-awb.dto';
+import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
 import { breakDownRequest } from '../lib/util/axios.util';
+import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
+import { breakdownTest } from './dto/breakdownTest';
 
 @Injectable()
 export class AwbService {
@@ -558,6 +558,7 @@ export class AwbService {
         localTime: query.localTime,
         localInTerminal: query.localInTerminal,
         simulation: query.simulation,
+        ghost: query.ghost,
         createdAt: findDate,
       },
       order: orderByUtil(query.order),
@@ -662,16 +663,19 @@ export class AwbService {
   // 해포
   async breakDown(
     parentId: number,
-    createAwbDtos: CreateAwbDto[],
+    createAwbDtos: CreateAwbDto[] | breakDownAwb[],
     queryRunnerManager: EntityManager,
   ) {
     const parentCargo = await this.awbRepository.findOne({
       where: { id: parentId },
+      relations: { AirCraftSchedule: true },
+      select: { AirCraftSchedule: { id: true } },
     });
+
     // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
     if (
       !parentCargo &&
-      (parentCargo.parent !== 0 || parentCargo.parent === null) &&
+      (parentCargo.parent === 0 || parentCargo.parent === null) &&
       parentCargo.breakDown === false
     ) {
       throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
@@ -683,8 +687,16 @@ export class AwbService {
       for (let i = 0; i < createAwbDtos.length; i++) {
         // 2-1. 하위 화물 등록
         const subAwb = createAwbDtos[i];
+        // 하위 하풀 부모와 동기화 될 요소들 전처리
         subAwb.parent = parentCargo.id;
+        subAwb.breakDown = true;
+        subAwb.AirCraftSchedule = parentCargo.AirCraftSchedule;
+        subAwb.state = 'inskidplatform'; // 안착대에서 해포가 될 테니 상태값은 '안착대적재'
 
+        // ps에서 값을 파싱할 때 save를 사용하려면 priamry key를 없에야 해서 id는 제외
+        if ('id' in subAwb) {
+          delete subAwb.id;
+        }
         const awbResult = await queryRunner.manager
           .getRepository(Awb)
           .save(subAwb);
@@ -692,7 +704,7 @@ export class AwbService {
         if (awbResult && awbResult.scc && awbResult.id) {
           // 4. 입력된 scc찾기
           const sccResult = await this.sccRepository.find({
-            where: { code: In(awbResult.scc) },
+            where: { code: In(awbResult.scc as string[]) },
           });
 
           // 5. awb와 scc를 연결해주기 위한 작업
@@ -713,6 +725,17 @@ export class AwbService {
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
+  }
+
+  // ps에 해포 보내기
+  async breakDownForPs(
+    prepareBreakDownAwbDto: PrepareBreakDownAwbInputDto,
+    queryRunnerManager: EntityManager,
+  ) {
+    // TODO: ps 연결되면 주석 해제하고 로직 바꾸기
+    // const psResult = await breakDownRequest(prepareBreakDownAwbDto);
+    const awbList: breakDownAwb[] = breakdownTest.result;
+    await this.breakDown(awbList[0].id, awbList, queryRunnerManager);
   }
 
   // 이미 등록된 awb를 해포
@@ -757,15 +780,6 @@ export class AwbService {
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
-  }
-
-  // ps에 해포 보내기
-  async breakDownForPs(
-    prepareBreakDownAwbDto: PrepareBreakDownAwbDto,
-    queryRunnerManager: EntityManager,
-  ) {
-    const awbList = await breakDownRequest(prepareBreakDownAwbDto);
-    await this.breakDown(awbList[0].id, awbList, queryRunnerManager);
   }
 
   remove(id: number) {
