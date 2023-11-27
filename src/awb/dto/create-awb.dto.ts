@@ -15,7 +15,7 @@ export class CreateAwbDto extends PickType(Awb, [
   'separateNumber',
   'destination',
   // 'source',
-  // 'breakDown',
+  'breakDown',
   'piece',
   'state',
   'parent',
@@ -50,5 +50,5 @@ export class CreateAwbDto extends PickType(Awb, [
     example: 1,
     description: '항공편 FK',
   })
-  AirCraftSchedule?: Partial<AircraftSchedule>;
+  AirCraftSchedule?: Partial<AircraftSchedule> | number;
 }

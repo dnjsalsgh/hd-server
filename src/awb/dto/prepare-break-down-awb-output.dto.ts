@@ -25,6 +25,8 @@ export class breakDownAwb {
   waterVolume: number;
   weight: number;
   width: number;
+  breakDown?: boolean;
+  AirCraftSchedule?: number;
 }
 
 export class PrepareBreakDownAwbOutputDto {

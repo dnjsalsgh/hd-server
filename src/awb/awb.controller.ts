@@ -153,6 +153,7 @@ export class AwbController {
     return this.awbService.injectionScc(awbId, body, queryRunnerManager);
   }
 
+  @ApiQuery({ name: 'ghost', required: false, type: 'boolean' })
   @ApiQuery({ name: 'prefab', required: false, type: 'string' })
   @ApiQuery({ name: 'waterVolume', required: false, type: 'number' })
   @ApiQuery({ name: 'squareVolume', required: false, type: 'number' })

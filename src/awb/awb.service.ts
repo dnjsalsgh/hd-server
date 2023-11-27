@@ -558,6 +558,7 @@ export class AwbService {
         localTime: query.localTime,
         localInTerminal: query.localInTerminal,
         simulation: query.simulation,
+        ghost: query.ghost,
         createdAt: findDate,
       },
       order: orderByUtil(query.order),
@@ -667,12 +668,14 @@ export class AwbService {
   ) {
     const parentCargo = await this.awbRepository.findOne({
       where: { id: parentId },
+      relations: { AirCraftSchedule: true },
+      select: { AirCraftSchedule: { id: true } },
     });
 
     // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
     if (
       !parentCargo &&
-      (parentCargo.parent !== 0 || parentCargo.parent === null) &&
+      (parentCargo.parent === 0 || parentCargo.parent === null) &&
       parentCargo.breakDown === false
     ) {
       throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
@@ -684,8 +687,13 @@ export class AwbService {
       for (let i = 0; i < createAwbDtos.length; i++) {
         // 2-1. 하위 화물 등록
         const subAwb = createAwbDtos[i];
+        // 하위 하풀 부모와 동기화 될 요소들 전처리
         subAwb.parent = parentCargo.id;
+        subAwb.breakDown = true;
+        subAwb.AirCraftSchedule = parentCargo.AirCraftSchedule;
+        subAwb.state = 'inskidplatform'; // 안착대에서 해포가 될 테니 상태값은 '안착대적재'
 
+        // ps에서 값을 파싱할 때 save를 사용하려면 priamry key를 없에야 해서 id는 제외
         if ('id' in subAwb) {
           delete subAwb.id;
         }
