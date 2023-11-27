@@ -205,4 +205,18 @@ export class AwbUtilService {
   async saveAwbSccJoin(queryRunner, joinParam) {
     return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
   }
+
+  // scc 조회
+  async findScc(awbResult) {
+    return await this.sccRepository.find({
+      where: { code: In(awbResult.scc as string[]) },
+    });
+  }
+
+  // 부모 화물 상태 변경
+  async changeParentCargoStatus(parentId, queryRunner) {
+    await queryRunner.manager
+      .getRepository(Awb)
+      .update({ id: parentId }, { breakDown: true });
+  }
 }
