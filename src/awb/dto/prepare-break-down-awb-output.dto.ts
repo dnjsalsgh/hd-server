@@ -17,6 +17,7 @@ export class PrepareBreakDownAwbDto extends PickType(Awb, [
   'parent',
   'modelPath',
   'simulation',
+  'destination',
   'path',
   'spawnRatio',
   'description',
