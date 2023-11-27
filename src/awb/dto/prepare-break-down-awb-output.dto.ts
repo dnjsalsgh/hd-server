@@ -1,48 +1,36 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import { Awb } from '../entities/awb.entity';
 import { Scc } from '../../scc/entities/scc.entity';
 
-export class PrepareBreakDownAwbDto extends PickType(Awb, [
-  'prefab',
-  'waterVolume',
-  'squareVolume',
-  'width',
-  'length',
-  'depth',
-  'weight',
-  'barcode',
-  'separateNumber',
-  'piece',
-  'state',
-  'parent',
-  'modelPath',
-  'simulation',
-  'destination',
-  'path',
-  'spawnRatio',
-  'description',
-  'ghost',
-  'gSkidOn',
-  'awbTotalPiece',
-  'allAwbReceive',
-  'receivedUser',
-  'receivedDate',
-]) {
-  @ApiProperty({
-    example: 1,
-    description: '화물의 id',
-  })
+export class breakDownAwb {
+  allAwbReceive: boolean;
+  awbTotalPiece: number;
+  barcode: string;
+  depth: number;
+  description: string;
+  destination: string;
+  gSkidOn: boolean;
+  ghost: boolean;
   id: number;
-
-  @ApiProperty({
-    example: '["GEN","EAT"]',
-    description: 'SCCFK',
-  })
+  length: number;
+  modelPath: string | null;
+  parent: number;
+  path: string | null;
+  piece: number;
+  prefab: string;
+  receivedDate: string;
+  receivedUser: string;
   scc: Partial<Scc>[];
+  separateNumber: number;
+  simulation: boolean;
+  spawnRatio: number;
+  squareVolume: number;
+  state: string;
+  waterVolume: number;
+  weight: number;
+  width: number;
+}
 
-  // @ApiProperty({
-  //   example: 1,
-  //   description: '항공편 FK',
-  // })
-  // AirCraftSchedule?: Partial<AircraftSchedule>;
+export class PrepareBreakDownAwbOutputDto {
+  code: number;
+  result: breakDownAwb[];
+  state: string;
 }

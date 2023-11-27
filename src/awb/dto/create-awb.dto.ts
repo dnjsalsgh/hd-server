@@ -4,7 +4,6 @@ import { Scc } from '../../scc/entities/scc.entity';
 import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 
 export class CreateAwbDto extends PickType(Awb, [
-  // 'name',
   'prefab',
   'waterVolume',
   'squareVolume',
@@ -12,10 +11,9 @@ export class CreateAwbDto extends PickType(Awb, [
   'length',
   'depth',
   'weight',
-  // 'isStructure',
   'barcode',
   'separateNumber',
-  // 'destination',
+  'destination',
   // 'source',
   // 'breakDown',
   'piece',

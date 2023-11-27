@@ -43,10 +43,9 @@ import { CreateVmsAwbHistoryDto } from '../vms-awb-history/dto/create-vms-awb-hi
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
-import csv from 'csv';
-import fs from 'fs';
-import { PrepareBreakDownAwbDto } from './dto/prepare-break-down-awb.dto';
+import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
 import { breakDownRequest } from '../lib/util/axios.util';
+import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
 
 @Injectable()
 export class AwbService {
@@ -662,7 +661,7 @@ export class AwbService {
   // 해포
   async breakDown(
     parentId: number,
-    createAwbDtos: CreateAwbDto[],
+    createAwbDtos: CreateAwbDto[] | breakDownAwb[],
     queryRunnerManager: EntityManager,
   ) {
     const parentCargo = await this.awbRepository.findOne({
@@ -761,10 +760,18 @@ export class AwbService {
 
   // ps에 해포 보내기
   async breakDownForPs(
-    prepareBreakDownAwbDto: PrepareBreakDownAwbDto,
+    prepareBreakDownAwbDto: PrepareBreakDownAwbInputDto,
     queryRunnerManager: EntityManager,
   ) {
-    const awbList = await breakDownRequest(prepareBreakDownAwbDto);
+    const psResult = await breakDownRequest(prepareBreakDownAwbDto);
+    const awbList: breakDownAwb[] = psResult.result;
+    // const convertedAwbDto: CreateAwbDto[] = awbList.map((awb) => {
+    //   return {
+    //     id: awb.id,
+    //     barcode: awb.barcode,
+    //   };
+    // });
+
     await this.breakDown(awbList[0].id, awbList, queryRunnerManager);
   }
 

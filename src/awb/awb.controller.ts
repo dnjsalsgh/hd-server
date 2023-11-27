@@ -41,7 +41,7 @@ import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
-import { PrepareBreakDownAwbDto } from './dto/prepare-break-down-awb.dto';
+import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -147,7 +147,7 @@ export class AwbController {
   @UseInterceptors(TransactionInterceptor)
   @Post('/break-down/for-ps')
   breakDownEvent(
-    @Body() body: PrepareBreakDownAwbDto,
+    @Body() body: PrepareBreakDownAwbInputDto,
     @TransactionManager() queryRunnerManager: EntityManager,
   ) {
     return this.awbService.breakDownForPs(body, queryRunnerManager);
