@@ -819,17 +819,10 @@ export class SimulatorResultService {
     const queryRunner = queryRunnerManager.queryRunner;
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
 
-    // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
-    const asrsStateArray = await this.asrsHistoryService.nowState();
     // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const uldStateArray = await this.uldHistoryService.nowState(
       apiRequest.UldCode,
     );
-
-    // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
-    // 현재 ASRS의 정보들
-    const Awbs = [];
-    this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
