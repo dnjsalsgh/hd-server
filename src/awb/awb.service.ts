@@ -46,6 +46,7 @@ import dayjs from 'dayjs';
 import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
 import { breakDownRequest } from '../lib/util/axios.util';
 import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
+import { breakdownTest } from './dto/breakdownTest';
 
 @Injectable()
 export class AwbService {
@@ -667,6 +668,7 @@ export class AwbService {
     const parentCargo = await this.awbRepository.findOne({
       where: { id: parentId },
     });
+
     // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
     if (
       !parentCargo &&
@@ -684,6 +686,9 @@ export class AwbService {
         const subAwb = createAwbDtos[i];
         subAwb.parent = parentCargo.id;
 
+        if ('id' in subAwb) {
+          delete subAwb.id;
+        }
         const awbResult = await queryRunner.manager
           .getRepository(Awb)
           .save(subAwb);
@@ -691,7 +696,7 @@ export class AwbService {
         if (awbResult && awbResult.scc && awbResult.id) {
           // 4. 입력된 scc찾기
           const sccResult = await this.sccRepository.find({
-            where: { code: In(awbResult.scc) },
+            where: { code: In(awbResult.scc as string[]) },
           });
 
           // 5. awb와 scc를 연결해주기 위한 작업
@@ -712,6 +717,17 @@ export class AwbService {
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
+  }
+
+  // ps에 해포 보내기
+  async breakDownForPs(
+    prepareBreakDownAwbDto: PrepareBreakDownAwbInputDto,
+    queryRunnerManager: EntityManager,
+  ) {
+    // TODO: ps 연결되면 주석 해제하고 로직 바꾸기
+    // const psResult = await breakDownRequest(prepareBreakDownAwbDto);
+    const awbList: breakDownAwb[] = breakdownTest.result;
+    await this.breakDown(awbList[0].id, awbList, queryRunnerManager);
   }
 
   // 이미 등록된 awb를 해포
@@ -756,23 +772,6 @@ export class AwbService {
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
-  }
-
-  // ps에 해포 보내기
-  async breakDownForPs(
-    prepareBreakDownAwbDto: PrepareBreakDownAwbInputDto,
-    queryRunnerManager: EntityManager,
-  ) {
-    const psResult = await breakDownRequest(prepareBreakDownAwbDto);
-    const awbList: breakDownAwb[] = psResult.result;
-    // const convertedAwbDto: CreateAwbDto[] = awbList.map((awb) => {
-    //   return {
-    //     id: awb.id,
-    //     barcode: awb.barcode,
-    //   };
-    // });
-
-    await this.breakDown(awbList[0].id, awbList, queryRunnerManager);
   }
 
   remove(id: number) {

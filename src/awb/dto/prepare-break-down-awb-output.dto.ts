@@ -18,7 +18,7 @@ export class breakDownAwb {
   prefab: string;
   receivedDate: string;
   receivedUser: string;
-  scc: Partial<Scc>[];
+  scc: string[];
   separateNumber: number;
   simulation: boolean;
   spawnRatio: number;

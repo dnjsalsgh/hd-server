@@ -93,6 +93,19 @@ export class AwbController {
   }
 
   @ApiOperation({
+    summary: 'ps에 화물 해포 요청',
+    description: 'ps에 화물 해포 요청보네기, piece 수만큼 화물이 해포될 예정',
+  })
+  @UseInterceptors(TransactionInterceptor)
+  @Post('/break-down/for-ps')
+  breakDownEvent(
+    @Body() body: PrepareBreakDownAwbInputDto,
+    @TransactionManager() queryRunnerManager: EntityManager,
+  ) {
+    return this.awbService.breakDownForPs(body, queryRunnerManager);
+  }
+
+  @ApiOperation({
     summary: '해포 실행',
     description:
       '부모 화물의 Id을 parameter로 넣고, body에 자식 awb를 배열형태로 입력합니다.',
@@ -138,19 +151,6 @@ export class AwbController {
     @TransactionManager() queryRunnerManager: EntityManager,
   ) {
     return this.awbService.injectionScc(awbId, body, queryRunnerManager);
-  }
-
-  @ApiOperation({
-    summary: 'ps에 화물 해포 요청',
-    description: 'ps에 화물 해포 요청보네기, piece 수만큼 화물이 해포될 예정',
-  })
-  @UseInterceptors(TransactionInterceptor)
-  @Post('/break-down/for-ps')
-  breakDownEvent(
-    @Body() body: PrepareBreakDownAwbInputDto,
-    @TransactionManager() queryRunnerManager: EntityManager,
-  ) {
-    return this.awbService.breakDownForPs(body, queryRunnerManager);
   }
 
   @ApiQuery({ name: 'prefab', required: false, type: 'string' })
