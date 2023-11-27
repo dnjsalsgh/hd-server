@@ -573,6 +573,7 @@ export class AwbService {
     return searchResult;
   }
 
+  // awb의 정보를 csv로 export 할 수 있는 메서드
   async printCsv(query: Awb & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
@@ -660,68 +661,77 @@ export class AwbService {
     return this.awbRepository.update(id, updateAwbDto);
   }
 
-  // 해포
-  async breakDown(
-    parentId: number,
-    createAwbDtos: CreateAwbDto[] | breakDownAwb[],
-    queryRunnerManager: EntityManager,
-  ) {
+  // 부모 화물 정보 검증
+  async validateParentCargo(parentId: number) {
     const parentCargo = await this.awbRepository.findOne({
       where: { id: parentId },
       relations: { AirCraftSchedule: true },
       select: { AirCraftSchedule: { id: true } },
     });
 
-    // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
     if (
-      !parentCargo &&
-      (parentCargo.parent === 0 || parentCargo.parent === null) &&
+      !parentCargo ||
+      parentCargo.parent !== 0 ||
+      parentCargo.parent === null ||
       parentCargo.breakDown === false
     ) {
       throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
     }
 
+    return parentCargo;
+  }
+
+  // 하위 화물 등록
+  async registerSubAwb(subAwb, parentCargo, queryRunner) {
+    subAwb.parent = parentCargo.id;
+    subAwb.breakDown = true;
+    subAwb.AirCraftSchedule = parentCargo.AirCraftSchedule;
+    subAwb.state = 'inskidplatform';
+
+    if ('id' in subAwb) {
+      delete subAwb.id;
+    }
+
+    return await queryRunner.manager.getRepository(Awb).save(subAwb);
+  }
+
+  // awb와 scc 연결
+  async joinAwbScc(sccResult, awbResult, queryRunner) {
+    const joinParam = sccResult.map((item) => {
+      return {
+        Awb: awbResult.id,
+        Scc: item.id,
+      };
+    });
+
+    await this.awbUtilService.saveAwbSccJoin(queryRunner, joinParam);
+  }
+
+  // 해포
+  async breakDown(
+    parentId: number,
+    createAwbDtos: CreateAwbDto[] | breakDownAwb[],
+    queryRunnerManager: EntityManager,
+  ) {
+    const parentCargo = await this.validateParentCargo(parentId);
+
     const queryRunner = queryRunnerManager.queryRunner;
+
     try {
-      // 2. 해포된 화물들 등록
       for (let i = 0; i < createAwbDtos.length; i++) {
-        // 2-1. 하위 화물 등록
         const subAwb = createAwbDtos[i];
-        // 하위 하풀 부모와 동기화 될 요소들 전처리
-        subAwb.parent = parentCargo.id;
-        subAwb.breakDown = true;
-        subAwb.AirCraftSchedule = parentCargo.AirCraftSchedule;
-        subAwb.state = 'inskidplatform'; // 안착대에서 해포가 될 테니 상태값은 '안착대적재'
-
-        // ps에서 값을 파싱할 때 save를 사용하려면 priamry key를 없에야 해서 id는 제외
-        if ('id' in subAwb) {
-          delete subAwb.id;
-        }
-        const awbResult = await queryRunner.manager
-          .getRepository(Awb)
-          .save(subAwb);
-
+        const awbResult = await this.registerSubAwb(
+          subAwb,
+          parentCargo,
+          queryRunner,
+        );
         if (awbResult && awbResult.scc && awbResult.id) {
-          // 4. 입력된 scc찾기
-          const sccResult = await this.sccRepository.find({
-            where: { code: In(awbResult.scc as string[]) },
-          });
-
-          // 5. awb와 scc를 연결해주기 위한 작업
-          const joinParam = sccResult.map((item) => {
-            return {
-              Awb: awbResult.id,
-              Scc: item.id,
-            };
-          });
-          await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+          const sccResult = await this.awbUtilService.findScc(awbResult);
+          await this.joinAwbScc(sccResult, awbResult, queryRunner);
         }
       }
 
-      // 2-3. 부모 화물 breakDown: True로 상태 변경
-      await queryRunner.manager
-        .getRepository(Awb)
-        .update({ id: parentId }, { breakDown: true });
+      await this.awbUtilService.changeParentCargoStatus(parentId, queryRunner);
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
