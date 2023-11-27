@@ -1,5 +1,3 @@
-import { Scc } from '../../scc/entities/scc.entity';
-
 export class breakDownAwb {
   allAwbReceive: boolean;
   awbTotalPiece: number;
