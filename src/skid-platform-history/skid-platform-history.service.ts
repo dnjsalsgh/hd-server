@@ -238,7 +238,7 @@ export class SkidPlatformHistoryService {
       .leftJoinAndSelect('sph.Asrs', 'Asrs')
       .leftJoinAndSelect('sph.Awb', 'Awb')
       .leftJoinAndSelect('Awb.Scc', 'Scc') // awb의 Scc를 반환합니다.
-      // .where('sph.inOutType = :type', { type: 'in' })
+      .where('sph.virtual = :virtual', { virtual: true })
       .orderBy('sph.skid_platform_id')
       .addOrderBy('sph.id', 'DESC')
       .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
