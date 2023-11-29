@@ -104,7 +104,7 @@ export class Awb {
   isStructure: boolean;
 
   @ApiProperty({
-    example: '미국',
+    example: 'USA',
     description: '목적지',
   })
   @Column({ type: 'varchar', length: 500, nullable: true })

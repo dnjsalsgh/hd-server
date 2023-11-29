@@ -2,7 +2,7 @@ import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Awb } from '../entities/awb.entity';
 import { Scc } from '../../scc/entities/scc.entity';
 
-export class PrepareBreakDownAwbDto extends PickType(Awb, [
+export class PrepareBreakDownAwbInputDto extends PickType(Awb, [
   'prefab',
   'waterVolume',
   'squareVolume',
@@ -17,6 +17,7 @@ export class PrepareBreakDownAwbDto extends PickType(Awb, [
   'parent',
   'modelPath',
   'simulation',
+  'destination',
   'path',
   'spawnRatio',
   'description',

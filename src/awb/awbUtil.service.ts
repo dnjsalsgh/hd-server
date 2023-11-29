@@ -83,6 +83,26 @@ export class AwbUtilService {
     return existingAwb;
   }
 
+  async findExistingAwbById(queryRunner, awbId: number): Promise<Awb> {
+    const [existingAwb] = await queryRunner.manager.getRepository(Awb).find({
+      where: { id: awbId },
+      relations: { Scc: true },
+      order: orderByUtil(null),
+    });
+
+    return existingAwb;
+  }
+
+  async findExistingAwbListById(queryRunner, awbId: number[]): Promise<Awb[]> {
+    const existingAwb = await queryRunner.manager.getRepository(Awb).find({
+      where: { id: In(awbId) },
+      relations: { Scc: true },
+      order: orderByUtil(null),
+    });
+
+    return existingAwb;
+  }
+
   async findSccInAwb(queryRunner, awbId: number) {
     const [searchResult] = await queryRunner.manager.getRepository(Awb).find({
       where: { id: awbId },
@@ -184,5 +204,19 @@ export class AwbUtilService {
 
   async saveAwbSccJoin(queryRunner, joinParam) {
     return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+  }
+
+  // scc 조회
+  async findScc(awbResult) {
+    return await this.sccRepository.find({
+      where: { code: In(awbResult.scc as string[]) },
+    });
+  }
+
+  // 부모 화물 상태 변경
+  async changeParentCargoStatus(parentId, queryRunner) {
+    await queryRunner.manager
+      .getRepository(Awb)
+      .update({ id: parentId }, { breakDown: true });
   }
 }

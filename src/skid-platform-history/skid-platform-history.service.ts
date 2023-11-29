@@ -230,7 +230,7 @@ export class SkidPlatformHistoryService {
   }
 
   // 안착대 이력에서 skid_platform_id를 기준으로 가상포트의 최신 안착대의 상태만 가져옴
-  async nowVirtualState() {
+  async nowVirtualState(virtual: boolean) {
     const virtualState = await this.skidPlatformHistoryRepository
       .createQueryBuilder('sph')
       .distinctOn(['sph.skid_platform_id'])
@@ -238,7 +238,7 @@ export class SkidPlatformHistoryService {
       .leftJoinAndSelect('sph.Asrs', 'Asrs')
       .leftJoinAndSelect('sph.Awb', 'Awb')
       .leftJoinAndSelect('Awb.Scc', 'Scc') // awb의 Scc를 반환합니다.
-      // .where('sph.inOutType = :type', { type: 'in' })
+      .where('SkidPlatform.virtual = :virtual', { virtual: virtual })
       .orderBy('sph.skid_platform_id')
       .addOrderBy('sph.id', 'DESC')
       .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.

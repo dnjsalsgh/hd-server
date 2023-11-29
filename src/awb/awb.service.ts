@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -43,10 +43,10 @@ import { CreateVmsAwbHistoryDto } from '../vms-awb-history/dto/create-vms-awb-hi
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
-import csv from 'csv';
-import fs from 'fs';
-import { PrepareBreakDownAwbDto } from './dto/prepare-break-down-awb.dto';
+import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
 import { breakDownRequest } from '../lib/util/axios.util';
+import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
+import { breakdownTest } from './dto/breakdownTest';
 
 @Injectable()
 export class AwbService {
@@ -77,6 +77,10 @@ export class AwbService {
 
     try {
       // 2. awb를 입력하기
+
+      // 초기 입력 시 피스수 = 전체피스수
+      if (!awbDto.awbTotalPiece) awbDto.awbTotalPiece = awbDto.piece;
+
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
         .save(awbDto);
@@ -118,9 +122,19 @@ export class AwbService {
     const queryRunner = queryRunnerManager.queryRunner;
 
     try {
+      // 초기 입력 시 피스수 = 전체피스수
+      for (const awbDto of createAwbDtos) {
+        if (!awbDto.awbTotalPiece) awbDto.awbTotalPiece = awbDto.piece;
+      }
+
+      const updatedAwbDtos = createAwbDtos.map((awbDto) => ({
+        ...awbDto,
+        awbTotalPiece: awbDto.awbTotalPiece || awbDto.piece,
+      }));
+
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
-        .save(createAwbDtos);
+        .save(updatedAwbDtos);
 
       for (const awb of awbResult) {
         if (awb.scc && awb && awb.id) {
@@ -558,6 +572,7 @@ export class AwbService {
         localTime: query.localTime,
         localInTerminal: query.localInTerminal,
         simulation: query.simulation,
+        ghost: query.ghost,
         createdAt: findDate,
       },
       order: orderByUtil(query.order),
@@ -572,6 +587,7 @@ export class AwbService {
     return searchResult;
   }
 
+  // awb의 정보를 csv로 export 할 수 있는 메서드
   async printCsv(query: Awb & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
@@ -659,60 +675,98 @@ export class AwbService {
     return this.awbRepository.update(id, updateAwbDto);
   }
 
-  // 해포
-  async breakDown(
-    parentId: number,
-    createAwbDtos: CreateAwbDto[],
-    queryRunnerManager: EntityManager,
-  ) {
+  // 부모 화물 정보 검증
+  async validateParentCargo(parentId: number) {
     const parentCargo = await this.awbRepository.findOne({
       where: { id: parentId },
+      relations: { AirCraftSchedule: true },
+      select: { AirCraftSchedule: { id: true } },
     });
-    // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
+
     if (
-      !parentCargo &&
-      parentCargo.parent !== 0 &&
+      !parentCargo ||
+      parentCargo.parent !== 0 ||
+      parentCargo.parent === null ||
       parentCargo.breakDown === false
     ) {
       throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
     }
 
+    return parentCargo;
+  }
+
+  // 하위 화물 등록
+  async registerSubAwb(subAwb, parentCargo, queryRunner) {
+    subAwb.parent = parentCargo.id;
+    subAwb.breakDown = true;
+    subAwb.AirCraftSchedule = parentCargo.AirCraftSchedule;
+    subAwb.state = 'inskidplatform';
+
+    if ('id' in subAwb) {
+      delete subAwb.id;
+    }
+
+    return await queryRunner.manager.getRepository(Awb).save(subAwb);
+  }
+
+  // awb와 scc 연결
+  async joinAwbScc(sccResult, awbResult, queryRunner) {
+    const joinParam = sccResult.map((item) => {
+      return {
+        Awb: awbResult.id,
+        Scc: item.id,
+      };
+    });
+
+    await this.awbUtilService.saveAwbSccJoin(queryRunner, joinParam);
+  }
+
+  // 해포
+  async breakDown(
+    parentId: number,
+    createAwbDtos: CreateAwbDto[] | breakDownAwb[],
+    queryRunnerManager: EntityManager,
+  ) {
+    const parentCargo = await this.validateParentCargo(parentId);
+
     const queryRunner = queryRunnerManager.queryRunner;
+
     try {
-      // 2. 해포된 화물들 등록
       for (let i = 0; i < createAwbDtos.length; i++) {
-        // 2-1. 하위 화물 등록
         const subAwb = createAwbDtos[i];
-        subAwb.parent = parentCargo.id;
-
-        const awbResult = await queryRunner.manager
-          .getRepository(Awb)
-          .save(subAwb);
-
+        const awbResult = await this.registerSubAwb(
+          subAwb,
+          parentCargo,
+          queryRunner,
+        );
         if (awbResult && awbResult.scc && awbResult.id) {
-          // 4. 입력된 scc찾기
-          const sccResult = await this.sccRepository.find({
-            where: { code: In(awbResult.scc) },
-          });
-
-          // 5. awb와 scc를 연결해주기 위한 작업
-          const joinParam = sccResult.map((item) => {
-            return {
-              Awb: awbResult.id,
-              Scc: item.id,
-            };
-          });
-          await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
+          const sccResult = await this.awbUtilService.findScc(awbResult);
+          await this.joinAwbScc(sccResult, awbResult, queryRunner);
         }
       }
 
-      // 2-3. 부모 화물 breakDown: True로 상태 변경
-      await queryRunner.manager
-        .getRepository(Awb)
-        .update({ id: parentId }, { breakDown: true });
+      await this.awbUtilService.changeParentCargoStatus(parentId, queryRunner);
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
+  }
+
+  // ps에 해포 보내기
+  async breakDownForPs(
+    prepareBreakDownAwbDto: PrepareBreakDownAwbInputDto,
+    queryRunnerManager: EntityManager,
+  ) {
+    const psResult = await breakDownRequest(prepareBreakDownAwbDto);
+
+    if (!psResult.result) {
+      throw new HttpException('ps에서 정보를 가져오지 못했습니다', 400);
+    }
+    // const awbList: breakDownAwb[] = breakdownTest.result;
+    await this.breakDown(
+      psResult.result[0].id,
+      psResult.result,
+      queryRunnerManager,
+    );
   }
 
   // 이미 등록된 awb를 해포
@@ -757,11 +811,6 @@ export class AwbService {
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
-  }
-
-  // ps에 해포 보내기
-  async breakDownForPs(prepareBreakDownAwbDto: PrepareBreakDownAwbDto) {
-    await breakDownRequest(prepareBreakDownAwbDto);
   }
 
   remove(id: number) {

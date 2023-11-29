@@ -23,6 +23,12 @@ import { redisCustomProvider } from '../redis/redisCustomProvider';
 import { UldType } from '../uld-type/entities/uld-type.entity';
 import { UldService } from '../uld/uld.service';
 import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
+import { AwbUtilService } from '../awb/awbUtil.service';
+import { Scc } from '../scc/entities/scc.entity';
+import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
+import { FileService } from '../file/file.service';
+import { SccService } from '../scc/scc.service';
+import { Basic } from '../basic/entities/basic.entity';
 
 @Module({
   imports: [
@@ -44,6 +50,9 @@ import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
       Awb,
       Asrs,
       SkidPlatform,
+      Scc,
+      AircraftSchedule,
+      Basic,
     ]),
     // mqtt 모듈설정
     MqttModule,
@@ -57,6 +66,9 @@ import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
     UldHistoryService,
     UldService,
     RedisService,
+    AwbUtilService,
+    FileService,
+    SccService,
     ...redisCustomProvider,
   ],
 })

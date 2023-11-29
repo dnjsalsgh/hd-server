@@ -107,7 +107,7 @@ export class userSelectInput {
     example: '18037499582',
     description: '사용자가 선택한 Awb의 이름',
   })
-  name: string;
+  barcode: string;
   @ApiProperty({
     example: 26,
     description: '사용자가 선택한 Awb의 width',
@@ -133,6 +133,11 @@ export class userSelectInput {
     description: '사용자가 선택한 Awb의 weight',
   })
   weight: number;
+  @ApiProperty({
+    example: 'ORD',
+    description: '사용자가 선택한 Awb의 weight',
+  })
+  destination: string;
   @ApiProperty({
     example: ['CAO'],
     description: '사용자가 선택한 Awb의 SCCs',

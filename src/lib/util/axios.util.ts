@@ -5,6 +5,8 @@ import { HttpException } from '@nestjs/common';
 import { userSelectOutput } from '../../simulator-result/dto/user-select-output';
 import { awbInPalletRackResult } from '../../simulator-result/dto/get-Awb-in-palletPack.dto';
 import { PsAllResponse } from '../../simulator-result/dto/ps-all-output.dto';
+import { PrepareBreakDownAwbInputDto } from '../../awb/dto/prepare-break-down-awb-input.dto';
+import { PrepareBreakDownAwbOutputDto } from '../../awb/dto/prepare-break-down-awb-output.dto';
 
 export const checkPsServer = async (): Promise<PsApiResponse> => {
   try {
@@ -138,8 +140,26 @@ export const sendSlackMessage = async (input: any) => {
 
 export const breakDownRequest = async (input: any) => {
   try {
-    const response = await axios.post(
-      `${process.env.PS_SERVER}/break-down`,
+    const response = await axios.post<PrepareBreakDownAwbOutputDto>(
+      `${process.env.PS_SERVER}/awb/break-down/for-ps`,
+      input,
+      {
+        headers: {
+          'Content-Type': 'application/json', // JSON 형식의 데이터 전송
+        },
+      },
+    );
+    const data = response.data; // 응답 데이터 가져오기
+    return data;
+  } catch (error) {
+    // throw new HttpException(`ps 정보를 받아오지 못했습니다.${error}`, 404); // 에러 처리
+  }
+};
+
+export const uldDeployCheckerRequest = async (input: any) => {
+  try {
+    const response = await axios.post<UldDeployCheckerOutputDto>(
+      `${process.env.PS_SERVER}/simulator-result/uld-deploy-checker`,
       input,
       {
         headers: {

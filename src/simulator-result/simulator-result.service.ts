@@ -12,7 +12,6 @@ import {
   EntityManager,
   Equal,
   FindOperator,
-  ILike,
   In,
   InsertResult,
   LessThanOrEqual,
@@ -53,8 +52,8 @@ import {
   getUserSelect,
   packageSimulatorCallAll,
   reboot,
+  uldDeployCheckerRequest,
 } from '../lib/util/axios.util';
-import { CreateAsrsHistoryDto } from '../asrs-history/dto/create-asrs-history.dto';
 import { AsrsHistoryService } from '../asrs-history/asrs-history.service';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { userSelectInput } from './dto/user-select-input.dto';
@@ -64,7 +63,12 @@ import { UldHistory } from '../uld-history/entities/uld-history.entity';
 import { UserSelectResult } from './dto/user-select-output';
 import { AWBGroupResult } from './dto/ps-output.dto';
 import { PsAllRequest } from './dto/ps-all-input.dto';
-import { PsAllResponse, PsAllResult } from './dto/ps-all-output.dto';
+import { PsAllResult } from './dto/ps-all-output.dto';
+import {
+  UldDeployCheckerListRequest,
+  UldDeployCheckerRequest,
+} from './dto/uld-deploy-checker-input.dto';
+import { AwbUtilService } from '../awb/awbUtil.service';
 
 @Injectable()
 export class SimulatorResultService {
@@ -93,6 +97,7 @@ export class SimulatorResultService {
     private readonly asrsHistoryService: AsrsHistoryService,
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
     private readonly uldHistoryService: UldHistoryService,
+    private readonly awbUtilService: AwbUtilService,
   ) {}
 
   async create(createSimulatorResultDto: CreateSimulatorResultDto) {
@@ -277,12 +282,13 @@ export class SimulatorResultService {
     const inputAWB = {
       id: apiRequest.id,
       palletRackId: apiRequest.palletRackId,
-      name: apiRequest.name,
+      barcode: apiRequest.barcode,
       width: apiRequest.width,
       length: apiRequest.length,
       depth: apiRequest.depth,
       waterVolume: apiRequest.waterVolume,
       weight: apiRequest.weight,
+      destination: apiRequest.destination,
       SCCs: apiRequest.SCCs,
     };
 
@@ -806,6 +812,156 @@ export class SimulatorResultService {
     return packageSimulatorCallRequestObject;
   }
 
+  // 해포된 화물이 uld안에 들어갈 수 있는지 확인하기 위한 메서드
+  async uldDeployChecker(
+    apiRequest: UldDeployCheckerRequest,
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
+    const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
+
+    // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const uldStateArray = await this.uldHistoryService.nowState(
+      apiRequest.UldCode,
+    );
+
+    // ps에 보낼 Uld정보를 모아두는
+    const Ulds = [];
+    await this.setUldStateByUldCode(apiRequest, Ulds);
+    if (Ulds.length <= 0)
+      throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
+
+    // uld의 현재 상황 묶음
+    const currentAWBsInULD = [];
+    this.setCurrentAwbInUld(uldStateArray, currentAWBsInULD);
+
+    // 화물검색
+    if (!apiRequest.awbId) {
+      throw new HttpException('awb 정보를 찾아오지 못했습니다', 400);
+    }
+
+    if (typeof apiRequest.awbId !== 'number') {
+      throw new HttpException('awbId를 입력해주세요.', 400);
+    }
+
+    const awbInfo = await this.awbUtilService.findExistingAwbById(
+      queryRunner,
+      apiRequest.awbId,
+    );
+
+    // 사용자가 넣는 화물
+    const inputAWB = {
+      barcode: awbInfo.barcode,
+      width: awbInfo.width,
+      length: awbInfo.length,
+      depth: awbInfo.depth,
+      waterVolume: awbInfo.waterVolume,
+      weight: awbInfo.weight,
+      destination: awbInfo.destination,
+      SCCs: awbInfo.Scc.map((s) => s.code),
+    };
+    const packageSimulatorCallRequestObject = {
+      mode: false,
+      Ulds: Ulds,
+      currentAWBsInULD: currentAWBsInULD,
+      inputAWB: inputAWB,
+    };
+    this.client
+      .send('hyundai/ps/input', packageSimulatorCallRequestObject)
+      .pipe()
+      .subscribe();
+
+    // ps 콜
+    const psResult = await uldDeployCheckerRequest(
+      packageSimulatorCallRequestObject,
+    );
+
+    // this.client.send('hyundai/ps/result', psResult).pipe(take(1)).subscribe();
+
+    if (psResult.code !== 200) {
+      throw new HttpException('ps 결과가 잘못되었습니다.', 400);
+    }
+
+    return psResult.result.fit;
+  }
+
+  // 해포된 화물이 uld안에 들어갈 수 있는지 확인하기 위한 메서드(awb List 용도)
+  async uldDeployCheckerList(
+    apiRequest: UldDeployCheckerListRequest,
+    queryRunnerManager: EntityManager,
+  ) {
+    const queryRunner = queryRunnerManager.queryRunner;
+    const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
+
+    // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const uldStateArray = await this.uldHistoryService.nowState(
+      apiRequest.UldCode,
+    );
+
+    // ps에 보낼 Uld정보를 모아두는
+    const Ulds = [];
+    await this.setUldStateByUldCode(apiRequest, Ulds);
+    if (Ulds.length <= 0)
+      throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
+
+    // uld의 현재 상황 묶음
+    const currentAWBsInULD = [];
+    this.setCurrentAwbInUld(uldStateArray, currentAWBsInULD);
+
+    // 화물검색
+    if (!apiRequest.awbIdList) {
+      throw new HttpException('awb 정보를 찾아오지 못했습니다', 400);
+    }
+
+    if (typeof apiRequest.awbIdList === 'number') {
+      throw new HttpException('awbId의 배열을 입력해주세요.', 400);
+    }
+
+    const awbInfoList = await this.awbUtilService.findExistingAwbListById(
+      queryRunner,
+      apiRequest.awbIdList,
+    );
+
+    const resultObjectFromPsResult = await Promise.allSettled(
+      awbInfoList.map(async (awbInfo) => {
+        const inputAWB = {
+          barcode: awbInfo.barcode,
+          width: awbInfo.width,
+          length: awbInfo.length,
+          depth: awbInfo.depth,
+          waterVolume: awbInfo.waterVolume,
+          weight: awbInfo.weight,
+          destination: awbInfo.destination,
+          SCCs: awbInfo.Scc.map((s) => s.code),
+        };
+
+        const packageSimulatorCallRequestObject = {
+          mode: false,
+          Ulds: Ulds,
+          currentAWBsInULD: currentAWBsInULD,
+          inputAWB: inputAWB,
+        };
+
+        const psResult = await uldDeployCheckerRequest(
+          packageSimulatorCallRequestObject,
+        );
+
+        if (psResult.code !== 200) {
+          throw new HttpException('ps 결과가 잘못되었습니다.', 400);
+        }
+
+        return {
+          awbId: awbInfo.id,
+          fit: psResult.result.fit,
+        };
+      }),
+    );
+
+    return resultObjectFromPsResult.map((result) =>
+      result.status === 'fulfilled' ? result.value : null,
+    );
+  }
+
   // 현재 자동창고, 안착대 상황을 한번에 보여주기
   async inputGroup() {
     // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
@@ -909,7 +1065,12 @@ export class SimulatorResultService {
 
   // uld가 type인지, vertexCord를 계산하기 위한 method
   private async setUldStateByUldCode(
-    apiRequest: PsApiRequest | userSelectInput | PsAllRequest,
+    apiRequest:
+      | PsApiRequest
+      | userSelectInput
+      | PsAllRequest
+      | UldDeployCheckerRequest
+      | UldDeployCheckerListRequest,
     Ulds: any[],
   ) {
     try {
@@ -964,6 +1125,7 @@ export class SimulatorResultService {
         depth: AwbInfo.depth,
         waterVolume: AwbInfo.waterVolume,
         weight: AwbInfo.weight,
+        destination: AwbInfo.destination,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
       };
       Awbs.push(targetAwb);
@@ -985,6 +1147,7 @@ export class SimulatorResultService {
         depth: AwbInfo.depth,
         waterVolume: AwbInfo.waterVolume,
         weight: AwbInfo.weight,
+        destination: AwbInfo.destination,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
       };
       currentAWBsInULD.push(targetUld);
@@ -1007,6 +1170,7 @@ export class SimulatorResultService {
         depth: AwbInfo.depth,
         waterVolume: AwbInfo.waterVolume,
         weight: AwbInfo.weight,
+        destination: AwbInfo.destination,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
         palletRackId: SkidPlatformInfo.id, // pallet의 id를 ps에 넘겨주기 위함
       };
