@@ -24,7 +24,10 @@ import { TransactionInterceptor } from '../lib/interceptor/transaction.interface
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager } from 'typeorm';
 import { PsAllRequest } from './dto/ps-all-input.dto';
-import { UldDeployCheckerRequest } from './dto/uld-deploy-checker-input.dto';
+import {
+  UldDeployCheckerListRequest,
+  UldDeployCheckerRequest,
+} from './dto/uld-deploy-checker-input.dto';
 
 @Controller('simulator-result')
 @ApiTags('[시뮬레이터 결과]simulator-result')
@@ -165,11 +168,11 @@ export class SimulatorResultController {
     description:
       'uld안에 화물들이 들어갈 수 있는지 확인, awbId에 리스트를 넣으면 됨',
   })
-  @ApiBody({ type: UldDeployCheckerRequest })
+  @ApiBody({ type: UldDeployCheckerListRequest })
   @UseInterceptors(TransactionInterceptor)
   @Post('/uld-deploy-checker/list')
   uldDeployCheckerList(
-    @Body() body: UldDeployCheckerRequest,
+    @Body() body: UldDeployCheckerListRequest,
     @TransactionManager() queryRunnerManager: EntityManager,
   ) {
     return this.simulatorResultService.uldDeployCheckerList(

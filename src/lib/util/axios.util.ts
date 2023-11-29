@@ -158,8 +158,8 @@ export const breakDownRequest = async (input: any) => {
 
 export const uldDeployCheckerRequest = async (input: any) => {
   try {
-    const response = await axios.post<PrepareBreakDownAwbInputDto[]>(
-      `${process.env.PS_SERVER}/uld-deploy-checker`,
+    const response = await axios.post<UldDeployCheckerOutputDto>(
+      `${process.env.PS_SERVER}/simulator-result/uld-deploy-checker`,
       input,
       {
         headers: {
