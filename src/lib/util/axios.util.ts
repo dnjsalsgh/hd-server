@@ -141,7 +141,7 @@ export const sendSlackMessage = async (input: any) => {
 export const breakDownRequest = async (input: any) => {
   try {
     const response = await axios.post<PrepareBreakDownAwbOutputDto>(
-      `${process.env.PS_SERVER}/break-down`,
+      `${process.env.PS_SERVER}/awb/break-down/for-ps`,
       input,
       {
         headers: {
