@@ -19,7 +19,6 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
 import { Asrs } from '../asrs/entities/asrs.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SkidPlatform } from './entities/skid-platform.entity';
@@ -33,7 +32,7 @@ export class SkidPlatformController {
     summary: 'skidPlatform(안착대) 생성 API',
     description: 'skidPlatform(안착대) 생성 한다',
   })
-  @ApiBody({ type: CreateAsrsDto })
+  @ApiBody({ type: CreateSkidPlatformDto })
   @ApiCreatedResponse({ description: '안착대를 생성한다.', type: Asrs })
   @Post()
   create(@Body() body: CreateSkidPlatformDto) {

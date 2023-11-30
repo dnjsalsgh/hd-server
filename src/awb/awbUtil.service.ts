@@ -95,7 +95,7 @@ export class AwbUtilService {
 
   async findExistingAwbListById(queryRunner, awbId: number[]): Promise<Awb[]> {
     const existingAwb = await queryRunner.manager.getRepository(Awb).find({
-      where: { id: awbId },
+      where: { id: In(awbId) },
       relations: { Scc: true },
       order: orderByUtil(null),
     });

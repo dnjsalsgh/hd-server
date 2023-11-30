@@ -141,7 +141,7 @@ export const sendSlackMessage = async (input: any) => {
 export const breakDownRequest = async (input: any) => {
   try {
     const response = await axios.post<PrepareBreakDownAwbOutputDto>(
-      `${process.env.PS_SERVER}/break-down`,
+      `${process.env.PS_SERVER}/awb/break-down/for-ps`,
       input,
       {
         headers: {
@@ -158,8 +158,8 @@ export const breakDownRequest = async (input: any) => {
 
 export const uldDeployCheckerRequest = async (input: any) => {
   try {
-    const response = await axios.post<PrepareBreakDownAwbInputDto[]>(
-      `${process.env.PS_SERVER}/uld-deploy-checker`,
+    const response = await axios.post<UldDeployCheckerOutputDto>(
+      `${process.env.PS_SERVER}/simulator-result/uld-deploy-checker`,
       input,
       {
         headers: {

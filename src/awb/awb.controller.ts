@@ -13,9 +13,6 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { AwbService } from './awb.service';
-import { CreateAwbDto } from './dto/create-awb.dto';
-import { UpdateAwbDto } from './dto/update-awb.dto';
 import {
   ApiBody,
   ApiConsumes,
@@ -23,25 +20,30 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Awb } from './entities/awb.entity';
-import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
-import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
-import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
-import { FileService } from '../file/file.service';
-import console from 'console';
 import { ConfigService } from '@nestjs/config';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { take } from 'rxjs';
-import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager } from 'typeorm';
+
+import { UpdateAwbDto } from './dto/update-awb.dto';
+import { CreateAwbDto } from './dto/create-awb.dto';
+import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
+import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
+import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
+import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
+import { InjectionSccDto } from './dto/injection-scc.dto';
+
+import { Awb } from './entities/awb.entity';
 import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
-import { InjectionSccDto } from './dto/injection-scc.dto';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
-import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
+import { FileService } from '../file/file.service';
+import { AwbService } from './awb.service';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')

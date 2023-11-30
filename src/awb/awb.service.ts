@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -77,6 +77,10 @@ export class AwbService {
 
     try {
       // 2. awb를 입력하기
+
+      // 초기 입력 시 피스수 = 전체피스수
+      if (!awbDto.awbTotalPiece) awbDto.awbTotalPiece = awbDto.piece;
+
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
         .save(awbDto);
@@ -118,9 +122,19 @@ export class AwbService {
     const queryRunner = queryRunnerManager.queryRunner;
 
     try {
+      // 초기 입력 시 피스수 = 전체피스수
+      for (const awbDto of createAwbDtos) {
+        if (!awbDto.awbTotalPiece) awbDto.awbTotalPiece = awbDto.piece;
+      }
+
+      const updatedAwbDtos = createAwbDtos.map((awbDto) => ({
+        ...awbDto,
+        awbTotalPiece: awbDto.awbTotalPiece || awbDto.piece,
+      }));
+
       const awbResult = await queryRunner.manager
         .getRepository(Awb)
-        .save(createAwbDtos);
+        .save(updatedAwbDtos);
 
       for (const awb of awbResult) {
         if (awb.scc && awb && awb.id) {
@@ -742,10 +756,17 @@ export class AwbService {
     prepareBreakDownAwbDto: PrepareBreakDownAwbInputDto,
     queryRunnerManager: EntityManager,
   ) {
-    // TODO: ps 연결되면 주석 해제하고 로직 바꾸기
-    // const psResult = await breakDownRequest(prepareBreakDownAwbDto);
-    const awbList: breakDownAwb[] = breakdownTest.result;
-    await this.breakDown(awbList[0].id, awbList, queryRunnerManager);
+    const psResult = await breakDownRequest(prepareBreakDownAwbDto);
+
+    if (!psResult.result) {
+      throw new HttpException('ps에서 정보를 가져오지 못했습니다', 400);
+    }
+    // const awbList: breakDownAwb[] = breakdownTest.result;
+    await this.breakDown(
+      psResult.result[0].id,
+      psResult.result,
+      queryRunnerManager,
+    );
   }
 
   // 이미 등록된 awb를 해포

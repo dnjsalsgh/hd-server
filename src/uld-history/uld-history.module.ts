@@ -8,10 +8,11 @@ import { MqttModule } from '../mqtt.module';
 import { UldService } from '../uld/uld.service';
 import { UldType } from '../uld-type/entities/uld-type.entity';
 import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
+import { Awb } from '../awb/entities/awb.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UldHistory, Uld, UldType, UldSccJoin]),
+    TypeOrmModule.forFeature([UldHistory, Uld, UldType, UldSccJoin, Awb]),
     MqttModule,
   ],
   controllers: [UldHistoryController],
