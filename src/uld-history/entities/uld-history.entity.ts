@@ -13,6 +13,7 @@ import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
 import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity';
+import { IsNumber, Min } from 'class-validator';
 
 @Entity()
 export class UldHistory {
@@ -91,6 +92,8 @@ export class UldHistory {
     description: 'UldFK',
     type: () => Uld,
   })
+  @IsNumber()
+  @Min(1)
   @ManyToOne(() => Uld, (uld) => uld.uldHistories)
   Uld: Relation<Uld> | number;
 
@@ -99,6 +102,8 @@ export class UldHistory {
     description: 'AwbFK',
     type: () => Awb,
   })
+  @IsNumber()
+  @Min(1)
   @ManyToOne(() => Awb, (awb) => awb.uldHistories)
   Awb: Relation<Awb> | number;
 }

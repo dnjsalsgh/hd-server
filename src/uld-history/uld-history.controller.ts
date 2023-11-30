@@ -28,32 +28,18 @@ export class UldHistoryController {
     summary: 'uld 안에 화물이 입력되면 호출하는 api',
     description: '[사용법] Uld: 목표 uldId, Awb: 사용된 awbId',
   })
-  @UseInterceptors(TransactionInterceptor)
   @Post()
-  create(
-    @Body() createUldHistoryDto: CreateUldHistoryDto,
-    @TransactionManager() queryRunnerManager: EntityManager,
-  ) {
-    return this.uldHistoryService.create(
-      createUldHistoryDto,
-      queryRunnerManager,
-    );
+  create(@Body() createUldHistoryDto: CreateUldHistoryDto) {
+    return this.uldHistoryService.create(createUldHistoryDto);
   }
 
   @ApiOperation({
     summary: '[태스트용] uld의 이력을 list 형태로 넣기 위함',
     description: 'uld의 이력을 list 형태로 넣기 위함',
   })
-  @UseInterceptors(TransactionInterceptor)
   @Post('/list')
-  createList(
-    @Body() createUldHistoryDto: CreateUldHistoryDto[],
-    @TransactionManager() queryRunnerManager: EntityManager,
-  ) {
-    return this.uldHistoryService.createList(
-      createUldHistoryDto,
-      queryRunnerManager,
-    );
+  createList(@Body() createUldHistoryDto: CreateUldHistoryDto[]) {
+    return this.uldHistoryService.createList(createUldHistoryDto);
   }
 
   @ApiQuery({ name: 'BuildUpOrder', required: false, type: 'number' })
