@@ -43,6 +43,22 @@ export class AsrsOutOrderService {
     return asrs;
   }
 
+  async manualChange(createAsrsOutOrderDtoList: CreateAsrsOutOrderDto[]) {
+    const asrs = await this.asrsOutOrderRepository.create(
+      createAsrsOutOrderDtoList,
+    );
+    // amr실시간 데이터 mqtt로 publish 하기 위함
+    this.client
+      .send(`hyundai/asrs1/outOrder`, {
+        asrs: asrs,
+        time: new Date().toISOString(),
+      })
+      .pipe(take(1))
+      .subscribe();
+    await this.asrsOutOrderRepository.save(asrs);
+    // return asrs;
+  }
+
   async findAll(query: AsrsOutOrder & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
@@ -73,6 +89,33 @@ export class AsrsOutOrderService {
         SkidPlatform: query.SkidPlatform
           ? Equal(+query.SkidPlatform)
           : undefined,
+        createdAt: findDate,
+      },
+    });
+  }
+
+  async findTarget(query: AsrsOutOrder & BasicQueryParamDto) {
+    // createdAt 기간검색 처리
+    const { createdAtFrom, createdAtTo } = query;
+    let findDate: FindOperator<Date>;
+    if (createdAtFrom && createdAtTo) {
+      findDate = Between(createdAtFrom, createdAtTo);
+    } else if (createdAtFrom) {
+      findDate = MoreThanOrEqual(createdAtFrom);
+    } else if (createdAtTo) {
+      findDate = LessThanOrEqual(createdAtTo);
+    }
+
+    return await this.asrsOutOrderRepository.find({
+      relations: {
+        Asrs: true,
+        Awb: true,
+      },
+      select: {
+        Asrs: { id: true, name: true },
+        Awb: { id: true, barcode: true },
+      },
+      where: {
         createdAt: findDate,
       },
     });
