@@ -156,12 +156,13 @@ export class SimulatorResultService {
           order: index,
           Asrs: element.storageId,
           Awb: element.AwbId,
+          Uld: Ulds[0]?.id,
         };
         asrsOutOrderParamArray.push(asrsOutOrderParam);
       }
       const asrsOutOrderResult = await queryRunner.manager
         .getRepository(AsrsOutOrder)
-        .upsert(asrsOutOrderParamArray, ['Asrs', 'Awb']);
+        .save(asrsOutOrderParamArray, { reload: true });
 
       // 1-1. 자동창고 작업지시 데이터 mqtt로 publish 하기
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
@@ -171,7 +172,6 @@ export class SimulatorResultService {
           queryRunner,
           asrsOutOrderResult,
         );
-
         // 불출순서를 mqtt에 배열로 보내기위해 전처리 과정
         const asrsOutOrder = asrsResult.map((asrsOutOrderElement) => {
           const Awb = asrsOutOrderElement.Awb as Awb;
@@ -322,13 +322,14 @@ export class SimulatorResultService {
           order: index,
           Asrs: element.storageId,
           Awb: element.AwbId,
+          Uld: Ulds[0]?.id,
         };
         if (asrsOutOrderParam.Asrs !== 0)
           asrsOutOrderParamArray.push(asrsOutOrderParam);
       }
       const asrsOutOrderResult = await queryRunner.manager
         .getRepository(AsrsOutOrder)
-        .upsert(asrsOutOrderParamArray, ['Awb', 'Asrs']);
+        .save(asrsOutOrderParamArray);
 
       // 1-1. 자동창고 작업지시 데이터 mqtt로 publish 하기
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
@@ -454,13 +455,14 @@ export class SimulatorResultService {
             order: index,
             Asrs: element.storageId,
             Awb: element.AwbId,
+            Uld: Ulds[0]?.id,
           };
           asrsOutOrderParamArray.push(asrsOutOrderParam);
         }
       }
       const asrsOutOrderResult = await queryRunner.manager
         .getRepository(AsrsOutOrder)
-        .upsert(asrsOutOrderParamArray, ['Asrs', 'Awb']);
+        .save(asrsOutOrderParamArray);
 
       // 1-1. 자동창고 작업지시 데이터 mqtt로 publish 하기
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
@@ -677,13 +679,14 @@ export class SimulatorResultService {
           order: index,
           Asrs: element.storageId,
           Awb: element.AwbId,
+          Uld: Ulds[0]?.id,
         };
         if (asrsOutOrderParam.Asrs !== 0)
           asrsOutOrderParamArray.push(asrsOutOrderParam);
       }
       const asrsOutOrderResult = await queryRunner.manager
         .getRepository(AsrsOutOrder)
-        .upsert(asrsOutOrderParamArray, ['Awb', 'Asrs']);
+        .save(asrsOutOrderParamArray);
 
       // 1-1. 자동창고 작업지시 데이터 mqtt로 publish 하기
       // 자동창고 작업지시가 생성되었을 때만 동작합니다.
@@ -1045,7 +1048,7 @@ export class SimulatorResultService {
   // 작업지시(asrs-out-order)를 객체형태로 만들기 위한 method
   private async getAsrsResult(
     queryRunner: QueryRunner,
-    asrsOutOrderResult: InsertResult,
+    asrsOutOrderResult: CreateAsrsOutOrderDto[],
   ) {
     return await queryRunner.manager.getRepository(AsrsOutOrder).find({
       relations: {
@@ -1057,7 +1060,7 @@ export class SimulatorResultService {
         Awb: { id: true, barcode: true },
       },
       where: {
-        id: In(asrsOutOrderResult.identifiers.map((v) => v.id)),
+        id: In(asrsOutOrderResult.map((v) => v.id)),
       },
       order: { order: 'asc' },
     });

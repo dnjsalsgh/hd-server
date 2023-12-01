@@ -38,10 +38,10 @@ export class AircraftService {
     }
     const result = await this.aircraftRepository.find({
       select: {
-        AircraftSchedules: AircraftScheduleAttributes,
+        // AircraftSchedules: AircraftScheduleAttributes,
       },
       relations: {
-        AircraftSchedules: true,
+        // AircraftSchedules: true,
       },
       where: {
         name: query.name ? ILike(`%${query.name}%`) : undefined,

@@ -21,6 +21,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { BuildUpOrder } from '../../build-up-order/entities/build-up-order.entity';
 import { Scc } from '../../scc/entities/scc.entity';
 import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
+import { AsrsOutOrder } from '../../asrs-out-order/entities/asrs-out-order.entity';
 
 @Entity()
 export class Uld {
@@ -99,6 +100,9 @@ export class Uld {
 
   @OneToMany(() => BuildUpOrder, (buildUpOrder) => buildUpOrder.Uld)
   buildUpOrders: Relation<BuildUpOrder[]>;
+
+  @OneToMany(() => AsrsOutOrder, (asrsOutOrder) => asrsOutOrder.Uld)
+  AsrsOutOrders: Relation<AsrsOutOrder[]>;
 
   @OneToMany(() => SimulatorResult, (simulatorResult) => simulatorResult.Uld)
   simulatorResult: Relation<SimulatorResult[]>;
