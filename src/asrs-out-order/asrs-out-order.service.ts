@@ -17,6 +17,7 @@ import { AwbAttribute } from '../awb/entities/awb.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
+import { UldAttribute } from '../uld/entities/uld.entity';
 
 @Injectable()
 export class AsrsOutOrderService {
@@ -76,16 +77,19 @@ export class AsrsOutOrderService {
         Asrs: AsrsAttribute,
         SkidPlatform: SkidPlatformAttribute,
         Awb: AwbAttribute,
+        Uld: UldAttribute,
       },
       relations: {
         Asrs: true,
         SkidPlatform: true,
         Awb: true,
+        Uld: true,
       },
       where: {
         // join 되는 테이블들의 FK를 typeorm 옵션에 맞추기위한 조정하기 위한 과정
         Asrs: query.Asrs ? Equal(+query.Asrs) : undefined,
         Awb: query.Awb ? Equal(+query.Awb) : undefined,
+        Uld: query.Uld ? Equal(+query.Uld) : undefined,
         SkidPlatform: query.SkidPlatform
           ? Equal(+query.SkidPlatform)
           : undefined,
@@ -106,7 +110,7 @@ export class AsrsOutOrderService {
       findDate = LessThanOrEqual(createdAtTo);
     }
 
-    return await this.asrsOutOrderRepository.find({
+    const searchResult = await this.asrsOutOrderRepository.find({
       relations: {
         Asrs: true,
         Awb: true,
@@ -116,9 +120,12 @@ export class AsrsOutOrderService {
         Awb: { id: true, barcode: true },
       },
       where: {
+        Uld: query.Uld ? Equal(+query.Uld) : undefined,
         createdAt: findDate,
       },
     });
+
+    return searchResult;
   }
 
   async findOne(id: number) {

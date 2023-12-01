@@ -18,7 +18,7 @@ import { SkidPlatformHistory } from '../../skid-platform-history/entities/skid-p
 import { Uld } from '../../uld/entities/uld.entity';
 
 @Entity()
-@Unique(['Asrs', 'Awb']) // 어떤 안착대로 가는지 모르기 때문에 skidplatform 유니크 제거
+// @Unique(['Asrs', 'Awb']) // 어떤 안착대로 가는지 모르기 때문에 skidplatform 유니크 제거
 export class AsrsOutOrder {
   @PrimaryGeneratedColumn()
   id: number;
@@ -71,7 +71,7 @@ export class AsrsOutOrder {
     type: () => Uld,
   })
   @ManyToOne(() => Uld, (uld) => uld.AsrsOutOrders)
-  Uld: Relation<Uld> | number;
+  Uld?: Relation<Uld> | number;
 
   @OneToMany(
     () => SkidPlatformHistory,

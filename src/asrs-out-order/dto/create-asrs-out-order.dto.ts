@@ -6,4 +6,7 @@ export class CreateAsrsOutOrderDto extends PickType(AsrsOutOrder, [
   'Asrs',
   // 'SkidPlatform',
   'Awb',
-]) {}
+  'Uld',
+]) {
+  id?: number;
+}
