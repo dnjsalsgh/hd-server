@@ -37,8 +37,6 @@ export class UldHistoryService {
   async create(createUldHistoryDto: CreateUldHistoryDto) {
     const savedHistory = this.saveHistory(createUldHistoryDto);
 
-    this.publishMqttMessage(`hyundai/uldHistory/insert`, savedHistory);
-
     if (savedHistory && createUldHistoryDto.Awb) {
       await this.injectScc(createUldHistoryDto);
     }
@@ -61,11 +59,19 @@ export class UldHistoryService {
   }
 
   async saveHistory(createUldHistoryDto: CreateUldHistoryDto) {
-    return await this.uldHistoryRepository.save(createUldHistoryDto);
+    const saveResult = await this.uldHistoryRepository.save(
+      createUldHistoryDto,
+    );
+    this.publishMqttMessage(`hyundai/uldHistory/insert`, saveResult);
+    return saveResult;
   }
 
   async saveHistoryList(createUldHistoryDtoList: CreateUldHistoryDto[]) {
-    return await this.uldHistoryRepository.save(createUldHistoryDtoList);
+    const saveResultList = await this.uldHistoryRepository.save(
+      createUldHistoryDtoList,
+    );
+    this.publishMqttMessage(`hyundai/uldHistory/insert`, saveResultList);
+    return saveResultList;
   }
 
   // uld에 scc를 주입하는 메서드
