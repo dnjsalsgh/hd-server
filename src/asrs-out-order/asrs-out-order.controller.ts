@@ -32,17 +32,6 @@ export class AsrsOutOrderController {
     return this.asrsOutOrderService.create(createAsrsOutOrderDto);
   }
 
-  @ApiOperation({
-    summary: '현재 db에 있는 불출 오더를 수정할 때 사용하는 api',
-    description:
-      '[사용법] order: 불출순서, Asrs: 불출될 창고(랙), Awb: 목표 화물',
-  })
-  @ApiBody({ type: [CreateAsrsOutOrderDto] })
-  @Post('/manual/change')
-  manualChange(@Body() createAsrsOutOrderDtoList: CreateAsrsOutOrderDto[]) {
-    return this.asrsOutOrderService.manualChange(createAsrsOutOrderDtoList);
-  }
-
   @ApiQuery({ name: 'Asrs', required: false, type: 'number' })
   @ApiQuery({ name: 'SkidPlatform', required: false, type: 'number' })
   @ApiQuery({ name: 'Awb', required: false, type: 'number' })

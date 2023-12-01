@@ -30,6 +30,7 @@ export class AsrsOutOrderService {
     private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
+
   async create(
     createAsrsOutOrderDto: CreateAsrsOutOrderDto,
   ): Promise<AsrsOutOrder> {
@@ -37,31 +38,9 @@ export class AsrsOutOrderService {
       createAsrsOutOrderDto,
     );
     // amr실시간 데이터 mqtt로 publish 하기 위함
-    this.client
-      .send(`hyundai/asrs1/outOrder`, {
-        asrs: asrs,
-        time: new Date().toISOString(),
-      })
-      .pipe(take(1))
-      .subscribe();
+    this.client.send(`hyundai/asrs1/outOrder`, asrs).pipe(take(1)).subscribe();
     await this.asrsOutOrderRepository.save(asrs);
     return asrs;
-  }
-
-  async manualChange(createAsrsOutOrderDtoList: CreateAsrsOutOrderDto[]) {
-    const asrs = await this.asrsOutOrderRepository.create(
-      createAsrsOutOrderDtoList,
-    );
-    // amr실시간 데이터 mqtt로 publish 하기 위함
-    this.client
-      .send(`hyundai/asrs1/outOrder`, {
-        asrs: asrs,
-        time: new Date().toISOString(),
-      })
-      .pipe(take(1))
-      .subscribe();
-    await this.asrsOutOrderRepository.save(asrs);
-    // return asrs;
   }
 
   async findAll(query: AsrsOutOrder & BasicQueryParamDto) {
