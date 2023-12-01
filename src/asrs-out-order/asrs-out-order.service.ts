@@ -4,20 +4,24 @@ import {
   Between,
   Equal,
   FindOperator,
+  LessThan,
   LessThanOrEqual,
+  Like,
+  MoreThan,
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
 import { CreateAsrsOutOrderDto } from './dto/create-asrs-out-order.dto';
 import { AsrsOutOrder } from './entities/asrs-out-order.entity';
 import { UpdateAsrsOutOrderDto } from './dto/update-asrs-out-order.dto';
-import { AsrsAttribute } from '../asrs/entities/asrs.entity';
+import { Asrs, AsrsAttribute } from '../asrs/entities/asrs.entity';
 import { SkidPlatformAttribute } from '../skid-platform/entities/skid-platform.entity';
-import { AwbAttribute } from '../awb/entities/awb.entity';
+import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { UldAttribute } from '../uld/entities/uld.entity';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class AsrsOutOrderService {
@@ -98,19 +102,8 @@ export class AsrsOutOrderService {
     });
   }
 
-  async findTarget(query: AsrsOutOrder & BasicQueryParamDto) {
-    // createdAt 기간검색 처리
-    const { createdAtFrom, createdAtTo } = query;
-    let findDate: FindOperator<Date>;
-    if (createdAtFrom && createdAtTo) {
-      findDate = Between(createdAtFrom, createdAtTo);
-    } else if (createdAtFrom) {
-      findDate = MoreThanOrEqual(createdAtFrom);
-    } else if (createdAtTo) {
-      findDate = LessThanOrEqual(createdAtTo);
-    }
-
-    const searchResult = await this.asrsOutOrderRepository.find({
+  async findTarget() {
+    const asrsOutOrderList = await this.asrsOutOrderRepository.find({
       relations: {
         Asrs: true,
         Awb: true,
@@ -119,13 +112,25 @@ export class AsrsOutOrderService {
         Asrs: { id: true, name: true },
         Awb: { id: true, barcode: true },
       },
-      where: {
-        Uld: query.Uld ? Equal(+query.Uld) : undefined,
-        createdAt: findDate,
-      },
+      order: orderByUtil(null),
+      take: 50,
     });
 
-    return searchResult;
+    const mainCreatedTime = asrsOutOrderList[0].createdAt.toISOString();
+
+    const filterdAsrsOutOrder = asrsOutOrderList
+      .filter((aoo) => {
+        return aoo.createdAt.toISOString() === mainCreatedTime;
+      })
+      .map((aoo) => {
+        return {
+          order: aoo.order,
+          Asrs: (aoo.Asrs as Asrs).name,
+          Awb: (aoo.Awb as Awb).barcode,
+        };
+      });
+
+    return filterdAsrsOutOrder;
   }
 
   async findOne(id: number) {
