@@ -99,6 +99,13 @@ export class AircraftSchedule {
   @Column({ type: 'text', array: true, nullable: true })
   waypoint: string[];
 
+  @ApiProperty({
+    example: false,
+    description: '항공편 작업이 끝났는지 판단',
+  })
+  @Column({ type: 'bool', default: false })
+  done: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
