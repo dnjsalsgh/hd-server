@@ -284,7 +284,7 @@ export class AsrsService {
   }
 
   // barcode와 separateNumber로 target awb를 찾기 위한 함수
-  async findAwbByBarcode(billNo: string, separateNumber = 0) {
+  async findAwbByBarcode(billNo: string, separateNumber: number) {
     try {
       const awbResult = await this.awbRepository.findOne({
         where: { barcode: billNo, separateNumber: separateNumber },
