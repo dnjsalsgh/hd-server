@@ -42,7 +42,6 @@ import {
   amrConfig,
   dimoaConfig,
   mssqlConfig,
-  mssqlVmsConfig,
   postgresConfig,
 } from './config/db.config';
 import { RedisModule } from './redis/redis.module';
