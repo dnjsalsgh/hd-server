@@ -244,7 +244,7 @@ export class AsrsService {
       }
 
       await this.recordOperation(unitNumber, awb?.id, inOutType);
-      await this.settingRedis(String(unitNumber), state);
+      // await this.settingRedis(String(unitNumber), state);
     } catch (error) {
       console.error(error.message);
     }
