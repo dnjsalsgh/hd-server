@@ -12,6 +12,7 @@ import {
   Like,
   MoreThanOrEqual,
   Repository,
+  TypeORMError,
 } from 'typeorm';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { CreateAsrsPlcDto } from './dto/create-asrs-plc.dto';
@@ -176,13 +177,20 @@ export class AsrsService {
     for (let unitNumber = 1; unitNumber <= 18; unitNumber++) {
       const unitKey = this.formatUnitNumber(unitNumber);
       const previousState = await this.redisService.get(unitNumber.toString());
+
       const onOffTag = this.getTag('SKID_ON', unitKey);
-      const awbNo = this.getTag('Bill_No', unitKey);
       const onOffSignal = this.checkOnOff(body, onOffTag);
+      const awbNo = this.getTag('Bill_No', unitKey);
+      const separateNumber = this.getTag('SEPARATION_NO', unitKey);
       const variableInOut = onOffSignal ? 'in' : 'out';
 
       if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
-        await this.processInOut(unitNumber, body[awbNo], variableInOut);
+        await this.processInOut(
+          unitNumber,
+          body[awbNo],
+          body[separateNumber],
+          variableInOut,
+        );
       }
     }
   }
@@ -192,14 +200,17 @@ export class AsrsService {
     return unitNumber.toString().padStart(2, '0');
   }
 
+  // on/off의 값을 return 하는 함수
   checkOnOff(body: CreateAsrsPlcDto, onOffTag: string) {
     return body[onOffTag];
   }
 
+  // key 값을 return 하는 함수
   getTag(suffix: string, unitKey: string) {
-    return `STK_03_${unitKey}_${suffix}`;
+    return `STK_03_${unitKey}_P2A_${suffix}`;
   }
 
+  // in인지 out 인지 return 하는 함수
   shouldSetInOUtAsrs(
     onOffSignal: boolean,
     previousState: string | null,
@@ -214,15 +225,32 @@ export class AsrsService {
     }
   }
 
-  async processInOut(unitNumber: number, awbNo: string, state: 'in' | 'out') {
-    const awb = await this.findAwbByBarcode(awbNo);
-    const inOutType = state === 'in' ? 'in' : 'out';
-    if (awb && awb.id) {
+  /**
+   * in인지 out 인지 판단 후 현재 상황은 redis에 저장
+   * 저장된 값은 이전의 상태를 판단하기 위함
+   */
+  async processInOut(
+    unitNumber: number,
+    awbNo: string,
+    separateNumber: number,
+    state: 'in' | 'out',
+  ) {
+    try {
+      const awb = await this.findAwbByBarcode(awbNo, separateNumber);
+      const inOutType = state === 'in' ? 'in' : 'out';
+
+      if (!(awb && awb.id)) {
+        throw new TypeORMError('awb 정보를 찾지 못했습니다.');
+      }
+
       await this.recordOperation(unitNumber, awb?.id, inOutType);
       await this.settingRedis(String(unitNumber), state);
+    } catch (error) {
+      console.error(error.message);
     }
   }
 
+  // 실제로 asrsHistory db에 저장하는 메서드
   async recordOperation(
     asrsId: number,
     awbId: number,
@@ -235,6 +263,7 @@ export class AsrsService {
         Asrs: asrsId,
         Awb: awbId,
       };
+
       await this.asrsHistoryRepository.save(asrsHistoryBody);
       await this.settingRedis(asrsId.toString(), inOutType);
     } catch (error) {
@@ -242,6 +271,7 @@ export class AsrsService {
     }
   }
 
+  // redis를 편하게 쓰기 위해 쓰는 함수
   async settingRedis(key: string, value: string) {
     await this.redisService.set(key, value);
   }
@@ -253,10 +283,16 @@ export class AsrsService {
     });
   }
 
-  async findAwbByBarcode(billNo: string) {
-    return await this.awbRepository.findOne({
-      where: { barcode: billNo },
-      order: orderByUtil(null),
-    });
+  // barcode와 separateNumber로 target awb를 찾기 위한 함수
+  async findAwbByBarcode(billNo: string, separateNumber = 0) {
+    try {
+      const awbResult = await this.awbRepository.findOne({
+        where: { barcode: billNo, separateNumber: separateNumber },
+        order: orderByUtil(null),
+      });
+      return awbResult;
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
