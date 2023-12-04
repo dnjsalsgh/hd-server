@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'AMR' })
 export class Hacs {
   @ApiProperty({
     example: 1,
@@ -233,31 +233,4 @@ export class Hacs {
   })
   @Column({ nullable: true })
   public Skid: boolean;
-
-  // @ApiProperty({
-  //   example: 10.3,
-  //   description: '충전기의 X좌표',
-  // })
-  // @Column({ type: 'float', nullable: true })
-  // public ChargeX: number;
-  //
-  // @ApiProperty({
-  //   example: 11.3,
-  //   description: '충전기의 X좌표',
-  // })
-  // @Column({ type: 'float', nullable: true })
-  // public ChargeY: number;
-  //
-  // @ApiProperty({
-  //   example: 9.3,
-  //   description: '충전기의 X좌표',
-  // })
-  // @Column({ type: 'float', nullable: true })
-  // public ChargeZ: number;
-
-  // @ApiProperty({
-  //   example: '인입용',
-  //   description: '인입용, 인출용 구분',
-  // })
-  // distinguish: string;
 }

@@ -6,6 +6,7 @@ import {
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
+  TypeORMError,
 } from 'typeorm';
 import { pipe, take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
@@ -317,11 +318,22 @@ export class SkidPlatformHistoryService {
       const onTag = `SUPPLY_01_${unitKey}_P2A_G_SKID_ON`;
       const offTag = `SUPPLY_01_${unitKey}_P2A_D_SKID_ON`;
       const awbNo = `SUPPLY_01_${unitKey}_P2A_Bill_No`;
+      const separateNumber = `SUPPLY_01_${unitKey}_P2A_SEPARATION_NO`;
 
       if (this.shouldSetInSkidPlatform(body, onTag, previousState)) {
-        await this.processInOut(unitNumber, body[awbNo], 'in');
+        await this.processInOut(
+          unitNumber,
+          body[awbNo],
+          body[separateNumber],
+          'in',
+        );
       } else if (this.shouldSetOutSkidPlatform(body, offTag, previousState)) {
-        await this.processInOut(unitNumber, body[awbNo], 'out');
+        await this.processInOut(
+          unitNumber,
+          body[awbNo],
+          body[separateNumber],
+          'out',
+        );
       }
     }
   }
@@ -331,6 +343,7 @@ export class SkidPlatformHistoryService {
     return unitNumber.toString().padStart(2, '0');
   }
 
+  // in으로 상태 변경하는 메서드
   shouldSetInSkidPlatform(
     body: CreateSkidPlatformAndAsrsPlcDto,
     onTag: string,
@@ -339,6 +352,7 @@ export class SkidPlatformHistoryService {
     return body[onTag] && (previousState === 'out' || previousState === null);
   }
 
+  // out으로 상태 변경하는 메서드
   shouldSetOutSkidPlatform(
     body: CreateAsrsPlcDto,
     offTag: string,
@@ -347,25 +361,43 @@ export class SkidPlatformHistoryService {
     return body[offTag] && previousState === 'in';
   }
 
-  async processInOut(unitNumber: number, awbNo: string, state: 'in' | 'out') {
-    const awb = await this.findAwbByBarcode(awbNo);
-    const inOutType = state === 'in' ? 'in' : 'out';
-    if (awb && awb.id) {
-      await this.recordOperation(unitNumber, awb.id, inOutType);
+  /**
+   * in인지 out 인지 판단 후 현재 상황은 redis에 저장
+   * 저장된 값은 이전의 상태를 판단하기 위함
+   */
+  async processInOut(
+    unitNumber: number,
+    awbNo: string,
+    separateNumber: number,
+    state: 'in' | 'out',
+  ) {
+    try {
+      const awb = await this.findAwbByBarcode(awbNo, separateNumber);
+      const inOutType = state === 'in' ? 'in' : 'out';
+
+      if (!(awb && awb.id)) {
+        throw new TypeORMError('awb 정보를 찾지 못했습니다.');
+      }
+
+      await this.recordOperation(unitNumber, awb, inOutType);
+    } catch (error) {
+      console.error(error.message);
     }
   }
 
+  // 실제로 skidPlatformHistory db에 저장하는 메서드
   async recordOperation(
     SkidPlatformId: number,
-    awbId: number,
+    awb: Awb,
     inOutType: 'in' | 'out',
   ) {
     try {
-      const asrsHistoryBody = {
+      const asrsHistoryBody: CreateSkidPlatformHistoryDto = {
         inOutType,
-        count: 0,
+        Awb: awb.id,
         SkidPlatform: SkidPlatformId,
-        Awb: awbId,
+        count: awb.piece, // plc에서 들어오는 정보로 변경해야 할 지 고민
+        totalCount: awb.awbTotalPiece,
       };
       await this.skidPlatformHistoryRepository.save(asrsHistoryBody);
       await this.settingRedis(`p${SkidPlatformId}`, inOutType);
@@ -374,14 +406,21 @@ export class SkidPlatformHistoryService {
     }
   }
 
+  // redis를 편하게 쓰기 위해 쓰는 함수
   async settingRedis(key: string, value: string) {
     await this.redisService.set(key, value);
   }
 
-  async findAwbByBarcode(billNo: string) {
-    return await this.awbRepository.findOne({
-      where: { barcode: billNo },
-      order: orderByUtil(null),
-    });
+  // barcode와 separateNumber로 target awb를 찾기 위한 함수
+  async findAwbByBarcode(billNo: string, separateNumber: number) {
+    try {
+      const awbResult = await this.awbRepository.findOne({
+        where: { barcode: billNo, separateNumber: separateNumber },
+        order: orderByUtil(null),
+      });
+      return awbResult;
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

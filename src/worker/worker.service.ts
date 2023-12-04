@@ -17,8 +17,8 @@ export class WorkerService {
     private readonly configService: ConfigService,
   ) {}
 
-  @Interval(300)
-  // 0.3 초마다 mssql 에서 amr 데이터를 가져옴
+  @Interval(500)
+  // 0.5 초마다 mssql 에서 amr 데이터를 가져옴
   InitialScheduler() {
     //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
     if (this.configService.get<string>('SCHEDULE') !== 'true') {

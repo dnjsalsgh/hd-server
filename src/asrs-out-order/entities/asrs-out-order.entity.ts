@@ -15,9 +15,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Asrs } from '../../asrs/entities/asrs.entity';
 import { SkidPlatform } from '../../skid-platform/entities/skid-platform.entity';
 import { SkidPlatformHistory } from '../../skid-platform-history/entities/skid-platform-history.entity';
+import { Uld } from '../../uld/entities/uld.entity';
 
 @Entity()
-@Unique(['Asrs', 'Awb']) // 어떤 안착대로 가는지 모르기 때문에 skidplatform 유니크 제거
+// @Unique(['Asrs', 'Awb']) // 어떤 안착대로 가는지 모르기 때문에 skidplatform 유니크 제거
 export class AsrsOutOrder {
   @PrimaryGeneratedColumn()
   id: number;
@@ -63,6 +64,14 @@ export class AsrsOutOrder {
   })
   @ManyToOne(() => Awb, (awb) => awb.AsrsOutOrders, { nullable: false })
   Awb: Relation<Awb> | number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'UldFK',
+    type: () => Uld,
+  })
+  @ManyToOne(() => Uld, (uld) => uld.AsrsOutOrders)
+  Uld?: Relation<Uld> | number;
 
   @OneToMany(
     () => SkidPlatformHistory,

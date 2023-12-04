@@ -12,14 +12,7 @@ import {
 import { Asrs } from '../../asrs/entities/asrs.entity';
 import { Awb } from '../../awb/entities/awb.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
 @Entity()
 @Unique(['inOutType', 'Awb', 'Asrs'])
@@ -60,6 +53,8 @@ export class AsrsHistory {
     type: () => Asrs,
   })
   @IsNotEmpty()
+  @IsNumber()
+  @Min(1)
   @ManyToOne(() => Asrs, (asrs) => asrs.asrsHistories, { nullable: false })
   Asrs: Relation<Asrs> | number;
 
@@ -69,6 +64,8 @@ export class AsrsHistory {
     type: () => Awb,
   })
   @IsNotEmpty()
+  @IsNumber()
+  @Min(1)
   @ManyToOne(() => Awb, (awb) => awb.AsrsHistories, { nullable: false })
   Awb: Relation<Awb> | number;
 }

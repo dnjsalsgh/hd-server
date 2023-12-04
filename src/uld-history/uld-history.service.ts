@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
   DataSource,
-  EntityManager,
   Equal,
   FindOperator,
   LessThanOrEqual,
@@ -28,21 +27,30 @@ export class UldHistoryService {
     private readonly uldHistoryRepository: Repository<UldHistory>,
     @InjectRepository(Uld)
     private readonly uldRepository: Repository<Uld>,
+    @InjectRepository(Awb)
+    private readonly awbRepository: Repository<Awb>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
     private dataSource: DataSource,
     private readonly uldService: UldService,
   ) {}
 
-  async create(
-    createUldHistoryDto: CreateUldHistoryDto,
-    queryRunnerManager: EntityManager,
-  ) {
-    const queryRunner = queryRunnerManager.queryRunner;
-
+  async create(createUldHistoryDto: CreateUldHistoryDto) {
     const savedHistory = this.saveHistory(createUldHistoryDto);
 
-    if (createUldHistoryDto.Awb) {
-      await this.injectScc(createUldHistoryDto, queryRunner);
+    if (savedHistory && createUldHistoryDto.Awb) {
+      await this.injectScc(createUldHistoryDto);
+    }
+
+    return savedHistory;
+  }
+
+  async createList(createUldHistoryDtoList: CreateUldHistoryDto[]) {
+    const savedHistory = await this.saveHistoryList(createUldHistoryDtoList);
+
+    for (const createUldHistoryDto of createUldHistoryDtoList) {
+      if (savedHistory && createUldHistoryDto.Awb) {
+        await this.injectScc(createUldHistoryDto);
+      }
     }
 
     this.publishMqttMessage(`hyundai/uldHistory/insert`, savedHistory);
@@ -50,15 +58,31 @@ export class UldHistoryService {
     return savedHistory;
   }
 
-  async saveHistory(createUldHistoryDto) {
-    return await this.uldHistoryRepository.save(createUldHistoryDto);
+  async saveHistory(createUldHistoryDto: CreateUldHistoryDto) {
+    const saveResult = await this.uldHistoryRepository.save(
+      createUldHistoryDto,
+    );
+    this.publishMqttMessage(`hyundai/uldHistory/insert`, saveResult);
+    return saveResult;
+  }
+
+  async saveHistoryList(createUldHistoryDtoList: CreateUldHistoryDto[]) {
+    const saveResultList = await this.uldHistoryRepository.save(
+      createUldHistoryDtoList,
+    );
+    this.publishMqttMessage(`hyundai/uldHistory/insert`, saveResultList);
+    return saveResultList;
   }
 
   // uld에 scc를 주입하는 메서드
-  async injectScc(createUldHistoryDto, queryRunner) {
+  async injectScc(
+    createUldHistoryDto,
+    // , queryRunner
+  ) {
     const targetAwbId = +createUldHistoryDto.Awb;
     const targetUldId = +createUldHistoryDto.Uld;
-    const sccList = await this.retrieveSccList(queryRunner, targetAwbId);
+
+    const sccList = await this.retrieveSccList(targetAwbId);
 
     if (sccList.length > 0) {
       await this.performSccInjection(targetUldId, sccList);
@@ -66,11 +90,12 @@ export class UldHistoryService {
   }
 
   // Awb에 scc가 있는지 검색하는 메서드
-  async retrieveSccList(queryRunner, targetAwbId) {
-    const sccList = await this.findSccInAwb(queryRunner, targetAwbId);
-    if (sccList.Scc.length > 0) {
+  async retrieveSccList(targetAwbId) {
+    const sccList = await this.findSccInAwb(targetAwbId);
+    if (sccList?.Scc.length > 0) {
       return sccList.Scc.map((v) => v.id);
     } else {
+      // throw new TypeORMError('scc가 존재하지 않습니다.');
       console.error('scc가 존재하지 않습니다.');
       return [];
     }
@@ -85,25 +110,6 @@ export class UldHistoryService {
   // mqtt 메세지 발행 로직
   publishMqttMessage(topic, message) {
     this.client.send(topic, message).subscribe();
-  }
-
-  async createList(
-    createUldHistoryDtoList: CreateUldHistoryDto[],
-    queryRunnerManager: EntityManager,
-  ) {
-    const queryRunner = queryRunnerManager.queryRunner;
-
-    const savedHistory = await this.saveHistory(createUldHistoryDtoList);
-
-    for (const createUldHistoryDto of createUldHistoryDtoList) {
-      if (createUldHistoryDto.Awb) {
-        await this.injectScc(createUldHistoryDto, queryRunner);
-      }
-    }
-
-    this.publishMqttMessage(`hyundai/uldHistory/insert`, savedHistory);
-
-    return savedHistory;
   }
 
   async findAll(query: UldHistory & BasicQueryParamDto) {
@@ -175,8 +181,8 @@ export class UldHistoryService {
     return this.uldHistoryRepository.delete(id);
   }
 
-  async findSccInAwb(queryRunner, awbId: number): Promise<Awb> {
-    const [searchResult] = await queryRunner.manager.getRepository(Awb).find({
+  async findSccInAwb(awbId: number): Promise<Awb> {
+    const [searchResult] = await this.awbRepository.find({
       where: { id: awbId },
       relations: {
         Scc: true,
