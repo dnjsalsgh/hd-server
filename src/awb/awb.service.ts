@@ -756,12 +756,20 @@ export class AwbService {
     prepareBreakDownAwbDto: PrepareBreakDownAwbInputDto,
     queryRunnerManager: EntityManager,
   ) {
+    // 사용자의 입력으로 awbTotalPiece 를 piece로 수정하게 함
+    // 사용자가 봤을 때 화물의 개수가 달라질 수 있으므로
+    await this.awbUtilService.updatePiece(
+      queryRunnerManager.queryRunner,
+      prepareBreakDownAwbDto.id,
+      prepareBreakDownAwbDto.awbTotalPiece,
+    );
+
     const psResult = await breakDownRequest(prepareBreakDownAwbDto);
 
     if (!psResult.result) {
       throw new HttpException('ps에서 정보를 가져오지 못했습니다', 400);
     }
-    // const awbList: breakDownAwb[] = breakdownTest.result;
+
     await this.breakDown(
       psResult.result[0].id,
       psResult.result,
