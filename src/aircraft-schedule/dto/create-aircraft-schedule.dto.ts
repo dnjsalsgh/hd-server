@@ -1,4 +1,4 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
+import { PickType } from '@nestjs/swagger';
 import { AircraftSchedule } from '../entities/aircraft-schedule.entity';
 import { Awb } from '../../awb/entities/awb.entity';
 
@@ -15,6 +15,7 @@ export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
   'Aircraft',
   'departure',
   'destination',
+  'done',
 ]) {
   // @ApiProperty({
   //   example:

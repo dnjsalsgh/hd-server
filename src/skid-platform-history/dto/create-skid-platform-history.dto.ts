@@ -18,7 +18,7 @@ export class CreateSkidPlatformHistoryDto extends PickType(
     example: 1,
     description: '창고 이름',
   })
-  Asrs: number;
+  Asrs?: number;
 
   @ApiProperty({
     example: 1,

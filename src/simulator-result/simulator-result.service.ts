@@ -881,7 +881,7 @@ export class SimulatorResultService {
 
     // this.client.send('hyundai/ps/result', psResult).pipe(take(1)).subscribe();
 
-    if (psResult.code !== 200) {
+    if (psResult?.code !== 200) {
       throw new HttpException('ps 결과가 잘못되었습니다.', 400);
     }
 
@@ -949,7 +949,7 @@ export class SimulatorResultService {
           packageSimulatorCallRequestObject,
         );
 
-        if (psResult.code !== 200) {
+        if (psResult?.code !== 200) {
           throw new HttpException('ps 결과가 잘못되었습니다.', 400);
         }
 

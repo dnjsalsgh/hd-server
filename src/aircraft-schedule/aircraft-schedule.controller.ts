@@ -12,7 +12,9 @@ import {
 import { AircraftScheduleService } from './aircraft-schedule.service';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { UpdateAwbDto } from '../awb/dto/update-awb.dto';
+import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
 
 @Controller('aircraft-schedule')
 @ApiTags('[항공기 스케줄]aircraft-schedule')
@@ -51,6 +53,7 @@ export class AircraftScheduleController {
   @ApiQuery({ name: 'order', required: false })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiQuery({ name: 'offset', required: false, type: 'number' })
+  @ApiQuery({ name: 'done', required: false, type: 'boolean' })
   @Get()
   findAll(
     @Query('Aircraft') Aircraft?: number,
@@ -62,6 +65,7 @@ export class AircraftScheduleController {
     @Query('order') order?: string,
     @Query('limit') limit?: number,
     @Query('offset') offset?: number,
+    @Query('done') done?: boolean,
   ) {
     return this.aircraftScheduleService.findAll(
       Aircraft,
@@ -73,6 +77,7 @@ export class AircraftScheduleController {
       order,
       limit,
       offset,
+      done,
     );
   }
 
@@ -87,6 +92,29 @@ export class AircraftScheduleController {
     @Body() updateAircraftScheduleDto: UpdateAircraftScheduleDto,
   ) {
     return this.aircraftScheduleService.update(+id, updateAircraftScheduleDto);
+  }
+
+  @ApiOperation({
+    summary: '항공편 작업 상태를 변경하기 위함',
+    description: '항공편 작업이 끝났다면 true, 아니면 false',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {},
+    },
+  })
+  @Put(':id/:done')
+  updateState(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('done') done: string,
+    @Body() updateAircraftScheduleDto?: UpdateAircraftScheduleDto,
+  ) {
+    return this.aircraftScheduleService.updateState(
+      id,
+      done,
+      updateAircraftScheduleDto,
+    );
   }
 
   @Delete(':id')

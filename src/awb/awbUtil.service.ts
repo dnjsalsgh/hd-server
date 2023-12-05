@@ -103,6 +103,16 @@ export class AwbUtilService {
     return existingAwb;
   }
 
+  async updatePiece(queryRunner, awbId: number, piece: number): Promise<Awb> {
+    const existingAwb = await queryRunner.manager
+      .getRepository(Awb)
+      .update(awbId, {
+        awbTotalPiece: piece,
+      });
+
+    return existingAwb;
+  }
+
   async findSccInAwb(queryRunner, awbId: number) {
     const [searchResult] = await queryRunner.manager.getRepository(Awb).find({
       where: { id: awbId },
