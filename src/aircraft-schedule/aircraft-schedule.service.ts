@@ -80,6 +80,7 @@ export class AircraftScheduleService {
     order?: string,
     limit?: number,
     offset?: number,
+    done?: boolean,
   ) {
     let findDate: FindOperator<Date>;
     if (createdAtFrom && createdAtTo) {
@@ -121,6 +122,7 @@ export class AircraftScheduleService {
         destination: destination ? destination : undefined,
         departure: departure ? departure : undefined,
         createdAt: findDate,
+        done: done,
       },
       order: orderByUtil(order),
       take: limit, // limit
@@ -174,6 +176,24 @@ export class AircraftScheduleService {
       Aircraft,
     });
     return;
+  }
+
+  // aircraftSchedule의 상태를 변경하는 메서드
+  updateState(
+    id: number,
+    done: string,
+    updateAircraftScheduleDto?: UpdateAircraftScheduleDto,
+  ) {
+    if (done) updateAircraftScheduleDto.done = done === 'true';
+
+    this.client
+      .send(`hyundai/aircraftSchedule/updateState`, updateAircraftScheduleDto)
+      .subscribe();
+
+    return this.aircraftScheduleRepository.update(
+      id,
+      updateAircraftScheduleDto,
+    );
   }
 
   async remove(id: number) {

@@ -104,7 +104,7 @@ export class AircraftSchedule {
     description: '항공편 작업이 끝났는지 판단',
   })
   @Column({ type: 'bool', default: false })
-  done: boolean;
+  done?: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
