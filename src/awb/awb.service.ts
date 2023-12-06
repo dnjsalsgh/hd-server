@@ -645,7 +645,7 @@ export class AwbService {
 
   findFamily(id: number) {
     return this.awbRepository.find({
-      where: [{ id: id }, { parent: id }],
+      where: [{ parent: id }],
       relations: {
         Scc: true,
         // AirCraftSchedules: true,
