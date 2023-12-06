@@ -13,7 +13,6 @@ import {
   Equal,
   FindOperator,
   In,
-  InsertResult,
   LessThanOrEqual,
   MoreThanOrEqual,
   QueryRunner,
