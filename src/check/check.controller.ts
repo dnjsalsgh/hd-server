@@ -123,10 +123,8 @@ export class CheckController {
   })
   @Post('nas')
   async checkNasFileUpdate(@Body() nasPathDto: NasPathDto) {
-    console.log('path = ', nasPathDto.path.split('\\').pop());
     try {
       const fileContent = await this.fileService.readFile(nasPathDto.path);
-      console.log(fileContent);
       const fileResult = await this.fileService.uploadFileToLocalServer(
         fileContent,
         `${nasPathDto.path.split('\\').pop()}`,
