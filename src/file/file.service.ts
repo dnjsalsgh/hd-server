@@ -52,12 +52,10 @@ export class FileService {
 
       // 파일 저장 경로
       const filePath = path.join(this.uploadsDirectory, fileName);
-
       // 파일 저장
       await fs.writeFile(filePath, fileContent);
 
       const relativePath = path.relative(this.modifiedPath, filePath);
-
       return relativePath; // 저장된 파일의 상대경로 반환(서버의 정적자원 반환을 위해)
     } catch (error) {
       await this.handleError(error);
