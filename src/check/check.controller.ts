@@ -3,11 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
 import { Vms3D } from '../vms/entities/vms.entity';
-import * as dotenv from 'dotenv';
 import { MqttService } from '../mqtt.service';
 import { ApiOperation } from '@nestjs/swagger';
 import { checkPsServer } from '../lib/util/axios.util';
 import { HttpExceptionFilter } from '../lib/filter/httpException.filter';
+import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
+import { Hacs } from '../hacs/entities/hacs.entity';
 
 @Controller('check')
 export class CheckController {
@@ -15,6 +16,10 @@ export class CheckController {
     @Inject('MQTT_SERVICE') private mqttClient: ClientProxy,
     @InjectRepository(Vms3D, 'mssqlDB')
     private readonly vmsRepository: Repository<Vms3D>,
+    @InjectRepository(VmsAwbResult, 'dimoaDB')
+    private readonly vmsAwbResultRepository: Repository<Vms3D>,
+    @InjectRepository(Hacs, 'amrDB')
+    private readonly hacsRepository: Repository<Hacs>,
     private readonly mqttService: MqttService,
     private readonly dataSource: DataSource,
   ) {}
@@ -55,6 +60,28 @@ export class CheckController {
     const repositoryExist = this.vmsRepository;
     const exist = await repositoryExist.query(`select 1`);
     return exist ? 'mssql Connected' : 'no Found Mssql';
+  }
+
+  @ApiOperation({
+    summary: '[dimoa 통신 확인]',
+    description: '',
+  })
+  @Get('dimoa')
+  async checkDimoa() {
+    const repositoryExist = this.vmsAwbResultRepository;
+    const exist = await repositoryExist.query(`select 1`);
+    return exist ? 'dimoaDB Connected' : 'no Found Mssql';
+  }
+
+  @ApiOperation({
+    summary: '[amr 통신 확인]',
+    description: '',
+  })
+  @Get('amr')
+  async checkAmr() {
+    const repositoryExist = this.hacsRepository;
+    const exist = await repositoryExist.query(`select 1`);
+    return exist ? 'amrDB Connected' : 'no Found Mssql';
   }
 
   @ApiOperation({
