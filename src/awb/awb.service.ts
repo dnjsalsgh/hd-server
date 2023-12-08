@@ -856,7 +856,7 @@ export class AwbService {
     });
   }
 
-  // vms에서 개수만큼 꺼내오는 메서드
+  // vms3D에서 개수만큼 꺼내오는 메서드
   async getAwbByVms(takeNumber: number) {
     const [result] = await this.vmsRepository.find({
       order: orderByUtil('-CREATE_DATE'),
@@ -865,11 +865,11 @@ export class AwbService {
     return result;
   }
 
-  // vms에서 이름으로 찾아오는 메서드
-  async getAwbByVmsByName(name: string) {
+  // vms3D에서 이름으로 찾아오는 메서드
+  async getAwbByVmsByName(name: string, separateNumber: number) {
     const [result] = await this.vmsRepository.find({
-      order: orderByUtil(null),
-      where: { AWB_NUMBER: name },
+      order: orderByUtil('-CREATE_DATE'),
+      where: { AWB_NUMBER: name, SEPARATION_NO: separateNumber },
     });
     return result;
   }
@@ -884,10 +884,10 @@ export class AwbService {
   }
 
   // vms2에서 이름으로 찾아오는 메서드
-  async getAwbByVms2dByName(name: string) {
+  async getAwbByVms2dByName(name: string, separateNumber: number) {
     const [result] = await this.vms2dRepository.find({
-      order: orderByUtil(null),
-      where: { AWB_NUMBER: name },
+      order: orderByUtil('-CREATE_DATE'),
+      where: { AWB_NUMBER: name, SEPARATION_NO: separateNumber },
     });
     return result;
   }
