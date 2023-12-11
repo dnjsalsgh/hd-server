@@ -44,3 +44,10 @@ LOCAL_SCHEDULE # in 로컬 스테줄러 실행 옵션 , nas 파일 업로드 실
 IF_ACTIVE # 로컬에서 돌아가는 nas 파일 업로드 실행조건
 
 
+## docker 컨테이너 안에 있는 로그를 호스트에 복사하는 방법
+
+docker cp schedule-server:/var/app/logs/http/2023-12-11.http.log serverlog
+
+/var/app/logs/http 까지는 고정 밑에 파일은 YYYY-MM-DD.http.log 형태로 넣으면 됨
+
+serverlog는 호스트에 저장할 폴더
