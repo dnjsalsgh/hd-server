@@ -68,8 +68,9 @@ export class CheckController {
   @Get('mssql')
   async checkMssql() {
     const repositoryExist = this.vmsRepository;
-    const exist = await repositoryExist.query(`select 1`);
-    return exist ? 'mssql Connected' : 'no Found Mssql';
+    const exist = await repositoryExist.query(`SELECT top 1 * from VWMS_3D_RESULT_DATA vdrd ;`);
+    return exist;
+    // return exist ? 'mssql Connected' : 'no Found Mssql';
   }
 
   @ApiOperation({
@@ -79,8 +80,9 @@ export class CheckController {
   @Get('dimoa')
   async checkDimoa() {
     const repositoryExist = this.vmsAwbResultRepository;
-    const exist = await repositoryExist.query(`select 1`);
-    return exist ? 'dimoaDB Connected' : 'no Found Mssql';
+    const exist = await repositoryExist.query(`SELECT top 1 * from VWMS_AWB_RESULT var`);
+    return exist;
+    // return exist ? 'dimoaDB Connected' : 'no Found Mssql';
   }
 
   @ApiOperation({
