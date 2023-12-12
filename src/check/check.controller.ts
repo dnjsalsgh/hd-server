@@ -127,21 +127,16 @@ export class CheckController {
   @Post('nas')
   async checkNasFileUpdate(@Body() nasPathDto: NasPathDto) {
     try {
-      // const fileContent = await this.fileService.readFile(nasPathDto.path);
-      // const fileResult = await this.fileService.uploadFileToLocalServer(
-      //   fileContent,
-      //   `${nasPathDto.path.split('\\').pop()}`,
-      // );
-    
-    const file = `Z:\\${nasPathDto.FILE_PATH}\\${nasPathDto.FILE_NAME}`;
-    console.log(file);
-    const fileContent = await this.fileService.readFile(file);
-    const fileResult = await this.fileService.uploadFileToLocalServer(
-      fileContent,
-      `${nasPathDto.FILE_NAME}.${nasPathDto.FILE_EXTENSION}`,
-    );
-    return fileResult;
+      const repositoryExist = this.vmsAwbResultRepository;
+      const exist = await repositoryExist.query(`SELECT top 1 * from VWMS_3D_RESULT_DATA vdrd ;`);
+      const existAwb = exist[0];
+      const file = `Z:\\${existAwb.FILE_PATH}\\${existAwb.FILE_NAME}`;
 
+      const fileContent = await this.fileService.readFile(file);
+      const fileResult = await this.fileService.uploadFileToLocalServer(
+        fileContent,
+        `${nasPathDto.FILE_NAME}`,
+      );
       return fileResult;
     } catch (error) {
       console.error(error);
