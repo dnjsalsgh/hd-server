@@ -511,22 +511,22 @@ export class AwbService {
 
   // vms의 3d 모델링 db의 파일 경로로 파일 업로드 하는 메서드
   protected async fileUpload(vms: Vms3D) {
-    const file = `${vms.FILE_PATH}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
+    const file = `Z:\\${vms.FILE_PATH}/${vms.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms.FILE_NAME}.${vms.FILE_EXTENSION}`,
+      `${vms.FILE_NAME}`,
     );
     return fileResult;
   }
 
   // vms의 2d 모델링 db의 파일 경로로 파일 업로드 하는 메서드
   protected async fileUpload2d(vms2d: Vms2d) {
-    const file = `${vms2d.FILE_PATH}/${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`;
+    const file = `Z:\\${vms2d.FILE_PATH}/${vms2d.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`,
+      `${vms2d.FILE_NAME}`,
     );
     return fileResult;
   }

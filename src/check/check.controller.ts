@@ -18,6 +18,7 @@ import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { FileService } from '../file/file.service';
 import { NasPathDto } from './dto/nas-path.dto';
+import { log } from 'console';
 
 @Controller('check')
 export class CheckController {
@@ -126,11 +127,21 @@ export class CheckController {
   @Post('nas')
   async checkNasFileUpdate(@Body() nasPathDto: NasPathDto) {
     try {
-      const fileContent = await this.fileService.readFile(nasPathDto.path);
-      const fileResult = await this.fileService.uploadFileToLocalServer(
-        fileContent,
-        `${nasPathDto.path.split('\\').pop()}`,
-      );
+      // const fileContent = await this.fileService.readFile(nasPathDto.path);
+      // const fileResult = await this.fileService.uploadFileToLocalServer(
+      //   fileContent,
+      //   `${nasPathDto.path.split('\\').pop()}`,
+      // );
+    
+    const file = `Z:\\${nasPathDto.FILE_PATH}\\${nasPathDto.FILE_NAME}`;
+    console.log(file);
+    const fileContent = await this.fileService.readFile(file);
+    const fileResult = await this.fileService.uploadFileToLocalServer(
+      fileContent,
+      `${nasPathDto.FILE_NAME}.${nasPathDto.FILE_EXTENSION}`,
+    );
+    return fileResult;
+
       return fileResult;
     } catch (error) {
       console.error(error);
