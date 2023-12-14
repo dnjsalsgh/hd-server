@@ -47,6 +47,11 @@ import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.
 import { breakDownRequest } from '../lib/util/axios.util';
 import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
 import { breakdownTest } from './dto/breakdownTest';
+import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
+import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
+import { CreateSimulatorHistoryDto } from '../simulator-history/dto/create-simulator-history.dto';
+import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
+import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
 @Injectable()
 export class AwbService {
@@ -55,6 +60,8 @@ export class AwbService {
     private readonly awbRepository: Repository<Awb>,
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
+    // @InjectRepository(SkidPlatformHistory)
+    // private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
     @InjectRepository(Vms3D, 'mssqlDB')
     private readonly vmsRepository: Repository<Vms3D>,
     @InjectRepository(Vms2d, 'mssqlDB')
@@ -68,6 +75,7 @@ export class AwbService {
     private readonly mqttService: MqttService,
     private readonly sccService: SccService,
     private readonly awbUtilService: AwbUtilService,
+    private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
   ) {}
 
   async create(createAwbDto: CreateAwbDto, queryRunnerManager: EntityManager) {
@@ -778,6 +786,15 @@ export class AwbService {
       psResult.result,
       queryRunnerManager,
     );
+
+    const createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto = {
+      inOutType: 'in',
+      SkidPlatform: prepareBreakDownAwbDto?.SkidPlatform,
+      Awb: prepareBreakDownAwbDto.id,
+      count: prepareBreakDownAwbDto.awbTotalPiece,
+      totalCount: prepareBreakDownAwbDto.awbTotalPiece,
+    };
+    await this.skidPlatformHistoryService.create(createSkidPlatformHistoryDto);
   }
 
   // 이미 등록된 awb를 해포

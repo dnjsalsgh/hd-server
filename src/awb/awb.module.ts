@@ -17,10 +17,23 @@ import { AwbUtilService } from './awbUtil.service';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
+import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
+import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
+import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
+import { RedisService } from '../redis/redis.service';
+import { redisCustomProvider } from '../redis/redisCustomProvider';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Awb, AwbSccJoin, Scc, Basic, AircraftSchedule]),
+    TypeOrmModule.forFeature([
+      Awb,
+      Scc,
+      Basic,
+      AwbSccJoin,
+      AsrsOutOrder,
+      AircraftSchedule,
+      SkidPlatformHistory,
+    ]),
     TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
     TypeOrmModule.forFeature([VmsAwbResult, VmsAwbHistory], 'dimoaDB'),
     MulterModule.register({ dest: './upload' }),
@@ -28,6 +41,15 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
     MqttModule,
   ],
   controllers: [AwbController],
-  providers: [AwbService, AwbUtilService, FileService, MqttService, SccService],
+  providers: [
+    AwbService,
+    AwbUtilService,
+    FileService,
+    MqttService,
+    SccService,
+    SkidPlatformHistoryService,
+    RedisService,
+    ...redisCustomProvider,
+  ],
 })
 export class AwbModule {}

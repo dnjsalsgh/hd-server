@@ -18,6 +18,11 @@ import { AwbUtilService } from '../awb/awbUtil.service';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
+import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
+import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
+import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
+import { RedisService } from '../redis/redis.service';
+import { redisCustomProvider } from '../redis/redisCustomProvider';
 
 @Module({
   imports: [
@@ -28,6 +33,8 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
       Scc,
       Basic,
       AircraftSchedule,
+      AsrsOutOrder,
+      SkidPlatformHistory,
     ]),
     TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
     TypeOrmModule.forFeature([VmsAwbResult, VmsAwbHistory], 'dimoaDB'),
@@ -42,6 +49,9 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
     AwbService,
     SccService,
     AwbUtilService,
+    SkidPlatformHistoryService,
+    RedisService,
+    ...redisCustomProvider,
   ],
 })
 export class AwbGroupModule {}
