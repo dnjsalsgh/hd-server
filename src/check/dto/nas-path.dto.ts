@@ -6,4 +6,8 @@ export class NasPathDto {
     description: '파일의 경로',
   })
   path: string;
+
+  FILE_PATH?: string;
+  FILE_NAME?: string;
+  FILE_EXTENSION?:string
 }

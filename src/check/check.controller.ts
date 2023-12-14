@@ -18,6 +18,7 @@ import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { FileService } from '../file/file.service';
 import { NasPathDto } from './dto/nas-path.dto';
+import { log } from 'console';
 
 @Controller('check')
 export class CheckController {
@@ -68,8 +69,9 @@ export class CheckController {
   @Get('mssql')
   async checkMssql() {
     const repositoryExist = this.vmsRepository;
-    const exist = await repositoryExist.query(`select 1`);
-    return exist ? 'mssql Connected' : 'no Found Mssql';
+    const exist = await repositoryExist.query(`SELECT top 1 * from VWMS_3D_RESULT_DATA vdrd ;`);
+    return exist;
+    // return exist ? 'mssql Connected' : 'no Found Mssql';
   }
 
   @ApiOperation({
@@ -79,8 +81,9 @@ export class CheckController {
   @Get('dimoa')
   async checkDimoa() {
     const repositoryExist = this.vmsAwbResultRepository;
-    const exist = await repositoryExist.query(`select 1`);
-    return exist ? 'dimoaDB Connected' : 'no Found Mssql';
+    const exist = await repositoryExist.query(`SELECT top 1 * from VWMS_AWB_RESULT var`);
+    return exist;
+    // return exist ? 'dimoaDB Connected' : 'no Found Mssql';
   }
 
   @ApiOperation({
@@ -124,10 +127,15 @@ export class CheckController {
   @Post('nas')
   async checkNasFileUpdate(@Body() nasPathDto: NasPathDto) {
     try {
-      const fileContent = await this.fileService.readFile(nasPathDto.path);
+      const repositoryExist = this.vmsAwbResultRepository;
+      const exist = await repositoryExist.query(`SELECT top 1 * from VWMS_3D_RESULT_DATA vdrd ;`);
+      const existAwb = exist[0];
+      const file = `Z:\\${existAwb.FILE_PATH}\\${existAwb.FILE_NAME}`;
+
+      const fileContent = await this.fileService.readFile(file);
       const fileResult = await this.fileService.uploadFileToLocalServer(
         fileContent,
-        `${nasPathDto.path.split('\\').pop()}`,
+        `${nasPathDto.FILE_NAME}`,
       );
       return fileResult;
     } catch (error) {

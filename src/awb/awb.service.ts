@@ -466,6 +466,9 @@ export class AwbService {
         const Awb = await this.findOne(awbIdInDb);
         await this.awbUtilService.sendMqttMessage(Awb);
       }
+      
+      // 모델링 파일 체크
+      await this.preventMissingData(vms, vms2d);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -511,22 +514,22 @@ export class AwbService {
 
   // vms의 3d 모델링 db의 파일 경로로 파일 업로드 하는 메서드
   protected async fileUpload(vms: Vms3D) {
-    const file = `${vms.FILE_PATH}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
+    const file = `Z:\\${vms.FILE_PATH}\\${vms.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms.FILE_NAME}.${vms.FILE_EXTENSION}`,
+      `${vms.FILE_NAME}`,
     );
     return fileResult;
   }
 
   // vms의 2d 모델링 db의 파일 경로로 파일 업로드 하는 메서드
   protected async fileUpload2d(vms2d: Vms2d) {
-    const file = `${vms2d.FILE_PATH}/${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`;
+    const file = `Z:\\${vms2d.FILE_PATH}\\${vms2d.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`,
+      `${vms2d.FILE_NAME}`,
     );
     return fileResult;
   }
@@ -912,6 +915,7 @@ export class AwbService {
 
   // awbNumber로 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
   async getLastAwbByAwbNumber(name: string) {
+    console.log("name = ", name)
     const [result] = await this.vmsAwbHistoryRepository.find({
       order: orderByUtil('-OUT_DATE'),
       where: { AWB_NUMBER: name },
