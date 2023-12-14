@@ -97,6 +97,7 @@ export class SkidPlatformHistoryService {
       historyData.count = existingHistory.count - historyData.count;
     }
 
+    // 안착대에 똑같은 값이 in 되면 팅기게끔 수정
     // if (historyData.inOutType === 'in') {
     //   historyData.count = (existingHistory.Awb as Awb).piece;
     // }
