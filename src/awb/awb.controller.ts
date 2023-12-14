@@ -307,9 +307,10 @@ export class AwbController {
       const vms3Ddata = await this.fetchAwbData();
       const vms2dData = await this.fetchAwb2dData();
 
-      if (!vms3Ddata) {
+      if (!vms3Ddata || !vms2dData) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
+
       const vmsAwbHistoryData = await this.fetchVmsAwbHistoryData(vms3Ddata);
       const sccData = await this.fetchVmsAwbResultData(vms3Ddata);
 

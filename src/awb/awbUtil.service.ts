@@ -48,11 +48,11 @@ export class AwbUtilService {
       piece: vmsAwbHistory?.CGO_PC ?? 1,
       state: 'invms',
       AirCraftSchedule: scheduleId,
-      gSkidOn: vmsAwbHistory.G_SKID_ON === 'Y',
-      awbTotalPiece: vmsAwbResult.CGO_TOTAL_PC,
-      allAwbReceive: vmsAwbResult.ALL_PART_RECEIVED === 'Y',
-      receivedUser: vmsAwbResult.RECEIVED_USER_ID,
-      receivedDate: vmsAwbResult.RECEIVED_DATE,
+      gSkidOn: vmsAwbHistory?.G_SKID_ON === 'Y',
+      awbTotalPiece: vmsAwbResult?.CGO_TOTAL_PC,
+      allAwbReceive: vmsAwbResult?.ALL_PART_RECEIVED === 'Y',
+      receivedUser: vmsAwbResult?.RECEIVED_USER_ID,
+      receivedDate: vmsAwbResult?.RECEIVED_DATE,
       modelPath: null,
       path: null,
     };
@@ -70,7 +70,7 @@ export class AwbUtilService {
         awbDto.path = filePath2d;
       } catch (e) {}
     }
-
+    console.log('awbDto = ', awbDto);
     return awbDto;
   }
 
@@ -176,21 +176,21 @@ export class AwbUtilService {
   }
 
   protected async fileUpload(vms: Vms3D) {
-    const file = `${vms.FILE_PATH}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
+    const file = `Z:\\${vms.FILE_PATH}\\${vms.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms.FILE_NAME}.${vms.FILE_EXTENSION}`,
+      `${vms.FILE_NAME}`,
     );
     return fileResult;
   }
 
   protected async fileUpload2d(vms2d: Vms2d) {
-    const file = `${vms2d.FILE_PATH}/${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`;
+    const file = `Z:\\${vms2d.FILE_PATH}\\${vms2d.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`,
+      `${vms2d.FILE_NAME}`,
     );
     return fileResult;
   }
