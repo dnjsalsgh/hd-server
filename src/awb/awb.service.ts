@@ -905,7 +905,7 @@ export class AwbService {
   }
 
   // awbNumber로 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
-  async getSccByAwbNumber(name: string) {
+  async getVmsByAwbNumber(name: string) {
     const [result] = await this.vmsAwbResultRepository.find({
       order: orderByUtil('-RECEIVED_DATE'),
       where: { AWB_NUMBER: name },
@@ -924,6 +924,24 @@ export class AwbService {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  // 최신 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
+  async getLastVmsAwbResult() {
+    const [result] = await this.vmsAwbResultRepository.find({
+      order: orderByUtil('-RECEIVED_DATE'),
+      take: 1,
+    });
+    return result;
+  }
+
+  // 최신 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
+  async getLastVmsAwbHistory() {
+    const [result] = await this.vmsAwbHistoryRepository.find({
+      order: orderByUtil('-OUT_DATE'),
+      take: 1,
+    });
+    return result;
   }
 
   // awb의 scc만 가져오는 메서드

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { CreateAwbDto } from './dto/create-awb.dto';
@@ -38,13 +38,19 @@ export class AwbUtilService {
       ? await this.findSchedule(vmsAwbHistory.FLIGHT_NUMBER)
       : null;
 
+    if (!vmsAwbHistory?.AWB_NUMBER) {
+      console.log(
+        `VWMS_AWB_HISTORY 테이블에 정보가 정확하지 않습니다. vmsAwbHistory: ${vmsAwbHistory.AWB_NUMBER}`,
+      );
+    }
+
     const awbDto: Partial<CreateAwbDto> = {
-      barcode: vms.AWB_NUMBER,
-      separateNumber: vms.SEPARATION_NO,
-      width: vms.WIDTH,
-      length: vms.LENGTH,
-      depth: vms.HEIGHT,
-      weight: vms.WEIGHT,
+      barcode: vmsAwbHistory.AWB_NUMBER,
+      separateNumber: vmsAwbHistory.SEPARATION_NO,
+      width: vmsAwbHistory.RESULT_WIDTH,
+      length: vmsAwbHistory.RESULT_LENGTH,
+      depth: vmsAwbHistory.RESULT_HEIGHT,
+      weight: vmsAwbHistory.RESULT_WEIGHT,
       piece: vmsAwbHistory?.CGO_PC ?? 1,
       state: 'invms',
       AirCraftSchedule: scheduleId,

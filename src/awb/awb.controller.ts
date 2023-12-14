@@ -27,7 +27,7 @@ import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
-import { EntityManager } from 'typeorm';
+import { EntityManager, TypeORMError } from 'typeorm';
 
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { CreateAwbDto } from './dto/create-awb.dto';
@@ -311,13 +311,13 @@ export class AwbController {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 
-      const vmsAwbHistoryData = await this.fetchVmsAwbHistoryData(vms3Ddata);
-      const sccData = await this.fetchVmsAwbResultData(vms3Ddata);
+      const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1();
+      const vmsAwbHistoryData = await this.fetchVmsAwbHistoryDataLimit1();
 
       await this.createAwbDataInMssql(
         vms3Ddata,
         vms2dData,
-        sccData,
+        vmsAwbResult,
         vmsAwbHistoryData,
       );
       await this.sendModelingCompleteSignal();
@@ -336,23 +336,48 @@ export class AwbController {
     return await this.awbService.getAwbByVms2d(1);
   }
 
+  private async fetchVmsAwbResultData(vms: Vms3D) {
+    const AWB_NUMBER = vms.AWB_NUMBER;
+    return await this.awbService.getVmsByAwbNumber(AWB_NUMBER);
+  }
+
   private async fetchVmsAwbHistoryData(vms: Vms3D) {
     const AWB_NUMBER = vms.AWB_NUMBER;
     return await this.awbService.getLastAwbByAwbNumber(AWB_NUMBER);
   }
 
-  private async fetchVmsAwbResultData(vms: Vms3D) {
-    const AWB_NUMBER = vms.AWB_NUMBER;
-    return await this.awbService.getSccByAwbNumber(AWB_NUMBER);
+  private async fetchVmsAwbResultDataLimit1() {
+    return await this.awbService.getLastVmsAwbResult();
+  }
+
+  private async fetchVmsAwbHistoryDataLimit1() {
+    return await this.awbService.getLastVmsAwbHistory();
   }
 
   private async createAwbDataInMssql(
     vms: Vms3D,
     vms2d: Vms2d,
-    sccData: VmsAwbResult,
+    vmsAwbResult: VmsAwbResult,
     vmsAwbHistory: VmsAwbHistory,
   ) {
-    await this.awbService.createWithMssql(vms, vms2d, sccData, vmsAwbHistory);
+    if (!vms) this.errorMessageHandling(vms, 'vms');
+    if (!vms2d) this.errorMessageHandling(vms2d, 'vms2d');
+    if (!vmsAwbResult) this.errorMessageHandling(vmsAwbResult, 'vmsAwbResult');
+    if (!vmsAwbHistory)
+      this.errorMessageHandling(vmsAwbHistory, 'vmsAwbHistory');
+
+    await this.awbService.createWithMssql(
+      vms,
+      vms2d,
+      vmsAwbResult,
+      vmsAwbHistory,
+    );
+  }
+
+  private errorMessageHandling(target: any, tableName: string) {
+    throw new TypeORMError(
+      `${tableName} 테이블에 정보가 정확하지 않습니다. ${target}: ${target}`,
+    );
   }
 
   private async sendModelingCompleteSignal() {
