@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'VWMS_3D_RESULT_DATA' })
@@ -65,13 +65,13 @@ export class Vms3D {
   @Column({ name: 'FILE_PATH', type: 'nvarchar', length: 1024, nullable: true })
   FILE_PATH: string;
 
-  @Column({
-    name: 'FILE_EXTENSION',
-    type: 'nvarchar',
-    length: 1024,
-    nullable: true,
-  })
-  FILE_EXTENSION: string;
+  // @Column({
+  //   name: 'FILE_EXTENSION',
+  //   type: 'nvarchar',
+  //   length: 1024,
+  //   nullable: true,
+  // })
+  // FILE_EXTENSION: string;
 
   @Column({
     name: 'FILE_SIZE',

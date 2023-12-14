@@ -6,7 +6,7 @@ export class CreateVms2dDto {
   CAMERA_2D_ID?: string;
   CAMERA_3D_ID?: string;
   FILE_PATH: string;
-  FILE_EXTENSION: string;
+  // FILE_EXTENSION: string;
   FILE_SIZE: number;
   STATUS?: string;
   STATUS_DESC?: string;

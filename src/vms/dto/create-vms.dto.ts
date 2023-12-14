@@ -5,7 +5,7 @@ export class CreateVmsDto {
   MEASUREMENT_COUNT: number;
   FILE_NAME: string;
   FILE_PATH: string;
-  FILE_EXTENSION: string;
+  // FILE_EXTENSION: string;
   FILE_SIZE: number;
   RESULT_TYPE: string;
   LENGTH: number;

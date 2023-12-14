@@ -466,7 +466,7 @@ export class AwbService {
         const Awb = await this.findOne(awbIdInDb);
         await this.awbUtilService.sendMqttMessage(Awb);
       }
-      
+
       // 모델링 파일 체크
       await this.preventMissingData(vms, vms2d);
 
@@ -915,7 +915,7 @@ export class AwbService {
 
   // awbNumber로 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
   async getLastAwbByAwbNumber(name: string) {
-    console.log("name = ", name)
+    console.log('name = ', name);
     const [result] = await this.vmsAwbHistoryRepository.find({
       order: orderByUtil('-OUT_DATE'),
       where: { AWB_NUMBER: name },
