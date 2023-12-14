@@ -787,6 +787,9 @@ export class AwbService {
       queryRunnerManager,
     );
 
+    if (!prepareBreakDownAwbDto?.SkidPlatform) {
+      return;
+    }
     const createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto = {
       inOutType: 'in',
       SkidPlatform: prepareBreakDownAwbDto?.SkidPlatform,
