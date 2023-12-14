@@ -37,6 +37,7 @@ export class SkidPlatformHistory {
     description: '안착대안 현재화물개수',
   })
   @IsNumber()
+  @IsNotEmpty()
   @Column({ type: 'int', nullable: false, default: 0 })
   count: number;
 
