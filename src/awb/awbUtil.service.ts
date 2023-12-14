@@ -38,12 +38,6 @@ export class AwbUtilService {
       ? await this.findSchedule(vmsAwbHistory.FLIGHT_NUMBER)
       : null;
 
-    if (!vmsAwbHistory?.AWB_NUMBER) {
-      console.log(
-        `VWMS_AWB_HISTORY 테이블에 정보가 정확하지 않습니다. vmsAwbHistory: ${vmsAwbHistory.AWB_NUMBER}`,
-      );
-    }
-
     const awbDto: Partial<CreateAwbDto> = {
       barcode: vmsAwbHistory.AWB_NUMBER,
       separateNumber: vmsAwbHistory.SEPARATION_NO,
@@ -63,6 +57,7 @@ export class AwbUtilService {
       path: null,
     };
 
+    // vms의 3D 파일을 저장함
     if (vms && vms.FILE_PATH) {
       try {
         const filePath = await this.fileUpload(vms);
@@ -70,6 +65,7 @@ export class AwbUtilService {
       } catch (e) {}
     }
 
+    // vms의 2D 파일을 저장함
     if (vms2d && vms2d.FILE_PATH) {
       try {
         const filePath2d = await this.fileUpload2d(vms2d);

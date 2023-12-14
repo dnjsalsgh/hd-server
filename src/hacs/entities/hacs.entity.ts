@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'AMR' })
 export class Hacs {
@@ -232,5 +232,5 @@ export class Hacs {
     description: '스키드 감지',
   })
   @Column({ nullable: true })
-  public Skid: boolean;
+  public Skid_On_Off: boolean;
 }
