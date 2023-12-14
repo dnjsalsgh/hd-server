@@ -69,13 +69,12 @@ export class SkidPlatformHistoryService {
 
   private async getProcessedData(historyData: CreateSkidPlatformHistoryDto) {
     const existingHistory = await this.findExistingHistory(historyData);
-
     if (!existingHistory) {
       historyData.totalCount = historyData.count;
       return historyData;
     }
     this.updateHistoryData(existingHistory, historyData);
-
+    console.log('historyData = ', historyData);
     return historyData;
   }
 
@@ -208,6 +207,7 @@ export class SkidPlatformHistoryService {
           SkidPlatform: true,
         },
       },
+      order: orderByUtil(null),
     });
     return result;
   }
@@ -227,7 +227,8 @@ export class SkidPlatformHistoryService {
       .orderBy('sph.skid_platform_id')
       .addOrderBy('sph.id', 'DESC')
       .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
-    return skidPlatfromState.filter((v) => v.inOutType === 'in');
+    // return skidPlatfromState.filter((v) => v.inOutType === 'in');
+    return skidPlatfromState.filter((v) => v.count >= 0);
   }
 
   // 안착대 이력에서 skid_platform_id를 기준으로 가상포트의 최신 안착대의 상태만 가져옴
