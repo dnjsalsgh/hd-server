@@ -87,7 +87,7 @@ const mssqlConfig: TypeOrmModuleOptions = {
   password: process.env.DIMOA_DATABASE_PASS,
   database: process.env.DIMOA_DATABASE_NAME,
   entities: [Vms3D, Vms2d],
-  synchronize: process.env.NODE_ENV === 'dev', // 개발 환경에서만 사z용하거나 자동 마이그레이션을 사용하지 않을 경우 false로 변경
+  synchronize: false, // 개발 환경에서만 사z용하거나 자동 마이그레이션을 사용하지 않을 경우 false로 변경
   options: { encrypt: false },
   logging: true,
 };
@@ -100,7 +100,7 @@ const dimoaConfig: TypeOrmModuleOptions = {
   password: process.env.DIMOA_DATABASE_PASS,
   database: process.env.DIMOA_DATABASE_NAME,
   entities: [VmsAwbResult, VmsAwbHistory],
-  synchronize: process.env.NODE_ENV === 'dev', // 개발 환경에서만 사용하거나 자동 마이그레이션을 사용하지 않을 경우 false로 변경
+  synchronize: false, // 개발 환경에서만 사용하거나 자동 마이그레이션을 사용하지 않을 경우 false로 변경
   options: { encrypt: false },
   logging: true,
 };
@@ -115,7 +115,7 @@ const amrConfig: TypeOrmModuleOptions = {
   entities: [Hacs],
   synchronize: process.env.NODE_ENV === 'dev',
   options: { trustServerCertificate: true },
-  logging: false,
+  logging: true,
 };
 
 export { postgresConfig, mssqlConfig, dimoaConfig, amrConfig };
