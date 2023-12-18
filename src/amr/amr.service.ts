@@ -200,7 +200,7 @@ export class AmrService {
   async createAmrByMssql() {
     const amrDataList = await this.hacsRepository.find({
       order: { LogDT: 'DESC' },
-      take: 6, // 최소한만 가져오려고 함(100 개)
+      take: 6, // 최소한만 가져오려고 함(6 개)
     });
 
 
