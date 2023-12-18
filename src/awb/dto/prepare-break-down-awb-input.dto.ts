@@ -40,6 +40,12 @@ export class PrepareBreakDownAwbInputDto extends PickType(Awb, [
   })
   scc: Partial<Scc>[];
 
+  @ApiProperty({
+    example: 1,
+    description: '안착대 FK',
+  })
+  SkidPlatform?: number;
+
   // @ApiProperty({
   //   example: 1,
   //   description: '항공편 FK',

@@ -47,6 +47,11 @@ import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.
 import { breakDownRequest } from '../lib/util/axios.util';
 import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
 import { breakdownTest } from './dto/breakdownTest';
+import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
+import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
+import { CreateSimulatorHistoryDto } from '../simulator-history/dto/create-simulator-history.dto';
+import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
+import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
 @Injectable()
 export class AwbService {
@@ -55,6 +60,8 @@ export class AwbService {
     private readonly awbRepository: Repository<Awb>,
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
+    // @InjectRepository(SkidPlatformHistory)
+    // private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
     @InjectRepository(Vms3D, 'mssqlDB')
     private readonly vmsRepository: Repository<Vms3D>,
     @InjectRepository(Vms2d, 'mssqlDB')
@@ -68,6 +75,7 @@ export class AwbService {
     private readonly mqttService: MqttService,
     private readonly sccService: SccService,
     private readonly awbUtilService: AwbUtilService,
+    private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
   ) {}
 
   async create(createAwbDto: CreateAwbDto, queryRunnerManager: EntityManager) {
@@ -212,7 +220,7 @@ export class AwbService {
         MEASUREMENT_COUNT: 0,
         FILE_NAME: awbDto.barcode,
         FILE_PATH: process.env.NAS_PATH,
-        FILE_EXTENSION: 'fbx',
+        // FILE_EXTENSION: 'fbx',
         FILE_SIZE: 0,
         RESULT_TYPE: 'C',
         WATER_VOLUME: awbDto.waterVolume,
@@ -232,7 +240,7 @@ export class AwbService {
         SEPARATION_NO: awbDto.separateNumber,
         FILE_NAME: awbDto.barcode,
         FILE_PATH: process.env.NAS_PATH_2D,
-        FILE_EXTENSION: 'png',
+        // FILE_EXTENSION: 'png',
         FILE_SIZE: 0,
         CALIBRATION_ID: randomeString,
         CREATE_USER_ID: randomeString,
@@ -418,7 +426,7 @@ export class AwbService {
   async createWithMssql(
     vms: Vms3D,
     vms2d: Vms2d,
-    sccData: VmsAwbResult,
+    vmsAwbResult: VmsAwbResult,
     vmsAwbHistory: VmsAwbHistory,
   ) {
     const queryRunner = this.awbUtilService.getQueryRunner();
@@ -432,7 +440,7 @@ export class AwbService {
       const awbDto = await this.awbUtilService.prepareAwbDto(
         vms,
         vms2d,
-        sccData,
+        vmsAwbResult,
         vmsAwbHistory,
       );
 
@@ -457,16 +465,16 @@ export class AwbService {
       }
 
       // scc 테이블에서 가져온 데이터를 입력
-      if (sccData && awbIdInDb) {
+      if (vmsAwbResult && awbIdInDb) {
         await this.awbUtilService.connectAwbWithScc(
           queryRunner,
-          sccData,
+          vmsAwbResult,
           awbIdInDb,
         );
         const Awb = await this.findOne(awbIdInDb);
         await this.awbUtilService.sendMqttMessage(Awb);
       }
-      
+
       // 모델링 파일 체크
       await this.preventMissingData(vms, vms2d);
 
@@ -778,6 +786,18 @@ export class AwbService {
       psResult.result,
       queryRunnerManager,
     );
+
+    if (!prepareBreakDownAwbDto?.SkidPlatform) {
+      return;
+    }
+    const createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto = {
+      inOutType: 'in',
+      SkidPlatform: prepareBreakDownAwbDto?.SkidPlatform,
+      Awb: prepareBreakDownAwbDto.id,
+      count: prepareBreakDownAwbDto.awbTotalPiece,
+      totalCount: prepareBreakDownAwbDto.awbTotalPiece,
+    };
+    await this.skidPlatformHistoryService.create(createSkidPlatformHistoryDto);
   }
 
   // 이미 등록된 awb를 해포
@@ -905,7 +925,7 @@ export class AwbService {
   }
 
   // awbNumber로 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
-  async getSccByAwbNumber(name: string) {
+  async getVmsByAwbNumber(name: string) {
     const [result] = await this.vmsAwbResultRepository.find({
       order: orderByUtil('-RECEIVED_DATE'),
       where: { AWB_NUMBER: name },
@@ -915,10 +935,31 @@ export class AwbService {
 
   // awbNumber로 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
   async getLastAwbByAwbNumber(name: string) {
-    console.log("name = ", name)
+    try {
+      const [result] = await this.vmsAwbHistoryRepository.find({
+        order: orderByUtil('-OUT_DATE'),
+        where: { AWB_NUMBER: name },
+      });
+      return result;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // 최신 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
+  async getLastVmsAwbResult() {
+    const [result] = await this.vmsAwbResultRepository.find({
+      order: orderByUtil('-RECEIVED_DATE'),
+      take: 1,
+    });
+    return result;
+  }
+
+  // 최신 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
+  async getLastVmsAwbHistory() {
     const [result] = await this.vmsAwbHistoryRepository.find({
       order: orderByUtil('-OUT_DATE'),
-      where: { AWB_NUMBER: name },
+      take: 1,
     });
     return result;
   }

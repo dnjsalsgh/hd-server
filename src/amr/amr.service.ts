@@ -56,30 +56,30 @@ export class AmrService {
     });
     // 1. make params by MS-SQL DBMS
     const amrBody: CreateAmrDto = {
-      name: body.Amrld.toString(), // 로봇 번호
-      logDT: new Date(body.LogDT).toISOString(), // 데이터 업데이트 일자
-      charging: body.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
+      name: body?.Amrld.toString(), // 로봇 번호
+      logDT: new Date(body?.LogDT).toISOString(), // 데이터 업데이트 일자
+      charging: body?.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
       // prcsCD: body.PrcsCD,
       // ACSMode: body.ACSMode === 1,
-      mode: body.Mode,
+      mode: body?.Mode,
       // errorLevel: body.ErrorLevel,
-      errorCode: body.ErrorCode.toString(),
-      soc: body.SOC,
-      travelDist: body.TravelDist, // 누적이동거리(m)
-      oprTime: body.OprTime, // 누적운행시간(M)
-      stopTime: body.StopTime, // 누적정지시간(M)
-      startBatteryLevel: body.StartBatteryLevel, // 충전을 시작할 때만 입력하기
+      errorCode: body?.ErrorCode.toString(),
+      soc: body?.SOC,
+      travelDist: body?.TravelDist, // 누적이동거리(m)
+      oprTime: body?.OprTime, // 누적운행시간(M)
+      stopTime: body?.StopTime, // 누적정지시간(M)
+      startBatteryLevel: body?.StartBatteryLevel, // 충전을 시작할 때만 입력하기
       // lastBatteryLevel: body.LastBatteryLevel,
       simulation: true,
       // distinguish: body.distinguish, // 인입용 인출용 구분
     };
 
     const amrChargerBody: CreateAmrChargerDto = {
-      name: body.Amrld.toString(),
-      working: body.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
-      x: body.ChargeX, // 유니티에서 보여지는 amr의 x좌표
-      y: body.ChargeY, // 유니티에서 보여지는 amr의 y좌표
-      z: body.ChargeZ, // 유니티에서 보여지는 amr의 z좌표
+      name: body?.Amrld.toString(),
+      working: body?.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
+      x: body?.ChargeX, // 유니티에서 보여지는 amr의 x좌표
+      y: body?.ChargeY, // 유니티에서 보여지는 amr의 y좌표
+      z: body?.ChargeZ, // 유니티에서 보여지는 amr의 z좌표
     };
 
     const amrChargeHistoryBody: CreateAmrChargeHistoryDto = {

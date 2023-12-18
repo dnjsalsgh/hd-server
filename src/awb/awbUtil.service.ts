@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { CreateAwbDto } from './dto/create-awb.dto';
@@ -39,24 +39,25 @@ export class AwbUtilService {
       : null;
 
     const awbDto: Partial<CreateAwbDto> = {
-      barcode: vms.AWB_NUMBER,
-      separateNumber: vms.SEPARATION_NO,
-      width: vms.WIDTH,
-      length: vms.LENGTH,
-      depth: vms.HEIGHT,
-      weight: vms.WEIGHT,
+      barcode: vmsAwbHistory.AWB_NUMBER,
+      separateNumber: vmsAwbHistory.SEPARATION_NO,
+      width: vmsAwbHistory.RESULT_WIDTH,
+      length: vmsAwbHistory.RESULT_LENGTH,
+      depth: vmsAwbHistory.RESULT_HEIGHT,
+      weight: vmsAwbHistory.RESULT_WEIGHT,
       piece: vmsAwbHistory?.CGO_PC ?? 1,
       state: 'invms',
       AirCraftSchedule: scheduleId,
-      gSkidOn: vmsAwbHistory.G_SKID_ON === 'Y',
-      awbTotalPiece: vmsAwbResult.CGO_TOTAL_PC,
-      allAwbReceive: vmsAwbResult.ALL_PART_RECEIVED === 'Y',
-      receivedUser: vmsAwbResult.RECEIVED_USER_ID,
-      receivedDate: vmsAwbResult.RECEIVED_DATE,
+      gSkidOn: vmsAwbHistory?.G_SKID_ON === 'Y',
+      awbTotalPiece: vmsAwbResult?.CGO_TOTAL_PC,
+      allAwbReceive: vmsAwbResult?.ALL_PART_RECEIVED === 'Y',
+      receivedUser: vmsAwbResult?.RECEIVED_USER_ID,
+      receivedDate: vmsAwbResult?.RECEIVED_DATE,
       modelPath: null,
       path: null,
     };
 
+    // vms의 3D 파일을 저장함
     if (vms && vms.FILE_PATH) {
       try {
         const filePath = await this.fileUpload(vms);
@@ -64,13 +65,14 @@ export class AwbUtilService {
       } catch (e) {}
     }
 
+    // vms의 2D 파일을 저장함
     if (vms2d && vms2d.FILE_PATH) {
       try {
         const filePath2d = await this.fileUpload2d(vms2d);
         awbDto.path = filePath2d;
       } catch (e) {}
     }
-
+    console.log('awbDto = ', awbDto);
     return awbDto;
   }
 
@@ -176,21 +178,21 @@ export class AwbUtilService {
   }
 
   protected async fileUpload(vms: Vms3D) {
-    const file = `${vms.FILE_PATH}/${vms.FILE_NAME}.${vms.FILE_EXTENSION}`;
+    const file = `Z:\\${vms.FILE_PATH}\\${vms.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms.FILE_NAME}.${vms.FILE_EXTENSION}`,
+      `${vms.FILE_NAME}`,
     );
     return fileResult;
   }
 
   protected async fileUpload2d(vms2d: Vms2d) {
-    const file = `${vms2d.FILE_PATH}/${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`;
+    const file = `Z:\\${vms2d.FILE_PATH}\\${vms2d.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms2d.FILE_NAME}.${vms2d.FILE_EXTENSION}`,
+      `${vms2d.FILE_NAME}`,
     );
     return fileResult;
   }

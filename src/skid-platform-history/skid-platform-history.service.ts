@@ -8,7 +8,7 @@ import {
   Repository,
   TypeORMError,
 } from 'typeorm';
-import { pipe, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
@@ -53,6 +53,7 @@ export class SkidPlatformHistoryService {
     const historyResult = await this.skidPlatformHistoryRepository.save(
       historyData as SkidPlatformHistory,
     );
+
     const skidPlatformNowState = await this.nowState();
 
     // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
@@ -74,8 +75,8 @@ export class SkidPlatformHistoryService {
       historyData.totalCount = historyData.count;
       return historyData;
     }
-    this.updateHistoryData(existingHistory, historyData);
 
+    this.updateHistoryData(existingHistory, historyData);
     return historyData;
   }
 
@@ -96,9 +97,10 @@ export class SkidPlatformHistoryService {
       historyData.count = existingHistory.count - historyData.count;
     }
 
-    if (historyData.inOutType === 'in') {
-      historyData.count = (existingHistory.Awb as Awb).piece;
-    }
+    // 안착대에 똑같은 값이 in 되면 팅기게끔 수정
+    // if (historyData.inOutType === 'in') {
+    //   historyData.count = (existingHistory.Awb as Awb).piece;
+    // }
   }
 
   async findAll(query: SkidPlatformHistory & BasicQueryParamDto) {
@@ -208,6 +210,7 @@ export class SkidPlatformHistoryService {
           SkidPlatform: true,
         },
       },
+      order: orderByUtil(null),
     });
     return result;
   }
@@ -227,7 +230,8 @@ export class SkidPlatformHistoryService {
       .orderBy('sph.skid_platform_id')
       .addOrderBy('sph.id', 'DESC')
       .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
-    return skidPlatfromState.filter((v) => v.inOutType === 'in');
+    // return skidPlatfromState.filter((v) => v.inOutType === 'in');
+    return skidPlatfromState.filter((v) => v.count >= 0);
   }
 
   // 안착대 이력에서 skid_platform_id를 기준으로 가상포트의 최신 안착대의 상태만 가져옴
