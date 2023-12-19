@@ -250,7 +250,7 @@ export class SimulatorResultService {
     const asrsStateArray = await this.asrsHistoryService.nowState();
     // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const skidPlatformStateArray =
-      await this.skidPlatformHistoryService.nowState();
+      await this.skidPlatformHistoryService.nowVirtualState(false, true);
     // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const uldStateArray = await this.uldHistoryService.nowState(
       apiRequest.UldCode,
@@ -416,7 +416,7 @@ export class SimulatorResultService {
 
     // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const skidPlatformStateArray =
-      await this.skidPlatformHistoryService.nowState();
+      await this.skidPlatformHistoryService.nowVirtualState(false, true);
 
     // ps에 보낼 Awb 정보들 모아두는 배열
     const Awbs = [];
@@ -558,7 +558,7 @@ export class SimulatorResultService {
       const asrsStateArray = await this.asrsHistoryService.nowState();
       // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
       const skidPlatformStateArray =
-        await this.skidPlatformHistoryService.nowState();
+        await this.skidPlatformHistoryService.nowVirtualState(false, true);
       // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
       const uldStateArray = await this.uldHistoryService.nowState(
         apiRequest.UldCode,
@@ -623,7 +623,7 @@ export class SimulatorResultService {
     const asrsStateArray = await this.asrsHistoryService.nowState();
     // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const skidPlatformStateArray =
-      await this.skidPlatformHistoryService.nowState();
+      await this.skidPlatformHistoryService.nowVirtualState(false, true);
     // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const uldStateArray = await this.uldHistoryService.nowState(
       apiRequest.UldCode,
@@ -779,7 +779,7 @@ export class SimulatorResultService {
     const asrsStateArray = await this.asrsHistoryService.nowState();
     // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const skidPlatformStateArray =
-      await this.skidPlatformHistoryService.nowState();
+      await this.skidPlatformHistoryService.nowVirtualState(false, true);
     // uld의 최신 이력을 uldCode 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const uldStateArray = await this.uldHistoryService.nowState(
       apiRequest.UldCode,
@@ -970,7 +970,7 @@ export class SimulatorResultService {
     const asrsStateArray = await this.asrsHistoryService.nowState();
     // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
     const skidPlatformStateArray =
-      await this.skidPlatformHistoryService.nowState();
+      await this.skidPlatformHistoryService.nowVirtualState(false, true);
 
     // 현재 ASRS의 정보들
     const Awbs = [];
