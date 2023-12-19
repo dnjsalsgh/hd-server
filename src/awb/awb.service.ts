@@ -449,8 +449,8 @@ export class AwbService {
         awbDto.barcode,
       );
 
-      // 예약된 화물(separateNO가 0이라 가정)은 awb에 저장되어 있으니 update, 그 외에는 insert
-      if (existingAwb && vms.SEPARATION_NO === 0) {
+      // 예약된 화물(separateNO가 1이라 가정)은 awb에 저장되어 있으니 update, 그 외에는 insert
+      if (existingAwb && vms.SEPARATION_NO === 1) {
         awbIdInDb = await this.awbUtilService.updateAwb(
           queryRunner,
           existingAwb.id,
@@ -937,7 +937,7 @@ export class AwbService {
   async getLastAwbByAwbNumber(name: string) {
     try {
       const [result] = await this.vmsAwbHistoryRepository.find({
-        order: orderByUtil('-OUT_DATE'),
+        order: orderByUtil('-IN_DATE'),
         where: { AWB_NUMBER: name },
       });
       return result;
@@ -958,7 +958,7 @@ export class AwbService {
   // 최신 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
   async getLastVmsAwbHistory() {
     const [result] = await this.vmsAwbHistoryRepository.find({
-      order: orderByUtil('-OUT_DATE'),
+      order: orderByUtil('-IN_DATE'),
       take: 1,
     });
     return result;

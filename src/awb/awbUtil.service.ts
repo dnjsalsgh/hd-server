@@ -45,11 +45,11 @@ export class AwbUtilService {
       length: vmsAwbHistory.RESULT_LENGTH,
       depth: vmsAwbHistory.RESULT_HEIGHT,
       weight: vmsAwbHistory.RESULT_WEIGHT,
-      piece: vmsAwbHistory?.CGO_PC ?? 1,
+      piece: vmsAwbHistory?.RESULT_PC ?? 1,
       state: 'invms',
       AirCraftSchedule: scheduleId,
       gSkidOn: vmsAwbHistory?.G_SKID_ON === 'Y',
-      awbTotalPiece: vmsAwbResult?.CGO_TOTAL_PC,
+      awbTotalPiece: vmsAwbHistory?.RESULT_PC ?? 1, // 초기 전체 화물의 piece 수는 전체 피스수로 인식
       allAwbReceive: vmsAwbResult?.ALL_PART_RECEIVED === 'Y',
       receivedUser: vmsAwbResult?.RECEIVED_USER_ID,
       receivedDate: vmsAwbResult?.RECEIVED_DATE,
