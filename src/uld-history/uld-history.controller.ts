@@ -7,7 +7,6 @@ import {
   Post,
   Put,
   Query,
-  UseInterceptors,
 } from '@nestjs/common';
 import { UldHistoryService } from './uld-history.service';
 import { CreateUldHistoryDto } from './dto/create-uld-history.dto';
@@ -15,9 +14,6 @@ import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { UldHistory } from './entities/uld-history.entity';
-import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
-import { TransactionManager } from '../lib/decorator/transaction.decorator';
-import { EntityManager } from 'typeorm';
 
 @Controller('uld-history')
 @ApiTags('[Uld 이력]uld-history')
