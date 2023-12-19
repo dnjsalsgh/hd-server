@@ -304,6 +304,7 @@ export class AwbController {
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
     try {
+      // vms 체적 데이터 가져오기
       const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1();
       const vmsAwbHistoryData = await this.fetchVmsAwbHistoryDataLimit1();
 
@@ -311,6 +312,7 @@ export class AwbController {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 
+      // vms 모델 데이터 가져오기
       const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
       const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
 
@@ -318,6 +320,7 @@ export class AwbController {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 
+      // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
       await this.createAwbDataInMssql(
         vms3Ddata,
         vms2dData,

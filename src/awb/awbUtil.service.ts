@@ -56,7 +56,7 @@ export class AwbUtilService {
       modelPath: null,
       path: null,
     };
-
+    console.log('vms = ', vms);
     // vms의 3D 파일을 저장함
     if (vms && vms.FILE_PATH) {
       try {

@@ -424,7 +424,7 @@ export class AwbService {
 
   // vms에서 온 데이터 중 처음은 update, 분리된 화물은 insert 하기 위한 메서드
   async createWithMssql(
-    vms: Vms3D,
+    vms3D: Vms3D,
     vms2d: Vms2d,
     vmsAwbResult: VmsAwbResult,
     vmsAwbHistory: VmsAwbHistory,
@@ -436,9 +436,10 @@ export class AwbService {
       let awbIdInDb: number;
       await queryRunner.startTransaction();
 
-      // vms에서 온 데이터 세팅
+      // vms에서 온 데이터 세팅(실제 db에 넣을 파라미터 세팅하는 부분)
+      // 모델링 파일 저장 로직도 여기서
       const awbDto = await this.awbUtilService.prepareAwbDto(
-        vms,
+        vms3D,
         vms2d,
         vmsAwbResult,
         vmsAwbHistory,
@@ -450,7 +451,7 @@ export class AwbService {
       );
 
       // 예약된 화물(separateNO가 1이라 가정)은 awb에 저장되어 있으니 update, 그 외에는 insert
-      if (existingAwb && vms.SEPARATION_NO === 1) {
+      if (existingAwb && vmsAwbHistory.SEPARATION_NO === 1) {
         awbIdInDb = await this.awbUtilService.updateAwb(
           queryRunner,
           existingAwb.id,
@@ -476,7 +477,7 @@ export class AwbService {
       }
 
       // 모델링 파일 체크
-      await this.preventMissingData(vms, vms2d);
+      // await this.preventMissingData(vms, vms2d);
 
       await queryRunner.commitTransaction();
     } catch (error) {
