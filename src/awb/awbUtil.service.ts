@@ -28,6 +28,7 @@ export class AwbUtilService {
     private readonly sccService: SccService,
   ) {}
 
+  // vms db에서 넘어온 데이터들을 awb에 넣기 위해 가공하는 메서드
   async prepareAwbDto(
     vms: Vms3D,
     vms2d: Vms2d,
@@ -38,6 +39,7 @@ export class AwbUtilService {
       ? await this.findSchedule(vmsAwbHistory.FLIGHT_NUMBER)
       : null;
 
+    // TODO: vms의 데이터로 awb에 정보를 넣을 일이 있다면 여기서 넣어야 함
     const awbDto: Partial<CreateAwbDto> = {
       barcode: vmsAwbHistory.AWB_NUMBER,
       separateNumber: vmsAwbHistory.SEPARATION_NO,
@@ -56,7 +58,7 @@ export class AwbUtilService {
       modelPath: null,
       path: null,
     };
-    console.log('vms = ', vms);
+
     // vms의 3D 파일을 저장함
     if (vms && vms.FILE_PATH) {
       try {
@@ -167,16 +169,19 @@ export class AwbUtilService {
     return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
   }
 
+  // mqtt 메시지를 보내는 캡슐화하는 위한 메서드
   async sendMqttMessage(existingAwb: any) {
     return this.mqttService.sendMqttMessage(`hyundai/vms1/create`, existingAwb);
   }
 
+  // 에러를 반환하는데 쉽게 만들 메서드
   async handleError(queryRunner, error) {
     await queryRunner.rollbackTransaction();
     await queryRunner.release();
     throw new TypeORMError(`rollback Working - ${error}`);
   }
 
+  // 3D 파일을 저장하는 로직
   protected async fileUpload(vms: Vms3D) {
     const file = `Z:\\${vms.FILE_PATH}\\${vms.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
@@ -187,6 +192,7 @@ export class AwbUtilService {
     return fileResult;
   }
 
+  // 2D 파일을 저장하는 로직
   protected async fileUpload2d(vms2d: Vms2d) {
     const file = `Z:\\${vms2d.FILE_PATH}\\${vms2d.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
