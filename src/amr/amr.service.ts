@@ -71,7 +71,7 @@ export class AmrService {
       const amrBody: CreateAmrDto = {
         name: amrData?.Amrld?.toString() || '', // 로봇 번호
         logDT: amrData?.LogDT || new Date().toISOString(), // 데이터 업데이트 일자
-        charging: amrData?.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
+        charging: amrData?.CurState === 'Charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
         // prcsCD: amrData.PrcsCD,
         // ACSMode: amrData.ACSMode === 1,
         mode: amrData?.Mode,
@@ -89,15 +89,15 @@ export class AmrService {
 
       const amrChargerBody: CreateAmrChargerDto = {
         name: amrData.Amrld.toString(),
-        working: amrData?.CurState === 'charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
+        working: amrData?.CurState === 'Charge',
         // x: amrData?.ChargeX, // 유니티에서 보여지는 amr의 x좌표
         // y: amrData?.ChargeY, // 유니티에서 보여지는 amr의 y좌표
         // z: amrData?.ChargeZ, // 유니티에서 보여지는 amr의 z좌표
       };
 
       const amrChargeHistoryBody: CreateAmrChargeHistoryDto = {
-        chargeStart: amrData?.StartTime,
-        chargeEnd: amrData?.EndTime,
+        chargeStart: amrData?.StartTime || new Date(),
+        chargeEnd: amrData?.EndTime || new Date(),
         soc: amrData.SOC?.toString(),
         soh: amrData.SOH?.toString(),
         // 밑쪽 로직에서 값 주입되어서 기본값 null
