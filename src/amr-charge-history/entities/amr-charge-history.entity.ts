@@ -35,14 +35,14 @@ export class AmrChargeHistory {
     example: 'soc',
     description: '배터리SOC',
   })
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   soc: string;
 
   @ApiProperty({
     example: 'soh',
     description: '배터리SOH',
   })
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   soh: string;
 
   @CreateDateColumn()

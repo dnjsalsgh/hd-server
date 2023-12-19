@@ -304,16 +304,23 @@ export class AwbController {
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
     try {
-      const vms3Ddata = await this.fetchAwbData();
-      const vms2dData = await this.fetchAwb2dData();
+      // vms 체적 데이터 가져오기
+      const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1();
+      const vmsAwbHistoryData = await this.fetchVmsAwbHistoryDataLimit1();
+
+      if (!vmsAwbResult || !vmsAwbHistoryData) {
+        throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
+      }
+
+      // vms 모델 데이터 가져오기
+      const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
+      const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
 
       if (!vms3Ddata || !vms2dData) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 
-      const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1();
-      const vmsAwbHistoryData = await this.fetchVmsAwbHistoryDataLimit1();
-
+      // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
       await this.createAwbDataInMssql(
         vms3Ddata,
         vms2dData,
@@ -334,6 +341,20 @@ export class AwbController {
 
   private async fetchAwb2dData() {
     return await this.awbService.getAwbByVms2d(1);
+  }
+
+  private async fetchAwbDataByBarcode(vmsAwbHistoryData: VmsAwbHistory) {
+    return await this.awbService.getAwbByVmsByName(
+      vmsAwbHistoryData.AWB_NUMBER,
+      vmsAwbHistoryData.SEPARATION_NO,
+    );
+  }
+
+  private async fetchAwb2dDataByBarcode(vmsAwbHistoryData: VmsAwbHistory) {
+    return await this.awbService.getAwbByVms2dByName(
+      vmsAwbHistoryData.AWB_NUMBER,
+      vmsAwbHistoryData.SEPARATION_NO,
+    );
   }
 
   private async fetchVmsAwbResultData(vms: Vms3D) {
