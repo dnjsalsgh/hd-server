@@ -19,6 +19,7 @@ import { Uld, UldAttribute } from '../uld/entities/uld.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { UldService } from '../uld/uld.service';
 import { UldSccInjectionDto } from '../uld/dto/uld-sccInjection.dto';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class UldHistoryService {
@@ -142,6 +143,9 @@ export class UldHistoryService {
         Awb: query.Awb ? Equal(+query.Awb) : undefined,
         createdAt: findDate,
       },
+      order: orderByUtil(query.order),
+      take: query.limit,
+      skip: query.offset,
     });
   }
 
@@ -166,7 +170,8 @@ export class UldHistoryService {
       .createQueryBuilder('uh')
       .leftJoinAndSelect('uh.Awb', 'Awb')
       .leftJoinAndSelect('Awb.Scc', 'Scc')
-      .where('uh.Uld = :uldId', { uldId: targetUld.id })
+      .where('Awb.ghost = :ghost', { ghost: false })
+      .andWhere('uh.Uld = :uldId', { uldId: targetUld.id })
       .orderBy('uh.id', 'ASC')
       .getMany();
 
