@@ -170,7 +170,8 @@ export class UldHistoryService {
       .createQueryBuilder('uh')
       .leftJoinAndSelect('uh.Awb', 'Awb')
       .leftJoinAndSelect('Awb.Scc', 'Scc')
-      .where('uh.Uld = :uldId', { uldId: targetUld.id })
+      .where('Awb.ghost = :ghost', { ghost: false })
+      .andWhere('uh.Uld = :uldId', { uldId: targetUld.id })
       .orderBy('uh.id', 'ASC')
       .getMany();
 
