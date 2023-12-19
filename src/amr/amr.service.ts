@@ -118,6 +118,15 @@ export class AmrService {
           ['name'],
         );
 
+        // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
+        // const amrResult = await queryRunner.manager
+        //   .getRepository(Amr)
+        //   .upsert(amrBody, ['name']);
+        //
+        // const amrChargerResult = await queryRunner.manager
+        //   .getRepository(AmrCharger)
+        //   .upsert(amrChargerBody, ['name']);
+
         // Amr 생성, amr충전 생성 될 시에만 이력 저장
         if (
           amrResult.identifiers[0].id &&
@@ -128,6 +137,9 @@ export class AmrService {
           amrChargeHistoryBody.amrCharger = amrChargerResult.identifiers[0].id;
 
           await this.amrChargeHistoryRepository.save(amrChargeHistoryBody);
+          // await queryRunner.manager
+          //   .getRepository(AmrChargeHistory)
+          //   .save(amrChargeHistoryBody);
         }
 
         // await queryRunner.commitTransaction();
