@@ -12,7 +12,6 @@ import { AmrService } from './amr.service';
 import { CreateAmrDto } from './dto/create-amr.dto';
 import { UpdateAmrDto } from './dto/update-amr.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { AmrRawDto } from './dto/amr-raw.dto';
 
 @Controller('amr')
 @ApiTags('[Amr]amr')
@@ -30,9 +29,9 @@ export class AmrController {
       '[사용x] amr의 움직임 데이터 확인 테스트용 api, mssql에서 amr 데이터 스케줄러로 0.3초마다 동작됨, mssql이 연결 안됬을 때 태스트용도로 만들었던 api',
     description: 'amr, amrCharge, amrChargeHistory 모두 등록함',
   })
-  @Post('/moving-data')
-  createByPlc(@Body() body: AmrRawDto) {
-    return this.amrService.createAmrByData(body);
+  @Get('/test/moving-data')
+  createByPlc() {
+    return this.amrService.createAmrByHacs();
   }
 
   @ApiQuery({ name: 'name', required: false, type: 'string' })

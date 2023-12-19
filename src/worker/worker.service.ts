@@ -24,7 +24,7 @@ export class WorkerService {
     if (this.configService.get<string>('SCHEDULE') !== 'true') {
       return;
     }
-    this.amrService.createAmrByMssql();
+    this.amrService.createAmrByHacs();
     console.log('amr 데이터 수집 스케줄러 동작');
   }
 
