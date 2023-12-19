@@ -304,6 +304,7 @@ export class AwbController {
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
     try {
+      console.time('vmsTimer');
       // vms 체적 데이터 가져오기
       const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1();
       const vmsAwbHistoryData = await this.fetchVmsAwbHistoryDataLimit1();
@@ -330,7 +331,7 @@ export class AwbController {
 
       // mqtt 메세지 보내기 로직 호출
       await this.sendModelingCompleteSignal();
-
+      console.timeEnd('vmsTimer');
       console.log('Modeling complete');
     } catch (error) {
       console.error('Error:', error);
