@@ -55,6 +55,8 @@ export class AwbUtilService {
       allAwbReceive: vmsAwbResult?.ALL_PART_RECEIVED === 'Y',
       receivedUser: vmsAwbResult?.RECEIVED_USER_ID,
       receivedDate: vmsAwbResult?.RECEIVED_DATE,
+      waterVolume: vmsAwbHistory?.RESULT_WATER_VOLUME,
+      squareVolume: vmsAwbHistory?.RESULT_CUBIC_VOLUME,
       modelPath: null,
       path: null,
     };
