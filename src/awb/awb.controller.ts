@@ -86,15 +86,6 @@ export class AwbController {
   }
 
   @ApiOperation({
-    summary:
-      '[사용x] vms 입력데이터 저장하기(scc와 항공편 스케줄 함께) /airschedule/awb를 사용하세요',
-  })
-  @Post('/aircraft')
-  createWithAircraftInfo(@Body() createAwbDto: CreateAwbWithAircraftDto) {
-    return this.awbService.createWithAircraft(createAwbDto);
-  }
-
-  @ApiOperation({
     summary: 'ps에 화물 해포 요청',
     description: 'ps에 화물 해포 요청보네기, piece 수만큼 화물이 해포될 예정',
   })
@@ -125,20 +116,6 @@ export class AwbController {
       createAwbDtoArray,
       queryRunnerManager,
     );
-  }
-
-  @ApiOperation({
-    summary: '해포 실행 by id',
-    description: '부모 화물의 id를 넣고, 자식을 body의 [id]로 넣습니다.',
-  })
-  @UseInterceptors(TransactionInterceptor)
-  @Post('/break-down-by-id/:awbId')
-  breakDownById(
-    @Param('awbId', ParseIntPipe) awbId: number,
-    @Body() body: CreateAwbBreakDownDto,
-    @TransactionManager() queryRunnerManager: EntityManager,
-  ) {
-    return this.awbService.breakDownById(awbId, body, queryRunnerManager);
   }
 
   @ApiOperation({

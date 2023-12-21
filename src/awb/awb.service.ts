@@ -60,8 +60,6 @@ export class AwbService {
     private readonly awbRepository: Repository<Awb>,
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
-    // @InjectRepository(SkidPlatformHistory)
-    // private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
     @InjectRepository(Vms3D, 'mssqlDB')
     private readonly vmsRepository: Repository<Vms3D>,
     @InjectRepository(Vms2d, 'mssqlDB')
@@ -289,86 +287,6 @@ export class AwbService {
       this.mqttService.sendMqttMessage(`hyundai/vms1/createFile`, {});
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
-    }
-  }
-
-  // 항공기, 항공편, awb를 동식에 입력하기 위한 메서드
-  async createWithAircraft(
-    createAwbDto: CreateAwbWithAircraftDto,
-    transaction: QueryRunner = this.dataSource.createQueryRunner(),
-  ) {
-    const { scc, ...awbDto } = createAwbDto;
-
-    const queryRunner = transaction;
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      // 1. aircraft 입력하기 있다면 update
-      const aircraftBody: CreateAircraftDto = {
-        name: createAwbDto.aircraftName,
-        code: createAwbDto.aircraftCode,
-        info: createAwbDto.aircraftInfo,
-        allow: createAwbDto.allow,
-        allowDryIce: createAwbDto.allowDryIce,
-      };
-      const aircraftResult = await queryRunner.manager
-        .getRepository(Aircraft)
-        .save(aircraftBody);
-
-      // 3. aircraftSchedule 입력하기
-      const aircraftScheduleBody: CreateAircraftScheduleDto = {
-        code: createAwbDto.aircraftCode,
-        source: createAwbDto.source,
-        localDepartureTime: createAwbDto.localDepartureTime,
-        koreaArrivalTime: createAwbDto.koreaArrivalTime,
-        workStartTime: createAwbDto.workStartTime,
-        workCompleteTargetTime: createAwbDto.workCompleteTargetTime,
-        koreaDepartureTime: createAwbDto.koreaDepartureTime,
-        localArrivalTime: createAwbDto.localArrivalTime,
-        waypoint: createAwbDto.waypoint,
-        Aircraft: aircraftResult.id,
-        departure: createAwbDto.departure,
-        destination: createAwbDto.destination,
-      };
-      const aircraftScheduleResult = await queryRunner.manager
-        .getRepository(AircraftSchedule)
-        .save(aircraftScheduleBody);
-
-      // 화물이 어떤 항공편으로 왔는지 추적하는 작업
-      awbDto.AirCraftSchedule = aircraftScheduleResult.id;
-      // 2. awb를 입력하기
-      const awbResult = await queryRunner.manager
-        .getRepository(Awb)
-        .save(awbDto);
-
-      // scc 정보, awb이 입력되어야 동작하게끔
-      if (scc && awbResult) {
-        // 4. 입력된 scc찾기
-        const sccResult = await this.sccRepository.find({
-          where: { code: In(scc.map((s) => s.code)) },
-        });
-
-        // 5. awb와 scc를 연결해주기 위한 작업
-        const joinParam = sccResult.map((item) => {
-          return {
-            Awb: awbResult.id,
-            Scc: item.id,
-          };
-        });
-        await queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
-      }
-
-      await queryRunner.commitTransaction();
-      // awb 실시간 데이터를 MQTT로 publish
-      this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
-        fileRead: true,
-      });
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw new TypeORMError(`rollback Working - ${error}`);
-    } finally {
-      await queryRunner.release();
     }
   }
 
@@ -801,50 +719,6 @@ export class AwbService {
       totalCount: prepareBreakDownAwbDto.awbTotalPiece,
     };
     await this.skidPlatformHistoryService.create(createSkidPlatformHistoryDto);
-  }
-
-  // 이미 등록된 awb를 해포
-  async breakDownById(
-    awbId: number,
-    body: CreateAwbBreakDownDto,
-    queryRunnerManager: EntityManager,
-  ) {
-    try {
-      const parentAwb = await this.awbRepository.findOneBy({
-        id: awbId,
-      });
-      // 1. 부모의 존재, 부모의 parent 칼럼이 0인지, 해포여부가 false인지 확인
-      if (
-        !parentAwb &&
-        parentAwb.parent !== 0 &&
-        parentAwb.breakDown === false
-      ) {
-        throw new NotFoundException('상위 화물 정보가 잘못되었습니다.');
-      }
-    } catch (e) {
-      throw new NotFoundException(`${e}`);
-    }
-
-    const queryRunner = queryRunnerManager.queryRunner;
-
-    try {
-      // 2. 해포된 화물들 등록
-      for (let i = 0; i < body.awbs.length; i++) {
-        // 2-1. 하위 화물 등록
-        const subAwb = body.awbs[i];
-
-        await queryRunner.manager
-          .getRepository(Awb)
-          .update({ id: subAwb }, { parent: awbId, breakDown: true });
-      }
-
-      // 2-3. 부모 화물 breakDown: True로 상태 변경
-      await queryRunner.manager
-        .getRepository(Awb)
-        .update({ id: awbId }, { breakDown: true });
-    } catch (error) {
-      throw new TypeORMError(`rollback Working - ${error}`);
-    }
   }
 
   remove(id: number) {
