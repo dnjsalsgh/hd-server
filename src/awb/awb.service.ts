@@ -714,6 +714,7 @@ export class AwbService {
     subAwb.breakDown = true;
     subAwb.AirCraftSchedule = parentCargo.AirCraftSchedule;
     subAwb.state = 'inskidplatform';
+    subAwb.separateNumber = parentCargo.separateNumber; // 고스트 화물은 부모화물의 seperateNumber랑 같아야 됨
 
     if ('id' in subAwb) {
       delete subAwb.id;

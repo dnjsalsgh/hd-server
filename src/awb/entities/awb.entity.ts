@@ -44,7 +44,7 @@ export class Awb {
     example: 0,
     description: '화물 분리 번호',
   })
-  @Column({ type: 'int', nullable: false, default: 0 })
+  @Column({ type: 'int', nullable: false, default: 1 })
   separateNumber: number;
 
   @ApiProperty({
