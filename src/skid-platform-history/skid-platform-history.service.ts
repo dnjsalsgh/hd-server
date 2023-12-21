@@ -8,7 +8,7 @@ import {
   Repository,
   TypeORMError,
 } from 'typeorm';
-import { take } from 'rxjs';
+import { pipe, take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
@@ -408,7 +408,16 @@ export class SkidPlatformHistoryService {
         count: awb.piece, // plc에서 들어오는 정보로 변경해야 할 지 고민
         totalCount: awb.awbTotalPiece,
       };
-      await this.skidPlatformHistoryRepository.save(asrsHistoryBody);
+
+      const skidPlatformHistoryFormIf =
+        await this.skidPlatformHistoryRepository.save(asrsHistoryBody);
+
+      // skidPlatformHistory를 mqtt에 보내기 위함
+      this.client
+        .send(`hyundai/skidPlatformHistory/insert`, skidPlatformHistoryFormIf)
+        .pipe(take(1))
+        .subscribe();
+
       await this.settingRedis(`p${SkidPlatformId}`, inOutType);
     } catch (e) {
       console.log(e);

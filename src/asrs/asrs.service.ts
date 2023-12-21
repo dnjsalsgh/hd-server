@@ -1,4 +1,9 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAsrsDto } from './dto/create-asrs.dto';
 import { UpdateAsrsDto } from './dto/update-asrs.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,6 +25,8 @@ import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Awb } from '../awb/entities/awb.entity';
 import { RedisService } from '../redis/redis.service';
+import { ClientProxy } from '@nestjs/microservices';
+import { take } from 'rxjs';
 
 @Injectable()
 export class AsrsService {
@@ -32,6 +39,7 @@ export class AsrsService {
     private readonly awbRepository: Repository<Awb>,
     private dataSource: DataSource,
     private redisService: RedisService,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
   async create(createAsrsDto: CreateAsrsDto): Promise<Asrs> {
@@ -264,7 +272,16 @@ export class AsrsService {
         Awb: awbId,
       };
 
-      await this.asrsHistoryRepository.save(asrsHistoryBody);
+      const asrsHistoryFromIf = await this.asrsHistoryRepository.save(
+        asrsHistoryBody,
+      );
+
+      // asrsHistory를 mqtt에 보내기 위함
+      this.client
+        .send(`hyundai/asrsHistory/insert`, asrsHistoryFromIf)
+        .pipe(take(1))
+        .subscribe();
+
       await this.settingRedis(asrsId.toString(), inOutType);
     } catch (error) {
       console.log(error);
