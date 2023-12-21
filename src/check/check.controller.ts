@@ -18,7 +18,6 @@ import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { FileService } from '../file/file.service';
 import { NasPathDto } from './dto/nas-path.dto';
-import { log } from 'console';
 
 @Controller('check')
 export class CheckController {
@@ -69,7 +68,9 @@ export class CheckController {
   @Get('mssql')
   async checkMssql() {
     const repositoryExist = this.vmsRepository;
-    const exist = await repositoryExist.query(`SELECT top 1 * from VWMS_3D_RESULT_DATA vdrd ;`);
+    const exist = await repositoryExist.query(
+      `SELECT top 1 * from VWMS_3D_RESULT_DATA vdrd ;`,
+    );
     return exist;
     // return exist ? 'mssql Connected' : 'no Found Mssql';
   }
@@ -81,7 +82,9 @@ export class CheckController {
   @Get('dimoa')
   async checkDimoa() {
     const repositoryExist = this.vmsAwbResultRepository;
-    const exist = await repositoryExist.query(`SELECT top 1 * from VWMS_AWB_RESULT var`);
+    const exist = await repositoryExist.query(
+      `SELECT top 1 * from VWMS_AWB_RESULT var`,
+    );
     return exist;
     // return exist ? 'dimoaDB Connected' : 'no Found Mssql';
   }
@@ -128,7 +131,9 @@ export class CheckController {
   async checkNasFileUpdate(@Body() nasPathDto: NasPathDto) {
     try {
       const repositoryExist = this.vmsAwbResultRepository;
-      const exist = await repositoryExist.query(`SELECT top 1 * from VWMS_3D_RESULT_DATA vdrd ;`);
+      const exist = await repositoryExist.query(
+        `SELECT top 1 * from VWMS_3D_RESULT_DATA vdrd ;`,
+      );
       const existAwb = exist[0];
       const file = `Z:\\${existAwb.FILE_PATH}\\${existAwb.FILE_NAME}`;
 

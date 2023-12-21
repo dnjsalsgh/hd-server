@@ -164,7 +164,7 @@ export class SimulatorResultController {
   }
 
   @ApiOperation({
-    summary: 'uld안에 화물들이 들어갈 수 있는지 확인하는 api',
+    summary: 'uld안에 화물list들이 들어갈 수 있는지 확인하는 api',
     description:
       'uld안에 화물들이 들어갈 수 있는지 확인, awbId에 리스트를 넣으면 됨',
   })

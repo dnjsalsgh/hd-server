@@ -63,22 +63,22 @@ export class UldController {
     return this.uldService.update(+id, updateUldDto);
   }
 
-  @ApiOperation({
-    summary: '기존에 있는 uld에 scc 주입하기',
-    description:
-      '[사용법] param에는 uld id를 넣고 body에 scc의 id를 배열로 넣어야 합니다.\n' +
-      '[목표] uld에 화물이 들어가면 화물안에 있는 scc로 uld의 scc를 바로 주입하는 것을 목표로합니다.',
-  })
-  @Put('inject-scc/:id')
-  injectionScc(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: UldSccInjectionDto,
-  ) {
-    return this.uldService.injectionScc(id, body);
-  }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.uldService.remove(+id);
   }
+
+  // @ApiOperation({
+  //   summary: '기존에 있는 uld에 scc 주입하기',
+  //   description:
+  //     '[사용법] param에는 uld id를 넣고 body에 scc의 id를 배열로 넣어야 합니다.\n' +
+  //     '[목표] uld에 화물이 들어가면 화물안에 있는 scc로 uld의 scc를 바로 주입하는 것을 목표로합니다.',
+  // })
+  // @Put('inject-scc/:id')
+  // injectionScc(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Body() body: UldSccInjectionDto,
+  // ) {
+  //   return this.uldService.injectionScc(id, body);
+  // }
 }

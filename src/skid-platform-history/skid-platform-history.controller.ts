@@ -104,14 +104,14 @@ export class SkidPlatformHistoryController {
     return this.skidPlatformHistoryService.remove(+id);
   }
 
-  @ApiOperation({
-    summary:
-      'plc의 데이터중 안착대 화물정보가 변경되었을 때 안착대 이력을 등록하기 위함.',
-    description: '안착대 화물정보가 변경 시 동작',
-  })
-  @ApiBody({ type: CreateSkidPlatformAndAsrsPlcDto })
-  @Post('/plc')
-  checkSkidPlatformChange(@Body() body: CreateSkidPlatformAndAsrsPlcDto) {
-    return this.skidPlatformHistoryService.checkSkidPlatformChange(body);
-  }
+  // @ApiOperation({
+  //   summary:
+  //     'plc의 데이터중 안착대 화물정보가 변경되었을 때 안착대 이력을 등록하기 위함.',
+  //   description: '안착대 화물정보가 변경 시 동작',
+  // })
+  // @ApiBody({ type: CreateSkidPlatformAndAsrsPlcDto })
+  // @Post('/plc')
+  // checkSkidPlatformChange(@Body() body: CreateSkidPlatformAndAsrsPlcDto) {
+  //   return this.skidPlatformHistoryService.checkSkidPlatformChange(body);
+  // }
 }
