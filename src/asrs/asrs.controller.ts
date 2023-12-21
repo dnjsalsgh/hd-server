@@ -101,7 +101,6 @@ export class AsrsController {
   // [asrs, skidPlatform] 데이터 수집
   // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/asrs1/eqData') //구독하는 주제
-  // @MessagePattern('hyundai/asrs1/data') //구독하는 주제
   createByPlcMatt(@Payload() data) {
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
       console.time('asrsLatency');
