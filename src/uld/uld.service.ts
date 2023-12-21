@@ -130,13 +130,13 @@ export class UldService {
     return this.uldRepository.delete(id);
   }
 
-  // async injectionScc(id: number, body: UldSccInjectionDto) {
-  //   const joinBody = body.Scc.map((item) => {
-  //     return {
-  //       Uld: id,
-  //       Scc: item,
-  //     };
-  //   });
-  //   const insertResult = await this.uldSccJoinRepository.save(joinBody);
-  // }
+  async injectionScc(id: number, body: UldSccInjectionDto) {
+    const joinBody = body.Scc.map((item) => {
+      return {
+        Uld: id,
+        Scc: item,
+      };
+    });
+    const insertResult = await this.uldSccJoinRepository.save(joinBody);
+  }
 }

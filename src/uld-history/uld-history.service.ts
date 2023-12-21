@@ -4,7 +4,6 @@ import { UpdateUldHistoryDto } from './dto/update-uld-history.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
-  DataSource,
   Equal,
   FindOperator,
   LessThanOrEqual,
@@ -31,7 +30,6 @@ export class UldHistoryService {
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
-    private dataSource: DataSource,
     private readonly uldService: UldService,
   ) {}
 
