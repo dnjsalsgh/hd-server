@@ -655,6 +655,7 @@ export class AwbService {
     return searchResult;
   }
 
+  // 해포 화물의 자식을 가져오기 위한 메서드
   findFamily(id: number) {
     return this.awbRepository.find({
       where: [{ parent: id }],
@@ -713,6 +714,7 @@ export class AwbService {
     subAwb.breakDown = true;
     subAwb.AirCraftSchedule = parentCargo.AirCraftSchedule;
     subAwb.state = 'inskidplatform';
+    subAwb.separateNumber = parentCargo.separateNumber; // 고스트 화물은 부모화물의 seperateNumber랑 같아야 됨
 
     if ('id' in subAwb) {
       delete subAwb.id;
@@ -974,59 +976,4 @@ export class AwbService {
     );
     return searchResult;
   }
-
-  /**
-   * 엣지에서 보내주는 vms 데이터 중 누락된 데이터를 다시 저장하기 위한 로직
-   * @param vmsMissCount edge에서 보내주는 지금까지 보내준 vms의 총 개수
-   */
-  // async preventMissingData(vmsMissCount: number) {
-  //   try {
-  //     // vms와의 차이를 구하기 위해 awb의 총 개수를 구하기
-  //     // const awbAllCount = await this.awbRepository.count();
-  //
-  //     // 만약 엣지에서 들어온 숫자와 vms의 전체 숫자가 같지 않으면
-  //     // if (vmsMissCount !== awbAllCount) {
-  //     const awbResult = await this.awbRepository.find({
-  //       order: orderByUtil(null),
-  //       take: 100 * Math.abs(vmsMissCount), // awb테이블의 최소한만 가져오려고 함(개수차이*100)
-  //       // skip: 100 * i,
-  //     });
-  //     // 1 ~ 100 / 101 ~ 200 / 201 ~ 300 ... 누락된 데이터를 찾음
-  //     for (let i = 0; i <= Math.floor(vmsMissCount / 100); i++) {
-  //       const vmsResult = await this.vmsRepository.find({
-  //         order: orderByUtil(null),
-  //         take: 100,
-  //         skip: 100 * i,
-  //       });
-  //       // 누락된 데이터찾기 & 누락되었다면 입력
-  //       for (const vms of vmsResult) {
-  //         const existVms = awbResult.find((awb) => awb.barcode === vms.name);
-  //         if (!existVms && vms.Sccs) {
-  //           // vms가 존재하고 Sccs가 존재한다면 vms에 등록된 scc 정보 찾기
-  //           const sccResult = await this.sccRepository.find({
-  //             where: { code: In(vms.Sccs.split(',')) },
-  //           });
-  //
-  //           // awb 등록하는 부분
-  //           const createAwbDto: Partial<CreateAwbDto> = {
-  //             barcode: vms.name,
-  //             waterVolume: vms.waterVolume,
-  //             width: vms.width,
-  //             length: vms.length,
-  //             depth: vms.depth,
-  //             weight: vms.weight,
-  //             state: 'saved',
-  //             modelPath: vms.modelPath,
-  //             scc: sccResult,
-  //           };
-  //
-  //           await this.awbRepository.create(createAwbDto);
-  //         }
-  //       }
-  //     }
-  //     // }
-  //   } catch (e) {
-  //     throw new TypeORMError(`rollback Working - ${e}`);
-  //   }
-  // }
 }

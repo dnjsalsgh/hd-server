@@ -304,10 +304,11 @@ export class AwbController {
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
     try {
+      // console.time('vmsTimer');
+      // console.time('findVms');
       // vms 체적 데이터 가져오기
       const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1();
       const vmsAwbHistoryData = await this.fetchVmsAwbHistoryDataLimit1();
-
       if (!vmsAwbResult || !vmsAwbHistoryData) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
@@ -317,9 +318,9 @@ export class AwbController {
       const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
 
       if (!vms3Ddata || !vms2dData) {
-        throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
+        throw new NotFoundException('모델링 테이블에 데이터가 없습니다.');
       }
-
+      // console.timeEnd('findVms');
       // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
       await this.createAwbDataInMssql(
         vms3Ddata,
@@ -327,8 +328,10 @@ export class AwbController {
         vmsAwbResult,
         vmsAwbHistoryData,
       );
-      await this.sendModelingCompleteSignal();
 
+      // mqtt 메세지 보내기 로직 호출
+      await this.sendModelingCompleteSignal();
+      // console.timeEnd('vmsTimer');
       console.log('Modeling complete');
     } catch (error) {
       console.error('Error:', error);
@@ -343,6 +346,7 @@ export class AwbController {
     return await this.awbService.getAwbByVms2d(1);
   }
 
+  // vms3D에서 이름으로 찾아오는 메서드
   private async fetchAwbDataByBarcode(vmsAwbHistoryData: VmsAwbHistory) {
     return await this.awbService.getAwbByVmsByName(
       vmsAwbHistoryData.AWB_NUMBER,
@@ -350,6 +354,7 @@ export class AwbController {
     );
   }
 
+  // vms2에서 이름으로 찾아오는 메서드
   private async fetchAwb2dDataByBarcode(vmsAwbHistoryData: VmsAwbHistory) {
     return await this.awbService.getAwbByVms2dByName(
       vmsAwbHistoryData.AWB_NUMBER,
@@ -367,10 +372,12 @@ export class AwbController {
     return await this.awbService.getLastAwbByAwbNumber(AWB_NUMBER);
   }
 
+  // 최신 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
   private async fetchVmsAwbResultDataLimit1() {
     return await this.awbService.getLastVmsAwbResult();
   }
 
+  // 최신 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
   private async fetchVmsAwbHistoryDataLimit1() {
     return await this.awbService.getLastVmsAwbHistory();
   }
@@ -381,6 +388,7 @@ export class AwbController {
     vmsAwbResult: VmsAwbResult,
     vmsAwbHistory: VmsAwbHistory,
   ) {
+    // vms db에서 값이 들어오지 않았을 때 예외처리
     if (!vms) this.errorMessageHandling(vms, 'vms');
     if (!vms2d) this.errorMessageHandling(vms2d, 'vms2d');
     if (!vmsAwbResult) this.errorMessageHandling(vmsAwbResult, 'vmsAwbResult');

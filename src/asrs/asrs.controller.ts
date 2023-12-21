@@ -104,8 +104,10 @@ export class AsrsController {
   // @MessagePattern('hyundai/asrs1/data') //구독하는 주제
   createByPlcMatt(@Payload() data) {
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
+      console.time('asrsLatency');
       this.asrsService.checkAsrsChange(data);
       this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+      console.timeEnd('asrsLatency');
     }
   }
 }
