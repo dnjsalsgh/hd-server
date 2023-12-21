@@ -303,6 +303,9 @@ export class AwbController {
   // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
+    if (this.configService.get<string>('LOCAL_SCHEDULE') !== 'true') {
+      return;
+    }
     try {
       // console.time('vmsTimer');
       // console.time('findVms');
