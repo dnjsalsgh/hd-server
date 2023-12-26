@@ -91,25 +91,11 @@ export class AsrsOutOrderService {
         Asrs: { id: true, name: true },
         Awb: { id: true, barcode: true },
       },
+      where: { order: 0 },
       order: orderByUtil(null),
-      take: 50,
+      take: 1,
     });
-
-    const mainCreatedTime = asrsOutOrderList[0].createdAt.toISOString();
-
-    const filterdAsrsOutOrder = asrsOutOrderList
-      .filter((aoo) => {
-        return aoo.createdAt.toISOString() === mainCreatedTime;
-      })
-      .map((aoo) => {
-        return {
-          order: aoo.order,
-          Asrs: (aoo.Asrs as Asrs).name,
-          Awb: (aoo.Awb as Awb).barcode,
-        };
-      });
-
-    return filterdAsrsOutOrder;
+    return asrsOutOrderList;
   }
 
   async findOne(id: number) {

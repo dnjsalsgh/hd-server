@@ -24,6 +24,7 @@ import { AircraftScheduleAttributes } from '../aircraft-schedule/entities/aircra
 import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
+import { orderByUtil } from '../lib/util/orderBy.util';
 
 @Injectable()
 export class UldService {
@@ -68,6 +69,7 @@ export class UldService {
     } else if (createdAtTo) {
       findDate = LessThanOrEqual(createdAtTo);
     }
+
     return await this.uldRepository.find({
       relations: {
         UldType: true,
@@ -94,6 +96,9 @@ export class UldService {
           : undefined,
         createdAt: findDate,
       },
+      order: orderByUtil(query.order),
+      take: query.limit,
+      skip: query.offset,
     });
   }
 
