@@ -601,6 +601,10 @@ export class SimulatorResultService {
       const psResult = await getAWBinPalletRack(
         packageSimulatorCallRequestObject,
       );
+      this.client
+        .send('hyundai/ps/input', packageSimulatorCallRequestObject)
+        .pipe(take(1))
+        .subscribe();
       console.timeEnd('ps Call part');
 
       // 안착대 추천도 결과를 mqtt에 전송
