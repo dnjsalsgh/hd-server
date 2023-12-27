@@ -59,6 +59,7 @@ export class AwbUtilService {
       squareVolume: vmsAwbHistory?.RESULT_CUBIC_VOLUME,
       modelPath: null,
       path: null,
+      simulation: false,
     };
 
     // vms의 3D 파일을 저장함
