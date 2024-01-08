@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "nest build",
-    "startpm": "pm2 start dist/main.js --name \"hd-server\"",
+    "startpm": "pm2 start ecosystem.config.js",
     "start:all": "npm-run-all --parallel build startpm",
     "monit": "pm2 monit",
     "reload": "pm2 reload 0",
