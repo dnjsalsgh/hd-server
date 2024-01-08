@@ -34,7 +34,7 @@ export class WorkerService {
   // * 10 * * * *
   // every 10minute between 8am and 7pm
   // @Cron('* */10 8-19 * * *', {
-  @Cron('*/10 * * * * *', {
+  @Cron('* */10 * * * *', {
     name: 'missingAWBModelingFileHandlingLogic',
     timeZone: 'Asia/Seoul',
   })

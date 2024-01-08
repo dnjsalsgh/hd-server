@@ -59,6 +59,10 @@ export class AwbUtilService {
       squareVolume: vmsAwbHistory?.RESULT_CUBIC_VOLUME,
       modelPath: null,
       path: null,
+      simulation: false,
+      destination: vmsAwbResult.ARRIVAL_CTY_CD, // 도착 공항 코드
+      source: vmsAwbResult.DEPARTURE_CTY_CD, // 출발 공항 코드
+      parent: 0, // 처음 vms에서 생성되었으니 부모 0
     };
 
     // vms의 3D 파일을 저장함
