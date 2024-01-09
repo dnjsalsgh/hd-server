@@ -34,17 +34,19 @@ export class WorkerService {
   // * 10 * * * *
   // every 10minute between 8am and 7pm
   // @Cron('* */10 8-19 * * *', {
-  @Cron('* */10 * * * *', {
-    name: 'missingAWBModelingFileHandlingLogic',
-    timeZone: 'Asia/Seoul',
-  })
+  // @Cron('*/3 * * * *', {
+  //   name: 'missingAWBModelingFileHandlingLogic',
+  //   timeZone: 'Asia/Seoul',
+  // })
+  @Interval(600000) // 10분 (10 * 60 * 1000 밀리초)
   // 3d 모델 누락 스케줄러
   async missingAWBModelingFileHandlingLogic() {
     if (this.configService.get<string>('LOCAL_SCHEDULE') !== 'true') {
       return;
     }
-
-    const missingAwbs = await this.awbService.getAwbNotCombineModelPath();
+    console.log('스케줄러 동작함');
+    // 화물 100개 limit 걸기
+    const missingAwbs = await this.awbService.getAwbNotCombineModelPath(100);
 
     for (const missingAwb of missingAwbs) {
       const missingVms = await this.awbService.getAwbByVmsByName(
