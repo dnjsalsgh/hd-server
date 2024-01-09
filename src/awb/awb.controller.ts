@@ -297,9 +297,9 @@ export class AwbController {
       const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
       const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
 
-      if (!vms3Ddata || !vms2dData) {
-        throw new NotFoundException('모델링 테이블에 데이터가 없습니다.');
-      }
+      // if (!vms3Ddata || !vms2dData) {
+      //   throw new NotFoundException('모델링 테이블에 데이터가 없습니다.');
+      // }
       // console.timeEnd('findVms');
       // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
       await this.createAwbDataInMssql(
@@ -369,8 +369,8 @@ export class AwbController {
     vmsAwbHistory: VmsAwbHistory,
   ) {
     // vms db에서 값이 들어오지 않았을 때 예외처리
-    if (!vms) this.errorMessageHandling(vms, 'vms');
-    if (!vms2d) this.errorMessageHandling(vms2d, 'vms2d');
+    // if (!vms) this.errorMessageHandling(vms, 'vms');
+    // if (!vms2d) this.errorMessageHandling(vms2d, 'vms2d');
     if (!vmsAwbResult) this.errorMessageHandling(vmsAwbResult, 'vmsAwbResult');
     if (!vmsAwbHistory)
       this.errorMessageHandling(vmsAwbHistory, 'vmsAwbHistory');

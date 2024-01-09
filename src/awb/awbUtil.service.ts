@@ -80,7 +80,6 @@ export class AwbUtilService {
         awbDto.path = filePath2d;
       } catch (e) {}
     }
-    console.log('awbDto = ', awbDto);
     return awbDto;
   }
 
