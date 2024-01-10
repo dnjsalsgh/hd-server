@@ -256,6 +256,22 @@ export class SkidPlatformHistoryService {
   }
 
   /**
+   * 빈 안착대 id 가져오기
+   */
+  async getEmptySkidPlatform() {
+    const skidPlatfromState = await this.skidPlatformHistoryRepository
+      .createQueryBuilder('sph')
+      .distinctOn(['sph.skid_platform_id'])
+      .leftJoinAndSelect('sph.SkidPlatform', 'SkidPlatform')
+      .where('sph.inOutType = :type', { type: 'out' })
+      .andWhere('SkidPlatform.virtual = :virtual', { virtual: false })
+      .orderBy('sph.skid_platform_id')
+      .addOrderBy('sph.id', 'DESC')
+      .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
+    return skidPlatfromState.filter((v) => v.inOutType === 'out');
+  }
+
+  /**
    * 안착대 이력에서 skidPlatform_id를 기준으로 최신 안착대의 'in' 상태인거 모두 삭제
    */
   async resetSkidPlatform() {

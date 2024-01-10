@@ -83,6 +83,15 @@ export class SkidPlatformHistoryController {
     return this.skidPlatformHistoryService.nowVirtualState(virtual);
   }
 
+  @ApiOperation({
+    summary: '빈 안착대 id 가져오기',
+    description: '빈 안착대 id 가져오기',
+  })
+  @Get('/empty-skid-platform')
+  StatusOfEmptySkidplatform() {
+    return this.skidPlatformHistoryService.getEmptySkidPlatform();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.skidPlatformHistoryService.findOne(+id);
