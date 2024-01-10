@@ -31,6 +31,16 @@ export class AsrsOutOrderController {
     return this.asrsOutOrderService.create(createAsrsOutOrderDto);
   }
 
+  @ApiOperation({
+    summary: '자동창고에 오래된 화물 불출서열 만드는 api',
+    description:
+      ' 자동창고에서 오래된 화물 불출서열 만드는 기능을 위한 api 입니다.',
+  })
+  @Post('/manual')
+  createAsrsOutOrderByManual() {
+    return this.asrsOutOrderService.createAsrsOutOrderByManual();
+  }
+
   @ApiQuery({ name: 'Asrs', required: false, type: 'number' })
   @ApiQuery({ name: 'SkidPlatform', required: false, type: 'number' })
   @ApiQuery({ name: 'Awb', required: false, type: 'number' })

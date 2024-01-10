@@ -263,7 +263,7 @@ export class SkidPlatformHistoryService {
       .createQueryBuilder('sph')
       .distinctOn(['sph.skid_platform_id'])
       .leftJoinAndSelect('sph.SkidPlatform', 'SkidPlatform')
-      .where('sph.inOutType = :type', { type: 'out' })
+      // .where('sph.inOutType = :type', { type: 'out' })
       .andWhere('SkidPlatform.virtual = :virtual', { virtual: false })
       .orderBy('sph.skid_platform_id')
       .addOrderBy('sph.id', 'DESC')
