@@ -252,6 +252,17 @@ export class SkidPlatformHistoryService {
       return virtualState.filter((v) => v.inOutType === 'in');
     }
 
+    // 각 skidPlatformHistory 객체에 Awbs 필드를 추가합니다.
+    for (const skidPlatformHistory of virtualState) {
+      const awbs = await this.awbRepository.find({
+        where: [{ parent: (skidPlatformHistory.Awb as Awb).id }],
+        relations: {
+          Scc: true,
+          // AirCraftSchedules: true,
+        },
+      });
+      skidPlatformHistory.Awb['Children'] = awbs; // Awbs 필드를 추가
+    }
     return virtualState;
   }
 
