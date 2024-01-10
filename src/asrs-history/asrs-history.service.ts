@@ -62,6 +62,30 @@ export class AsrsHistoryService {
   }
 
   /**
+   * 창고에 가장 첫번째로 들어간 화물 체크
+   */
+  async getOldAwb() {
+    // 메인 쿼리
+    const oldestIn = await this.asrsHistoryRepository
+      .createQueryBuilder('inHistory')
+      .leftJoinAndSelect('inHistory.Asrs', 'Asrs')
+      .leftJoinAndSelect('inHistory.Awb', 'Awb')
+      .leftJoinAndSelect('Awb.Scc', 'Scc') // awb의 Scc를 반환합니다.
+      .leftJoin(
+        'asrs_history',
+        'outHistory',
+        "inHistory.asrs_id = outHistory.asrs_id AND inHistory.awb_id = outHistory.awb_id AND outHistory.in_out_type = 'out'",
+      )
+      .where('inHistory.in_out_type = :inType', { inType: 'in' })
+      .andWhere('outHistory.id IS NULL')
+      .orderBy('inHistory.created_at', 'ASC')
+      .limit(1)
+      .getOne();
+
+    return oldestIn;
+  }
+
+  /**
    * 창고 이력에서 asrs_id를 기준으로 최신 안착대의 'in' 상태인거 모두 삭제
    */
   async resetAsrs() {
