@@ -358,7 +358,7 @@ export class SkidPlatformHistoryService {
       const separateNumber = `SUPPLY_01_${unitKey}_P2A_SEPARATION_NO`;
       const variableInOut = onOffSignal ? 'in' : 'out';
 
-      if (this.shouldSetInOutSkidPlatform(onOffSignal, variableInOut)) {
+      if (this.shouldSetInOutSkidPlatform(onOffSignal, previousState)) {
         await this.processInOut(
           unitNumber,
           body[awbNo],
@@ -427,7 +427,7 @@ export class SkidPlatformHistoryService {
     try {
       const awb = await this.findAwbByBarcode(awbNo, separateNumber);
       const inOutType = state === 'in' ? 'in' : 'out';
-
+      console.log('inout=',inOutType);
       if (!(awb && awb.id)) {
         throw new TypeORMError('awb 정보를 찾지 못했습니다.');
       }
