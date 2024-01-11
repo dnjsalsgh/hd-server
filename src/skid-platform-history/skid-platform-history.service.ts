@@ -351,24 +351,19 @@ export class SkidPlatformHistoryService {
       const previousState = await this.redisService.get(
         `p${unitNumber.toString()}`,
       );
-      const onTag = `SUPPLY_01_${unitKey}_P2A_G_SKID_ON`;
-      const offTag = `SUPPLY_01_${unitKey}_P2A_D_SKID_ON`;
+      const onOffTag = `SUPPLY_01_${unitKey}_P2A_G_SKID_ON`; // 화물의 유무
+      // const offTag = `SUPPLY_01_${unitKey}_P2A_D_SKID_ON`; // 스키드의 유무
+      const onOffSignal = this.checkOnOff(body, onOffTag);
       const awbNo = `SUPPLY_01_${unitKey}_P2A_Bill_No`;
       const separateNumber = `SUPPLY_01_${unitKey}_P2A_SEPARATION_NO`;
+      const variableInOut = onOffSignal ? 'in' : 'out';
 
-      if (this.shouldSetInSkidPlatform(body, onTag, previousState)) {
+      if (this.shouldSetInOutSkidPlatform(onOffSignal, variableInOut)) {
         await this.processInOut(
           unitNumber,
           body[awbNo],
           body[separateNumber],
-          'in',
-        );
-      } else if (this.shouldSetOutSkidPlatform(body, offTag, previousState)) {
-        await this.processInOut(
-          unitNumber,
-          body[awbNo],
-          body[separateNumber],
-          'out',
+          variableInOut,
         );
       }
     }
@@ -377,6 +372,11 @@ export class SkidPlatformHistoryService {
   // plc로 오는 데이터가 2자리 수로 맞춰놔서 convert 함수
   formatUnitNumber(unitNumber: number): string {
     return unitNumber.toString().padStart(2, '0');
+  }
+
+  // on/off의 값을 return 하는 함수
+  checkOnOff(body: CreateSkidPlatformAndAsrsPlcDto, onOffTag: string) {
+    return body[onOffTag];
   }
 
   // in으로 상태 변경하는 메서드
@@ -396,6 +396,23 @@ export class SkidPlatformHistoryService {
   ): boolean {
     return body[offTag] && previousState === 'in';
   }
+
+
+  // in인지 out 인지 return 하는 함수
+  shouldSetInOutSkidPlatform(
+    onOffSignal: boolean,
+    previousState: string | null,
+  ): boolean {
+    // 'in'
+    if (onOffSignal) {
+      return previousState === 'out' || previousState === null;
+    }
+    // 'out'
+    else {
+      return previousState === 'in';
+    }
+  }
+
 
   /**
    * in인지 out 인지 판단 후 현재 상황은 redis에 저장
