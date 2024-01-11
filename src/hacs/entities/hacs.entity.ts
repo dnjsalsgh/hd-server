@@ -12,6 +12,13 @@ export class Hacs {
 
   @ApiProperty({
     example: new Date(),
+    description: 'AMRNM',
+  })
+  @Column({ name: 'AMRNM', nullable: true })
+  public AMRNM: string;
+
+  @ApiProperty({
+    example: new Date(),
     description: '데이터 업데이트 일자',
   })
   @Column({ name: 'LOGDT', nullable: true })
