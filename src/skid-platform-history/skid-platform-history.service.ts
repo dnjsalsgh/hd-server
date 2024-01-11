@@ -252,7 +252,34 @@ export class SkidPlatformHistoryService {
       return virtualState.filter((v) => v.inOutType === 'in');
     }
 
+    // 각 skidPlatformHistory 객체에 Awbs 필드를 추가합니다.
+    for (const skidPlatformHistory of virtualState) {
+      const awbs = await this.awbRepository.find({
+        where: [{ parent: (skidPlatformHistory.Awb as Awb).id }],
+        relations: {
+          Scc: true,
+          // AirCraftSchedules: true,
+        },
+      });
+      skidPlatformHistory.Awb['Children'] = awbs; // Awbs 필드를 추가
+    }
     return virtualState;
+  }
+
+  /**
+   * 빈 안착대 id 가져오기
+   */
+  async getEmptySkidPlatform() {
+    const skidPlatfromState = await this.skidPlatformHistoryRepository
+      .createQueryBuilder('sph')
+      .distinctOn(['sph.skid_platform_id'])
+      .leftJoinAndSelect('sph.SkidPlatform', 'SkidPlatform')
+      // .where('sph.inOutType = :type', { type: 'out' })
+      .andWhere('SkidPlatform.virtual = :virtual', { virtual: false })
+      .orderBy('sph.skid_platform_id')
+      .addOrderBy('sph.id', 'DESC')
+      .getMany(); // 또는 getMany()를 사용하여 엔터티로 결과를 가져올 수 있습니다.
+    return skidPlatfromState.filter((v) => v.inOutType === 'out');
   }
 
   /**

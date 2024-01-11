@@ -69,11 +69,20 @@ export class AsrsHistoryController {
 
   @ApiOperation({
     summary: '창고의 현재 상태를 가져오기',
-    description: '창고id로 이력의 최신본만 가져오기',
+    description: '창고의 현재 상태를 가져오기',
   })
   @Get('/now')
   StatusOfAsrs() {
     return this.asrsHistoryService.nowState();
+  }
+
+  @ApiOperation({
+    summary: '창고에 오래된 화물 체크',
+    description: '창고에 가장 첫번째로 들어간 화물 체크',
+  })
+  @Get('/old-awb')
+  getOldAwb() {
+    return this.asrsHistoryService.getOldAwb();
   }
 
   @Get(':id')

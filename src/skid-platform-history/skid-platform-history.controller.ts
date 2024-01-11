@@ -11,8 +11,7 @@ import {
 import { SkidPlatformHistoryService } from './skid-platform-history.service';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
 import { UpdateSkidPlatformHistoryDto } from './dto/update-skid-platform-history.dto';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SkidPlatformHistory } from './entities/skid-platform-history.entity';
 
@@ -81,6 +80,15 @@ export class SkidPlatformHistoryController {
   @Get('/now/virtual/:virtual')
   StatusOfVirtualSkidplatform(@Param('virtual') virtual: boolean) {
     return this.skidPlatformHistoryService.nowVirtualState(virtual);
+  }
+
+  @ApiOperation({
+    summary: '빈 안착대 id 가져오기',
+    description: '빈 안착대 id 가져오기',
+  })
+  @Get('/empty-skid-platform')
+  StatusOfEmptySkidplatform() {
+    return this.skidPlatformHistoryService.getEmptySkidPlatform();
   }
 
   @Get(':id')

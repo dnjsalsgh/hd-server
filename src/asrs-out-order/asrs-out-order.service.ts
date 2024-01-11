@@ -1,13 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
   Equal,
   FindOperator,
-  LessThan,
   LessThanOrEqual,
-  Like,
-  MoreThan,
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
@@ -22,13 +19,20 @@ import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { UldAttribute } from '../uld/entities/uld.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
+import { AsrsHistoryService } from '../asrs-history/asrs-history.service';
+import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
 @Injectable()
 export class AsrsOutOrderService {
   constructor(
     @InjectRepository(AsrsOutOrder)
     private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
+    @InjectRepository(SkidPlatformHistory)
+    private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
+    private asrsHistoryService: AsrsHistoryService,
+    private skidPlatformHistoryService: SkidPlatformHistoryService,
   ) {}
 
   async create(
@@ -41,6 +45,40 @@ export class AsrsOutOrderService {
     this.client.send(`hyundai/asrs1/outOrder`, asrs).pipe(take(1)).subscribe();
     await this.asrsOutOrderRepository.save(asrs);
     return asrs;
+  }
+
+  // 자동창고에 오래된 화물 불출서열 만드는 메서드
+  async createAsrsOutOrderByManual() {
+    // asrs안에 가장 오래된 화물 가져오기
+    const targetAwb = await this.asrsHistoryService.getOldAwb();
+
+    if (!targetAwb) {
+      throw new NotFoundException('asrs의 정보를 찾을 수 없습니다.');
+    }
+
+    // asrsOutOrder 입력하기
+    const asrsOutOrderBody: CreateAsrsOutOrderDto = {
+      order: 0,
+      Asrs: (targetAwb.Asrs as Asrs)?.id,
+      Awb: (targetAwb.Awb as Awb)?.id,
+    };
+    const asrsOutOrderResult = await this.asrsOutOrderRepository.save(
+      asrsOutOrderBody,
+    );
+
+    // amr실시간 데이터 mqtt로 publish 하기 위함
+    const publishObject = {
+      order: 0,
+      Asrs: (targetAwb.Asrs as Asrs).name,
+      Awb: (targetAwb.Awb as Awb).barcode,
+    };
+
+    this.client
+      .send(`hyundai/asrs1/outOrder`, publishObject)
+      .pipe(take(1))
+      .subscribe();
+
+    return asrsOutOrderResult;
   }
 
   async findAll(query: AsrsOutOrder & BasicQueryParamDto) {
