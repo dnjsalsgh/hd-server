@@ -50,7 +50,7 @@ export class AwbUtilService {
       piece: vmsAwbHistory?.RESULT_PC ?? 1,
       state: 'invms',
       AirCraftSchedule: scheduleId,
-      gSkidOn: vmsAwbHistory?.G_SKID_ON === 'Y',
+      // gSkidOn: vmsAwbHistory?.G_SKID_ON === 'Y',
       awbTotalPiece: vmsAwbHistory?.RESULT_PC ?? 1, // 초기 전체 화물의 piece 수는 전체 피스수로 인식
       allAwbReceive: vmsAwbResult?.ALL_PART_RECEIVED === 'Y',
       receivedUser: vmsAwbResult?.RECEIVED_USER_ID,
@@ -192,7 +192,7 @@ export class AwbUtilService {
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms.FILE_NAME}`,
+      `${vms.AWB_NUMBER}_${vms.SEPARATION_NO}_${vms.FILE_NAME}`,
     );
     return fileResult;
   }
@@ -203,7 +203,7 @@ export class AwbUtilService {
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
       fileContent,
-      `${vms2d.FILE_NAME}`,
+      `${vms2d.AWB_NUMBER}_${vms2d.SEPARATION_NO}_${vms2d.FILE_NAME}`,
     );
     return fileResult;
   }
