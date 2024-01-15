@@ -454,6 +454,11 @@ export class SkidPlatformHistoryService {
       const skidPlatformHistoryFormIf =
         await this.skidPlatformHistoryRepository.save(asrsHistoryBody);
 
+      // asrsHistory에 입력이 성공 했다면
+      if (skidPlatformHistoryFormIf) {
+        await this.awbRepository.update(awb.id, { state: 'inskidplatform' });
+      }
+
       // skidPlatformHistory를 mqtt에 보내기 위함
       this.client
         .send(`hyundai/skidPlatformHistory/insert`, skidPlatformHistoryFormIf)

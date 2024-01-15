@@ -276,6 +276,11 @@ export class AsrsService {
         asrsHistoryBody,
       );
 
+      // asrsHistory에 입력이 성공 했다면
+      if (asrsHistoryFromIf) {
+        await this.awbRepository.update(awbId, { state: 'inasrs' });
+      }
+
       // asrsHistory를 mqtt에 보내기 위함
       this.client
         .send(`hyundai/asrsHistory/insert`, asrsHistoryFromIf)
