@@ -397,7 +397,6 @@ export class SkidPlatformHistoryService {
     return body[offTag] && previousState === 'in';
   }
 
-
   // in인지 out 인지 return 하는 함수
   shouldSetInOutSkidPlatform(
     onOffSignal: boolean,
@@ -413,7 +412,6 @@ export class SkidPlatformHistoryService {
     }
   }
 
-
   /**
    * in인지 out 인지 판단 후 현재 상황은 redis에 저장
    * 저장된 값은 이전의 상태를 판단하기 위함
@@ -427,7 +425,7 @@ export class SkidPlatformHistoryService {
     try {
       const awb = await this.findAwbByBarcode(awbNo, separateNumber);
       const inOutType = state === 'in' ? 'in' : 'out';
-      console.log('inout=',inOutType);
+
       if (!(awb && awb.id)) {
         throw new TypeORMError('awb 정보를 찾지 못했습니다.');
       }
