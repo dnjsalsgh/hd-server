@@ -12,6 +12,8 @@ import {
   Query,
   UploadedFile,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -32,8 +34,6 @@ import { EntityManager, TypeORMError } from 'typeorm';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
-import { CreateAwbWithAircraftDto } from './dto/create-awb-with-aircraft.dto';
-import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
 import { InjectionSccDto } from './dto/injection-scc.dto';
 
@@ -44,6 +44,7 @@ import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 import { FileService } from '../file/file.service';
 import { AwbService } from './awb.service';
+import { ParseIdListPipe } from '../lib/pipe/parseIdList.pipe';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -231,6 +232,20 @@ export class AwbController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.awbService.modelingCompleteById(id, file);
+  }
+
+  @ApiQuery({ name: 'idList', required: false, type: 'string' })
+  @Put('change/all-awb/:state')
+  updateStateList(
+    @Param('state') state: string,
+    @Query('idList', ParseIdListPipe) idList?: string,
+    @Body() updateAwbDto?: UpdateAwbDto,
+  ) {
+    return this.awbService.updateStateList(
+      idList as unknown as number[],
+      state,
+      updateAwbDto,
+    );
   }
 
   @ApiOperation({

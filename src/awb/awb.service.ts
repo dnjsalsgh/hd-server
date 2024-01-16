@@ -22,14 +22,8 @@ import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { Scc } from '../scc/entities/scc.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { Aircraft } from '../aircraft/entities/aircraft.entity';
-import { CreateAircraftDto } from '../aircraft/dto/create-aircraft.dto';
-import { CreateAircraftScheduleDto } from '../aircraft-schedule/dto/create-aircraft-schedule.dto';
-import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
-import { CreateAwbBreakDownDto } from './dto/create-awb-break-down.dto';
 import { FileService } from '../file/file.service';
 import { Vms3D } from '../vms/entities/vms.entity';
-import { CreateAwbWithAircraftDto } from '../awb/dto/create-awb-with-aircraft.dto';
 import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
@@ -46,10 +40,6 @@ import dayjs from 'dayjs';
 import { PrepareBreakDownAwbInputDto } from './dto/prepare-break-down-awb-input.dto';
 import { breakDownRequest } from '../lib/util/axios.util';
 import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
-import { breakdownTest } from './dto/breakdownTest';
-import { SkidPlatform } from '../skid-platform/entities/skid-platform.entity';
-import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
-import { CreateSimulatorHistoryDto } from '../simulator-history/dto/create-simulator-history.dto';
 import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
@@ -604,6 +594,16 @@ export class AwbService {
     if (state) updateAwbDto.state = state;
     // this.awbRepository.update({ parent: id }, updateAwbDto);
     return this.awbRepository.update(id, updateAwbDto);
+  }
+
+  // awb들의 상태를 변경하는 메서드
+  updateStateList(
+    idList: number[],
+    state: string,
+    updateAwbDto?: UpdateAwbDto,
+  ) {
+    if (state) updateAwbDto.state = state;
+    return this.awbRepository.update(idList, updateAwbDto);
   }
 
   // 부모 화물 정보 검증
