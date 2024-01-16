@@ -183,29 +183,29 @@ export class VmsAwbHistory {
   })
   RESULT_DENSITY: number;
 
-  @ApiProperty({
-    example: 0,
-    description: '일반스키드 여부',
-  })
-  @Column({
-    name: 'G_SKID_ON',
-    type: 'varchar',
-    length: 1,
-    nullable: true,
-  })
-  G_SKID_ON: string;
+  // @ApiProperty({
+  //   example: 0,
+  //   description: '일반스키드 여부',
+  // })
+  // @Column({
+  //   name: 'G_SKID_ON',
+  //   type: 'varchar',
+  //   length: 1,
+  //   nullable: true,
+  // })
+  // G_SKID_ON: string;
 
-  @ApiProperty({
-    example: 0,
-    description: '전용스키드 여부',
-  })
-  @Column({
-    name: 'D_SKID_ON',
-    type: 'varchar',
-    length: 1,
-    nullable: true,
-  })
-  D_SKID_ON: string;
+  // @ApiProperty({
+  //   example: 0,
+  //   description: '전용스키드 여부',
+  // })
+  // @Column({
+  //   name: 'D_SKID_ON',
+  //   type: 'varchar',
+  //   length: 1,
+  //   nullable: true,
+  // })
+  // D_SKID_ON: string;
 
   @ApiProperty({
     example: 0,

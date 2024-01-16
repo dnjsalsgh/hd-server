@@ -97,6 +97,7 @@ services:
       - mqtt:mqtt
       - redis:redis
       - mssql:mssql
+    restart: always
 
 networks:
   overlay:
