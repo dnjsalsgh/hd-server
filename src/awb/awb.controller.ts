@@ -234,20 +234,6 @@ export class AwbController {
     return this.awbService.modelingCompleteById(id, file);
   }
 
-  @ApiQuery({ name: 'idList', required: false, type: 'string' })
-  @Put('change/all-awb/:state')
-  updateStateList(
-    @Param('state') state: string,
-    @Query('idList', ParseIdListPipe) idList?: string,
-    @Body() updateAwbDto?: UpdateAwbDto,
-  ) {
-    return this.awbService.updateStateList(
-      idList as unknown as number[],
-      state,
-      updateAwbDto,
-    );
-  }
-
   @ApiOperation({
     summary: '화물의 상태를 변경하기 위함',
     description:
@@ -276,6 +262,20 @@ export class AwbController {
     @Body() updateAwbDto?: UpdateAwbDto,
   ) {
     return this.awbService.updateState(id, state, updateAwbDto);
+  }
+
+  @ApiQuery({ name: 'idList', required: false, type: 'string' })
+  @Put('change/all-awb/:state')
+  updateStateList(
+    @Param('state') state: string,
+    @Query('idList', ParseIdListPipe) idList?: string,
+    @Body() updateAwbDto?: UpdateAwbDto,
+  ) {
+    return this.awbService.updateStateList(
+      idList as unknown as number[],
+      state,
+      updateAwbDto,
+    );
   }
 
   @Delete(':id')
