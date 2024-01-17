@@ -322,7 +322,7 @@ export class AsrsService {
   // 불출 서열을 mqtt에 publish 하기 위한 메서드
   async sendOutOrder(asrsId: number) {
     this.client
-      .send(`hyundai/asrs1/outOrder`, { order: 0, asrs: asrsId })
+      .send(`hyundai/asrs1/outOrder`, [{ order: 0, asrs: asrsId }])
       .pipe(take(1))
       .subscribe();
   }
