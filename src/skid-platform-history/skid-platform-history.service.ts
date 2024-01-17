@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { pipe, take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
@@ -466,6 +466,9 @@ export class SkidPlatformHistoryService {
         .subscribe();
 
       await this.settingRedis(`p${SkidPlatformId}`, inOutType);
+
+      // redis에 입출고 내역을 저장하기 위함
+      await this.queueRedis(SkidPlatformId.toString(), inOutType);
     } catch (e) {
       console.log(e);
     }
@@ -474,6 +477,24 @@ export class SkidPlatformHistoryService {
   // redis를 편하게 쓰기 위해 쓰는 함수
   async settingRedis(key: string, value: string) {
     await this.redisService.set(key, value);
+  }
+
+  // redis에서 'in' 되면 queue에 넣고, 'out'되면 queue에서 빼는 메서드
+  async queueRedis(asrsId: string, inOutType: string) {
+    if (inOutType === 'in') {
+      await this.redisService.push('skidplatform', asrsId);
+    } else if (inOutType === 'out') {
+      await this.redisService.removeElement('skidplatform', 0, asrsId);
+    }
+  }
+
+  // redis list에 남아 있는 것중 가장 오래된 것 불출
+  async createOutOrder() {
+    const skidPlatformId = await this.redisService.pop('skidplatform');
+    if (+skidPlatformId <= 0) {
+      throw new HttpException('안착대에 화물이 없습니다.', 400);
+    }
+    // await this.sendOutOrder(+asrsId);
   }
 
   // barcode와 separateNumber로 target awb를 찾기 위한 함수
