@@ -98,6 +98,15 @@ export class AsrsController {
     return this.asrsService.checkAsrsChange(body);
   }
 
+  @ApiOperation({
+    summary: '창고에 오래된 화물 순서대로 불출서열 만들기',
+    description: '창고에 오래된 화물 순서대로 불출서열 만들기',
+  })
+  @Post('/createOutOrder')
+  createOurOrder() {
+    return this.asrsService.createOutOrder();
+  }
+
   // [asrs, skidPlatform] 데이터 수집
   // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/asrs1/eqData') //구독하는 주제
