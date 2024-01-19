@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { CreateAwbDto } from './dto/create-awb.dto';
@@ -64,6 +64,11 @@ export class AwbUtilService {
       source: vmsAwbResult.DEPARTURE_CTY_CD, // 출발 공항 코드
       parent: 0, // 처음 vms에서 생성되었으니 부모 0
     };
+
+    // VWMS_AWB_HISTORY에서 체적 정보가 없을 때 반환 하는 로직
+    if (!awbDto.width) {
+      throw new NotFoundException('체적 정보가 없습니다.');
+    }
 
     // vms의 3D 파일을 저장함
     if (vms && vms.FILE_PATH) {

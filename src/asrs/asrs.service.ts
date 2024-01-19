@@ -288,6 +288,9 @@ export class AsrsService {
         .subscribe();
 
       await this.settingRedis(asrsId.toString(), inOutType);
+
+      // redis에 입출고 내역을 저장하기 위함
+      await this.queueRedis(asrsId.toString(), inOutType);
     } catch (error) {
       console.log(error);
     }
@@ -296,6 +299,32 @@ export class AsrsService {
   // redis를 편하게 쓰기 위해 쓰는 함수
   async settingRedis(key: string, value: string) {
     await this.redisService.set(key, value);
+  }
+
+  // redis에서 'in' 되면 queue에 넣고, 'out'되면 queue에서 빼는 메서드
+  async queueRedis(asrsId: string, inOutType: string) {
+    if (inOutType === 'in') {
+      await this.redisService.push('asrs', asrsId);
+    } else if (inOutType === 'out') {
+      await this.redisService.removeElement('asrs', 0, asrsId);
+    }
+  }
+
+  // redis list에 남아 있는 것중 가장 오래된 것 불출
+  async createOutOrder() {
+    const asrsId = await this.redisService.pop('asrs');
+    if (+asrsId <= 0) {
+      throw new HttpException('창고에 화물이 없습니다.', 400);
+    }
+    await this.sendOutOrder(+asrsId);
+  }
+
+  // 불출 서열을 mqtt에 publish 하기 위한 메서드
+  async sendOutOrder(asrsId: number) {
+    this.client
+      .send(`hyundai/asrs1/outOrder`, [{ order: 0, asrs: asrsId }])
+      .pipe(take(1))
+      .subscribe();
   }
 
   async findAsrsByName(name: string) {
