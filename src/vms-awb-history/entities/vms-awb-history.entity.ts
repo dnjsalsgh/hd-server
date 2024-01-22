@@ -174,50 +174,74 @@ export class VmsAwbHistory {
 
   @ApiProperty({
     example: 0,
-    description: '계산 밀도(결과)',
+    description: '계산 볼륨 무게(결과)',
   })
   @Column({
-    name: 'RESULT_DENSITY',
+    name: 'RESULT_VOLUME_WEIGHT',
     type: 'float',
     nullable: true,
   })
-  RESULT_DENSITY: number;
-
-  // @ApiProperty({
-  //   example: 0,
-  //   description: '일반스키드 여부',
-  // })
-  // @Column({
-  //   name: 'G_SKID_ON',
-  //   type: 'varchar',
-  //   length: 1,
-  //   nullable: true,
-  // })
-  // G_SKID_ON: string;
-
-  // @ApiProperty({
-  //   example: 0,
-  //   description: '전용스키드 여부',
-  // })
-  // @Column({
-  //   name: 'D_SKID_ON',
-  //   type: 'varchar',
-  //   length: 1,
-  //   nullable: true,
-  // })
-  // D_SKID_ON: string;
+  RESULT_VOLUME_WEIGHT: number;
 
   @ApiProperty({
     example: 0,
-    description: '화물 상태',
+    description: '스키드ID',
   })
   @Column({
-    name: 'CRO_STATUS',
+    name: 'SKID_ON',
+    type: 'text',
+    length: 20,
+    nullable: true,
+  })
+  SKID_ON: string;
+
+  @ApiProperty({
+    example: 0,
+    description: '스키드 타입',
+  })
+  @Column({
+    name: 'SKID_TYPE',
+    type: 'int',
+    length: 1,
+    nullable: true,
+  })
+  SKID_TYPE: number;
+
+  @ApiProperty({
+    example: 0,
+    description: '측정 상태',
+  })
+  @Column({
+    name: 'MEASUREMENT_STATUS',
+    type: 'int',
+    length: 1,
+    nullable: true,
+  })
+  MEASUREMENT_STATUS: number;
+
+  @ApiProperty({
+    example: 0,
+    description: '측정 상태',
+  })
+  @Column({
+    name: 'MEASUREMENT_RETRY_COUNT',
+    type: 'int',
+    length: 1,
+    nullable: true,
+  })
+  MEASUREMENT_RETRY_COUNT: number;
+
+  @ApiProperty({
+    example: 0,
+    description: '화물 출고 완료',
+  })
+  @Column({
+    name: 'CGO_OUT_YN',
     type: 'varchar',
     length: 1,
     nullable: true,
   })
-  CRO_STATUS: string;
+  CGO_OUT_YN: string;
 
   @ApiProperty({
     example: 0,
