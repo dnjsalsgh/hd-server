@@ -190,7 +190,6 @@ export class VmsAwbHistory {
   @Column({
     name: 'SKID_ON',
     type: 'text',
-    length: 20,
     nullable: true,
   })
   SKID_ON: string;
@@ -202,7 +201,6 @@ export class VmsAwbHistory {
   @Column({
     name: 'SKID_TYPE',
     type: 'int',
-    length: 1,
     nullable: true,
   })
   SKID_TYPE: number;
@@ -214,7 +212,6 @@ export class VmsAwbHistory {
   @Column({
     name: 'MEASUREMENT_STATUS',
     type: 'int',
-    length: 1,
     nullable: true,
   })
   MEASUREMENT_STATUS: number;
@@ -226,7 +223,6 @@ export class VmsAwbHistory {
   @Column({
     name: 'MEASUREMENT_RETRY_COUNT',
     type: 'int',
-    length: 1,
     nullable: true,
   })
   MEASUREMENT_RETRY_COUNT: number;
