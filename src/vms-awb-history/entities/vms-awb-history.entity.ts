@@ -188,11 +188,11 @@ export class VmsAwbHistory {
     description: '스키드ID',
   })
   @Column({
-    name: 'SKID_ON',
+    name: 'SKID_ID',
     type: 'text',
     nullable: true,
   })
-  SKID_ON: string;
+  SKID_ID: string;
 
   @ApiProperty({
     example: 0,
