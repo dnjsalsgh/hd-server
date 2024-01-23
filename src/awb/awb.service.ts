@@ -751,7 +751,9 @@ export class AwbService {
     this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
       fileRead: true,
     });
-    const awb = await this.getLastAwb();
+    // const awb = await this.getLastAwb();
+    // vwms_history 기준으로 최신 awb를 보내기 위함
+    const awb = await this.getLastAwbByReceivedDate();
     this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
   }
 
@@ -812,6 +814,18 @@ export class AwbService {
     return awbResult;
   }
 
+  // 최신 awb를 꺼내오는 매서드
+  async getLastAwbByReceivedDate() {
+    const [awbResult] = await this.awbRepository.find({
+      where: {
+        receivedDate: Not(IsNull()),
+      },
+      order: orderByUtil('-receivedDate'),
+      take: 1,
+    });
+    return awbResult;
+  }
+
   // awbNumber로 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
   async getVmsByAwbNumber(name: string) {
     const [result] = await this.vmsAwbResultRepository.find({
@@ -856,13 +870,13 @@ export class AwbService {
   }
 
   // VWMS_AWB_HISTORY 테이블에 있는 정보 100 가져오기
-  async get30VmsAwbHistory() {
+  async get100VmsAwbHistory() {
     const result = await this.vmsAwbHistoryRepository.find({
       where: {
         CGO_WEIGHT: Not(IsNull()),
       },
       order: orderByUtil('-IN_DATE'),
-      take: 30,
+      take: 100,
     });
     return result;
   }
