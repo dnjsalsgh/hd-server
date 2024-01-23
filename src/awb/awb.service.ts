@@ -856,13 +856,13 @@ export class AwbService {
   }
 
   // VWMS_AWB_HISTORY 테이블에 있는 정보 100 가져오기
-  async get100VmsAwbHistory() {
+  async get30VmsAwbHistory() {
     const result = await this.vmsAwbHistoryRepository.find({
       where: {
         CGO_WEIGHT: Not(IsNull()),
       },
       order: orderByUtil('-IN_DATE'),
-      take: 100,
+      take: 30,
     });
     return result;
   }
