@@ -53,21 +53,24 @@ export class AwbUtilService {
       // gSkidOn: vmsAwbHistory?.G_SKID_ON === 'Y',
       awbTotalPiece: vmsAwbHistory?.RESULT_PC ?? 1, // 초기 전체 화물의 piece 수는 전체 피스수로 인식
       allAwbReceive: vmsAwbResult?.ALL_PART_RECEIVED === 'Y',
-      receivedUser: vmsAwbResult?.RECEIVED_USER_ID,
-      receivedDate: vmsAwbResult?.RECEIVED_DATE,
+      receivedUser: vmsAwbHistory?.IN_USER_ID,
+      receivedDate: vmsAwbHistory?.IN_DATE,
       waterVolume: vmsAwbHistory?.RESULT_WATER_VOLUME,
       squareVolume: vmsAwbHistory?.RESULT_CUBIC_VOLUME,
       modelPath: null,
       path: null,
       simulation: false,
-      destination: vmsAwbResult.ARRIVAL_CTY_CD, // 도착 공항 코드
-      source: vmsAwbResult.DEPARTURE_CTY_CD, // 출발 공항 코드
+      destination: vmsAwbResult?.ARRIVAL_CTY_CD, // 도착 공항 코드
+      source: vmsAwbResult?.DEPARTURE_CTY_CD, // 출발 공항 코드
       parent: 0, // 처음 vms에서 생성되었으니 부모 0
     };
 
     // VWMS_AWB_HISTORY에서 체적 정보가 없을 때 반환 하는 로직
+    // 100개를 긁어와서 누락된 화물 체크
+    // [24.01.23] 100개를 긁어와서 팅기는게 아니라 다음 화물을 위해 null값 반환
     if (!awbDto.width) {
-      throw new NotFoundException('체적 정보가 없습니다.');
+      return null;
+      // throw new NotFoundException('체적 정보가 없습니다.');
     }
 
     // vms의 3D 파일을 저장함
@@ -88,9 +91,13 @@ export class AwbUtilService {
     return awbDto;
   }
 
-  async findExistingAwb(queryRunner, barcode: string): Promise<Awb> {
+  async findExistingAwb(
+    queryRunner,
+    barcode: string,
+    separateNumber: number,
+  ): Promise<Awb> {
     const [existingAwb] = await queryRunner.manager.getRepository(Awb).find({
-      where: { barcode: barcode },
+      where: { barcode: barcode, separateNumber: separateNumber },
       order: orderByUtil(null),
     });
 

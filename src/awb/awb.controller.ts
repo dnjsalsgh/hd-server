@@ -302,32 +302,37 @@ export class AwbController {
       // console.time('vmsTimer');
       // console.time('findVms');
       // vms 체적 데이터 가져오기
-      const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1();
-      const vmsAwbHistoryData = await this.fetchVmsAwbHistoryDataLimit1();
-      if (!vmsAwbResult || !vmsAwbHistoryData) {
+      const vmsAwbHistoryDataList = await this.fetchVmsAwbHistoryDataLimit100();
+      if (!vmsAwbHistoryDataList || !(vmsAwbHistoryDataList?.length > 0)) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
 
-      // vms 모델 데이터 가져오기
-      const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
-      const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
+      for (const vmsAwbHistoryData of vmsAwbHistoryDataList) {
+        // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
+        const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1(
+          vmsAwbHistoryData.AWB_NUMBER,
+        );
+        // vms 모델 데이터 가져오기
+        const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
+        const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
 
-      // if (!vms3Ddata || !vms2dData) {
-      //   throw new NotFoundException('모델링 테이블에 데이터가 없습니다.');
-      // }
-      // console.timeEnd('findVms');
-      // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
-      await this.createAwbDataInMssql(
-        vms3Ddata,
-        vms2dData,
-        vmsAwbResult,
-        vmsAwbHistoryData,
-      );
+        // if (!vms3Ddata || !vms2dData) {
+        //   throw new NotFoundException('모델링 테이블에 데이터가 없습니다.');
+        // }
+        // console.timeEnd('findVms');
+        // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
+        await this.createAwbDataInMssql(
+          vms3Ddata,
+          vms2dData,
+          vmsAwbResult,
+          vmsAwbHistoryData,
+        );
 
-      // mqtt 메세지 보내기 로직 호출
-      await this.sendModelingCompleteSignal();
-      // console.timeEnd('vmsTimer');
-      console.log('Modeling complete');
+        // mqtt 메세지 보내기 로직 호출
+        await this.sendModelingCompleteSignal();
+        // console.timeEnd('vmsTimer');
+        console.log('vms 동기화 완료');
+      }
     } catch (error) {
       console.error('Error:', error);
     }
@@ -368,13 +373,14 @@ export class AwbController {
   }
 
   // 최신 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
-  private async fetchVmsAwbResultDataLimit1() {
-    return await this.awbService.getLastVmsAwbResult();
+  private async fetchVmsAwbResultDataLimit1(barcode: string) {
+    return await this.awbService.getLastVmsAwbResult(barcode);
   }
 
-  // 최신 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
-  private async fetchVmsAwbHistoryDataLimit1() {
-    return await this.awbService.getLastVmsAwbHistory();
+  // VWMS_AWB_HISTORY 테이블에 있는 정보 100개 가져오기
+  private async fetchVmsAwbHistoryDataLimit100() {
+    // return await this.awbService.getLastVmsAwbHistory();
+    return await this.awbService.get100VmsAwbHistory();
   }
 
   private async createAwbDataInMssql(
@@ -386,6 +392,8 @@ export class AwbController {
     // vms db에서 값이 들어오지 않았을 때 예외처리
     // if (!vms) this.errorMessageHandling(vms, 'vms');
     // if (!vms2d) this.errorMessageHandling(vms2d, 'vms2d');
+
+    // TODO 개발용으로 vmsAwbResult 테이블 없으니 이렇게 함 주석 해제할 것
     if (!vmsAwbResult) this.errorMessageHandling(vmsAwbResult, 'vmsAwbResult');
     if (!vmsAwbHistory)
       this.errorMessageHandling(vmsAwbHistory, 'vmsAwbHistory');
