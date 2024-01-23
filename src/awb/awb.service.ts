@@ -376,6 +376,9 @@ export class AwbService {
           awbDto,
         );
         awbIdInDb = insertedAwb.id;
+        // insert된 것만 mqtt로 전송
+        const Awb = await this.findOne(awbIdInDb);
+        await this.awbUtilService.sendMqttMessage(Awb);
       }
       // if (!existingAwb) {
       //   const insertedAwb = await this.awbUtilService.insertAwb(
@@ -392,8 +395,6 @@ export class AwbService {
           vmsAwbResult,
           awbIdInDb,
         );
-        const Awb = await this.findOne(awbIdInDb);
-        await this.awbUtilService.sendMqttMessage(Awb);
       }
 
       await queryRunner.commitTransaction();
