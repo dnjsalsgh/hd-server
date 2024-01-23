@@ -876,7 +876,7 @@ export class AwbService {
   async get100VmsAwbHistory() {
     const result = await this.vmsAwbHistoryRepository.find({
       where: {
-        CGO_WEIGHT: Not(IsNull()),
+        RESULT_LENGTH: Not(IsNull()),
       },
       order: orderByUtil('-IN_DATE'),
       take: 100,
