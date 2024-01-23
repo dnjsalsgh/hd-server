@@ -306,7 +306,7 @@ export class AwbController {
       if (!vmsAwbHistoryDataList || !(vmsAwbHistoryDataList?.length > 0)) {
         throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
       }
-
+      console.time('in100');
       for (const vmsAwbHistoryData of vmsAwbHistoryDataList) {
         // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
         const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1(
@@ -328,6 +328,7 @@ export class AwbController {
           vmsAwbHistoryData,
         );
       }
+      console.timeEnd('in100');
       // mqtt 메세지 보내기 로직 호출
       await this.sendModelingCompleteSignal();
       // console.timeEnd('vmsTimer');
@@ -393,7 +394,7 @@ export class AwbController {
     // if (!vms2d) this.errorMessageHandling(vms2d, 'vms2d');
 
     // TODO 개발용으로 vmsAwbResult 테이블 없으니 이렇게 함 주석 해제할 것
-    if (!vmsAwbResult) this.errorMessageHandling(vmsAwbResult, 'vmsAwbResult');
+    // if (!vmsAwbResult) this.errorMessageHandling(vmsAwbResult, 'vmsAwbResult');
     if (!vmsAwbHistory)
       this.errorMessageHandling(vmsAwbHistory, 'vmsAwbHistory');
 
