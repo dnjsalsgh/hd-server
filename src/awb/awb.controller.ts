@@ -379,7 +379,7 @@ export class AwbController {
   // VWMS_AWB_HISTORY 테이블에 있는 정보 100개 가져오기
   private async fetchVmsAwbHistoryDataLimit100() {
     // return await this.awbService.getLastVmsAwbHistory();
-    return await this.awbService.get30VmsAwbHistory();
+    return await this.awbService.get100VmsAwbHistory();
   }
 
   private async createAwbDataInMssql(
