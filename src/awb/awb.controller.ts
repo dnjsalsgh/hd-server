@@ -327,12 +327,11 @@ export class AwbController {
           vmsAwbResult,
           vmsAwbHistoryData,
         );
-
-        // mqtt 메세지 보내기 로직 호출
-        await this.sendModelingCompleteSignal();
-        // console.timeEnd('vmsTimer');
-        console.log('vms 동기화 완료');
       }
+      // mqtt 메세지 보내기 로직 호출
+      await this.sendModelingCompleteSignal();
+      // console.timeEnd('vmsTimer');
+      console.log('vms 동기화 완료');
     } catch (error) {
       console.error('Error:', error);
     }
