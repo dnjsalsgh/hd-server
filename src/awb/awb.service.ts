@@ -11,6 +11,7 @@ import {
   ILike,
   In,
   IsNull,
+  Not,
   LessThanOrEqual,
   MoreThanOrEqual,
   QueryRunner,
@@ -353,13 +354,17 @@ export class AwbService {
         vmsAwbHistory,
       );
 
+      if (!awbDto) return;
+
       const existingAwb = await this.awbUtilService.findExistingAwb(
         queryRunner,
         awbDto.barcode,
+        awbDto.separateNumber,
       );
 
       // 예약된 화물(separateNO가 1이라 가정)은 awb에 저장되어 있으니 update, 그 외에는 insert
-      if (existingAwb && vmsAwbHistory.SEPARATION_NO === 1) {
+      // null값 들어오고 update되는지, null값 들어오고 새로운 값이 insert 되는지 몰라서 안전하게 2개다 걸어둠
+      if (existingAwb) {
         awbIdInDb = await this.awbUtilService.updateAwb(
           queryRunner,
           existingAwb.id,
@@ -372,6 +377,13 @@ export class AwbService {
         );
         awbIdInDb = insertedAwb.id;
       }
+      // if (!existingAwb) {
+      //   const insertedAwb = await this.awbUtilService.insertAwb(
+      //     queryRunner,
+      //     awbDto,
+      //   );
+      //   awbIdInDb = insertedAwb.id;
+      // }
 
       // scc 테이블에서 가져온 데이터를 입력
       if (vmsAwbResult && awbIdInDb) {
@@ -383,9 +395,6 @@ export class AwbService {
         const Awb = await this.findOne(awbIdInDb);
         await this.awbUtilService.sendMqttMessage(Awb);
       }
-
-      // 모델링 파일 체크
-      // await this.preventMissingData(vms, vms2d);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -825,8 +834,11 @@ export class AwbService {
   }
 
   // 최신 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
-  async getLastVmsAwbResult() {
+  async getLastVmsAwbResult(barcode: string) {
     const [result] = await this.vmsAwbResultRepository.find({
+      where: {
+        AWB_NUMBER: Equal(barcode),
+      },
       order: orderByUtil('-RECEIVED_DATE'),
       take: 1,
     });
@@ -838,6 +850,18 @@ export class AwbService {
     const [result] = await this.vmsAwbHistoryRepository.find({
       order: orderByUtil('-IN_DATE'),
       take: 1,
+    });
+    return result;
+  }
+
+  // VWMS_AWB_HISTORY 테이블에 있는 정보 100 가져오기
+  async get100VmsAwbHistory() {
+    const result = await this.vmsAwbHistoryRepository.find({
+      where: {
+        CGO_WEIGHT: Not(IsNull()),
+      },
+      order: orderByUtil('-IN_DATE'),
+      take: 100,
     });
     return result;
   }
