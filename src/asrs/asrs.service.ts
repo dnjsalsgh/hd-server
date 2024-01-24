@@ -253,7 +253,7 @@ export class AsrsService {
     try {
       const awb = await this.findAwbByBarcode(awbNo, separateNumber);
       const inOutType = state === 'in' ? 'in' : 'out';
-
+      console.log('awb = ', awb, awbNo, separateNumber);
       if (!(awb && awb.id)) {
         throw new TypeORMError('awb 정보를 찾지 못했습니다.');
       }
