@@ -50,13 +50,27 @@ import { AwbUtilService } from './awbUtil.service';
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
 export class AwbController {
+  private messageQueue = [];
+  private readonly processInterval = 500; // 처리 간격을 500ms (0.5초)로 설정
+  private processing = false;
   constructor(
     private readonly awbService: AwbService,
     private readonly awbUtilService: AwbUtilService,
     private readonly fileService: FileService,
     private readonly configService: ConfigService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
-  ) {}
+  ) {
+    setInterval(() => this.processMessage(), this.processInterval);
+  }
+  // 0.5초마다 큐에서 메시지를 꺼내 처리
+  private async processMessage() {
+    if (this.messageQueue.length > 0 && !this.processing) {
+      this.processing = true; // 처리 중 플래그 설정
+      const message = this.messageQueue.shift();
+      await this.awbService.createAwbByPlcMqtt(message);
+      this.processing = false; // 처리 완료 후 플래그 해제
+    }
+  }
 
   @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
   @UseInterceptors(TransactionInterceptor)
@@ -291,7 +305,9 @@ export class AwbController {
     if (data && this.configService.get<string>('VMS_DATA') !== 'true') {
       return;
     }
-    await this.awbService.createAwbByPlcMqtt(data);
+    // 메시지를 큐에 추가
+    this.messageQueue.push(data);
+    // await this.awbService.createAwbByPlcMqtt(data);
     // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
