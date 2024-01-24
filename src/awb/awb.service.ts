@@ -343,6 +343,7 @@ export class AwbService {
 
     try {
       let awbIdInDb: number;
+      let insertedAwb: Awb = null;
       await queryRunner.startTransaction();
 
       // vms에서 온 데이터 세팅(실제 db에 넣을 파라미터 세팅하는 부분)
@@ -354,7 +355,10 @@ export class AwbService {
         vmsAwbHistory,
       );
 
-      if (!awbDto) return;
+      if (!awbDto) {
+        console.log(`awbDto 생성 실패 ${awbDto}`);
+        return;
+      }
 
       const existingAwb = await this.awbUtilService.findExistingAwb(
         queryRunner,
@@ -381,10 +385,7 @@ export class AwbService {
       //   await this.awbUtilService.sendMqttMessage(Awb);
       // }
       if (!existingAwb) {
-        const insertedAwb = await this.awbUtilService.insertAwb(
-          queryRunner,
-          awbDto,
-        );
+        insertedAwb = await this.awbUtilService.insertAwb(queryRunner, awbDto);
         awbIdInDb = insertedAwb.id;
         // insert된 것만 mqtt로 전송
         const Awb = await this.findOne(awbIdInDb);
@@ -401,6 +402,8 @@ export class AwbService {
       }
 
       await queryRunner.commitTransaction();
+
+      return insertedAwb;
     } catch (error) {
       await this.awbUtilService.handleError(queryRunner, error);
     } finally {
@@ -760,6 +763,15 @@ export class AwbService {
     this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
   }
 
+  // vms데이터를 받았다는 신호를 전송하는 메서드
+  async sendSyncMqttMessage(awb: Awb) {
+    // awb실시간 데이터 mqtt로 publish 하기 위함
+    this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
+      fileRead: true,
+    });
+    this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
+  }
+
   // 모델링 파일이 없는 화물을 검색하는 메서드
   async getAwbNotCombineModelPath(limitNumber: number) {
     return await this.awbRepository.find({
@@ -880,6 +892,23 @@ export class AwbService {
       },
       order: orderByUtil('-IN_DATE'),
       take: 10,
+    });
+    return result;
+  }
+
+  // VWMS_AWB_HISTORY 테이블에 있는 정보 barcode, separateNumber로 정보 가져오기
+  async getVmsAwbHistoryByBarcodeAndSeparateNumber(
+    barcode: string,
+    separateNumber: number,
+  ) {
+    const [result] = await this.vmsAwbHistoryRepository.find({
+      where: {
+        AWB_NUMBER: barcode,
+        SEPARATION_NO: separateNumber,
+        RESULT_LENGTH: Not(IsNull()),
+      },
+      order: orderByUtil('-IN_DATE'),
+      take: 1,
     });
     return result;
   }

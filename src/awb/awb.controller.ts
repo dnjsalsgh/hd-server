@@ -45,12 +45,14 @@ import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entit
 import { FileService } from '../file/file.service';
 import { AwbService } from './awb.service';
 import { ParseIdListPipe } from '../lib/pipe/parseIdList.pipe';
+import { AwbUtilService } from './awbUtil.service';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
 export class AwbController {
   constructor(
     private readonly awbService: AwbService,
+    private readonly awbUtilService: AwbUtilService,
     private readonly fileService: FileService,
     private readonly configService: ConfigService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
@@ -286,10 +288,81 @@ export class AwbController {
   // VMS 설비데이터 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
   async createByPlcMatt(@Payload() data) {
-    // vms 데이터 mqtt로 publish 하기 위함
-    if (data && this.configService.get<string>('VMS_DATA') === 'true') {
-      this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
+    if (data && this.configService.get<string>('VMS_DATA') !== 'true') {
+      return;
     }
+
+    // 현재 들어오는 데이터 확인하기
+    const currentBarcode = data['VMS_08_01_P2A_Bill_No'].toString();
+    const currentSeparateNumber = data['VMS_08_01_P2A_SEPARATION_NO'];
+
+    // redis에 있는 값 가져오기
+    const previousBarcode = await this.awbUtilService.getBarcode();
+    const previousSeparateNumber =
+      +(await this.awbUtilService.getSeparateNumber());
+
+    const firstTime =
+      previousBarcode === null && previousSeparateNumber === null;
+
+    // 비교하기
+    // 같다면 return
+    if (
+      !firstTime &&
+      currentBarcode === previousBarcode &&
+      currentSeparateNumber === previousSeparateNumber
+    ) {
+      return;
+    }
+
+    // 다르다면 로직 시작
+    // history 값 가져오기
+    try {
+      // vms 체적 데이터 가져오기
+      const vmsAwbHistoryData =
+        await this.fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
+          currentBarcode,
+          currentSeparateNumber,
+        );
+
+      if (!vmsAwbHistoryData) {
+        throw new NotFoundException(
+          'vmsAwbHistory 테이블에 데이터가 없습니다.',
+        );
+      }
+
+      // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
+      const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1(
+        vmsAwbHistoryData.AWB_NUMBER,
+      );
+
+      // vms 모델 데이터 가져오기
+      const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
+      const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
+
+      // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
+      // 체적이 null이라면 return
+      // 체적이 있다면 insert 하기
+      const awb = await this.createAwbDataInMssql(
+        vms3Ddata,
+        vms2dData,
+        vmsAwbResult,
+        vmsAwbHistoryData,
+      );
+
+      // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
+      // insert 되면 redis의 값 수정
+      if (awb) {
+        await this.awbUtilService.settingRedis(awb.barcode, awb.separateNumber);
+        // mqtt 메세지 보내기 로직 호출
+        await this.awbService.sendSyncMqttMessage(awb);
+      }
+
+      console.log('vms 동기화 완료');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
   // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
@@ -330,7 +403,7 @@ export class AwbController {
       }
       console.timeEnd('in100');
       // mqtt 메세지 보내기 로직 호출
-      await this.sendModelingCompleteSignal();
+      // await this.sendModelingCompleteSignal();
       // console.timeEnd('vmsTimer');
       console.log('vms 동기화 완료');
     } catch (error) {
@@ -383,6 +456,17 @@ export class AwbController {
     return await this.awbService.get100VmsAwbHistory();
   }
 
+  // VWMS_AWB_HISTORY 테이블에 있는 정보 barcode, separateNumber로 정보 가져오기
+  private async fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
+    barcode: string,
+    separateNumber: number,
+  ) {
+    return await this.awbService.getVmsAwbHistoryByBarcodeAndSeparateNumber(
+      barcode,
+      separateNumber,
+    );
+  }
+
   private async createAwbDataInMssql(
     vms: Vms3D,
     vms2d: Vms2d,
@@ -398,12 +482,13 @@ export class AwbController {
     if (!vmsAwbHistory)
       this.errorMessageHandling(vmsAwbHistory, 'vmsAwbHistory');
 
-    await this.awbService.createWithMssql(
+    const awb = await this.awbService.createWithMssql(
       vms,
       vms2d,
       vmsAwbResult,
       vmsAwbHistory,
     );
+    return awb;
   }
 
   private errorMessageHandling(target: any, tableName: string) {
