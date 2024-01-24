@@ -194,6 +194,11 @@ export class AsrsService {
       const separateNumber = this.getTag('SEPARATION_NO', unitKey);
       const variableInOut = onOffSignal ? 'in' : 'out';
 
+      // 빈 바코드 있을 때 다음걸로 넘어가기
+      if (body[awbNo] === '') {
+        continue;
+      }
+
       if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
         await this.processInOut(
           unitNumber,

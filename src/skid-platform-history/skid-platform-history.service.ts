@@ -360,6 +360,11 @@ export class SkidPlatformHistoryService {
       const separateNumber = `SUPPLY_01_${unitKey}_P2A_SEPARATION_NO`;
       const variableInOut = onOffSignal ? 'in' : 'out';
 
+      // 빈 바코드 있을 때 다음걸로 넘어가기
+      if (body[awbNo] === '') {
+        continue;
+      }
+
       if (this.shouldSetInOutSkidPlatform(onOffSignal, previousState)) {
         await this.processInOut(
           unitNumber,

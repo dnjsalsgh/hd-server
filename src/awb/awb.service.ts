@@ -938,7 +938,6 @@ export class AwbService {
 
   // vms에서 mqtt로 awb 정보왔을 때 사용하는 메서드
   async createAwbByPlcMqtt(data) {
-    console.log('로직도는횟수1');
     // 현재 들어오는 데이터 확인하기
     const currentBarcode = data['VMS_08_01_P2A_Bill_No'];
     const currentSeparateNumber = data['VMS_08_01_P2A_SEPARATION_NO'];
