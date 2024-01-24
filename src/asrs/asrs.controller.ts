@@ -52,6 +52,7 @@ export class AsrsController {
       const message = this.messageQueue.shift();
       await this.asrsService.checkAwb(message);
       this.processing = false; // 처리 완료 후 플래그 해제
+      console.log('asrs, 안착대 누락 awb 확인 로직 동작');
     }
   }
   @ApiOperation({
@@ -132,7 +133,6 @@ export class AsrsController {
       // await this.asrsService.checkAwb(data);
       // 메시지를 큐에 추가
       this.messageQueue.push(data);
-      console.log('asrs, 안착대 누락 awb 확인 로직 동작');
     }
 
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
