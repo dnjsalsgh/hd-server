@@ -897,7 +897,7 @@ export class AwbService {
         RESULT_LENGTH: Not(IsNull()),
       },
       order: orderByUtil('-IN_DATE'),
-      take: 10,
+      take: 1,
     });
     return result;
   }
