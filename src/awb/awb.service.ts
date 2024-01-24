@@ -344,6 +344,7 @@ export class AwbService {
     vmsAwbResult: VmsAwbResult,
     vmsAwbHistory: VmsAwbHistory,
   ) {
+    console.log('로직도는횟수2');
     const queryRunner = this.awbUtilService.getQueryRunner();
     await queryRunner.connect();
     const awbRepository = await this.awbRepository;
@@ -933,6 +934,7 @@ export class AwbService {
 
   // vms에서 mqtt로 awb 정보왔을 때 사용하는 메서드
   async createAwbByPlcMqtt(data) {
+    console.log('로직도는횟수1');
     // 현재 들어오는 데이터 확인하기
     const currentBarcode = data['VMS_08_01_P2A_Bill_No'];
     const currentSeparateNumber = data['VMS_08_01_P2A_SEPARATION_NO'];
@@ -1025,11 +1027,11 @@ export class AwbService {
     const currentBarcode = barcode;
     const currentSeparateNumber = separateNumber;
 
-    console.log('currentBarcode = ', currentBarcode);
-    console.log('currentSeparateNumber = ', currentSeparateNumber);
+    // console.log('currentBarcode = ', currentBarcode);
+    // console.log('currentSeparateNumber = ', currentSeparateNumber);
     if (!currentBarcode || !currentSeparateNumber) {
       // throw new NotFoundException('barcode, separateNumber 데이터가 없습니다.');
-      console.log('barcode, separateNumber 데이터가 없습니다.');
+      // console.log('barcode, separateNumber 데이터가 없습니다.');
       return null;
     }
 
@@ -1043,7 +1045,7 @@ export class AwbService {
         );
 
       if (!vmsAwbHistoryData) {
-        console.log('vmsAwbHistory 테이블에 데이터가 없습니다.');
+        // console.log('vmsAwbHistory 테이블에 데이터가 없습니다.');
         return null;
         // throw new NotFoundException('vmsAwbHistory 테이블에 데이터가 없습니다.');
       }
