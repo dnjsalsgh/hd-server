@@ -922,4 +922,166 @@ export class AwbService {
     );
     return searchResult;
   }
+
+  // vms에서 mqtt로 awb 정보왔을 때 사용하는 메서드
+  async createAwbByPlcMqtt(data) {
+    // 현재 들어오는 데이터 확인하기
+    const currentBarcode = data['VMS_08_01_P2A_Bill_No'];
+    const currentSeparateNumber = data['VMS_08_01_P2A_SEPARATION_NO'];
+
+    if (!currentBarcode || !currentSeparateNumber) {
+      throw new NotFoundException(
+        'VMS_08_01_P2A_Bill_No, VMS_08_01_P2A_SEPARATION_NO 데이터가 없습니다.',
+      );
+    }
+
+    // redis에 있는 값 가져오기
+    const previousBarcode = await this.awbUtilService.getBarcode();
+    const previousSeparateNumber =
+      +(await this.awbUtilService.getSeparateNumber());
+
+    const firstTime =
+      previousBarcode === null && previousSeparateNumber === null;
+
+    // 비교하기
+    // 같다면 return
+    if (
+      !firstTime &&
+      currentBarcode === previousBarcode &&
+      currentSeparateNumber === previousSeparateNumber
+    ) {
+      return;
+    }
+
+    // 다르다면 로직 시작
+    // history 값 가져오기
+    try {
+      // vms 체적 데이터 가져오기
+      const vmsAwbHistoryData =
+        await this.fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
+          currentBarcode,
+          currentSeparateNumber,
+        );
+
+      if (!vmsAwbHistoryData) {
+        throw new NotFoundException(
+          'vmsAwbHistory 테이블에 데이터가 없습니다.',
+        );
+      }
+
+      // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
+      const vmsAwbResult = await this.getLastVmsAwbResult(
+        vmsAwbHistoryData.AWB_NUMBER,
+      );
+
+      // vms 모델 데이터 가져오기
+      const vms3Ddata = await this.getAwbByVmsByName(
+        vmsAwbHistoryData.AWB_NUMBER,
+        vmsAwbHistoryData.SEPARATION_NO,
+      );
+      const vms2dData = await this.getAwbByVms2dByName(
+        vmsAwbHistoryData.AWB_NUMBER,
+        vmsAwbHistoryData.SEPARATION_NO,
+      );
+
+      // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
+      // 체적이 null이라면 return
+      // 체적이 있다면 insert 하기
+      const awb = await this.createWithMssql(
+        vms3Ddata,
+        vms2dData,
+        vmsAwbResult,
+        vmsAwbHistoryData,
+      );
+
+      // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
+      // insert 되면 redis의 값 수정
+      if (awb) {
+        await this.awbUtilService.settingRedis(awb.barcode, awb.separateNumber);
+        // mqtt 메세지 보내기 로직 호출
+        await this.sendSyncMqttMessage(awb);
+      }
+
+      console.log('vms 동기화 완료');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // asrs에서 mqtt로 awb 정보왔을 때 사용하는 매서드
+  async createAwbByPlcMqttUsingAsrsAndSkidPlatform(
+    barcode: string,
+    separateNumber: number,
+  ) {
+    // 현재 들어오는 데이터 확인하기
+    const currentBarcode = barcode;
+    const currentSeparateNumber = separateNumber;
+
+    if (!currentBarcode || !currentSeparateNumber) {
+      throw new NotFoundException('barcode, separateNumber 데이터가 없습니다.');
+    }
+
+    // history 값 가져오기
+    try {
+      // vms 체적 데이터 가져오기
+      const vmsAwbHistoryData =
+        await this.fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
+          currentBarcode,
+          currentSeparateNumber,
+        );
+
+      if (!vmsAwbHistoryData) {
+        throw new NotFoundException(
+          'vmsAwbHistory 테이블에 데이터가 없습니다.',
+        );
+      }
+
+      // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
+      const vmsAwbResult = await this.getLastVmsAwbResult(
+        vmsAwbHistoryData.AWB_NUMBER,
+      );
+
+      // vms 모델 데이터 가져오기
+      const vms3Ddata = await this.getAwbByVmsByName(
+        vmsAwbHistoryData.AWB_NUMBER,
+        vmsAwbHistoryData.SEPARATION_NO,
+      );
+      const vms2dData = await this.getAwbByVms2dByName(
+        vmsAwbHistoryData.AWB_NUMBER,
+        vmsAwbHistoryData.SEPARATION_NO,
+      );
+
+      // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
+      // 체적이 null이라면 return
+      // 체적이 있다면 insert 하기
+      const awb = await this.createWithMssql(
+        vms3Ddata,
+        vms2dData,
+        vmsAwbResult,
+        vmsAwbHistoryData,
+      );
+
+      // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
+      // insert 되면 redis의 값 수정
+      if (awb) {
+        // mqtt 메세지 보내기 로직 호출
+        await this.sendSyncMqttMessage(awb);
+      }
+
+      console.log('asrs에서 vms 데이터 생성');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // VWMS_AWB_HISTORY 테이블에 있는 정보 barcode, separateNumber로 정보 가져오기
+  private async fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
+    barcode: string,
+    separateNumber: number,
+  ) {
+    return await this.getVmsAwbHistoryByBarcodeAndSeparateNumber(
+      barcode,
+      separateNumber,
+    );
+  }
 }
