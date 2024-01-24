@@ -364,7 +364,7 @@ export class SkidPlatformHistoryService {
       if (body[awbNo] === '') {
         continue;
       }
-
+      console.log('body[awbNo] = 안착대 awbBarcode', body[awbNo]);
       if (this.shouldSetInOutSkidPlatform(onOffSignal, previousState)) {
         await this.processInOut(
           unitNumber,
