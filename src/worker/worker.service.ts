@@ -24,9 +24,7 @@ export class WorkerService {
     if (this.configService.get<string>('SCHEDULE') !== 'true') {
       return;
     }
-    console.time('amrLatency');
     this.amrService.createAmrByHacs();
-    console.timeEnd('amrLatency');
     console.log('amr 데이터 수집 스케줄러 동작');
   }
 

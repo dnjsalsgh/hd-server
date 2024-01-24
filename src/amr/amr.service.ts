@@ -52,7 +52,7 @@ export class AmrService {
    */
   async createAmrByHacs() {
     const amrDataList = await this.hacsRepository.find({
-      where: { Connected: 1 },
+      // where: { Connected: 1 },
       order: { LogDT: 'DESC' },
       take: 5, // 최소한만 가져오려고 함(6 개)
     });
