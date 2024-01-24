@@ -1021,12 +1021,14 @@ export class AwbService {
   ) {
     // 현재 들어오는 데이터 확인하기
     const currentBarcode = barcode;
-    const currentSeparateNumber = separateNumber === 1 ? 1 : separateNumber;
+    const currentSeparateNumber = separateNumber;
 
     console.log('currentSeparateNumber = ', currentSeparateNumber);
     console.log('currentSeparateNumber = ', typeof currentSeparateNumber);
     if (!currentBarcode || !currentSeparateNumber) {
-      throw new NotFoundException('barcode, separateNumber 데이터가 없습니다.');
+      // throw new NotFoundException('barcode, separateNumber 데이터가 없습니다.');
+      console.log('barcode, separateNumber 데이터가 없습니다.');
+      return null;
     }
 
     // history 값 가져오기
@@ -1039,9 +1041,9 @@ export class AwbService {
         );
 
       if (!vmsAwbHistoryData) {
-        throw new NotFoundException(
-          'vmsAwbHistory 테이블에 데이터가 없습니다.',
-        );
+        console.log('vmsAwbHistory 테이블에 데이터가 없습니다.');
+        return null;
+        // throw new NotFoundException('vmsAwbHistory 테이블에 데이터가 없습니다.');
       }
 
       // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
