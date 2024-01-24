@@ -137,7 +137,9 @@ export class AsrsController {
 
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
       await this.asrsService.checkAsrsChange(data);
+      console.log('asrs 체킹');
       await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+      console.log('skidPlatform 체킹');
       // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
     }
   }
