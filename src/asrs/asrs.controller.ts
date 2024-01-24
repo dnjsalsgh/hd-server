@@ -33,7 +33,7 @@ import { AwbService } from '../awb/awb.service';
 @ApiTags('[자동창고]Asrs')
 export class AsrsController {
   private messageQueue = [];
-  private readonly processInterval = 500; // 처리 간격을 500ms (0.5초)로 설정
+  private readonly processInterval = 1000; // 처리 간격을 500ms (0.5초)로 설정
   private processing = false;
   constructor(
     private readonly asrsService: AsrsService,
