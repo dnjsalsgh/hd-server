@@ -288,6 +288,16 @@ export class AwbController {
   async createByPlcMatt(@Payload() data) {
     // vms 데이터 mqtt로 publish 하기 위함
     if (data && this.configService.get<string>('VMS_DATA') === 'true') {
+      // 현재 들어오는 데이터 확인하기
+      // redis에 있는 값 가져오기
+      // 비교하기
+      // 같다면 return
+      // 다르다면 로직 시작
+      // history 값 가져오기
+      // 체적이 null이라면 return
+      // 체적이 있다면 insert 하기
+      // insert 되면 redis의 값 수정
+
       this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
     }
   }
@@ -381,6 +391,17 @@ export class AwbController {
   private async fetchVmsAwbHistoryDataLimit100() {
     // return await this.awbService.getLastVmsAwbHistory();
     return await this.awbService.get100VmsAwbHistory();
+  }
+
+  // VWMS_AWB_HISTORY 테이블에 있는 정보 barcode, separateNumber로 정보 가져오기
+  private async fetchgetVmsAwbHistoryByBarcodeAndSeparateNumber(
+    barcode: string,
+    separateNumber: number,
+  ) {
+    return await this.awbService.getVmsAwbHistoryByBarcodeAndSeparateNumber(
+      barcode,
+      separateNumber,
+    );
   }
 
   private async createAwbDataInMssql(

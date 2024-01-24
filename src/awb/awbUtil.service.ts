@@ -14,6 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class AwbUtilService {
@@ -26,6 +27,7 @@ export class AwbUtilService {
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
     private readonly sccService: SccService,
+    private readonly redisService: RedisService,
   ) {}
 
   // vms db에서 넘어온 데이터들을 awb에 넣기 위해 가공하는 메서드

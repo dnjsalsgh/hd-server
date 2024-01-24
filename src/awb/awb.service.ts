@@ -884,6 +884,23 @@ export class AwbService {
     return result;
   }
 
+  // VWMS_AWB_HISTORY 테이블에 있는 정보 barcode, separateNumber로 정보 가져오기
+  async getVmsAwbHistoryByBarcodeAndSeparateNumber(
+    barcode: string,
+    separateNumber: number,
+  ) {
+    const result = await this.vmsAwbHistoryRepository.find({
+      where: {
+        AWB_NUMBER: barcode,
+        SEPARATION_NO: separateNumber,
+        RESULT_LENGTH: Not(IsNull()),
+      },
+      order: orderByUtil('-IN_DATE'),
+      take: 10,
+    });
+    return result;
+  }
+
   // awb의 scc만 가져오는 메서드
   async getScc(awbId: number) {
     const queryRunner = this.awbUtilService.getQueryRunner();
