@@ -343,6 +343,7 @@ export class AwbService {
 
     try {
       let awbIdInDb: number;
+      let insertedAwb: Awb = null;
       await queryRunner.startTransaction();
 
       // vms에서 온 데이터 세팅(실제 db에 넣을 파라미터 세팅하는 부분)
@@ -381,10 +382,7 @@ export class AwbService {
       //   await this.awbUtilService.sendMqttMessage(Awb);
       // }
       if (!existingAwb) {
-        const insertedAwb = await this.awbUtilService.insertAwb(
-          queryRunner,
-          awbDto,
-        );
+        insertedAwb = await this.awbUtilService.insertAwb(queryRunner, awbDto);
         awbIdInDb = insertedAwb.id;
         // insert된 것만 mqtt로 전송
         const Awb = await this.findOne(awbIdInDb);
@@ -401,6 +399,8 @@ export class AwbService {
       }
 
       await queryRunner.commitTransaction();
+
+      return insertedAwb;
     } catch (error) {
       await this.awbUtilService.handleError(queryRunner, error);
     } finally {
@@ -889,14 +889,14 @@ export class AwbService {
     barcode: string,
     separateNumber: number,
   ) {
-    const result = await this.vmsAwbHistoryRepository.find({
+    const [result] = await this.vmsAwbHistoryRepository.find({
       where: {
         AWB_NUMBER: barcode,
         SEPARATION_NO: separateNumber,
         RESULT_LENGTH: Not(IsNull()),
       },
       order: orderByUtil('-IN_DATE'),
-      take: 10,
+      take: 1,
     });
     return result;
   }

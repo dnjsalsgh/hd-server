@@ -30,6 +30,19 @@ export class AwbUtilService {
     private readonly redisService: RedisService,
   ) {}
 
+  async settingRedis(barcode: string, separateNumber: number) {
+    await this.redisService.set('barcode', barcode);
+    await this.redisService.set('separateNumber', separateNumber.toString());
+  }
+
+  async getBarcode() {
+    return this.redisService.get('barcode');
+  }
+
+  async getSeparateNumber() {
+    return this.redisService.get('separateNumber');
+  }
+
   // vms db에서 넘어온 데이터들을 awb에 넣기 위해 가공하는 메서드
   async prepareAwbDto(
     vms: Vms3D,
