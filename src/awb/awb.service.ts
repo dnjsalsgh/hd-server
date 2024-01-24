@@ -355,7 +355,10 @@ export class AwbService {
         vmsAwbHistory,
       );
 
-      if (!awbDto) return;
+      if (!awbDto) {
+        console.log(`awbDto 생성 실패 ${awbDto}`);
+        return;
+      }
 
       const existingAwb = await this.awbUtilService.findExistingAwb(
         queryRunner,

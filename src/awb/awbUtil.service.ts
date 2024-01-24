@@ -84,6 +84,7 @@ export class AwbUtilService {
     // 100개를 긁어와서 누락된 화물 체크
     // [24.01.23] 100개를 긁어와서 팅기는게 아니라 다음 화물을 위해 null값 반환
     if (!awbDto.width) {
+      console.log(`awbDto.width 없어서 실패`);
       return null;
       // throw new NotFoundException('체적 정보가 없습니다.');
     }

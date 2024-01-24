@@ -291,22 +291,26 @@ export class AwbController {
     // vms 데이터 mqtt로 publish 하기 위함
     if (data && this.configService.get<string>('VMS_DATA') === 'true') {
       // 현재 들어오는 데이터 확인하기
-      const currentBarcode = data['VMS_08_01_P2A_Bill_No'];
+      const currentBarcode = data['VMS_08_01_P2A_Bill_No'].toString();
       const currentSeparateNumber = data['VMS_08_01_P2A_SEPARATION_NO'];
 
       // redis에 있는 값 가져오기
       const previousBarcode = await this.awbUtilService.getBarcode();
       const previousSeparateNumber =
-        await this.awbUtilService.getSeparateNumber();
+        +(await this.awbUtilService.getSeparateNumber());
 
+      const firstTime =
+        previousBarcode === null && previousSeparateNumber === null;
       // 비교하기
       // 같다면 return
       if (
-        currentBarcode === previousBarcode ||
+        !firstTime &&
+        currentBarcode === previousBarcode &&
         currentSeparateNumber === previousSeparateNumber
       ) {
         return;
       }
+
       // 다르다면 로직 시작
       // history 값 가져오기
       try {
@@ -318,7 +322,9 @@ export class AwbController {
           );
 
         if (!vmsAwbHistoryData) {
-          throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
+          throw new NotFoundException(
+            'vmsAwbHistory 테이블에 데이터가 없습니다.',
+          );
         }
 
         // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
