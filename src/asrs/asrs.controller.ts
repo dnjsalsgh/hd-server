@@ -27,6 +27,7 @@ import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { ConfigService } from '@nestjs/config';
+import { AwbService } from '../awb/awb.service';
 
 @Controller('asrs')
 @ApiTags('[자동창고]Asrs')
@@ -35,6 +36,7 @@ export class AsrsController {
     private readonly asrsService: AsrsService,
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
     private readonly configService: ConfigService,
+
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
@@ -112,10 +114,9 @@ export class AsrsController {
   @MessagePattern('hyundai/asrs1/eqData') //구독하는 주제
   createByPlcMatt(@Payload() data) {
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
-      console.time('asrsLatency');
       this.asrsService.checkAsrsChange(data);
       this.skidPlatformHistoryService.checkSkidPlatformChange(data);
-      console.timeEnd('asrsLatency');
+      // this.asrsService.checkAwb();
     }
   }
 }

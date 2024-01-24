@@ -27,6 +27,7 @@ import { Awb } from '../awb/entities/awb.entity';
 import { RedisService } from '../redis/redis.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
+import { AwbService } from '../awb/awb.service';
 
 @Injectable()
 export class AsrsService {
@@ -39,6 +40,7 @@ export class AsrsService {
     private readonly awbRepository: Repository<Awb>,
     private dataSource: DataSource,
     private redisService: RedisService,
+    private readonly awbService: AwbService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
@@ -344,6 +346,30 @@ export class AsrsService {
       return awbResult;
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  /**
+   * plc로 들어온 데이터중 화물 누락된 화물 데이터 체크
+   * @param body
+   */
+  async checkAwb() {
+    for (let unitNumber = 1; unitNumber <= 18; unitNumber++) {
+      const unitKey = this.formatUnitNumber(unitNumber);
+
+      const awbNo = this.getTag('Bill_No', unitKey);
+      const separateNumber = this.getTag('SEPARATION_NO', unitKey);
+
+      const awb = await this.findAwbByBarcode(awbNo, +separateNumber);
+
+      if (awb) {
+        continue;
+      }
+
+      this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
+        awb.barcode,
+        awb.separateNumber,
+      );
     }
   }
 }

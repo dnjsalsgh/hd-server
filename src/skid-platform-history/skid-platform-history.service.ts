@@ -8,7 +8,7 @@ import {
   Repository,
   TypeORMError,
 } from 'typeorm';
-import { pipe, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
@@ -30,6 +30,7 @@ import {
 } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { RedisService } from '../redis/redis.service';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import { AwbService } from '../awb/awb.service';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -40,9 +41,10 @@ export class SkidPlatformHistoryService {
     private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-    @Inject('MQTT_SERVICE') private client: ClientProxy,
     private dataSource: DataSource,
     private redisService: RedisService,
+    // private readonly awbService: AwbService,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
   async create(createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto) {
@@ -507,6 +509,23 @@ export class SkidPlatformHistoryService {
       return awbResult;
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  /**
+   * plc로 들어온 데이터중 화물 누락된 화물 데이터 체크
+   */
+  async checkAwb() {
+    for (let unitNumber = 1; unitNumber <= 4; unitNumber++) {
+      const unitKey = this.formatUnitNumber(unitNumber);
+
+      const awbNo = `SUPPLY_01_${unitKey}_P2A_Bill_No`;
+      const separateNumber = `SUPPLY_01_${unitKey}_P2A_SEPARATION_NO`;
+
+      // this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
+      //   awbNo,
+      //   +separateNumber,
+      // );
     }
   }
 }
