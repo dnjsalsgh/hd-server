@@ -112,16 +112,16 @@ export class AsrsController {
   // [asrs, skidPlatform] 데이터 수집
   // 자동창고&스태커크레인&안착대 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/asrs1/eqData') //구독하는 주제
-  createByPlcMatt(@Payload() data) {
+  async createByPlcMatt(@Payload() data) {
     if (data && this.configService.get<string>('VMS_DATA') === 'true') {
       // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
-      this.asrsService.checkAwb(data);
+      await this.asrsService.checkAwb(data);
       console.log('asrs, 안착대 누락 awb 확인 로직 동작');
     }
 
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
-      this.asrsService.checkAsrsChange(data);
-      this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+      await this.asrsService.checkAsrsChange(data);
+      await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
       // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
     }
   }

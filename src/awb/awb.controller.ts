@@ -295,10 +295,11 @@ export class AwbController {
     // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
+  // 3d 모델링 파일 트리거를 받아서 하는것이 아닌 mqtt로 직접 awb 정보를 받는다. 바로 위에 메서드로 대체
   // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
-    if (this.configService.get<string>('LOCAL_SCHEDULE') !== 'true') {
+    if (this.configService.get<string>('LOCAL_SCHEDULE') === 'true') {
       return;
     }
     try {
