@@ -347,7 +347,6 @@ export class AwbService {
     console.log('로직도는횟수2');
     const queryRunner = this.awbUtilService.getQueryRunner();
     await queryRunner.connect();
-    const awbRepository = await this.awbRepository;
 
     try {
       let awbIdInDb: number;
@@ -1003,7 +1002,7 @@ export class AwbService {
         vmsAwbResult,
         vmsAwbHistoryData,
       );
-
+      console.log('awb = ', awb);
       // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
       // insert 되면 redis의 값 수정
       if (awb) {
