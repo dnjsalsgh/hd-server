@@ -763,6 +763,15 @@ export class AwbService {
     this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
   }
 
+  // vms데이터를 받았다는 신호를 전송하는 메서드
+  async sendSyncMqttMessage(awb: Awb) {
+    // awb실시간 데이터 mqtt로 publish 하기 위함
+    this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
+      fileRead: true,
+    });
+    this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
+  }
+
   // 모델링 파일이 없는 화물을 검색하는 메서드
   async getAwbNotCombineModelPath(limitNumber: number) {
     return await this.awbRepository.find({
