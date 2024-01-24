@@ -32,14 +32,28 @@ import { AwbService } from '../awb/awb.service';
 @Controller('asrs')
 @ApiTags('[자동창고]Asrs')
 export class AsrsController {
+  private messageQueue = [];
+  private readonly processInterval = 500; // 처리 간격을 500ms (0.5초)로 설정
+  private processing = false;
   constructor(
     private readonly asrsService: AsrsService,
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
     private readonly configService: ConfigService,
 
     @Inject('MQTT_SERVICE') private client: ClientProxy,
-  ) {}
+  ) {
+    setInterval(() => this.processMessage(), this.processInterval);
+  }
 
+  // 0.5초마다 큐에서 메시지를 꺼내 처리
+  private async processMessage() {
+    if (this.messageQueue.length > 0 && !this.processing) {
+      this.processing = true; // 처리 중 플래그 설정
+      const message = this.messageQueue.shift();
+      await this.asrsService.checkAwb(message);
+      this.processing = false; // 처리 완료 후 플래그 해제
+    }
+  }
   @ApiOperation({
     summary: 'Asrs(자동창고) 생성 API',
     description: 'Asrs(자동창고) 생성 한다',
@@ -115,7 +129,9 @@ export class AsrsController {
   async createByPlcMatt(@Payload() data) {
     if (data && this.configService.get<string>('VMS_DATA') === 'true') {
       // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
-      await this.asrsService.checkAwb(data);
+      // await this.asrsService.checkAwb(data);
+      // 메시지를 큐에 추가
+      this.messageQueue.push(data);
       console.log('asrs, 안착대 누락 awb 확인 로직 동작');
     }
 
