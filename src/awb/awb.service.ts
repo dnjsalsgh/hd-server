@@ -387,6 +387,11 @@ export class AwbService {
           awbDto,
         );
         awbIdInDb = insertedAwb.id;
+        // insert되면 redis에 등록
+        await this.awbUtilService.settingRedis(
+          insertedAwb.barcode,
+          insertedAwb.separateNumber,
+        );
         // insert된 것만 mqtt로 전송
         const Awb = await this.findOne(awbIdInDb);
         await this.awbUtilService.sendMqttMessage(Awb);
