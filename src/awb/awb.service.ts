@@ -965,7 +965,7 @@ export class AwbService {
 
       if (!vmsAwbHistoryData) {
         throw new NotFoundException(
-          'vmsAwbHistory 테이블에 데이터가 없습니다.',
+          `vmsAwbHistory 테이블에 데이터가 없습니다. in awb.service${currentBarcode}, ${currentSeparateNumber}`,
         );
       }
 
