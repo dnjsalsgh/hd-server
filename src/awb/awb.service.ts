@@ -346,6 +346,7 @@ export class AwbService {
   ) {
     const queryRunner = this.awbUtilService.getQueryRunner();
     await queryRunner.connect();
+    const awbRepository = await this.awbRepository;
 
     try {
       let awbIdInDb: number;
@@ -408,6 +409,7 @@ export class AwbService {
       }
 
       await queryRunner.commitTransaction();
+      await queryRunner.release();
 
       return insertedAwb;
     } catch (error) {
