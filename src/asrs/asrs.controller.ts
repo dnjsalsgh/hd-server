@@ -130,7 +130,6 @@ export class AsrsController {
   async createByPlcMatt(@Payload() data) {
     if (data && this.configService.get<string>('VMS_DATA') === 'true') {
       // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
-      // await this.asrsService.checkAwb(data);
       // 메시지를 큐에 추가
       this.messageQueue.push(data);
     }
