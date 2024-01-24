@@ -1023,8 +1023,8 @@ export class AwbService {
     const currentBarcode = barcode;
     const currentSeparateNumber = separateNumber;
 
+    console.log('currentBarcode = ', currentBarcode);
     console.log('currentSeparateNumber = ', currentSeparateNumber);
-    console.log('currentSeparateNumber = ', typeof currentSeparateNumber);
     if (!currentBarcode || !currentSeparateNumber) {
       // throw new NotFoundException('barcode, separateNumber 데이터가 없습니다.');
       console.log('barcode, separateNumber 데이터가 없습니다.');
