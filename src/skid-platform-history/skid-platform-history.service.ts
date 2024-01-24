@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
@@ -31,6 +31,7 @@ import {
 import { RedisService } from '../redis/redis.service';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { AwbService } from '../awb/awb.service';
+import { AwbUtilService } from '../awb/awbUtil.service';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -43,7 +44,6 @@ export class SkidPlatformHistoryService {
     private readonly awbRepository: Repository<Awb>,
     private dataSource: DataSource,
     private redisService: RedisService,
-    // private readonly awbService: AwbService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 

@@ -1,4 +1,10 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAwbDto } from './dto/create-awb.dto';
 import { UpdateAwbDto } from './dto/update-awb.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -903,9 +909,9 @@ export class AwbService {
   ) {
     const [result] = await this.vmsAwbHistoryRepository.find({
       where: {
-        AWB_NUMBER: barcode,
-        SEPARATION_NO: separateNumber,
         RESULT_LENGTH: Not(IsNull()),
+        AWB_NUMBER: barcode.toString(),
+        SEPARATION_NO: separateNumber,
       },
       order: orderByUtil('-IN_DATE'),
       take: 1,
@@ -1015,8 +1021,10 @@ export class AwbService {
   ) {
     // 현재 들어오는 데이터 확인하기
     const currentBarcode = barcode;
-    const currentSeparateNumber = separateNumber;
+    const currentSeparateNumber = separateNumber === 1 ? 1 : separateNumber;
 
+    console.log('currentSeparateNumber = ', currentSeparateNumber);
+    console.log('currentSeparateNumber = ', typeof currentSeparateNumber);
     if (!currentBarcode || !currentSeparateNumber) {
       throw new NotFoundException('barcode, separateNumber 데이터가 없습니다.');
     }
@@ -1027,7 +1035,7 @@ export class AwbService {
       const vmsAwbHistoryData =
         await this.fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
           currentBarcode,
-          currentSeparateNumber,
+          +currentSeparateNumber,
         );
 
       if (!vmsAwbHistoryData) {
