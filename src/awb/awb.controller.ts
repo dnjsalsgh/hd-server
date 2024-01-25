@@ -60,17 +60,17 @@ export class AwbController {
     private readonly configService: ConfigService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {
-    setInterval(() => this.processMessage(), this.processInterval);
+    // setInterval(() => this.processMessage(), this.processInterval);
   }
   // 0.5초마다 큐에서 메시지를 꺼내 처리
-  private async processMessage() {
-    if (this.messageQueue.length > 0 && !this.processing) {
-      this.processing = true; // 처리 중 플래그 설정
-      const message = this.messageQueue.shift();
-      await this.awbService.createAwbByPlcMqtt(message);
-      this.processing = false; // 처리 완료 후 플래그 해제
-    }
-  }
+  // private async processMessage() {
+  // if (this.messageQueue.length > 0 && !this.processing) {
+  //   this.processing = true; // 처리 중 플래그 설정
+  //   const message = this.messageQueue.shift();
+  //   await this.awbService.createAwbByPlcMqtt(message);
+  //   this.processing = false; // 처리 완료 후 플래그 해제
+  // }
+  // }
 
   @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
   @UseInterceptors(TransactionInterceptor)
@@ -299,21 +299,33 @@ export class AwbController {
     return this.awbService.remove(+id);
   }
 
+  // 3초 딜레이를 위한 Promise 기반의 delay 함수
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   // VMS 설비데이터 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
   async createByPlcMatt(@Payload() data) {
     if (data && this.configService.get<string>('VMS_DATA') !== 'true') {
       return;
     }
-    // 메시지를 큐에 추가
-    this.messageQueue.push(data);
-    // await this.awbService.createAwbByPlcMqtt(data);
-    // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
 
-    // 메시지 큐의 길이가 10을 초과하면 가장 오래된 메시지부터 제거(메모리 관리 문제)
-    while (this.messageQueue.length > 10) {
-      this.messageQueue.shift(); // 배열의 첫 번째 요소를 제거
+    // 3초 딜레이로 부하 줄이기
+    if (!this.processing) {
+      this.processing = true; // 처리 시작 표시
+
+      // 메시지 처리 로직
+      await this.awbService.createAwbByPlcMqtt(data);
+      console.log('VMS 설비데이터 데이터를 추적하는 메서드 동작함');
+
+      // 3초 딜레이
+      await this.delay(1000);
+
+      this.processing = false; // 처리 완료 표시
     }
+
+    // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
   // 3d 모델링 파일 트리거를 받아서 하는것이 아닌 mqtt로 직접 awb 정보를 받는다. 바로 위에 메서드로 대체
@@ -455,3 +467,11 @@ export class AwbController {
     await this.awbService.sendModelingCompleteMqttMessage();
   }
 }
+
+// 메시지를 큐에 추가
+// this.messageQueue.push(data);
+
+// 메시지 큐의 길이가 10을 초과하면 가장 오래된 메시지부터 제거(메모리 관리 문제)
+// while (this.messageQueue.length > 10) {
+//   this.messageQueue.shift(); // 배열의 첫 번째 요소를 제거
+// }
