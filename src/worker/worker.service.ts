@@ -36,7 +36,7 @@ export class WorkerService {
   //   name: 'missingAWBModelingFileHandlingLogic',
   //   timeZone: 'Asia/Seoul',
   // })
-  @Interval(600000) // 10분 (10 * 60 * 1000 밀리초)
+  @Interval(6000) // 10분 (10 * 60 * 1000 밀리초)
   // 3d 모델 누락 스케줄러
   async missingAWBModelingFileHandlingLogic() {
     if (this.configService.get<string>('LOCAL_SCHEDULE') !== 'true') {
