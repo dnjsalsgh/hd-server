@@ -807,6 +807,7 @@ export class AwbService {
       where: [
         { modelPath: IsNull() }, // modelPath가 null인 경우
         // { path: IsNull() },
+        { simulation: false },
       ],
       order: orderByUtil(null),
       take: limitNumber,
