@@ -438,12 +438,12 @@ export class AwbService {
       const createAwbDto: Partial<CreateAwbDto> = {
         barcode: vms.AWB_NUMBER,
         separateNumber: vms.SEPARATION_NO,
-        modelPath: vms.FILE_PATH,
-        path: vms2d.FILE_PATH,
+        modelPath: null,
+        path: null,
       };
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
-      if (createAwbDto.modelPath) {
+      if (vms.FILE_PATH) {
         try {
           const filePath = await this.fileUpload(vms);
           createAwbDto.modelPath = filePath;
@@ -451,7 +451,7 @@ export class AwbService {
       }
 
       // vms에서 2d 데이터 파일 저장하는 부분
-      if (createAwbDto.path) {
+      if (vms2d.FILE_PATH) {
         try {
           const filePath = await this.fileUpload2d(vms2d);
           createAwbDto.path = filePath;
@@ -464,7 +464,10 @@ export class AwbService {
           barcode: createAwbDto.barcode,
           separateNumber: createAwbDto.separateNumber,
         },
-        createAwbDto,
+        {
+          modelPath: createAwbDto.modelPath,
+          path: createAwbDto.path,
+        },
       );
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
