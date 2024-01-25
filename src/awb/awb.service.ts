@@ -374,43 +374,43 @@ export class AwbService {
 
       // 예약된 화물(separateNO가 1이라 가정)은 awb에 저장되어 있으니 update, 그 외에는 insert
       // null값 들어오고 update되는지, null값 들어오고 새로운 값이 insert 되는지 몰라서 안전하게 2개다 걸어둠
-      // if (existingAwb) {
-      //   awbIdInDb = await this.awbUtilService.updateAwb(
-      //     queryRunner,
-      //     existingAwb.id,
-      //     awbDto,
-      //   );
-      // } else {
-      //   const insertedAwb = await this.awbUtilService.insertAwb(
-      //     queryRunner,
-      //     awbDto,
-      //   );
-      //   awbIdInDb = insertedAwb.id;
-      //   // insert되면 redis에 등록
-      //   await this.awbUtilService.settingRedis(
-      //     insertedAwb.barcode,
-      //     insertedAwb.separateNumber,
-      //   );
-      //   // insert된 것만 mqtt로 전송
-      //   const Awb = await this.findOne(awbIdInDb);
-      //   await this.awbUtilService.sendMqttMessage(Awb);
-      // }
-
-      // 존재하지 않을 때만 awb insert하기
-      if (!existingAwb) {
-        insertedAwb = await this.awbUtilService.insertAwb(queryRunner, awbDto);
+      if (existingAwb) {
+        awbIdInDb = await this.awbUtilService.updateAwb(
+          queryRunner,
+          existingAwb.id,
+          awbDto,
+        );
+      } else {
+        const insertedAwb = await this.awbUtilService.insertAwb(
+          queryRunner,
+          awbDto,
+        );
         awbIdInDb = insertedAwb.id;
-
         // insert되면 redis에 등록
         await this.awbUtilService.settingRedis(
           insertedAwb.barcode,
           insertedAwb.separateNumber,
         );
-
         // insert된 것만 mqtt로 전송
         const Awb = await this.findOne(awbIdInDb);
         await this.awbUtilService.sendMqttMessage(Awb);
       }
+
+      // 존재하지 않을 때만 awb insert하기
+      // if (!existingAwb) {
+      //   insertedAwb = await this.awbUtilService.insertAwb(queryRunner, awbDto);
+      //   awbIdInDb = insertedAwb.id;
+      //
+      //   // insert되면 redis에 등록
+      //   await this.awbUtilService.settingRedis(
+      //     insertedAwb.barcode,
+      //     insertedAwb.separateNumber,
+      //   );
+      //
+      //   // insert된 것만 mqtt로 전송
+      //   const Awb = await this.findOne(awbIdInDb);
+      //   await this.awbUtilService.sendMqttMessage(Awb);
+      // }
 
       // scc 테이블에서 가져온 데이터를 입력
       if (vmsAwbResult && awbIdInDb) {
