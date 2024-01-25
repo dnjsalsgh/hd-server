@@ -309,6 +309,11 @@ export class AwbController {
     this.messageQueue.push(data);
     // await this.awbService.createAwbByPlcMqtt(data);
     // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
+
+    // 메시지 큐의 길이가 10을 초과하면 가장 오래된 메시지부터 제거(메모리 관리 문제)
+    while (this.messageQueue.length > 10) {
+      this.messageQueue.shift(); // 배열의 첫 번째 요소를 제거
+    }
   }
 
   // 3d 모델링 파일 트리거를 받아서 하는것이 아닌 mqtt로 직접 awb 정보를 받는다. 바로 위에 메서드로 대체
