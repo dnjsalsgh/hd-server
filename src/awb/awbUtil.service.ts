@@ -80,6 +80,8 @@ export class AwbUtilService {
       parent: 0, // 처음 vms에서 생성되었으니 부모 0
     };
 
+    console.log('awbDto가 생성됨 = ', awbDto);
+
     // VWMS_AWB_HISTORY에서 체적 정보가 없을 때 반환 하는 로직
     // 100개를 긁어와서 누락된 화물 체크
     // [24.01.23] 100개를 긁어와서 팅기는게 아니라 다음 화물을 위해 null값 반환

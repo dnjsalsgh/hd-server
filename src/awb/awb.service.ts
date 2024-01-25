@@ -457,10 +457,10 @@ export class AwbService {
         } catch (e) {}
       }
 
-      await this.awbRepository.update(
-        { barcode: createAwbDto.barcode },
-        createAwbDto,
-      );
+      // await this.awbRepository.update(
+      //   { barcode: createAwbDto.barcode },
+      //   createAwbDto,
+      // );
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
