@@ -365,6 +365,7 @@ export class SkidPlatformHistoryService {
         continue;
       }
       console.log('body[awbNo] = 안착대 awbBarcode', body[awbNo]);
+      console.log('onOffSignal, previousState = ', onOffSignal, previousState);
       if (this.shouldSetInOutSkidPlatform(onOffSignal, previousState)) {
         await this.processInOut(
           unitNumber,

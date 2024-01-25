@@ -402,4 +402,13 @@ export class AsrsService {
       );
     }
   }
+
+  delayedPromiseFunction() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        console.log('1초 후에 이 메시지가 출력되고, Promise가 해결됩니다.');
+        resolve('처리 완료'); // Promise를 해결하고 값을 반환
+      }, 1000);
+    });
+  }
 }
