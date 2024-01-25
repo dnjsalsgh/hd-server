@@ -217,7 +217,7 @@ export class AwbUtilService {
   }
 
   // 3D 파일을 저장하는 로직
-  protected async fileUpload(vms: Vms3D) {
+  public async fileUpload(vms: Vms3D) {
     const file = `Z:\\${vms.FILE_PATH}\\${vms.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
@@ -228,7 +228,7 @@ export class AwbUtilService {
   }
 
   // 2D 파일을 저장하는 로직
-  protected async fileUpload2d(vms2d: Vms2d) {
+  public async fileUpload2d(vms2d: Vms2d) {
     const file = `Z:\\${vms2d.FILE_PATH}\\${vms2d.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
