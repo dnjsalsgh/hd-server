@@ -437,6 +437,7 @@ export class AwbService {
     try {
       const createAwbDto: Partial<CreateAwbDto> = {
         barcode: vms.AWB_NUMBER,
+        separateNumber: vms.SEPARATION_NO,
         modelPath: vms.FILE_PATH,
         path: vms2d.FILE_PATH,
       };
