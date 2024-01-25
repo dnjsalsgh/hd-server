@@ -443,7 +443,7 @@ export class AwbService {
       };
 
       // vms에서 nas 경로를 읽어서 파일 저장하는 부분
-      if (vms.FILE_PATH) {
+      if (vms && vms.FILE_PATH) {
         try {
           const filePath = await this.fileUpload(vms);
           createAwbDto.modelPath = filePath;
@@ -451,7 +451,7 @@ export class AwbService {
       }
 
       // vms에서 2d 데이터 파일 저장하는 부분
-      if (vms2d.FILE_PATH) {
+      if (vms2d && vms2d.FILE_PATH) {
         try {
           const filePath = await this.fileUpload2d(vms2d);
           createAwbDto.path = filePath;
