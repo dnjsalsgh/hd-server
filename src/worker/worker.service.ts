@@ -47,6 +47,7 @@ export class WorkerService {
     const missingAwbs = await this.awbService.getAwbNotCombineModelPath(10);
 
     for (const missingAwb of missingAwbs) {
+      console.log('missingAwb = ', missingAwb);
       const missingVms = await this.awbService.getAwbByVmsByName(
         missingAwb.barcode,
         missingAwb.separateNumber,
