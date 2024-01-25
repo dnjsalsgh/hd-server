@@ -782,11 +782,10 @@ export class AwbService {
   // 모델링 파일이 없는 화물을 검색하는 메서드
   async getAwbNotCombineModelPath(limitNumber: number) {
     return await this.awbRepository.find({
-      where: [
-        { modelPath: IsNull() }, // modelPath가 null인 경우
-        // { path: IsNull() },
-        { simulation: false },
-      ],
+      where: {
+        modelPath: IsNull(), // modelPath가 null인 경우
+        simulation: false, // simulation이 false인 경우
+      },
       order: orderByUtil(null),
       take: limitNumber,
     });
