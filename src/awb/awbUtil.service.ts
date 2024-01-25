@@ -58,9 +58,9 @@ export class AwbUtilService {
     const awbDto: Partial<CreateAwbDto> = {
       barcode: vmsAwbHistory.AWB_NUMBER,
       separateNumber: vmsAwbHistory.SEPARATION_NO,
-      width: vmsAwbHistory.RESULT_WIDTH * 100, // 설비에서 m로 와서 변경
-      length: vmsAwbHistory.RESULT_LENGTH * 100, // 설비에서 m로 와서 변경
-      depth: vmsAwbHistory.RESULT_HEIGHT * 100, // 설비에서 m로 와서 변경
+      width: vmsAwbHistory.RESULT_WIDTH,
+      length: vmsAwbHistory.RESULT_LENGTH,
+      depth: vmsAwbHistory.RESULT_HEIGHT,
       weight: vmsAwbHistory.RESULT_WEIGHT,
       piece: vmsAwbHistory?.RESULT_PC ?? 1,
       state: 'invms',
