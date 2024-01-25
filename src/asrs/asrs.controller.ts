@@ -33,7 +33,7 @@ import { AwbService } from '../awb/awb.service';
 @ApiTags('[자동창고]Asrs')
 export class AsrsController {
   private messageQueue = [];
-  private readonly processInterval = 1000; // 처리 간격을 500ms (0.5초)로 설정
+  private readonly processInterval = 1500; // 처리 간격을 1500ms (1.5초)로 설정
   private processing = false;
   constructor(
     private readonly asrsService: AsrsService,
@@ -45,13 +45,13 @@ export class AsrsController {
     setInterval(() => this.processMessage(), this.processInterval);
   }
 
-  // 0.5초마다 큐에서 메시지를 꺼내 처리
+  // 1.5초마다 큐에서 메시지를 꺼내 처리
   private async processMessage() {
-    // console.log('this.messageQueue.length = ', this.messageQueue.length);
+    console.log('this.messageQueue.length = ', this.messageQueue.length);
     if (this.messageQueue.length > 0 && !this.processing) {
       this.processing = true; // 처리 중 플래그 설정
       const message = this.messageQueue.shift();
-      // await this.asrsService.checkAwb(message);
+      await this.asrsService.checkAwb(message);
       this.processing = false; // 처리 완료 후 플래그 해제
       console.log('asrs, 안착대 누락 awb 확인 로직 동작');
     }
@@ -137,7 +137,6 @@ export class AsrsController {
 
       // 메시지 큐의 길이가 10을 초과하면 가장 오래된 메시지부터 제거
       while (this.messageQueue.length > 10) {
-        console.log('큐빼기 시작');
         this.messageQueue.shift(); // 배열의 첫 번째 요소를 제거
       }
     }
