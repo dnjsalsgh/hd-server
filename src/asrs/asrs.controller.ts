@@ -47,7 +47,6 @@ export class AsrsController {
 
   // 1.5초마다 큐에서 메시지를 꺼내 처리
   private async processMessage() {
-    console.log('this.messageQueue.length = ', this.messageQueue.length);
     if (this.messageQueue.length > 0 && !this.processing) {
       this.processing = true; // 처리 중 플래그 설정
       const message = this.messageQueue.shift();
