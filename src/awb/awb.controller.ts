@@ -46,6 +46,7 @@ import { FileService } from '../file/file.service';
 import { AwbService } from './awb.service';
 import { ParseIdListPipe } from '../lib/pipe/parseIdList.pipe';
 import { AwbUtilService } from './awbUtil.service';
+import console from 'console';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -335,46 +336,65 @@ export class AwbController {
     if (this.configService.get<string>('LOCAL_SCHEDULE') === 'true') {
       return;
     }
-    try {
-      // console.time('vmsTimer');
-      // console.time('findVms');
-      // vms 체적 데이터 가져오기
-      const vmsAwbHistoryDataList = await this.fetchVmsAwbHistoryDataLimit100();
-      if (!vmsAwbHistoryDataList || !(vmsAwbHistoryDataList?.length > 0)) {
-        throw new NotFoundException(
-          `vms 테이블에 데이터가 없습니다. in createFile topic}`,
-        );
-      }
-      console.time('in100');
-      for (const vmsAwbHistoryData of vmsAwbHistoryDataList) {
-        // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
-        const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1(
-          vmsAwbHistoryData.AWB_NUMBER,
-        );
-        // vms 모델 데이터 가져오기
-        const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
-        const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
+    console.log('스케줄러 동작함');
+    // 화물 100개 limit 걸기
+    const missingAwbs = await this.awbService.getAwbNotCombineModelPath(10);
 
-        // if (!vms3Ddata || !vms2dData) {
-        //   throw new NotFoundException('모델링 테이블에 데이터가 없습니다.');
-        // }
-        // console.timeEnd('findVms');
-        // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
-        await this.createAwbDataInMssql(
-          vms3Ddata,
-          vms2dData,
-          vmsAwbResult,
-          vmsAwbHistoryData,
-        );
+    for (const missingAwb of missingAwbs) {
+      const missingVms = await this.awbService.getAwbByVmsByName(
+        missingAwb.barcode,
+        missingAwb.separateNumber,
+      );
+      const missingVms2d = await this.awbService.getAwbByVms2dByName(
+        missingAwb.barcode,
+        missingAwb.separateNumber,
+      );
+      if (missingVms || missingVms2d) {
+        // 누락 로직 돌고 있으니 모델링 누락 스케줄러 동작안해도됨
+        await this.awbService.preventMissingData(missingVms, missingVms2d);
       }
-      console.timeEnd('in100');
-      // mqtt 메세지 보내기 로직 호출
-      // await this.sendModelingCompleteSignal();
-      // console.timeEnd('vmsTimer');
-      console.log('vms 동기화 완료');
-    } catch (error) {
-      console.error('Error:', error);
     }
+
+    // try {
+    //   // console.time('vmsTimer');
+    //   // console.time('findVms');
+    //   // vms 체적 데이터 가져오기
+    //   const vmsAwbHistoryDataList = await this.fetchVmsAwbHistoryDataLimit100();
+    //   if (!vmsAwbHistoryDataList || !(vmsAwbHistoryDataList?.length > 0)) {
+    //     throw new NotFoundException(
+    //       `vms 테이블에 데이터가 없습니다. in createFile topic}`,
+    //     );
+    //   }
+    //   console.time('in100');
+    //   for (const vmsAwbHistoryData of vmsAwbHistoryDataList) {
+    //     // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
+    //     const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1(
+    //       vmsAwbHistoryData.AWB_NUMBER,
+    //     );
+    //     // vms 모델 데이터 가져오기
+    //     const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
+    //     const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
+    //
+    //     // if (!vms3Ddata || !vms2dData) {
+    //     //   throw new NotFoundException('모델링 테이블에 데이터가 없습니다.');
+    //     // }
+    //     // console.timeEnd('findVms');
+    //     // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
+    //     await this.createAwbDataInMssql(
+    //       vms3Ddata,
+    //       vms2dData,
+    //       vmsAwbResult,
+    //       vmsAwbHistoryData,
+    //     );
+    //   }
+    //   console.timeEnd('in100');
+    //   // mqtt 메세지 보내기 로직 호출
+    //   // await this.sendModelingCompleteSignal();
+    //   // console.timeEnd('vmsTimer');
+    //   console.log('vms 동기화 완료');
+    // } catch (error) {
+    //   console.error('Error:', error);
+    // }
   }
 
   private async fetchAwbData() {
