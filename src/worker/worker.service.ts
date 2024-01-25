@@ -44,7 +44,7 @@ export class WorkerService {
     }
     console.log('스케줄러 동작함');
     // 화물 100개 limit 걸기
-    const missingAwbs = await this.awbService.getAwbNotCombineModelPath(100);
+    const missingAwbs = await this.awbService.getAwbNotCombineModelPath(10);
 
     for (const missingAwb of missingAwbs) {
       const missingVms = await this.awbService.getAwbByVmsByName(
