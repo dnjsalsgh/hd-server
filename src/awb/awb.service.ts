@@ -966,13 +966,13 @@ export class AwbService {
 
     // 비교하기
     // 같다면 return
-    if (
-      !firstTime &&
-      currentBarcode === previousBarcode &&
-      currentSeparateNumber === previousSeparateNumber
-    ) {
-      return;
-    }
+    // if (
+    //   !firstTime &&
+    //   currentBarcode === previousBarcode &&
+    //   currentSeparateNumber === previousSeparateNumber
+    // ) {
+    //   return;
+    // }
 
     // 다르다면 로직 시작
     // history 값 가져오기
