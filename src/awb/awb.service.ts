@@ -456,11 +456,15 @@ export class AwbService {
           createAwbDto.path = filePath;
         } catch (e) {}
       }
+      console.log('createAwbDto = ', createAwbDto);
 
-      // await this.awbRepository.update(
-      //   { barcode: createAwbDto.barcode },
-      //   createAwbDto,
-      // );
+      await this.awbRepository.update(
+        {
+          barcode: createAwbDto.barcode,
+          separateNumber: createAwbDto.separateNumber,
+        },
+        createAwbDto,
+      );
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
