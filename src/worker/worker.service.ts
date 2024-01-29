@@ -42,7 +42,7 @@ export class WorkerService {
     if (this.configService.get<string>('LOCAL_SCHEDULE') !== 'true') {
       return;
     }
-    console.log('스케줄러 동작함');
+    console.log('누락 3d파일 체크 스케줄러 동작함');
     // 화물 100개 limit 걸기
     const missingAwbs = await this.awbService.getAwbNotCombineModelPath(10);
 
