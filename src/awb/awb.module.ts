@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AwbService } from './awb.service';
 import { AwbController } from './awb.controller';
 import { Awb } from './entities/awb.entity';

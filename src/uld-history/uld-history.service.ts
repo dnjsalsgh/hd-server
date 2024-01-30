@@ -19,6 +19,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { UldService } from '../uld/uld.service';
 import { UldSccInjectionDto } from '../uld/dto/uld-sccInjection.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import { log } from 'console';
 
 @Injectable()
 export class UldHistoryService {
@@ -34,13 +35,16 @@ export class UldHistoryService {
   ) {}
 
   async create(createUldHistoryDto: CreateUldHistoryDto) {
-    const savedHistory = this.saveHistory(createUldHistoryDto);
-
-    if (savedHistory && createUldHistoryDto.Awb) {
+    const saveResult = await this.uldHistoryRepository.save(
+      createUldHistoryDto,
+    );
+    // uld 생성되면 mqtt로 전송
+    this.client.send(`hyundai/uldHistory/insert`, saveResult).subscribe();
+    if (saveResult && createUldHistoryDto.Awb) {
       await this.injectScc(createUldHistoryDto);
     }
 
-    return savedHistory;
+    return saveResult;
   }
 
   async createList(createUldHistoryDtoList: CreateUldHistoryDto[]) {

@@ -14,6 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class AwbUtilService {
@@ -26,7 +27,21 @@ export class AwbUtilService {
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
     private readonly sccService: SccService,
+    private readonly redisService: RedisService,
   ) {}
+
+  async settingRedis(barcode: string, separateNumber: number) {
+    await this.redisService.set('barcode', barcode);
+    await this.redisService.set('separateNumber', separateNumber.toString());
+  }
+
+  async getBarcode() {
+    return this.redisService.get('barcode');
+  }
+
+  async getSeparateNumber() {
+    return this.redisService.get('separateNumber');
+  }
 
   // vms db에서 넘어온 데이터들을 awb에 넣기 위해 가공하는 메서드
   async prepareAwbDto(
@@ -65,10 +80,13 @@ export class AwbUtilService {
       parent: 0, // 처음 vms에서 생성되었으니 부모 0
     };
 
+    // console.log('awbDto가 생성됨 = ', awbDto);
+
     // VWMS_AWB_HISTORY에서 체적 정보가 없을 때 반환 하는 로직
     // 100개를 긁어와서 누락된 화물 체크
     // [24.01.23] 100개를 긁어와서 팅기는게 아니라 다음 화물을 위해 null값 반환
     if (!awbDto.width) {
+      console.log(`awbDto.width 없어서 실패`);
       return null;
       // throw new NotFoundException('체적 정보가 없습니다.');
     }
@@ -199,7 +217,7 @@ export class AwbUtilService {
   }
 
   // 3D 파일을 저장하는 로직
-  protected async fileUpload(vms: Vms3D) {
+  public async fileUpload(vms: Vms3D) {
     const file = `Z:\\${vms.FILE_PATH}\\${vms.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(
@@ -210,7 +228,7 @@ export class AwbUtilService {
   }
 
   // 2D 파일을 저장하는 로직
-  protected async fileUpload2d(vms2d: Vms2d) {
+  public async fileUpload2d(vms2d: Vms2d) {
     const file = `Z:\\${vms2d.FILE_PATH}\\${vms2d.FILE_NAME}`;
     const fileContent = await this.fileService.readFile(file);
     const fileResult = await this.fileService.uploadFileToLocalServer(

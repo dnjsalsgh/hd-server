@@ -45,16 +45,33 @@ import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entit
 import { FileService } from '../file/file.service';
 import { AwbService } from './awb.service';
 import { ParseIdListPipe } from '../lib/pipe/parseIdList.pipe';
+import { AwbUtilService } from './awbUtil.service';
+import console from 'console';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
 export class AwbController {
+  private messageQueue = [];
+  private readonly processInterval = 500; // 처리 간격을 500ms (0.5초)로 설정
+  private processing = false;
   constructor(
     private readonly awbService: AwbService,
+    private readonly awbUtilService: AwbUtilService,
     private readonly fileService: FileService,
     private readonly configService: ConfigService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
-  ) {}
+  ) {
+    // setInterval(() => this.processMessage(), this.processInterval);
+  }
+  // 0.5초마다 큐에서 메시지를 꺼내 처리
+  // private async processMessage() {
+  // if (this.messageQueue.length > 0 && !this.processing) {
+  //   this.processing = true; // 처리 중 플래그 설정
+  //   const message = this.messageQueue.shift();
+  //   await this.awbService.createAwbByPlcMqtt(message);
+  //   this.processing = false; // 처리 완료 후 플래그 해제
+  // }
+  // }
 
   @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
   @UseInterceptors(TransactionInterceptor)
@@ -283,58 +300,101 @@ export class AwbController {
     return this.awbService.remove(+id);
   }
 
+  // 3초 딜레이를 위한 Promise 기반의 delay 함수
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   // VMS 설비데이터 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
   async createByPlcMatt(@Payload() data) {
-    // vms 데이터 mqtt로 publish 하기 위함
-    if (data && this.configService.get<string>('VMS_DATA') === 'true') {
-      this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
+    if (data && this.configService.get<string>('VMS_DATA') !== 'true') {
+      return;
     }
+
+    // 3초 딜레이로 부하 줄이기
+    if (!this.processing) {
+      this.processing = true; // 처리 시작 표시
+
+      // 메시지 처리 로직
+      await this.awbService.createAwbByPlcMqtt(data);
+      console.log('VMS 설비데이터 데이터를 추적하는 메서드 동작함');
+
+      // 3초 딜레이
+      await this.delay(1000);
+
+      this.processing = false; // 처리 완료 표시
+    }
+
+    // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
+  // 3d 모델링 파일 트리거를 받아서 하는것이 아닌 mqtt로 직접 awb 정보를 받는다. 바로 위에 메서드로 대체
   // mssql에서 데이터 가져오기, 3D 모델링파일 생성 완료 트리거
   @MessagePattern('hyundai/vms1/createFile') // 구독하는 주제
   async updateAwbByVmsDB(@Payload() data) {
-    if (this.configService.get<string>('LOCAL_SCHEDULE') !== 'true') {
+    if (this.configService.get<string>('LOCAL_SCHEDULE') === 'true') {
       return;
     }
-    try {
-      // console.time('vmsTimer');
-      // console.time('findVms');
-      // vms 체적 데이터 가져오기
-      const vmsAwbHistoryDataList = await this.fetchVmsAwbHistoryDataLimit100();
-      if (!vmsAwbHistoryDataList || !(vmsAwbHistoryDataList?.length > 0)) {
-        throw new NotFoundException('vms 테이블에 데이터가 없습니다.');
-      }
+    // console.log('스케줄러 동작함');
+    // // 화물 100개 limit 걸기
+    // const missingAwbs = await this.awbService.getAwbNotCombineModelPath(10);
+    //
+    // for (const missingAwb of missingAwbs) {
+    //   const missingVms = await this.awbService.getAwbByVmsByName(
+    //     missingAwb.barcode,
+    //     missingAwb.separateNumber,
+    //   );
+    //   const missingVms2d = await this.awbService.getAwbByVms2dByName(
+    //     missingAwb.barcode,
+    //     missingAwb.separateNumber,
+    //   );
+    //   if (missingVms || missingVms2d) {
+    //     // 누락 로직 돌고 있으니 모델링 누락 스케줄러 동작안해도됨
+    //     await this.awbService.preventMissingData(missingVms, missingVms2d);
+    //   }
+    // }
 
-      for (const vmsAwbHistoryData of vmsAwbHistoryDataList) {
-        // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
-        const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1(
-          vmsAwbHistoryData.AWB_NUMBER,
-        );
-        // vms 모델 데이터 가져오기
-        const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
-        const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
-
-        // if (!vms3Ddata || !vms2dData) {
-        //   throw new NotFoundException('모델링 테이블에 데이터가 없습니다.');
-        // }
-        // console.timeEnd('findVms');
-        // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
-        await this.createAwbDataInMssql(
-          vms3Ddata,
-          vms2dData,
-          vmsAwbResult,
-          vmsAwbHistoryData,
-        );
-      }
-      // mqtt 메세지 보내기 로직 호출
-      await this.sendModelingCompleteSignal();
-      // console.timeEnd('vmsTimer');
-      console.log('vms 동기화 완료');
-    } catch (error) {
-      console.error('Error:', error);
-    }
+    // try {
+    //   // console.time('vmsTimer');
+    //   // console.time('findVms');
+    //   // vms 체적 데이터 가져오기
+    //   const vmsAwbHistoryDataList = await this.fetchVmsAwbHistoryDataLimit100();
+    //   if (!vmsAwbHistoryDataList || !(vmsAwbHistoryDataList?.length > 0)) {
+    //     throw new NotFoundException(
+    //       `vms 테이블에 데이터가 없습니다. in createFile topic}`,
+    //     );
+    //   }
+    //   console.time('in100');
+    //   for (const vmsAwbHistoryData of vmsAwbHistoryDataList) {
+    //     // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
+    //     const vmsAwbResult = await this.fetchVmsAwbResultDataLimit1(
+    //       vmsAwbHistoryData.AWB_NUMBER,
+    //     );
+    //     // vms 모델 데이터 가져오기
+    //     const vms3Ddata = await this.fetchAwbDataByBarcode(vmsAwbHistoryData);
+    //     const vms2dData = await this.fetchAwb2dDataByBarcode(vmsAwbHistoryData);
+    //
+    //     // if (!vms3Ddata || !vms2dData) {
+    //     //   throw new NotFoundException('모델링 테이블에 데이터가 없습니다.');
+    //     // }
+    //     // console.timeEnd('findVms');
+    //     // 가져온 데이터를 조합해서 db에 insert 로직 호출하기
+    //     await this.createAwbDataInMssql(
+    //       vms3Ddata,
+    //       vms2dData,
+    //       vmsAwbResult,
+    //       vmsAwbHistoryData,
+    //     );
+    //   }
+    //   console.timeEnd('in100');
+    //   // mqtt 메세지 보내기 로직 호출
+    //   // await this.sendModelingCompleteSignal();
+    //   // console.timeEnd('vmsTimer');
+    //   console.log('vms 동기화 완료');
+    // } catch (error) {
+    //   console.error('Error:', error);
+    // }
   }
 
   private async fetchAwbData() {
@@ -382,6 +442,17 @@ export class AwbController {
     return await this.awbService.get100VmsAwbHistory();
   }
 
+  // VWMS_AWB_HISTORY 테이블에 있는 정보 barcode, separateNumber로 정보 가져오기
+  private async fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
+    barcode: string,
+    separateNumber: number,
+  ) {
+    return await this.awbService.getVmsAwbHistoryByBarcodeAndSeparateNumber(
+      barcode,
+      separateNumber,
+    );
+  }
+
   private async createAwbDataInMssql(
     vms: Vms3D,
     vms2d: Vms2d,
@@ -393,16 +464,17 @@ export class AwbController {
     // if (!vms2d) this.errorMessageHandling(vms2d, 'vms2d');
 
     // TODO 개발용으로 vmsAwbResult 테이블 없으니 이렇게 함 주석 해제할 것
-    if (!vmsAwbResult) this.errorMessageHandling(vmsAwbResult, 'vmsAwbResult');
+    // if (!vmsAwbResult) this.errorMessageHandling(vmsAwbResult, 'vmsAwbResult');
     if (!vmsAwbHistory)
       this.errorMessageHandling(vmsAwbHistory, 'vmsAwbHistory');
 
-    await this.awbService.createWithMssql(
+    const awb = await this.awbService.createWithMssql(
       vms,
       vms2d,
       vmsAwbResult,
       vmsAwbHistory,
     );
+    return awb;
   }
 
   private errorMessageHandling(target: any, tableName: string) {
@@ -415,3 +487,11 @@ export class AwbController {
     await this.awbService.sendModelingCompleteMqttMessage();
   }
 }
+
+// 메시지를 큐에 추가
+// this.messageQueue.push(data);
+
+// 메시지 큐의 길이가 10을 초과하면 가장 오래된 메시지부터 제거(메모리 관리 문제)
+// while (this.messageQueue.length > 10) {
+//   this.messageQueue.shift(); // 배열의 첫 번째 요소를 제거
+// }

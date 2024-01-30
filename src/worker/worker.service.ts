@@ -24,9 +24,7 @@ export class WorkerService {
     if (this.configService.get<string>('SCHEDULE') !== 'true') {
       return;
     }
-    console.time('amrLatency');
     this.amrService.createAmrByHacs();
-    console.timeEnd('amrLatency');
     console.log('amr 데이터 수집 스케줄러 동작');
   }
 
@@ -38,15 +36,15 @@ export class WorkerService {
   //   name: 'missingAWBModelingFileHandlingLogic',
   //   timeZone: 'Asia/Seoul',
   // })
-  @Interval(600000) // 10분 (10 * 60 * 1000 밀리초)
+  @Interval(6000) // 10분 (10 * 60 * 1000 밀리초)
   // 3d 모델 누락 스케줄러
   async missingAWBModelingFileHandlingLogic() {
     if (this.configService.get<string>('LOCAL_SCHEDULE') !== 'true') {
       return;
     }
-    console.log('스케줄러 동작함');
+    console.log('누락 3d파일 체크 스케줄러 동작함');
     // 화물 100개 limit 걸기
-    const missingAwbs = await this.awbService.getAwbNotCombineModelPath(100);
+    const missingAwbs = await this.awbService.getAwbNotCombineModelPath(10);
 
     for (const missingAwb of missingAwbs) {
       const missingVms = await this.awbService.getAwbByVmsByName(
@@ -58,6 +56,7 @@ export class WorkerService {
         missingAwb.separateNumber,
       );
       if (missingVms || missingVms2d) {
+        // 누락 로직 돌고 있으니 모델링 누락 스케줄러 동작안해도됨
         await this.awbService.preventMissingData(missingVms, missingVms2d);
       }
     }

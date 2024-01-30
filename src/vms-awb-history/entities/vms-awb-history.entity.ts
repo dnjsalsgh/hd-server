@@ -22,7 +22,7 @@ export class VmsAwbHistory {
   @PrimaryColumn({
     name: 'AWB_NUMBER',
     type: 'nvarchar',
-    length: 100,
+    length: 11,
     nullable: false,
   })
   AWB_NUMBER: string;

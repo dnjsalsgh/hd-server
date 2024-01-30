@@ -27,6 +27,7 @@ import { Awb } from '../awb/entities/awb.entity';
 import { RedisService } from '../redis/redis.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
+import { AwbService } from '../awb/awb.service';
 
 @Injectable()
 export class AsrsService {
@@ -39,6 +40,7 @@ export class AsrsService {
     private readonly awbRepository: Repository<Awb>,
     private dataSource: DataSource,
     private redisService: RedisService,
+    private readonly awbService: AwbService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
@@ -192,6 +194,11 @@ export class AsrsService {
       const separateNumber = this.getTag('SEPARATION_NO', unitKey);
       const variableInOut = onOffSignal ? 'in' : 'out';
 
+      // 빈 바코드 있을 때 다음걸로 넘어가기
+      if (body[awbNo] === '') {
+        continue;
+      }
+
       if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
         await this.processInOut(
           unitNumber,
@@ -246,7 +253,7 @@ export class AsrsService {
     try {
       const awb = await this.findAwbByBarcode(awbNo, separateNumber);
       const inOutType = state === 'in' ? 'in' : 'out';
-
+      console.log('awb = ', awb, awbNo, separateNumber);
       if (!(awb && awb.id)) {
         throw new TypeORMError('awb 정보를 찾지 못했습니다.');
       }
@@ -345,5 +352,63 @@ export class AsrsService {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  /**
+   * plc로 들어온 데이터중 화물 누락된 화물 데이터 체크
+   * @param body
+   */
+  async checkAwb(body: CreateAsrsPlcDto) {
+    // asrs의 정보들
+    for (let unitNumber = 1; unitNumber <= 18; unitNumber++) {
+      const unitKey = this.formatUnitNumber(unitNumber);
+
+      const awbNo = this.getTag('Bill_No', unitKey);
+      const separateNumber = this.getTag('SEPARATION_NO', unitKey);
+
+      const awb = await this.findAwbByBarcode(
+        body[awbNo],
+        +body[separateNumber],
+      );
+
+      if (awb) {
+        continue;
+      }
+      await this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
+        body[awbNo],
+        +body[separateNumber],
+      );
+    }
+
+    // skidPlatformHistory의 정보들
+    for (let unitNumber = 1; unitNumber <= 4; unitNumber++) {
+      const unitKey = this.formatUnitNumber(unitNumber);
+
+      const awbNo = `SUPPLY_01_${unitKey}_P2A_Bill_No`;
+      const separateNumber = `SUPPLY_01_${unitKey}_P2A_SEPARATION_NO`;
+
+      const awb = await this.findAwbByBarcode(
+        body[awbNo],
+        +body[separateNumber],
+      );
+
+      if (awb) {
+        continue;
+      }
+
+      await this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
+        body[awbNo],
+        +body[separateNumber],
+      );
+    }
+  }
+
+  delayedPromiseFunction() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        console.log('1초 후에 이 메시지가 출력되고, Promise가 해결됩니다.');
+        resolve('처리 완료'); // Promise를 해결하고 값을 반환
+      }, 1000);
+    });
   }
 }

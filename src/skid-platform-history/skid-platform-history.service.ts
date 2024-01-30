@@ -8,9 +8,9 @@ import {
   Repository,
   TypeORMError,
 } from 'typeorm';
-import { pipe, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
@@ -30,6 +30,8 @@ import {
 } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { RedisService } from '../redis/redis.service';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import { AwbService } from '../awb/awb.service';
+import { AwbUtilService } from '../awb/awbUtil.service';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -40,9 +42,9 @@ export class SkidPlatformHistoryService {
     private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-    @Inject('MQTT_SERVICE') private client: ClientProxy,
     private dataSource: DataSource,
     private redisService: RedisService,
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
   async create(createSkidPlatformHistoryDto: CreateSkidPlatformHistoryDto) {
@@ -53,6 +55,16 @@ export class SkidPlatformHistoryService {
     const historyResult = await this.skidPlatformHistoryRepository.save(
       historyData as SkidPlatformHistory,
     );
+
+    if (
+      createSkidPlatformHistoryDto.SkidPlatform <= 4 &&
+      createSkidPlatformHistoryDto.inOutType === 'out'
+    ) {
+      await this.settingRedis(
+        `p${createSkidPlatformHistoryDto.SkidPlatform}`,
+        'out',
+      );
+    }
 
     const skidPlatformNowState = await this.nowState();
 
@@ -358,6 +370,12 @@ export class SkidPlatformHistoryService {
       const separateNumber = `SUPPLY_01_${unitKey}_P2A_SEPARATION_NO`;
       const variableInOut = onOffSignal ? 'in' : 'out';
 
+      // 빈 바코드 있을 때 다음걸로 넘어가기
+      if (body[awbNo] === '') {
+        continue;
+      }
+      console.log('body[awbNo] = 안착대 awbBarcode', body[awbNo]);
+      console.log('onOffSignal, previousState = ', onOffSignal, previousState);
       if (this.shouldSetInOutSkidPlatform(onOffSignal, previousState)) {
         await this.processInOut(
           unitNumber,
@@ -406,10 +424,11 @@ export class SkidPlatformHistoryService {
     if (onOffSignal) {
       return previousState === 'out' || previousState === null;
     }
+    // out 처리는 작업지시에서 post로 하는것이기 때문에 out처리 막아둠
     // 'out'
-    else {
-      return previousState === 'in';
-    }
+    // else {
+    //   return previousState === 'in';
+    // }
   }
 
   /**
@@ -460,8 +479,19 @@ export class SkidPlatformHistoryService {
       }
 
       // skidPlatformHistory를 mqtt에 보내기 위함
+      // this.client
+      //   .send(`hyundai/skidPlatformHistory/insert`, skidPlatformHistoryFormIf)
+      //   .pipe(take(1))
+      //   .subscribe();
+
+      // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
+      const skidPlatformNowState = await this.nowState();
       this.client
-        .send(`hyundai/skidPlatformHistory/insert`, skidPlatformHistoryFormIf)
+        .send(`hyundai/skidPlatform/insert`, {
+          statusCode: 200,
+          message: 'current skidPlatform state',
+          data: skidPlatformNowState,
+        })
         .pipe(take(1))
         .subscribe();
 
@@ -507,6 +537,23 @@ export class SkidPlatformHistoryService {
       return awbResult;
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  /**
+   * plc로 들어온 데이터중 화물 누락된 화물 데이터 체크
+   */
+  async checkAwb() {
+    for (let unitNumber = 1; unitNumber <= 4; unitNumber++) {
+      const unitKey = this.formatUnitNumber(unitNumber);
+
+      const awbNo = `SUPPLY_01_${unitKey}_P2A_Bill_No`;
+      const separateNumber = `SUPPLY_01_${unitKey}_P2A_SEPARATION_NO`;
+
+      // this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
+      //   awbNo,
+      //   +separateNumber,
+      // );
     }
   }
 }
