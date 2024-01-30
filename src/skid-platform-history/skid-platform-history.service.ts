@@ -56,6 +56,16 @@ export class SkidPlatformHistoryService {
       historyData as SkidPlatformHistory,
     );
 
+    if (
+      createSkidPlatformHistoryDto.SkidPlatform <= 4 &&
+      createSkidPlatformHistoryDto.inOutType === 'out'
+    ) {
+      await this.settingRedis(
+        `p${createSkidPlatformHistoryDto.SkidPlatform}`,
+        'out',
+      );
+    }
+
     const skidPlatformNowState = await this.nowState();
 
     // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
@@ -421,10 +431,11 @@ export class SkidPlatformHistoryService {
     if (onOffSignal) {
       return previousState === 'out' || previousState === null;
     }
+    // out 처리는 작업지시에서 post로 하는것이기 때문에 out처리 막아둠
     // 'out'
-    else {
-      return previousState === 'in';
-    }
+    // else {
+    //   return previousState === 'in';
+    // }
   }
 
   /**
@@ -482,14 +493,14 @@ export class SkidPlatformHistoryService {
 
       // 현재 안착대에 어떤 화물이 들어왔는지 파악하기 위한 mqtt 전송 [작업지시 화면에서 필요함]
       const skidPlatformNowState = await this.nowState();
-    this.client
-    .send(`hyundai/skidPlatform/insert`, {
-      statusCode: 200,
-      message: 'current skidPlatform state',
-      data: skidPlatformNowState,
-    })
-    .pipe(take(1))
-    .subscribe();
+      this.client
+        .send(`hyundai/skidPlatform/insert`, {
+          statusCode: 200,
+          message: 'current skidPlatform state',
+          data: skidPlatformNowState,
+        })
+        .pipe(take(1))
+        .subscribe();
 
       await this.settingRedis(`p${SkidPlatformId}`, inOutType);
 
