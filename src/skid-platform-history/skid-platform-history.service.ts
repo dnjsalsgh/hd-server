@@ -364,6 +364,13 @@ export class SkidPlatformHistoryService {
       if (body[awbNo] === '') {
         continue;
       }
+
+
+      // 만약 gskid 못 믿을 때 out 처리 하는 법
+      if (body[awbNo] === '' && body[separateNumber] === 0 && previousState === 'in') {
+        continue;
+      }
+
       console.log('body[awbNo] = 안착대 awbBarcode', body[awbNo]);
       console.log('onOffSignal, previousState = ', onOffSignal, previousState);
       if (this.shouldSetInOutSkidPlatform(onOffSignal, previousState)) {
