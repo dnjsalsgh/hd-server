@@ -318,7 +318,6 @@ export class AwbController {
 
       // 메시지 처리 로직
       await this.awbService.createAwbByPlcMqtt(data);
-      console.log('VMS 설비데이터 데이터를 추적하는 메서드 동작함');
 
       // 3초 딜레이
       await this.delay(1000);

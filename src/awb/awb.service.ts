@@ -49,6 +49,8 @@ import { breakDownRequest } from '../lib/util/axios.util';
 import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
 import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
+import { ClientProxy } from '@nestjs/microservices';
+import { take } from 'rxjs';
 
 @Injectable()
 export class AwbService {
@@ -65,7 +67,7 @@ export class AwbService {
     private readonly vmsAwbResultRepository: Repository<VmsAwbResult>,
     @InjectRepository(VmsAwbHistory, 'dimoaDB')
     private readonly vmsAwbHistoryRepository: Repository<VmsAwbHistory>,
-    @Inject('MQTT_SERVICE') private client: ClientProxy
+    @Inject('MQTT_SERVICE') private client: ClientProxy,
     private dataSource: DataSource,
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
@@ -350,7 +352,6 @@ export class AwbService {
 
     try {
       let awbIdInDb: number;
-      let insertedAwb: Awb = null;
       await queryRunner.startTransaction();
 
       // vms에서 온 데이터 세팅(실제 db에 넣을 파라미터 세팅하는 부분)
@@ -392,26 +393,7 @@ export class AwbService {
           insertedAwb.barcode,
           insertedAwb.separateNumber,
         );
-        // insert된 것만 mqtt로 전송
-        const Awb = await this.findOne(awbIdInDb);
-        await this.awbUtilService.sendMqttMessage(Awb);
       }
-
-      // 존재하지 않을 때만 awb insert하기
-      // if (!existingAwb) {
-      //   insertedAwb = await this.awbUtilService.insertAwb(queryRunner, awbDto);
-      //   awbIdInDb = insertedAwb.id;
-      //
-      //   // insert되면 redis에 등록
-      //   await this.awbUtilService.settingRedis(
-      //     insertedAwb.barcode,
-      //     insertedAwb.separateNumber,
-      //   );
-      //
-      //   // insert된 것만 mqtt로 전송
-      //   const Awb = await this.findOne(awbIdInDb);
-      //   await this.awbUtilService.sendMqttMessage(Awb);
-      // }
 
       // scc 테이블에서 가져온 데이터를 입력
       if (vmsAwbResult && awbIdInDb) {
@@ -425,7 +407,17 @@ export class AwbService {
       await queryRunner.commitTransaction();
       await queryRunner.release();
 
-      return insertedAwb;
+      if (!existingAwb) {
+        // insert된 것만 mqtt로 전송
+        const [Awb] = await this.findOneByBarcodeAndSeparateNumber(
+          awbDto.barcode,
+          awbDto.separateNumber,
+        );
+
+        return Awb;
+      }
+
+      return null;
     } catch (error) {
       await this.awbUtilService.handleError(queryRunner, error);
     } finally {
@@ -609,6 +601,20 @@ export class AwbService {
     return searchResult;
   }
 
+  async findOneByBarcodeAndSeparateNumber(
+    barcode: string,
+    separateNUmber: number,
+  ) {
+    const searchResult = await this.awbRepository.find({
+      where: { barcode: barcode, separateNumber: separateNUmber },
+      // relations: {
+      //   Scc: true,
+      //   AirCraftSchedule: true,
+      // },
+    });
+    return searchResult;
+  }
+
   update(id: number, updateAwbDto: UpdateAwbDto) {
     return this.awbRepository.update(id, updateAwbDto);
   }
@@ -774,11 +780,16 @@ export class AwbService {
   // vms데이터를 받았다는 신호를 전송하는 메서드
   async sendSyncMqttMessage(awb: Awb) {
     // awb실시간 데이터 mqtt로 publish 하기 위함
+    // this.client.send(`hyundai/vms1/awb`, awb).subscribe();
+    // this.client
+    //   .send(`hyundai/vms1/readCompl`, {
+    //     fileRead: true,
+    //   })
+    //   .subscribe();
     this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
       fileRead: true,
     });
-    this.client.send(`hyundai/vms1/awb`, awb).pipe(take(1)).subscribe()
-    this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
+    await this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
   }
 
   // 모델링 파일이 없는 화물을 검색하는 메서드
@@ -990,10 +1001,9 @@ export class AwbService {
         console.log('vms에서 awb가 생성되지 않았습니다.');
         return null;
       }
-
       // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
       // insert 되면 redis의 값 수정
-      await this.awbUtilService.settingRedis(awb.barcode, awb.separateNumber);
+      // await this.awbUtilService.settingRedis(awb.barcode, awb.separateNumber);
       // mqtt 메세지 보내기 로직 호출
       await this.sendSyncMqttMessage(awb);
       console.log('vms 동기화 완료');
@@ -1061,10 +1071,10 @@ export class AwbService {
 
       // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
       // insert 되면 redis의 값 수정
-      if (awb) {
-        // mqtt 메세지 보내기 로직 호출
-        await this.sendSyncMqttMessage(awb);
-      }
+      // if (awb) {
+      // mqtt 메세지 보내기 로직 호출
+      // await this.sendSyncMqttMessage(awb);
+      // }
 
       console.log('asrs에서 vms 데이터 생성');
     } catch (error) {
