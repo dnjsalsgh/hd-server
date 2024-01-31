@@ -65,6 +65,7 @@ export class AwbService {
     private readonly vmsAwbResultRepository: Repository<VmsAwbResult>,
     @InjectRepository(VmsAwbHistory, 'dimoaDB')
     private readonly vmsAwbHistoryRepository: Repository<VmsAwbHistory>,
+    @Inject('MQTT_SERVICE') private client: ClientProxy
     private dataSource: DataSource,
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
@@ -776,6 +777,7 @@ export class AwbService {
     this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
       fileRead: true,
     });
+    this.client.send(`hyundai/vms1/awb`, awb).pipe(take(1)).subscribe()
     this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
   }
 
@@ -941,24 +943,6 @@ export class AwbService {
         'VMS_08_01_P2A_Bill_No, VMS_08_01_P2A_SEPARATION_NO 데이터가 없습니다.',
       );
     }
-
-    // redis에 있는 값 가져오기
-    const previousBarcode = await this.awbUtilService.getBarcode();
-    const previousSeparateNumber =
-      +(await this.awbUtilService.getSeparateNumber());
-
-    const firstTime =
-      previousBarcode === null && previousSeparateNumber === null;
-
-    // 비교하기
-    // 같다면 return
-    // if (
-    //   !firstTime &&
-    //   currentBarcode === previousBarcode &&
-    //   currentSeparateNumber === previousSeparateNumber
-    // ) {
-    //   return;
-    // }
 
     // 다르다면 로직 시작
     // history 값 가져오기
