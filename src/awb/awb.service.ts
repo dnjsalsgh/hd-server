@@ -1039,9 +1039,8 @@ export class AwbService {
         );
 
       if (!vmsAwbHistoryData) {
-        // console.log('vmsAwbHistory 테이블에 데이터가 없습니다.');
-        return null;
         // throw new NotFoundException('vmsAwbHistory 테이블에 데이터가 없습니다.');
+        return null;
       }
 
       // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
