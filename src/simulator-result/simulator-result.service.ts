@@ -1134,6 +1134,12 @@ export class SimulatorResultService {
         destination: AwbInfo.destination,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
       };
+      // 화물의 체적이 null이 들어오는 경우를 방지함
+      if (!targetAwb.width) {
+        throw new NotFoundException(
+          `체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+        );
+      }
       Awbs.push(targetAwb);
     }
   }
@@ -1180,6 +1186,12 @@ export class SimulatorResultService {
         SCCs: AwbInfo.Scc?.map((v) => v.code),
         palletRackId: SkidPlatformInfo.id, // pallet의 id를 ps에 넘겨주기 위함
       };
+      // 화물의 체적이 null이 들어오는 경우를 방지함
+      if (!targetSkidPlatform.width) {
+        throw new NotFoundException(
+          `체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+        );
+      }
       palletRack.push(targetSkidPlatform);
     }
   }
