@@ -23,6 +23,8 @@ import {
   QueryRunner,
   Repository,
   TypeORMError,
+  MoreThan,
+  LessThan,
 } from 'typeorm';
 import { Awb } from './entities/awb.entity';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
@@ -804,6 +806,23 @@ export class AwbService {
     });
   }
 
+  // 체적이 없는 화물을 검색하는 메서드
+  async getAwbNotVolumeAwb() {
+    // 오늘 날짜의 시작과 끝을 구하고, KST로 변환합니다 (UTC+9).
+    const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
+    const todayEnd = dayjs().endOf('day').add(9, 'hour').toDate();
+
+    return await this.awbRepository.find({
+      where: {
+        createdAt: Between(todayStart, todayEnd),
+        width: IsNull(), // modelPath가 null인 경우
+        simulation: false, // simulation이 false인 경우
+      },
+      order: orderByUtil(null),
+      // take: limitNumber,
+    });
+  }
+
   // vms3D에서 개수만큼 꺼내오는 메서드
   async getAwbByVms(takeNumber: number) {
     const [result] = await this.vmsRepository.find({
@@ -1075,7 +1094,7 @@ export class AwbService {
       // await this.sendSyncMqttMessage(awb);
       // }
 
-      console.log('asrs에서 vms 데이터 생성');
+      console.log('누락 체크 로직에서 vms 데이터 생성');
     } catch (error) {
       console.error('Error:', error);
     }

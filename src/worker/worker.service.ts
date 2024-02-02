@@ -36,7 +36,7 @@ export class WorkerService {
   //   name: 'missingAWBModelingFileHandlingLogic',
   //   timeZone: 'Asia/Seoul',
   // })
-  @Interval(6000) // 10분 (10 * 60 * 1000 밀리초)
+  @Interval(6000) // 10초
   // 3d 모델 누락 스케줄러
   async missingAWBModelingFileHandlingLogic() {
     if (this.configService.get<string>('LOCAL_SCHEDULE') !== 'true') {
@@ -59,6 +59,24 @@ export class WorkerService {
         // 누락 로직 돌고 있으니 모델링 누락 스케줄러 동작안해도됨
         await this.awbService.preventMissingData(missingVms, missingVms2d);
       }
+    }
+  }
+
+  @Interval(6000) // 10초
+  // 누락 체적 vms 스케줄러
+  async missingAWBVolumeHandlingLogic() {
+    if (this.configService.get<string>('VMS_VOLUME') !== 'true') {
+      return;
+    }
+    console.log('누락 체적 vms 체크 스케줄러 동작함');
+    // width 화물이 없다는 것 = 체적이 없다는 것
+    const missingAwbs = await this.awbService.getAwbNotVolumeAwb();
+
+    for (const missingAwb of missingAwbs) {
+      await this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
+        missingAwb.barcode,
+        missingAwb.separateNumber,
+      );
     }
   }
 }

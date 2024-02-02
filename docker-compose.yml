@@ -62,6 +62,7 @@ services:
       IF_ACTIVE: 'true' # 도커에서 돌가는 asrs 데이터 수집 실행 조건
       LOCAL_SCHEDULE: 'false' # 로컬에서 돌아가는 nas 파일 업로드 실행조건
       VMS_DATA: 'false' # 로컬에서 돌아가는 vms 체적 데이터 실행 옵션
+      VMS_VOLUME: 'false' #로컬에서 돌아가는 vms 누락 체적데이터 가져오기 옵션
       LOGGING: 'false'
       DATABASE_HOST: host.docker.internal # Use host.docker.internal to refer to the host machine's IP
       DATABASE_PORT: ${DATABASE_PORT}
