@@ -923,7 +923,7 @@ export class AwbService {
   ) {
     const [result] = await this.vmsAwbHistoryRepository.find({
       where: {
-        RESULT_LENGTH: Not(IsNull()),
+        // RESULT_LENGTH: Not(IsNull()),
         AWB_NUMBER: barcode.toString(),
         SEPARATION_NO: separateNumber,
       },
