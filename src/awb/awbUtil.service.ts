@@ -106,6 +106,17 @@ export class AwbUtilService {
         awbDto.path = filePath2d;
       } catch (e) {}
     }
+
+    // model이 업데이트가 되었을 때 모델 데이터를 주는 mqtt
+    // if (awbDto.modelPath) {
+    //   this.mqttService.sendMqttMessage('hyundai/awb/modelUpdate', {
+    //     barcode: vms.AWB_NUMBER,
+    //     separateNumber: vms.SEPARATION_NO,
+    //     modelPath: awbDto.modelPath,
+    //     path: awbDto.path,
+    //   });
+    // }
+
     return awbDto;
   }
 

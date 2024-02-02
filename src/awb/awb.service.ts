@@ -452,6 +452,15 @@ export class AwbService {
           createAwbDto.path = filePath;
         } catch (e) {}
       }
+
+      // model이 업데이트가 되었을 때 모델 데이터를 주는 mqtt
+      // if (createAwbDto.modelPath) {
+      //   this.mqttService.sendMqttMessage(
+      //     'hyundai/awb/modelUpdate',
+      //     createAwbDto,
+      //   );
+      // }
+
       console.log('createAwbDto = ', createAwbDto);
 
       await this.awbRepository.update(
