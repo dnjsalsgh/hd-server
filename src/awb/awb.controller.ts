@@ -53,7 +53,7 @@ import console from 'console';
 export class AwbController {
   private messageQueue = [];
   private readonly processInterval = 500; // 처리 간격을 500ms (0.5초)로 설정
-  private processing = false;
+  private invmsProcessing = false;
   constructor(
     private readonly awbService: AwbService,
     private readonly awbUtilService: AwbUtilService,
@@ -311,18 +311,19 @@ export class AwbController {
     if (data && this.configService.get<string>('VMS_DATA') !== 'true') {
       return;
     }
+    // 1초 딜레이로 부하 줄이기
+    if (!this.invmsProcessing) {
 
-    // 3초 딜레이로 부하 줄이기
-    if (!this.processing) {
-      this.processing = true; // 처리 시작 표시
+      this.invmsProcessing = true; // 처리 시작 표시
 
+      console.log("vms eqData 실행 스케줄러 동작");
       // 메시지 처리 로직
       await this.awbService.createAwbByPlcMqtt(data);
-
+      
       // 3초 딜레이
-      await this.delay(1000);
+      await this.delay(3000);
 
-      this.processing = false; // 처리 완료 표시
+      this.invmsProcessing = false; // 처리 완료 표시
     }
 
     // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
