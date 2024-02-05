@@ -911,7 +911,7 @@ export class AwbService {
   ) {
     const [result] = await this.vmsAwbHistoryRepository.find({
       where: {
-        RESULT_LENGTH: Not(IsNull()),
+        // RESULT_LENGTH: Not(IsNull()),
         AWB_NUMBER: barcode.toString(),
         SEPARATION_NO: separateNumber,
       },
@@ -937,13 +937,14 @@ export class AwbService {
     // 현재 들어오는 데이터 확인하기
     const currentBarcode = data['VMS_08_01_P2A_Bill_No'];
     const currentSeparateNumber = data['VMS_08_01_P2A_SEPARATION_NO'];
+    console.log(currentBarcode, currentSeparateNumber);
     try {
 
-    if (!currentBarcode || !currentSeparateNumber) {
-      throw new NotFoundException(
-        'VMS_08_01_P2A_Bill_No, VMS_08_01_P2A_SEPARATION_NO 데이터가 없습니다.',
-      );
-    }
+      if (!currentBarcode || !currentSeparateNumber) {
+        throw new NotFoundException(
+          'VMS_08_01_P2A_Bill_No, VMS_08_01_P2A_SEPARATION_NO 데이터가 없습니다.',
+        );
+      }
 
     // 다르다면 로직 시작
     // history 값 가져오기
@@ -998,7 +999,7 @@ export class AwbService {
       await this.sendSyncMqttMessage(awb);
       console.log('vms 동기화 완료');
     } catch (error) {
-      // console.error('Error:', error);
+      console.error('Error:', error);
     }
   }
 
