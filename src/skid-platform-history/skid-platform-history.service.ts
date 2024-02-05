@@ -538,7 +538,7 @@ export class SkidPlatformHistoryService {
   async findAwbByBarcode(billNo: string, separateNumber: number) {
     try {
       const awbResult = await this.awbRepository.findOne({
-        where: { barcode: billNo, separateNumber: separateNumber },
+        where: { barcode: billNo, separateNumber: separateNumber, parent: 0 },
         order: orderByUtil(null),
       });
       return awbResult;
