@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { take } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
@@ -30,8 +30,6 @@ import {
 } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { RedisService } from '../redis/redis.service';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { AwbService } from '../awb/awb.service';
-import { AwbUtilService } from '../awb/awbUtil.service';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -375,9 +373,12 @@ export class SkidPlatformHistoryService {
         continue;
       }
 
-
       // 만약 gskid 못 믿을 때 out 처리 하는 법
-      if (body[awbNo] === '' && body[separateNumber] === 0 && previousState === 'in') {
+      if (
+        body[awbNo] === '' &&
+        body[separateNumber] === 0 &&
+        previousState === 'in'
+      ) {
         continue;
       }
 
@@ -538,7 +539,7 @@ export class SkidPlatformHistoryService {
   async findAwbByBarcode(billNo: string, separateNumber: number) {
     try {
       const awbResult = await this.awbRepository.findOne({
-        where: { barcode: billNo, separateNumber: separateNumber, parent: 0 },
+        where: { barcode: billNo, separateNumber: separateNumber, parent: 0 }, // 해포된 화물은 들어가지 못하게 변경
         order: orderByUtil(null),
       });
       return awbResult;
