@@ -59,7 +59,7 @@ export class SimulatorResultController {
     @Body() body: userSelectInput,
     @TransactionManager() queryRunnerManager: EntityManager,
   ) {
-    return this.simulatorResultService.createBuildUpOrderBySimulatorResult(
+    return this.simulatorResultService.createUserSelect(
       body,
       queryRunnerManager,
     );

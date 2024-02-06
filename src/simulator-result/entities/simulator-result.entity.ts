@@ -48,7 +48,7 @@ export class SimulatorResult {
     description: '알고리즘 버전',
   })
   @Column({ type: 'varchar', length: 50, nullable: true })
-  version: number;
+  version?: number;
 
   @ApiProperty({
     example: true,

@@ -239,7 +239,7 @@ export class SimulatorResultService {
   }
 
   // 패키지 시뮬레이터의 userSelect 실행
-  async createBuildUpOrderBySimulatorResult(
+  async createUserSelect(
     apiRequest: userSelectInput,
     queryRunnerManager: EntityManager,
   ) {
