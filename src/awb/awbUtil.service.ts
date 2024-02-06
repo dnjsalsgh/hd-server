@@ -58,8 +58,10 @@ export class AwbUtilService {
     const awbDto: Partial<CreateAwbDto> = {
       barcode: vmsAwbHistory.AWB_NUMBER,
       separateNumber: vmsAwbHistory.SEPARATION_NO,
-      width: vmsAwbHistory.RESULT_WIDTH,
-      length: vmsAwbHistory.RESULT_LENGTH,
+      // width: vmsAwbHistory.RESULT_WIDTH,
+      // length: vmsAwbHistory.RESULT_LENGTH,
+      width: vmsAwbHistory.RESULT_LENGTH,
+      length: vmsAwbHistory.RESULT_WIDTH,
       depth: vmsAwbHistory.RESULT_HEIGHT,
       weight: vmsAwbHistory.RESULT_WEIGHT,
       piece: vmsAwbHistory?.RESULT_PC ?? 1,
