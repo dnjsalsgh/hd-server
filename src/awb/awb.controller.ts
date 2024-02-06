@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Inject,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -12,8 +11,6 @@ import {
   Query,
   UploadedFile,
   UseInterceptors,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -26,7 +23,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
-import { take } from 'rxjs';
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager, TypeORMError } from 'typeorm';
@@ -54,6 +50,7 @@ export class AwbController {
   private messageQueue = [];
   private readonly processInterval = 500; // 처리 간격을 500ms (0.5초)로 설정
   private invmsProcessing = false;
+
   constructor(
     private readonly awbService: AwbService,
     private readonly awbUtilService: AwbUtilService,
@@ -63,6 +60,7 @@ export class AwbController {
   ) {
     // setInterval(() => this.processMessage(), this.processInterval);
   }
+
   // 0.5초마다 큐에서 메시지를 꺼내 처리
   // private async processMessage() {
   // if (this.messageQueue.length > 0 && !this.processing) {
@@ -313,13 +311,12 @@ export class AwbController {
     }
     // 1초 딜레이로 부하 줄이기
     if (!this.invmsProcessing) {
-
       this.invmsProcessing = true; // 처리 시작 표시
 
-      console.log("vms eqData 실행 스케줄러 동작");
+      console.log('vms eqData 실행 스케줄러 동작');
       // 메시지 처리 로직
       await this.awbService.createAwbByPlcMqtt(data);
-      
+
       // 3초 딜레이
       await this.delay(3000);
 
