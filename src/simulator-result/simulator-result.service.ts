@@ -1128,7 +1128,7 @@ export class SimulatorResultService {
         id: AwbInfo.id,
         storageId: AsrsInfo.id,
         name: AwbInfo.barcode,
-        separateNumber: AwbInfo.separateNumber,
+        separateNumber: AwbInfo.separateNumber.toString(),
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -1157,7 +1157,7 @@ export class SimulatorResultService {
       const targetUld = {
         id: AwbInfo.id,
         name: AwbInfo.barcode,
-        separateNumber: AwbInfo.separateNumber,
+        separateNumber: AwbInfo.separateNumber.toString(),
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -1181,7 +1181,7 @@ export class SimulatorResultService {
       const targetSkidPlatform = {
         id: AwbInfo.id,
         name: AwbInfo.barcode,
-        separateNumber: AwbInfo.separateNumber,
+        separateNumber: AwbInfo.separateNumber.toString(),
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
