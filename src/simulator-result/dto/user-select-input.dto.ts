@@ -109,6 +109,12 @@ export class userSelectInput {
   })
   barcode: string;
   @ApiProperty({
+    example: 2,
+    description: '사용자가 선택한 Awb의 separateNumber',
+  })
+  separateNumber: number;
+
+  @ApiProperty({
     example: 26,
     description: '사용자가 선택한 Awb의 width',
   })

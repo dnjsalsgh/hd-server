@@ -281,7 +281,8 @@ export class SimulatorResultService {
     const inputAWB = {
       id: apiRequest.id,
       palletRackId: apiRequest.palletRackId,
-      barcode: apiRequest.barcode,
+      name: apiRequest.barcode,
+      separateNumber: apiRequest.separateNumber,
       width: apiRequest.width,
       length: apiRequest.length,
       depth: apiRequest.depth,
@@ -1126,6 +1127,7 @@ export class SimulatorResultService {
         id: AwbInfo.id,
         storageId: AsrsInfo.id,
         name: AwbInfo.barcode,
+        separateNumber: AwbInfo.separateNumber,
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -1154,6 +1156,7 @@ export class SimulatorResultService {
       const targetUld = {
         id: AwbInfo.id,
         name: AwbInfo.barcode,
+        separateNumber: AwbInfo.separateNumber,
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -1177,6 +1180,7 @@ export class SimulatorResultService {
       const targetSkidPlatform = {
         id: AwbInfo.id,
         name: AwbInfo.barcode,
+        separateNumber: AwbInfo.separateNumber,
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
