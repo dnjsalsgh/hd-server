@@ -58,8 +58,10 @@ export class AwbUtilService {
     const awbDto: Partial<CreateAwbDto> = {
       barcode: vmsAwbHistory.AWB_NUMBER,
       separateNumber: vmsAwbHistory.SEPARATION_NO,
-      width: vmsAwbHistory.RESULT_WIDTH,
-      length: vmsAwbHistory.RESULT_LENGTH,
+      // width: vmsAwbHistory.RESULT_WIDTH,
+      // length: vmsAwbHistory.RESULT_LENGTH,
+      width: vmsAwbHistory.RESULT_LENGTH,
+      length: vmsAwbHistory.RESULT_WIDTH,
       depth: vmsAwbHistory.RESULT_HEIGHT,
       weight: vmsAwbHistory.RESULT_WEIGHT,
       piece: vmsAwbHistory?.RESULT_PC ?? 1,
@@ -85,11 +87,11 @@ export class AwbUtilService {
     // VWMS_AWB_HISTORY에서 체적 정보가 없을 때 반환 하는 로직
     // 100개를 긁어와서 누락된 화물 체크
     // [24.01.23] 100개를 긁어와서 팅기는게 아니라 다음 화물을 위해 null값 반환
-    if (!awbDto.width) {
-      console.log(`awbDto.width 없어서 실패`);
-      return null;
-      // throw new NotFoundException('체적 정보가 없습니다.');
-    }
+    // if (!awbDto.width) {
+    //   console.log(`awbDto.width 없어서 실패`);
+    //   return null;
+    // throw new NotFoundException('체적 정보가 없습니다.');
+    // }
 
     // vms의 3D 파일을 저장함
     if (vms && vms.FILE_PATH) {
@@ -106,6 +108,17 @@ export class AwbUtilService {
         awbDto.path = filePath2d;
       } catch (e) {}
     }
+
+    // model이 업데이트가 되었을 때 모델 데이터를 주는 mqtt
+    if (awbDto.modelPath) {
+      this.mqttService.sendMqttMessage('hyundai/awb/modelUpdate', {
+        barcode: vms.AWB_NUMBER,
+        separateNumber: vms.SEPARATION_NO,
+        modelPath: awbDto.modelPath,
+        path: awbDto.path,
+      });
+    }
+
     return awbDto;
   }
 

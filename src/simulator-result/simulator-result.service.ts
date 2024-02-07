@@ -239,7 +239,7 @@ export class SimulatorResultService {
   }
 
   // 패키지 시뮬레이터의 userSelect 실행
-  async createBuildUpOrderBySimulatorResult(
+  async createUserSelect(
     apiRequest: userSelectInput,
     queryRunnerManager: EntityManager,
   ) {
@@ -281,7 +281,8 @@ export class SimulatorResultService {
     const inputAWB = {
       id: apiRequest.id,
       palletRackId: apiRequest.palletRackId,
-      barcode: apiRequest.barcode,
+      name: apiRequest.barcode,
+      separateNumber: apiRequest.separateNumber,
       width: apiRequest.width,
       length: apiRequest.length,
       depth: apiRequest.depth,
@@ -598,13 +599,14 @@ export class SimulatorResultService {
       };
 
       console.time('ps Call part');
-      const psResult = await getAWBinPalletRack(
-        packageSimulatorCallRequestObject,
-      );
       this.client
         .send('hyundai/ps/input', packageSimulatorCallRequestObject)
         .pipe(take(1))
         .subscribe();
+      const psResult = await getAWBinPalletRack(
+        packageSimulatorCallRequestObject,
+      );
+
       console.timeEnd('ps Call part');
 
       // 안착대 추천도 결과를 mqtt에 전송
@@ -1126,6 +1128,7 @@ export class SimulatorResultService {
         id: AwbInfo.id,
         storageId: AsrsInfo.id,
         name: AwbInfo.barcode,
+        separateNumber: AwbInfo.separateNumber.toString(),
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -1134,6 +1137,12 @@ export class SimulatorResultService {
         destination: AwbInfo.destination,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
       };
+      // 화물의 체적이 null이 들어오는 경우를 방지함
+      if (!targetAwb.width) {
+        throw new NotFoundException(
+          `체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+        );
+      }
       Awbs.push(targetAwb);
     }
   }
@@ -1148,6 +1157,7 @@ export class SimulatorResultService {
       const targetUld = {
         id: AwbInfo.id,
         name: AwbInfo.barcode,
+        separateNumber: AwbInfo.separateNumber.toString(),
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -1171,6 +1181,7 @@ export class SimulatorResultService {
       const targetSkidPlatform = {
         id: AwbInfo.id,
         name: AwbInfo.barcode,
+        separateNumber: AwbInfo.separateNumber.toString(),
         width: AwbInfo.width,
         length: AwbInfo.length,
         depth: AwbInfo.depth,
@@ -1180,6 +1191,12 @@ export class SimulatorResultService {
         SCCs: AwbInfo.Scc?.map((v) => v.code),
         palletRackId: SkidPlatformInfo.id, // pallet의 id를 ps에 넘겨주기 위함
       };
+      // 화물의 체적이 null이 들어오는 경우를 방지함
+      if (!targetSkidPlatform.width) {
+        throw new NotFoundException(
+          `체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+        );
+      }
       palletRack.push(targetSkidPlatform);
     }
   }
