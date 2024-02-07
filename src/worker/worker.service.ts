@@ -79,4 +79,22 @@ export class WorkerService {
       );
     }
   }
+
+  // @Interval(10000) // 6초
+  // Amr에서 누락 vms 스케줄러
+  // async missingAWBInAmr() {
+  // if (this.configService.get<string>('VMS_VOLUME') !== 'true') {
+  //   return;
+  // }
+  // console.log('Amr에서 누락 vms 스케줄러 동작함');
+  // // width 화물이 없다는 것 = 체적이 없다는 것
+  // const missingAwbs = await this.amrService.getAwbInAmr();
+  //
+  // for (const missingAwb of missingAwbs) {
+  //   await this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
+  //     missingAwb.barcode,
+  //     missingAwb.separateNumber,
+  //   );
+  // }
+  // }
 }

@@ -7,6 +7,7 @@ import {
   Between,
   DataSource,
   FindOperator,
+  IsNull,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
@@ -25,6 +26,7 @@ import { orderByUtil } from '../lib/util/orderBy.util';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { LoggerService } from '../lib/logger/logger.service';
 import { log } from 'console';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class AmrService {
@@ -247,5 +249,22 @@ export class AmrService {
 
   remove(id: number) {
     return this.amrRepository.delete(id);
+  }
+
+  // 체적이 없는 화물을 검색하는 메서드
+  async getAwbInAmr() {
+    // 오늘 날짜의 시작과 끝을 구하고, KST로 변환합니다 (UTC+9).
+    const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
+    const todayEnd = dayjs().endOf('day').add(9, 'hour').toDate();
+
+    return await this.amrRepository.find({
+      where: {
+        createdAt: Between(todayStart, todayEnd),
+        // width: IsNull(), // modelPath가 null인 경우
+        // simulation: false, // simulation이 false인 경우
+      },
+      order: orderByUtil(null),
+      // take: limitNumber,
+    });
   }
 }
