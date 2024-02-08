@@ -6,6 +6,9 @@ import { AwbService } from '../awb/awb.service';
 import console from 'console';
 import { FileService } from '../file/file.service';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Hacs } from '../hacs/entities/hacs.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class WorkerService {
@@ -15,6 +18,8 @@ export class WorkerService {
     private readonly awbService: AwbService,
     private readonly fileService: FileService,
     private readonly configService: ConfigService,
+    @InjectRepository(Hacs, 'amrDB') // amr에서 화물 정보를 긁어오기 위함
+    private readonly hacsRepository: Repository<Hacs>,
   ) {}
 
   @Interval(600)
@@ -80,16 +85,22 @@ export class WorkerService {
     }
   }
 
+  /**
+   * Amr에서 누락 vms 스케줄러
+   */
   // @Interval(10000) // 6초
-  // Amr에서 누락 vms 스케줄러
   // async missingAWBInAmr() {
   // if (this.configService.get<string>('VMS_VOLUME') !== 'true') {
   //   return;
   // }
   // console.log('Amr에서 누락 vms 스케줄러 동작함');
-  // // width 화물이 없다는 것 = 체적이 없다는 것
-  // const missingAwbs = await this.amrService.getAwbInAmr();
-  //
+  // /**
+  //  * TODO: acs db확인하고
+  //  * barcode랑 sep_no를 추출하기
+  //  * 누락 화물 체크 로직에 태우기
+  //  */
+  // // acs db에서 barcode랑 sep_no를 추출하기
+  // const acsDB = await this.hacsRepository.find({});
   // for (const missingAwb of missingAwbs) {
   //   await this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
   //     missingAwb.barcode,
