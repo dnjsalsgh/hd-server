@@ -618,7 +618,10 @@ export class SimulatorResultService {
         .subscribe();
       return psResult;
     } catch (e) {
-      throw new HttpException(`정보를 정확히 입력해주세요 ${e}`, e.status);
+      throw new HttpException(
+        `정보를 정확히 입력해주세요 ${e}`,
+        e.status || 400,
+      );
     }
   }
 
