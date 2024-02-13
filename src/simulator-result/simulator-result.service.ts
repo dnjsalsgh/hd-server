@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SimulatorResult } from './entities/simulator-result.entity';
@@ -68,6 +69,7 @@ import {
   UldDeployCheckerRequest,
 } from './dto/uld-deploy-checker-input.dto';
 import { AwbUtilService } from '../awb/awbUtil.service';
+import { HttpExceptionFilter } from '../lib/filter/httpException.filter';
 
 @Injectable()
 export class SimulatorResultService {
@@ -616,7 +618,7 @@ export class SimulatorResultService {
         .subscribe();
       return psResult;
     } catch (e) {
-      throw new HttpException(`정보를 정확히 입력해주세요 ${e}`, 400);
+      throw new HttpException(`정보를 정확히 입력해주세요 ${e}`, e.status);
     }
   }
 
@@ -1137,12 +1139,15 @@ export class SimulatorResultService {
         destination: AwbInfo.destination,
         SCCs: AwbInfo.Scc?.map((v) => v.code),
       };
+
       // 화물의 체적이 null이 들어오는 경우를 방지함
       if (!targetAwb.width) {
-        throw new NotFoundException(
-          `체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+        throw new HttpException(
+          `403 체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+          403,
         );
       }
+
       Awbs.push(targetAwb);
     }
   }
@@ -1193,8 +1198,9 @@ export class SimulatorResultService {
       };
       // 화물의 체적이 null이 들어오는 경우를 방지함
       if (!targetSkidPlatform.width) {
-        throw new NotFoundException(
-          `체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+        throw new HttpException(
+          `403 체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+          403,
         );
       }
       palletRack.push(targetSkidPlatform);
