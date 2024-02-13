@@ -94,7 +94,7 @@ export class AircraftScheduleService {
     const result = await this.aircraftScheduleRepository.find({
       relations: {
         Aircraft: true,
-        Awbs: true,
+        Awbs: { Scc: true },
         Ulds: {
           UldType: true,
           uldHistories: {
@@ -106,7 +106,7 @@ export class AircraftScheduleService {
       },
       select: {
         Aircraft: AircraftAttribute,
-        Awbs: AwbSimpleAttribute,
+        Awbs: { ...AwbSimpleAttribute, Scc: SccAttribute },
         Ulds: {
           ...UldAttribute,
           UldType: UldTypeAttribute,
