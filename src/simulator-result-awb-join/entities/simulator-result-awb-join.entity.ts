@@ -4,6 +4,7 @@ import { Column, Entity } from 'typeorm';
 export class SimulatorResultAwbJoin {
   @Column('int', {
     name: 'simulator_result_id',
+    primary: true,
     nullable: false,
   })
   SimulatorResult: number;
