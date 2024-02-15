@@ -106,6 +106,20 @@ export class AircraftSchedule {
   @Column({ type: 'bool', default: false })
   done?: boolean;
 
+  @ApiProperty({
+    example: 0,
+    description: '',
+  })
+  @Column({ type: 'int', default: 0 })
+  plannedULDCount?: number;
+
+  @ApiProperty({
+    example: 0,
+    description: '',
+  })
+  @Column({ type: 'int', default: 0 })
+  completedULDCount?: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
