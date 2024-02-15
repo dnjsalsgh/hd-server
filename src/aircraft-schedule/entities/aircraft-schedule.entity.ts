@@ -176,4 +176,6 @@ export const AircraftScheduleAttributes = {
   localArrivalTime: true,
   waypoint: true,
   createdAt: true,
+  plannedULDCount: true,
+  completedULDCount: true
 };
