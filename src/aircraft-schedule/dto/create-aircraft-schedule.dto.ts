@@ -16,6 +16,8 @@ export class CreateAircraftScheduleDto extends PickType(AircraftSchedule, [
   'departure',
   'destination',
   'done',
+  'plannedULDCount',
+  'completedULDCount',
 ]) {
   // @ApiProperty({
   //   example:

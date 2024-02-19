@@ -177,5 +177,5 @@ export const AircraftScheduleAttributes = {
   waypoint: true,
   createdAt: true,
   plannedULDCount: true,
-  completedULDCount: true
+  completedULDCount: true,
 };
