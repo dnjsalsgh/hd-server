@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -15,7 +14,7 @@ import { UpdateUldDto } from './dto/update-uld.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { Uld } from './entities/uld.entity';
-import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
+import { ManageUldCountDto } from './dto/manage-uld-count.dto';
 
 @Controller('uld')
 @ApiTags('[Uld]uld')
@@ -49,8 +48,8 @@ export class UldController {
       '[목표] 모바일에서 uld가 끝났다는 신호를 mqtt로 쏘기 위한 api 입니다.',
   })
   @Get('/complete')
-  complete() {
-    return this.uldService.complete();
+  complete(@Query() query: ManageUldCountDto) {
+    return this.uldService.complete(query);
   }
 
   @Get(':id')

@@ -20,11 +20,15 @@ import {
 import { UldSccInjectionDto } from './dto/uld-sccInjection.dto';
 import { UldSccJoin } from '../uld-scc-join/entities/uld-scc-join.entity';
 import { ClientProxy } from '@nestjs/microservices';
-import { AircraftScheduleAttributes } from '../aircraft-schedule/entities/aircraft-schedule.entity';
+import {
+  AircraftSchedule,
+  AircraftScheduleAttributes,
+} from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
 import { AwbAttribute } from '../awb/entities/awb.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import { ManageUldCountDto } from './dto/manage-uld-count.dto';
 
 @Injectable()
 export class UldService {
@@ -35,6 +39,8 @@ export class UldService {
     private readonly UldTypeRepository: Repository<UldType>,
     @InjectRepository(UldSccJoin)
     private readonly uldSccJoinRepository: Repository<UldSccJoin>,
+    @InjectRepository(AircraftSchedule)
+    private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 
@@ -123,7 +129,8 @@ export class UldService {
     return result;
   }
 
-  complete() {
+  complete(query: ManageUldCountDto) {
+    // this.aircraftScheduleRepository.findOne();
     this.client.send(`hyundai/work/complete`, { work: 'complete' }).subscribe();
   }
 
