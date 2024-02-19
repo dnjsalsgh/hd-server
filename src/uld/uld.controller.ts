@@ -47,6 +47,7 @@ export class UldController {
     description:
       '[목표] 모바일에서 uld가 끝났다는 신호를 mqtt로 쏘기 위한 api 입니다.',
   })
+  @ApiQuery({ name: 'AircraftScheduleId', required: false })
   @Get('/complete')
   complete(@Query() query: ManageUldCountDto) {
     return this.uldService.complete(query);

@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUldDto } from './dto/create-uld.dto';
 import { UpdateUldDto } from './dto/update-uld.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -129,9 +134,26 @@ export class UldService {
     return result;
   }
 
-  complete(query: ManageUldCountDto) {
-    // this.aircraftScheduleRepository.findOne();
+  async complete(query: ManageUldCountDto) {
     this.client.send(`hyundai/work/complete`, { work: 'complete' }).subscribe();
+
+    try {
+      const aircraftSchedule = await this.aircraftScheduleRepository.findOne({
+        where: { id: query.AircraftScheduleId },
+      });
+
+      if (!aircraftSchedule) {
+        throw new NotFoundException(`aircraftSchedule not found`);
+      }
+
+      const updatedCount = aircraftSchedule.completedULDCount + 1;
+
+      await this.aircraftScheduleRepository.update(aircraftSchedule.id, {
+        completedULDCount: updatedCount,
+      });
+    } catch (e) {
+      throw new NotFoundException(`${e}`);
+    }
   }
 
   update(id: number, updateUldDto: UpdateUldDto) {
