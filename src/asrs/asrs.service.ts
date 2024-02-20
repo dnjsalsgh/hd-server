@@ -201,6 +201,8 @@ export class AsrsService {
         continue;
       }
 
+      console.log('awbNo = ', awbNo);
+      console.log('separateNumber = ', separateNumber);
       if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
         await this.processInOut(
           unitNumber,
@@ -255,7 +257,7 @@ export class AsrsService {
     try {
       const awb = await this.findAwbByBarcode(awbNo, separateNumber);
       const inOutType = state === 'in' ? 'in' : 'out';
-      console.log('awb = ', awb, awbNo, separateNumber);
+
       if (!(awb && awb.id)) {
         throw new TypeORMError('awb 정보를 찾지 못했습니다.');
       }
@@ -274,6 +276,18 @@ export class AsrsService {
     inOutType: 'in' | 'out',
   ) {
     try {
+      const asrsState = await this.asrsHistoryRepository
+        .createQueryBuilder('ah')
+        .leftJoinAndSelect('ah.Asrs', 'Asrs')
+        .leftJoinAndSelect('ah.Awb', 'Awb')
+        .where('Asrs.id = :asrsId', { asrsId: asrsId })
+        .orderBy('ah.createdAt', 'DESC')
+        .getOne();
+
+      if (asrsState !== null && (asrsState?.Awb as Awb)?.id !== awbId) {
+        throw new NotFoundException('창고에 있는 화물과는 다른 화물입니다.');
+      }
+
       const asrsHistoryBody = {
         inOutType,
         count: 0,

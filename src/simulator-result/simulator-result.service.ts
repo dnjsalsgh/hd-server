@@ -561,7 +561,7 @@ export class SimulatorResultService {
   // 패키지 시뮬레이터의 결과로 [안착대 추천도] 반환하는 곳
   async getAWBinPalletRack(apiRequest: userSelectInput) {
     try {
-      const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
+      const mode = apiRequest.simulation || false; // 시뮬레이션, 커넥티드 분기
 
       // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
       const asrsStateArray = await this.asrsHistoryService.nowState();
