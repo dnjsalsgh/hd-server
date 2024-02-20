@@ -88,7 +88,7 @@ export class AmrService {
       };
 
       // amr의 에러code가 오면 그 에러 코드로 알람 발생
-      if (amrBody.errorCode !== '') {
+      if (amrBody.errorCode !== null && amrBody.errorCode !== '') {
         await this.alarmService.create({
           equipmentName: amrData?.AMRNM || amrBody.name,
           stopTime: new Date(),
