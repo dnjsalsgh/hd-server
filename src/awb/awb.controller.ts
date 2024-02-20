@@ -334,6 +334,7 @@ export class AwbController {
           alarmMessage: 'VMS 계측기 에러',
         });
       }
+      console.log('설비알람 체킹 in hyundai/vms1/eqData');
 
       // 3초 딜레이
       await this.delay(3000);

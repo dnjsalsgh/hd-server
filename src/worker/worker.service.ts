@@ -84,28 +84,4 @@ export class WorkerService {
       );
     }
   }
-
-  /**
-   * Amr에서 누락 vms 스케줄러
-   */
-  // @Interval(10000) // 6초
-  // async missingAWBInAmr() {
-  // if (this.configService.get<string>('VMS_VOLUME') !== 'true') {
-  //   return;
-  // }
-  // console.log('Amr에서 누락 vms 스케줄러 동작함');
-  // /**
-  //  * TODO: acs db확인하고
-  //  * barcode랑 sep_no를 추출하기
-  //  * 누락 화물 체크 로직에 태우기
-  //  */
-  // // acs db에서 barcode랑 sep_no를 추출하기
-  // const acsDB = await this.hacsRepository.find({});
-  // for (const missingAwb of missingAwbs) {
-  //   await this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
-  //     missingAwb.barcode,
-  //     missingAwb.separateNumber,
-  //   );
-  // }
-  // }
 }

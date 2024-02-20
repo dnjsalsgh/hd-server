@@ -159,6 +159,7 @@ export class AsrsController {
       await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
       console.log('skidPlatform 체킹');
       await this.asrsService.makeAlarmFromPlc(data);
+      console.log('설비알람 체킹 in hyundai/asrs1/eqData');
       // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
     }
   }
