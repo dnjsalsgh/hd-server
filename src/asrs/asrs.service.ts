@@ -405,12 +405,96 @@ export class AsrsService {
     }
   }
 
-  delayedPromiseFunction() {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        console.log('1초 후에 이 메시지가 출력되고, Promise가 해결됩니다.');
-        resolve('처리 완료'); // Promise를 해결하고 값을 반환
-      }, 1000);
+  // plc에서 들어온 데이터 중 에러 코드만 가지고 alarm 테이블에 저장하기
+  async makeAlarmFromPlc(body: CreateAsrsPlcDto) {
+    const CONV_01_01_P2A_Total_Error = body['CONV_01_01_P2A_Total_Error'];
+    const CONV_01_02_P2A_Total_Error = body['CONV_01_02_P2A_Total_Error'];
+    const CONV_01_03_P2A_Total_Error = body['CONV_01_03_P2A_Total_Error'];
+    const CONV_01_04_P2A_Total_Error = body['CONV_01_04_P2A_Total_Error'];
+
+    const CONV_02_01_P2A_Total_Error = body['CONV_02_01_P2A_Total_Error'];
+    const CONV_02_02_P2A_Total_Error = body['CONV_02_02_P2A_Total_Error'];
+    const CONV_02_03_P2A_Total_Error = body['CONV_02_03_P2A_Total_Error'];
+
+    const ASRS_01_01_P2A_Total_Error = body['ASRS_01_01_P2A_Total_Error'];
+
+    const Stacker_Total_Error = body['Stacker_Total_Error'];
+
+    const ASRS_02_01_P2A_Total_Error = body['ASRS_02_01_P2A_Total_Error'];
+
+    const SUPPLY_01_01_P2A_Total_Error = body['SUPPLY_01_01_P2A_Total_Error'];
+    const SUPPLY_01_02_P2A_Total_Error = body['SUPPLY_01_02_P2A_Total_Error'];
+    const SUPPLY_01_03_P2A_Total_Error = body['SUPPLY_01_03_P2A_Total_Error'];
+    const SUPPLY_01_04_P2A_Total_Error = body['SUPPLY_01_04_P2A_Total_Error'];
+
+    const RETURN_02_01_P2A_Total_Error = body['RETURN_02_01_P2A_Total_Error'];
+    const RETURN_02_02_P2A_Total_Error = body['RETURN_02_02_P2A_Total_Error'];
+    const RETURN_03_01_P2A_Total_Error = body['RETURN_03_01_P2A_Total_Error'];
+
+    if (CONV_01_01_P2A_Total_Error === 1)
+      await this.makeAlarm('진입 컨베이어_AMR 도킹', '진입 컨베이어_AMR 도킹');
+    if (CONV_01_02_P2A_Total_Error === 1)
+      await this.makeAlarm(
+        '버퍼디버팅 컨베이어(진입)',
+        '버퍼디버팅 컨베이어(진입)',
+      );
+    if (CONV_01_03_P2A_Total_Error === 1)
+      await this.makeAlarm('로딩 컨베이어', '로딩 컨베이어');
+
+    if (CONV_01_04_P2A_Total_Error === 1)
+      await this.makeAlarm(
+        '연결컨베이어(VMS진입전)',
+        '연결컨베이어(VMS진입전)',
+      );
+
+    if (CONV_02_01_P2A_Total_Error === 1)
+      await this.makeAlarm(
+        '연결컨베이어(VMS진출후)',
+        '연결컨베이어(VMS진출후)',
+      );
+    if (CONV_02_02_P2A_Total_Error === 1)
+      await this.makeAlarm(
+        '버퍼디버팅 컨베이어(진출)',
+        '버퍼디버팅 컨베이어(진출)',
+      );
+    if (CONV_02_03_P2A_Total_Error === 1)
+      await this.makeAlarm('진출 컨베이어_AMR도킹', '진출 컨베이어_AMR도킹');
+
+    if (ASRS_01_01_P2A_Total_Error === 1)
+      await this.makeAlarm('진입_AMR_도킹부', '진입_AMR_도킹부');
+
+    if (Stacker_Total_Error === 1)
+      await this.makeAlarm('스태커 크레인 종합이상', '스태커 크레인 종합이상');
+
+    if (ASRS_02_01_P2A_Total_Error === 1)
+      await this.makeAlarm('진출_AMR_도킹부', '진출_AMR_도킹부');
+
+    if (SUPPLY_01_01_P2A_Total_Error === 1)
+      await this.makeAlarm('안착대1 종합이상', '안착대1 종합이상');
+    if (SUPPLY_01_02_P2A_Total_Error === 1)
+      await this.makeAlarm('안착대2 종합이상', '안착대2 종합이상');
+    if (SUPPLY_01_03_P2A_Total_Error === 1)
+      await this.makeAlarm('안착대3 종합이상', '안착대3 종합이상');
+    if (SUPPLY_01_04_P2A_Total_Error === 1)
+      await this.makeAlarm('안착대4 종합이상', '안착대4 종합이상');
+
+    if (RETURN_02_01_P2A_Total_Error === 1)
+      await this.makeAlarm('반송포트1 종합이상', '반송포트1 종합이상');
+    if (RETURN_02_02_P2A_Total_Error === 1)
+      await this.makeAlarm('반송포트2 종합이상', '반송포트2 종합이상');
+    if (RETURN_03_01_P2A_Total_Error === 1)
+      await this.makeAlarm(
+        '반송대기장포트1 종합이상',
+        '반송대기장포트1 종합이상',
+      );
+  }
+
+  async makeAlarm(equipmentName: string, alarmMessage: string) {
+    await this.alarmService.create({
+      equipmentName: '진입 컨베이어_AMR 도킹',
+      stopTime: new Date(),
+      count: 1,
+      alarmMessage: '컨베이어 종합 이상',
     });
   }
 }

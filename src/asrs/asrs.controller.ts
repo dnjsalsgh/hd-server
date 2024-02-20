@@ -158,6 +158,7 @@ export class AsrsController {
       console.log('asrs 체킹');
       await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
       console.log('skidPlatform 체킹');
+      await this.asrsService.makeAlarmFromPlc(data);
       // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
     }
   }
