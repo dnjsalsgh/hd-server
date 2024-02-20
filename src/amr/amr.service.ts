@@ -95,6 +95,7 @@ export class AmrService {
           count: 1,
           alarmMessage: amrData?.ErrorInfo || amrBody.errorCode,
         });
+        console.log('설비알람 체킹 in amr');
       }
 
       const amrChargerBody: CreateAmrChargerDto = {
