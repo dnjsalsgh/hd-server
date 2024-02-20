@@ -491,10 +491,10 @@ export class AsrsService {
 
   async makeAlarm(equipmentName: string, alarmMessage: string) {
     await this.alarmService.create({
-      equipmentName: '진입 컨베이어_AMR 도킹',
+      equipmentName: equipmentName,
       stopTime: new Date(),
       count: 1,
-      alarmMessage: '컨베이어 종합 이상',
+      alarmMessage: alarmMessage,
     });
   }
 }
