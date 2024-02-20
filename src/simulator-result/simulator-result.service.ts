@@ -294,7 +294,7 @@ export class SimulatorResultService {
       SCCs: apiRequest.SCCs,
     };
 
-    if (!inputAWB.id && !inputAWB.name) {
+    if (!inputAWB.id) {
       throw new NotFoundException(
         `inputAWB 정보가 잘못되었습니다. id: ${inputAWB.id}, palletRackId: ${inputAWB.palletRackId}, name: ${inputAWB.name}, separateNumber: ${inputAWB.separateNumber}`,
       );
