@@ -127,7 +127,7 @@ export class AircraftScheduleService {
       order: orderByUtil(order),
       take: limit, // limit
       skip: offset, // offset
-      cache: 60000, // 1 minute caching
+      // cache: 60000, // 1 minute caching
     });
 
     this.client.send(`hyundai/aircraftSchedule/find`, result).subscribe();
