@@ -281,7 +281,7 @@ export class SimulatorResultService {
 
     // 사용자가 넣는 화물
     const inputAWB = {
-      id: apiRequest.id,
+      id: apiRequest.id || 0,
       palletRackId: apiRequest.palletRackId,
       name: apiRequest.barcode,
       separateNumber: apiRequest.separateNumber,
@@ -296,7 +296,7 @@ export class SimulatorResultService {
 
     if (inputAWB.id || inputAWB.name) {
       throw new NotFoundException(
-        `inputAWB 정보가 잘못되었습니다. ${inputAWB}`,
+        `inputAWB 정보가 잘못되었습니다. id: ${inputAWB.id}, palletRackId: ${inputAWB.palletRackId}, name: ${inputAWB.name}, separateNumber: ${inputAWB.separateNumber}`,
       );
     }
 
