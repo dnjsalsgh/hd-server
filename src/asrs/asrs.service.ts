@@ -28,6 +28,7 @@ import { RedisService } from '../redis/redis.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { AwbService } from '../awb/awb.service';
+import { AlarmService } from '../alarm/alarm.service';
 
 @Injectable()
 export class AsrsService {
@@ -41,6 +42,7 @@ export class AsrsService {
     private dataSource: DataSource,
     private redisService: RedisService,
     private readonly awbService: AwbService,
+    private readonly alarmService: AlarmService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
 

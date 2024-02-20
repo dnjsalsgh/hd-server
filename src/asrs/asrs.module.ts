@@ -26,6 +26,8 @@ import { FileService } from '../file/file.service';
 import { MqttService } from '../mqtt.service';
 import { AwbUtilService } from '../awb/awbUtil.service';
 import { SccService } from '../scc/scc.service';
+import { AlarmService } from '../alarm/alarm.service';
+import { Alarm } from '../alarm/entities/alarm.entity';
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { SccService } from '../scc/scc.service';
       Basic,
       AwbSccJoin,
       AircraftSchedule,
+      Alarm,
     ]),
     TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
     TypeOrmModule.forFeature([VmsAwbResult, VmsAwbHistory], 'dimoaDB'),
@@ -58,6 +61,7 @@ import { SccService } from '../scc/scc.service';
     AwbService,
     SccService,
     AwbUtilService,
+    AlarmService,
   ],
 })
 export class AsrsModule {}
