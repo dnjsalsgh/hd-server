@@ -294,6 +294,12 @@ export class SimulatorResultService {
       SCCs: apiRequest.SCCs,
     };
 
+    if (inputAWB.id || inputAWB.name) {
+      throw new NotFoundException(
+        `inputAWB 정보가 잘못되었습니다. ${inputAWB}`,
+      );
+    }
+
     const packageSimulatorCallRequestObject = {
       mode: false,
       Awbs: Awbs,
