@@ -22,6 +22,8 @@ import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platfo
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { RedisService } from '../redis/redis.service';
 import { redisCustomProvider } from '../redis/redisCustomProvider';
+import { AlarmService } from '../alarm/alarm.service';
+import { Alarm } from '../alarm/entities/alarm.entity';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { redisCustomProvider } from '../redis/redisCustomProvider';
       AsrsOutOrder,
       AircraftSchedule,
       SkidPlatformHistory,
+      Alarm,
     ]),
     TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
     TypeOrmModule.forFeature([VmsAwbResult, VmsAwbHistory], 'dimoaDB'),
@@ -50,6 +53,7 @@ import { redisCustomProvider } from '../redis/redisCustomProvider';
     SkidPlatformHistoryService,
     RedisService,
     ...redisCustomProvider,
+    AlarmService,
   ],
 })
 export class AwbModule {}

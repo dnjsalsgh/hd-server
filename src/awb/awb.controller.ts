@@ -43,6 +43,7 @@ import { AwbService } from './awb.service';
 import { ParseIdListPipe } from '../lib/pipe/parseIdList.pipe';
 import { AwbUtilService } from './awbUtil.service';
 import console from 'console';
+import { AlarmService } from '../alarm/alarm.service';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -56,6 +57,7 @@ export class AwbController {
     private readonly awbUtilService: AwbUtilService,
     private readonly fileService: FileService,
     private readonly configService: ConfigService,
+    private readonly alaramService: AlarmService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {
     // setInterval(() => this.processMessage(), this.processInterval);
@@ -309,6 +311,7 @@ export class AwbController {
     if (data && this.configService.get<string>('VMS_DATA') !== 'true') {
       return;
     }
+
     // 1초 딜레이로 부하 줄이기
     if (!this.invmsProcessing) {
       this.invmsProcessing = true; // 처리 시작 표시
@@ -316,6 +319,21 @@ export class AwbController {
       console.log('vms eqData 실행 스케줄러 동작');
       // 메시지 처리 로직
       await this.awbService.createAwbByPlcMqtt(data);
+
+      /**
+       * vms에서 오는 알람 처리를 위한 로직
+       * awbService에 로직 생성하려고 하면 주입 모듈 꼬여서 안넣어둠
+       */
+      const VMS_08_01_P2A_Total_Error = data['VMS_08_01_P2A_Total_Error'];
+
+      if (VMS_08_01_P2A_Total_Error === 1) {
+        await this.alaramService.create({
+          equipmentName: 'VMS 계측기 에러',
+          stopTime: new Date(),
+          count: 1,
+          alarmMessage: 'VMS 계측기 에러',
+        });
+      }
 
       // 3초 딜레이
       await this.delay(3000);
