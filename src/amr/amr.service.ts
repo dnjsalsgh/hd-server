@@ -7,26 +7,22 @@ import {
   Between,
   DataSource,
   FindOperator,
-  IsNull,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
   TypeORMError,
 } from 'typeorm';
-import { AmrRawDto } from './dto/amr-raw.dto';
 import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-history.entity';
 import { CreateAmrChargerDto } from '../amr-charger/dto/create-amr-charger.dto';
 import { CreateAmrChargeHistoryDto } from '../amr-charge-history/dto/create-amr-charge-history.dto';
-import { CreateTimeTableDto } from '../time-table/dto/create-time-table.dto';
-import { TimeTable } from '../time-table/entities/time-table.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { LoggerService } from '../lib/logger/logger.service';
-import { log } from 'console';
 import dayjs from 'dayjs';
+import { AlarmService } from '../alarm/alarm.service';
 
 @Injectable()
 export class AmrService {
@@ -41,6 +37,7 @@ export class AmrService {
     @InjectRepository(Hacs, 'amrDB')
     private readonly hacsRepository: Repository<Hacs>,
     private readonly loggerService: LoggerService,
+    private readonly alarmService: AlarmService,
   ) {}
 
   create(createAmrDto: CreateAmrDto) {
@@ -89,6 +86,16 @@ export class AmrService {
         simulation: true,
         // distinguish: amrData?.distinguish, // 인입용 인출용 구분
       };
+
+      // amr의 에러code가 오면 그 에러 코드로 알람 발생
+      if (amrBody.errorCode !== '') {
+        await this.alarmService.create({
+          equipmentName: amrData?.AMRNM || amrBody.name,
+          stopTime: new Date(),
+          count: 1,
+          alarmMessage: amrData?.ErrorInfo || amrBody.errorCode,
+        });
+      }
 
       const amrChargerBody: CreateAmrChargerDto = {
         name: amrData.Amrld.toString(),

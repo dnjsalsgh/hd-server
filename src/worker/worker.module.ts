@@ -36,6 +36,8 @@ import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platfo
 import { RedisService } from '../redis/redis.service';
 import { redisCustomProvider } from '../redis/redisCustomProvider';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
+import { Alarm } from '../alarm/entities/alarm.entity';
+import { AlarmService } from '../alarm/alarm.service';
 
 @Module({
   imports: [
@@ -97,6 +99,7 @@ import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
       AsrsOutOrder,
       AircraftSchedule,
       SkidPlatformHistory,
+      Alarm,
     ]),
     TypeOrmModule.forFeature([Vms3D, Vms2d], 'mssqlDB'),
     TypeOrmModule.forFeature([VmsAwbResult, VmsAwbHistory], 'dimoaDB'),
@@ -119,6 +122,7 @@ import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
     SkidPlatformHistoryService,
     RedisService,
     ...redisCustomProvider,
+    AlarmService,
   ],
 })
 export class WorkerModule {}

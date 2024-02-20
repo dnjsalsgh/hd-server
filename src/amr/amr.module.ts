@@ -8,10 +8,12 @@ import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-hist
 import { MqttModule } from '../mqtt.module';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { LoggerService } from '../lib/logger/logger.service';
+import { AlarmService } from '../alarm/alarm.service';
+import { Alarm } from '../alarm/entities/alarm.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Amr, AmrCharger, AmrChargeHistory]),
+    TypeOrmModule.forFeature([Amr, AmrCharger, AmrChargeHistory, Alarm]),
     TypeOrmModule.forFeature([Hacs], 'amrDB'),
     // mqtt 모듈설정
     MqttModule,
@@ -24,6 +26,7 @@ import { LoggerService } from '../lib/logger/logger.service';
       provide: 'SERVICE_NAME', // 여기에서 프로바이더 이름을 지정합니다.
       useValue: 'AmrService', // 원하는 값을 useValue로 지정합니다.
     },
+    AlarmService,
   ],
 })
 export class AmrModule {}
