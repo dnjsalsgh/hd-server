@@ -100,6 +100,56 @@ services:
       - mssql:mssql
     restart: always
 
+  simulation-server: # 시뮤레이션
+    container_name: simulation-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      SCHEDULE: 'false' # 도커에서 돌가는 amr스케줄 실행 조건
+      IF_ACTIVE: 'false' # 도커에서 돌가는 asrs 데이터 수집 실행 조건
+      LOCAL_SCHEDULE: 'false' # 로컬에서 돌아가는 nas 파일 업로드 실행조건
+      VMS_DATA: 'false' # 로컬에서 돌아가는 vms 체적 데이터 실행 옵션
+      VMS_VOLUME: 'false' #로컬에서 돌아가는 vms 누락 체적데이터 가져오기 옵션
+      LOGGING: 'false'
+      DATABASE_HOST: host.docker.internal # Use host.docker.internal to refer to the host machine's IP
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DATABASE_NAME: 'hd_test2'
+      REDIS_HOST: host.docker.internal
+      REDIS_PORT: ${REDIS_PORT}
+      MQTT_HOST: host.docker.internal
+      MQTT_PORT: ${MQTT_PORT}
+
+      DIMOA_DATABASE_HOST: ${DIMOA_DATABASE_HOST}
+      DIMOA_DATABASE_PORT: ${DIMOA_DATABASE_PORT}
+      DIMOA_DATABASE_USER: ${DIMOA_DATABASE_USER}
+      DIMOA_DATABASE_PASS: ${DIMOA_DATABASE_PASS}
+      DIMOA_DATABASE_NAME: ${DIMOA_DATABASE_NAME}
+      NAS_PATH: ${NAS_PATH}
+
+      AMR_DATABASE_HOST: ${AMR_DATABASE_HOST}
+      AMR_DATABASE_PORT: ${AMR_DATABASE_PORT}
+      AMR_DATABASE_USER: ${AMR_DATABASE_USER}
+      AMR_DATABASE_PASS: ${AMR_DATABASE_PASS}
+      AMR_DATABASE_NAME: ${AMR_DATABASE_NAME}
+      TZ: 'Asia/Seoul'
+    ports:
+      - '3003:3000'
+    volumes:
+      - logs-volume:/var/app/logs
+    networks:
+      - overlay
+    links:
+      - postgres:postgres
+      - mqtt:mqtt
+      - redis:redis
+      - mssql:mssql
+    restart: always
+
+
 networks:
   overlay:
 

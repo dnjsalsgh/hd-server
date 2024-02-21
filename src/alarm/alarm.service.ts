@@ -22,6 +22,7 @@ export class AlarmService {
     private readonly alarmRepository: Repository<Alarm>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {}
+
   async create(createAlarmDto: CreateAlarmDto) {
     const result = await this.alarmRepository.save(createAlarmDto);
     this.client
@@ -45,6 +46,7 @@ export class AlarmService {
 
     const findResult = await this.alarmRepository.find({
       where: {
+        equipmentName: query.equipmentName,
         createdAt: findDate,
       },
       order: orderByUtil(query.order),
