@@ -89,12 +89,20 @@ export class AmrService {
 
       // amr의 에러code가 오면 그 에러 코드로 알람 발생
       if (amrBody.errorCode !== null && amrBody.errorCode !== '') {
-        await this.alarmService.create({
-          equipmentName: amrData?.AMRNM || amrBody.name,
-          stopTime: new Date(),
-          count: 1,
-          alarmMessage: amrData?.ErrorInfo || amrBody.errorCode,
-        });
+        const previousAmrBody = await this.alarmService.getPreviousAlarmState(
+          amrData?.AMRNM,
+        );
+        if (previousAmrBody) {
+          await this.alarmService.changeAlarm(previousAmrBody);
+        } else {
+          await this.alarmService.create({
+            equipmentName: amrData?.AMRNM,
+            stopTime: new Date(),
+            count: 1,
+            alarmMessage: amrData?.ErrorInfo || amrBody.errorCode,
+          });
+        }
+
         console.log('설비알람 체킹 in amr');
       }
 

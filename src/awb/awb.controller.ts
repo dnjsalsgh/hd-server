@@ -57,7 +57,7 @@ export class AwbController {
     private readonly awbUtilService: AwbUtilService,
     private readonly fileService: FileService,
     private readonly configService: ConfigService,
-    private readonly alaramService: AlarmService,
+    private readonly alarmService: AlarmService,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
   ) {
     // setInterval(() => this.processMessage(), this.processInterval);
@@ -326,16 +326,16 @@ export class AwbController {
        */
       const VMS_08_01_P2A_Total_Error = data['VMS_08_01_P2A_Total_Error'];
       const previousVMS_08_01_P2A_Total_Error =
-        await this.alaramService.getPreviousAlarmState(
+        await this.alarmService.getPreviousAlarmState(
           'VMS_08_01_P2A_Total_Error',
         );
       if (VMS_08_01_P2A_Total_Error === 1) {
         if (previousVMS_08_01_P2A_Total_Error) {
-          await this.alaramService.changeAlarm(
+          await this.alarmService.changeAlarm(
             previousVMS_08_01_P2A_Total_Error,
           );
         } else {
-          await this.alaramService.create({
+          await this.alarmService.create({
             equipmentName: 'VMS 계측기 에러',
             stopTime: new Date(),
             count: 1,
