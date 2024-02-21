@@ -325,14 +325,23 @@ export class AwbController {
        * awbService에 로직 생성하려고 하면 주입 모듈 꼬여서 안넣어둠
        */
       const VMS_08_01_P2A_Total_Error = data['VMS_08_01_P2A_Total_Error'];
-
+      const previousVMS_08_01_P2A_Total_Error =
+        await this.alaramService.getPreviousAlarmState(
+          'VMS_08_01_P2A_Total_Error',
+        );
       if (VMS_08_01_P2A_Total_Error === 1) {
-        await this.alaramService.create({
-          equipmentName: 'VMS 계측기 에러',
-          stopTime: new Date(),
-          count: 1,
-          alarmMessage: 'VMS 계측기 에러',
-        });
+        if (previousVMS_08_01_P2A_Total_Error) {
+          await this.alaramService.changeAlarm(
+            previousVMS_08_01_P2A_Total_Error,
+          );
+        } else {
+          await this.alaramService.create({
+            equipmentName: 'VMS 계측기 에러',
+            stopTime: new Date(),
+            count: 1,
+            alarmMessage: 'VMS 계측기 에러',
+          });
+        }
       }
       console.log('설비알람 체킹 in hyundai/vms1/eqData');
 
