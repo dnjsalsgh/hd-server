@@ -284,7 +284,8 @@ export class AsrsService {
         .orderBy('ah.createdAt', 'DESC')
         .getOne();
 
-      if (asrsState !== null && (asrsState?.Awb as Awb)?.id !== awbId) {
+        // 창고에서 나갈 때 다른 화물이 들어오면 막기 처리
+      if (inOutType === 'out' && asrsState !== null && (asrsState?.Awb as Awb)?.id !== awbId) {
         throw new NotFoundException('창고에 있는 화물과는 다른 화물입니다.');
       }
 
