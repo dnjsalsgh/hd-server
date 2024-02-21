@@ -488,10 +488,13 @@ export class AsrsService {
       await this.getPreviousAlarmState('RETURN_03_01_P2A_Total_Error');
 
     if (CONV_01_01_P2A_Total_Error === 1)
-      await this.makeAlarm(
-        'CONV_01_01_P2A_Total_Error',
-        '진입 컨베이어_AMR 도킹',
-      );
+      if (previousCONV_01_01_P2A_Total_Error.done) {
+      }
+
+    await this.makeAlarm(
+      'CONV_01_01_P2A_Total_Error',
+      '진입 컨베이어_AMR 도킹',
+    );
     if (CONV_01_02_P2A_Total_Error === 1)
       await this.makeAlarm(
         'CONV_01_02_P2A_Total_Error',

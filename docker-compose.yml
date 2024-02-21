@@ -42,15 +42,15 @@ services:
       - overlay
     restart: always
 
-  simulation_mqtt:
-    image: eclipse-mosquitto:2.0
-    container_name: simulation_mqtt
-    ports:
-      - '1889:1883'
-    command: mosquitto -c /mosquitto-no-auth.conf
-    networks:
-      - overlay
-    restart: always
+#  simulation_mqtt:
+#    image: eclipse-mosquitto:2.0
+#    container_name: simulation_mqtt
+#    ports:
+#      - '1889:1883'
+#    command: mosquitto -c /mosquitto-no-auth.conf
+#    networks:
+#      - overlay
+#    restart: always
 
   redis:
     image: redis:latest
@@ -131,7 +131,7 @@ services:
       REDIS_HOST: host.docker.internal
       REDIS_PORT: ${REDIS_PORT}
       MQTT_HOST: host.docker.internal
-      MQTT_PORT: 1889
+      MQTT_PORT: ${MQTT_PORT}
 
       DIMOA_DATABASE_HOST: ${DIMOA_DATABASE_HOST}
       DIMOA_DATABASE_PORT: ${DIMOA_DATABASE_PORT}
