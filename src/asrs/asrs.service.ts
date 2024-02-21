@@ -30,6 +30,7 @@ import { take } from 'rxjs';
 import { AwbService } from '../awb/awb.service';
 import { AlarmService } from '../alarm/alarm.service';
 import { Alarm } from '../alarm/entities/alarm.entity';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class AsrsService {
@@ -287,8 +288,12 @@ export class AsrsService {
         .orderBy('ah.createdAt', 'DESC')
         .getOne();
 
-        // 창고에서 나갈 때 다른 화물이 들어오면 막기 처리
-      if (inOutType === 'out' && asrsState !== null && (asrsState?.Awb as Awb)?.id !== awbId) {
+      // 창고에서 나갈 때 다른 화물이 들어오면 막기 처리
+      if (
+        inOutType === 'out' &&
+        asrsState !== null &&
+        (asrsState?.Awb as Awb)?.id !== awbId
+      ) {
         throw new NotFoundException('창고에 있는 화물과는 다른 화물입니다.');
       }
 
@@ -488,77 +493,188 @@ export class AsrsService {
     const previousRETURN_03_01_P2A_Total_Error =
       await this.getPreviousAlarmState('RETURN_03_01_P2A_Total_Error');
 
-    if (CONV_01_01_P2A_Total_Error === 1)
-      if (previousCONV_01_01_P2A_Total_Error.done) {
+    if (CONV_01_01_P2A_Total_Error === 1) {
+      if (previousCONV_01_01_P2A_Total_Error) {
+        await this.changeAlarm(previousCONV_01_01_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'CONV_01_01_P2A_Total_Error',
+          '진입 컨베이어_AMR 도킹',
+        );
       }
+    }
+    if (CONV_01_02_P2A_Total_Error === 1) {
+      if (previousCONV_01_02_P2A_Total_Error) {
+        await this.changeAlarm(previousCONV_01_02_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'CONV_01_02_P2A_Total_Error',
+          '버퍼디버팅 컨베이어(진입)',
+        );
+      }
+    }
+    if (CONV_01_03_P2A_Total_Error === 1) {
+      if (previousCONV_01_03_P2A_Total_Error) {
+        await this.changeAlarm(previousCONV_01_03_P2A_Total_Error);
+      } else {
+        await this.makeAlarm('CONV_01_03_P2A_Total_Error', '로딩 컨베이어');
+      }
+    }
 
-    await this.makeAlarm(
-      'CONV_01_01_P2A_Total_Error',
-      '진입 컨베이어_AMR 도킹',
-    );
-    if (CONV_01_02_P2A_Total_Error === 1)
-      await this.makeAlarm(
-        'CONV_01_02_P2A_Total_Error',
-        '버퍼디버팅 컨베이어(진입)',
-      );
-    if (CONV_01_03_P2A_Total_Error === 1)
-      await this.makeAlarm('CONV_01_03_P2A_Total_Error', '로딩 컨베이어');
+    if (CONV_01_04_P2A_Total_Error === 1) {
+      if (previousCONV_01_04_P2A_Total_Error) {
+        await this.changeAlarm(previousCONV_01_04_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'CONV_01_04_P2A_Total_Error',
+          '연결컨베이어(VMS진입전)',
+        );
+      }
+    }
 
-    if (CONV_01_04_P2A_Total_Error === 1)
-      await this.makeAlarm(
-        'CONV_01_04_P2A_Total_Error',
-        '연결컨베이어(VMS진입전)',
-      );
+    if (CONV_02_01_P2A_Total_Error === 1) {
+      if (previousCONV_02_01_P2A_Total_Error) {
+        await this.changeAlarm(previousCONV_02_01_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'CONV_02_01_P2A_Total_Error',
+          '연결컨베이어(VMS진출후)',
+        );
+      }
+    }
 
-    if (CONV_02_01_P2A_Total_Error === 1)
-      await this.makeAlarm(
-        'CONV_02_01_P2A_Total_Error',
-        '연결컨베이어(VMS진출후)',
-      );
-    if (CONV_02_02_P2A_Total_Error === 1)
-      await this.makeAlarm(
-        'CONV_02_02_P2A_Total_Error',
-        '버퍼디버팅 컨베이어(진출)',
-      );
-    if (CONV_02_03_P2A_Total_Error === 1)
-      await this.makeAlarm(
-        'CONV_02_03_P2A_Total_Error',
-        '진출 컨베이어_AMR도킹',
-      );
+    if (CONV_02_02_P2A_Total_Error === 1) {
+      if (previousCONV_02_02_P2A_Total_Error) {
+        await this.changeAlarm(previousCONV_02_02_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'CONV_02_01_P2A_Total_Error',
+          '연결컨베이어(VMS진출후)',
+        );
+      }
+    }
 
-    if (ASRS_01_01_P2A_Total_Error === 1)
-      await this.makeAlarm('ASRS_01_01_P2A_Total_Error', '진입_AMR_도킹부');
+    if (CONV_02_03_P2A_Total_Error === 1) {
+      if (previousCONV_02_03_P2A_Total_Error) {
+        await this.changeAlarm(previousCONV_02_03_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'CONV_02_03_P2A_Total_Error',
+          '진출 컨베이어_AMR도킹',
+        );
+      }
+    }
 
-    if (Stacker_Total_Error === 1)
-      await this.makeAlarm('Stacker_Total_Error', '스태커 크레인 종합이상');
+    if (ASRS_01_01_P2A_Total_Error === 1) {
+      if (previousASRS_01_01_P2A_Total_Error) {
+        await this.changeAlarm(previousASRS_01_01_P2A_Total_Error);
+      } else {
+        await this.makeAlarm('ASRS_01_01_P2A_Total_Error', '진입_AMR_도킹부');
+      }
+    }
 
-    if (ASRS_02_01_P2A_Total_Error === 1)
-      await this.makeAlarm('ASRS_02_01_P2A_Total_Error', '진출_AMR_도킹부');
+    if (Stacker_Total_Error === 1) {
+      if (previousStacker_Total_Error) {
+        await this.changeAlarm(previousStacker_Total_Error);
+      } else {
+        await this.makeAlarm('Stacker_Total_Error', '스태커 크레인 종합이상');
+      }
+    }
 
-    if (SUPPLY_01_01_P2A_Total_Error === 1)
-      await this.makeAlarm('SUPPLY_01_01_P2A_Total_Error', '안착대1 종합이상');
-    if (SUPPLY_01_02_P2A_Total_Error === 1)
-      await this.makeAlarm('SUPPLY_01_02_P2A_Total_Error', '안착대2 종합이상');
-    if (SUPPLY_01_03_P2A_Total_Error === 1)
-      await this.makeAlarm('SUPPLY_01_03_P2A_Total_Error', '안착대3 종합이상');
-    if (SUPPLY_01_04_P2A_Total_Error === 1)
-      await this.makeAlarm('SUPPLY_01_04_P2A_Total_Error', '안착대4 종합이상');
+    if (ASRS_02_01_P2A_Total_Error === 1) {
+      if (previousASRS_02_01_P2A_Total_Error) {
+        await this.changeAlarm(previousASRS_02_01_P2A_Total_Error);
+      } else {
+        await this.makeAlarm('ASRS_02_01_P2A_Total_Error', '진출_AMR_도킹부');
+      }
+    }
 
-    if (RETURN_02_01_P2A_Total_Error === 1)
-      await this.makeAlarm(
-        'RETURN_02_01_P2A_Total_Error',
-        '반송포트1 종합이상',
-      );
-    if (RETURN_02_02_P2A_Total_Error === 1)
-      await this.makeAlarm(
-        'RETURN_02_02_P2A_Total_Error',
-        '반송포트2 종합이상',
-      );
-    if (RETURN_03_01_P2A_Total_Error === 1)
-      await this.makeAlarm(
-        'RETURN_03_01_P2A_Total_Error',
-        '반송대기장포트1 종합이상',
-      );
+    if (SUPPLY_01_01_P2A_Total_Error === 1) {
+      if (previousSUPPLY_01_01_P2A_Total_Error) {
+        await this.changeAlarm(previousSUPPLY_01_01_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'SUPPLY_01_01_P2A_Total_Error',
+          '안착대1 종합이상',
+        );
+      }
+    }
+
+    if (SUPPLY_01_02_P2A_Total_Error === 1) {
+      if (previousSUPPLY_01_02_P2A_Total_Error) {
+        await this.changeAlarm(previousSUPPLY_01_02_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'SUPPLY_01_02_P2A_Total_Error',
+          '안착대2 종합이상',
+        );
+      }
+    }
+    if (SUPPLY_01_03_P2A_Total_Error === 1) {
+      if (previousSUPPLY_01_03_P2A_Total_Error) {
+        await this.changeAlarm(previousSUPPLY_01_03_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'SUPPLY_01_03_P2A_Total_Error',
+          '안착대3 종합이상',
+        );
+      }
+    }
+
+    if (SUPPLY_01_04_P2A_Total_Error === 1) {
+      if (previousSUPPLY_01_04_P2A_Total_Error) {
+        await this.changeAlarm(previousSUPPLY_01_04_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'SUPPLY_01_04_P2A_Total_Error',
+          '안착대4 종합이상',
+        );
+      }
+    }
+
+    if (SUPPLY_01_04_P2A_Total_Error === 1) {
+      if (previousSUPPLY_01_04_P2A_Total_Error) {
+        await this.changeAlarm(previousSUPPLY_01_04_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'SUPPLY_01_04_P2A_Total_Error',
+          '안착대1 종합이상',
+        );
+      }
+    }
+
+    if (RETURN_02_01_P2A_Total_Error === 1) {
+      if (previousRETURN_02_01_P2A_Total_Error) {
+        await this.changeAlarm(previousRETURN_02_01_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'RETURN_02_01_P2A_Total_Error',
+          '반송포트1 종합이상',
+        );
+      }
+    }
+
+    if (RETURN_02_02_P2A_Total_Error === 1) {
+      if (previousRETURN_02_02_P2A_Total_Error) {
+        await this.changeAlarm(previousRETURN_02_02_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'RETURN_02_02_P2A_Total_Error',
+          '반송포트2 종합이상',
+        );
+      }
+    }
+
+    if (RETURN_03_01_P2A_Total_Error === 1) {
+      if (previousRETURN_03_01_P2A_Total_Error) {
+        await this.changeAlarm(previousRETURN_03_01_P2A_Total_Error);
+      } else {
+        await this.makeAlarm(
+          'RETURN_03_01_P2A_Total_Error',
+          '반송대기장포트1 종합이상',
+        );
+      }
+    }
   }
 
   async makeAlarm(equipmentName: string, alarmMessage: string) {
@@ -570,9 +686,18 @@ export class AsrsService {
     });
   }
 
+  async changeAlarm(alarm: Alarm) {
+    await this.alarmRepository.update(alarm.id, { count: alarm.count + 1 });
+  }
+
   async getPreviousAlarmState(equipmentName: string) {
+    // 오늘 날짜의 시작과 끝을 구하고, KST로 변환합니다 (UTC+9).
+    const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
+    const todayEnd = dayjs().endOf('day').add(9, 'hour').toDate();
+
     const [findResult] = await this.alarmRepository.find({
       where: {
+        createdAt: Between(todayStart, todayEnd),
         equipmentName: equipmentName,
       },
       order: orderByUtil(null),
