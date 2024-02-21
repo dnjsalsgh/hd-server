@@ -113,7 +113,7 @@ const amrConfig: TypeOrmModuleOptions = {
   password: process.env.AMR_DATABASE_PASS,
   database: process.env.AMR_DATABASE_NAME,
   entities: [Hacs],
-  synchronize: process.env.NODE_ENV === 'dev',
+  synchronize: false,
   options: { trustServerCertificate: true },
   logging: false,
 };

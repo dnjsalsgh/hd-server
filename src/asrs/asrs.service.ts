@@ -29,6 +29,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { AwbService } from '../awb/awb.service';
 import { AlarmService } from '../alarm/alarm.service';
+import { Alarm } from '../alarm/entities/alarm.entity';
 
 @Injectable()
 export class AsrsService {
@@ -39,6 +40,8 @@ export class AsrsService {
     private readonly asrsHistoryRepository: Repository<AsrsHistory>,
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
+    @InjectRepository(Alarm)
+    private readonly alarmRepository: Repository<Alarm>,
     private dataSource: DataSource,
     private redisService: RedisService,
     private readonly awbService: AwbService,
@@ -426,80 +429,134 @@ export class AsrsService {
     const CONV_01_02_P2A_Total_Error = body['CONV_01_02_P2A_Total_Error'];
     const CONV_01_03_P2A_Total_Error = body['CONV_01_03_P2A_Total_Error'];
     const CONV_01_04_P2A_Total_Error = body['CONV_01_04_P2A_Total_Error'];
-
     const CONV_02_01_P2A_Total_Error = body['CONV_02_01_P2A_Total_Error'];
     const CONV_02_02_P2A_Total_Error = body['CONV_02_02_P2A_Total_Error'];
     const CONV_02_03_P2A_Total_Error = body['CONV_02_03_P2A_Total_Error'];
-
     const ASRS_01_01_P2A_Total_Error = body['ASRS_01_01_P2A_Total_Error'];
-
     const Stacker_Total_Error = body['Stacker_Total_Error'];
-
     const ASRS_02_01_P2A_Total_Error = body['ASRS_02_01_P2A_Total_Error'];
-
     const SUPPLY_01_01_P2A_Total_Error = body['SUPPLY_01_01_P2A_Total_Error'];
     const SUPPLY_01_02_P2A_Total_Error = body['SUPPLY_01_02_P2A_Total_Error'];
     const SUPPLY_01_03_P2A_Total_Error = body['SUPPLY_01_03_P2A_Total_Error'];
     const SUPPLY_01_04_P2A_Total_Error = body['SUPPLY_01_04_P2A_Total_Error'];
-
     const RETURN_02_01_P2A_Total_Error = body['RETURN_02_01_P2A_Total_Error'];
     const RETURN_02_02_P2A_Total_Error = body['RETURN_02_02_P2A_Total_Error'];
     const RETURN_03_01_P2A_Total_Error = body['RETURN_03_01_P2A_Total_Error'];
 
+    const previousCONV_01_01_P2A_Total_Error = await this.getPreviousAlarmState(
+      'CONV_01_01_P2A_Total_Error',
+    );
+    const previousCONV_01_02_P2A_Total_Error = await this.getPreviousAlarmState(
+      'CONV_01_02_P2A_Total_Error',
+    );
+    const previousCONV_01_03_P2A_Total_Error = await this.getPreviousAlarmState(
+      'CONV_01_03_P2A_Total_Error',
+    );
+    const previousCONV_01_04_P2A_Total_Error = await this.getPreviousAlarmState(
+      'CONV_01_04_P2A_Total_Error',
+    );
+    const previousCONV_02_01_P2A_Total_Error = await this.getPreviousAlarmState(
+      'CONV_02_01_P2A_Total_Error',
+    );
+    const previousCONV_02_02_P2A_Total_Error = await this.getPreviousAlarmState(
+      'CONV_02_02_P2A_Total_Error',
+    );
+    const previousCONV_02_03_P2A_Total_Error = await this.getPreviousAlarmState(
+      'CONV_02_03_P2A_Total_Error',
+    );
+    const previousASRS_01_01_P2A_Total_Error = await this.getPreviousAlarmState(
+      'ASRS_01_01_P2A_Total_Error',
+    );
+    const previousStacker_Total_Error = await this.getPreviousAlarmState(
+      'Stacker_Total_Error',
+    );
+    const previousASRS_02_01_P2A_Total_Error = await this.getPreviousAlarmState(
+      'ASRS_02_01_P2A_Total_Error',
+    );
+    const previousSUPPLY_01_01_P2A_Total_Error =
+      await this.getPreviousAlarmState('SUPPLY_01_01_P2A_Total_Error');
+    const previousSUPPLY_01_02_P2A_Total_Error =
+      await this.getPreviousAlarmState('SUPPLY_01_02_P2A_Total_Error');
+    const previousSUPPLY_01_03_P2A_Total_Error =
+      await this.getPreviousAlarmState('SUPPLY_01_03_P2A_Total_Error');
+    const previousSUPPLY_01_04_P2A_Total_Error =
+      await this.getPreviousAlarmState('SUPPLY_01_04_P2A_Total_Error');
+    const previousRETURN_02_01_P2A_Total_Error =
+      await this.getPreviousAlarmState('RETURN_02_01_P2A_Total_Error');
+    const previousRETURN_02_02_P2A_Total_Error =
+      await this.getPreviousAlarmState('RETURN_02_02_P2A_Total_Error');
+    const previousRETURN_03_01_P2A_Total_Error =
+      await this.getPreviousAlarmState('RETURN_03_01_P2A_Total_Error');
+
     if (CONV_01_01_P2A_Total_Error === 1)
-      await this.makeAlarm('진입 컨베이어_AMR 도킹', '진입 컨베이어_AMR 도킹');
+      if (previousCONV_01_01_P2A_Total_Error.done) {
+      }
+
+    await this.makeAlarm(
+      'CONV_01_01_P2A_Total_Error',
+      '진입 컨베이어_AMR 도킹',
+    );
     if (CONV_01_02_P2A_Total_Error === 1)
       await this.makeAlarm(
-        '버퍼디버팅 컨베이어(진입)',
+        'CONV_01_02_P2A_Total_Error',
         '버퍼디버팅 컨베이어(진입)',
       );
     if (CONV_01_03_P2A_Total_Error === 1)
-      await this.makeAlarm('로딩 컨베이어', '로딩 컨베이어');
+      await this.makeAlarm('CONV_01_03_P2A_Total_Error', '로딩 컨베이어');
 
     if (CONV_01_04_P2A_Total_Error === 1)
       await this.makeAlarm(
-        '연결컨베이어(VMS진입전)',
+        'CONV_01_04_P2A_Total_Error',
         '연결컨베이어(VMS진입전)',
       );
 
     if (CONV_02_01_P2A_Total_Error === 1)
       await this.makeAlarm(
-        '연결컨베이어(VMS진출후)',
+        'CONV_02_01_P2A_Total_Error',
         '연결컨베이어(VMS진출후)',
       );
     if (CONV_02_02_P2A_Total_Error === 1)
       await this.makeAlarm(
-        '버퍼디버팅 컨베이어(진출)',
+        'CONV_02_02_P2A_Total_Error',
         '버퍼디버팅 컨베이어(진출)',
       );
     if (CONV_02_03_P2A_Total_Error === 1)
-      await this.makeAlarm('진출 컨베이어_AMR도킹', '진출 컨베이어_AMR도킹');
+      await this.makeAlarm(
+        'CONV_02_03_P2A_Total_Error',
+        '진출 컨베이어_AMR도킹',
+      );
 
     if (ASRS_01_01_P2A_Total_Error === 1)
-      await this.makeAlarm('진입_AMR_도킹부', '진입_AMR_도킹부');
+      await this.makeAlarm('ASRS_01_01_P2A_Total_Error', '진입_AMR_도킹부');
 
     if (Stacker_Total_Error === 1)
-      await this.makeAlarm('스태커 크레인 종합이상', '스태커 크레인 종합이상');
+      await this.makeAlarm('Stacker_Total_Error', '스태커 크레인 종합이상');
 
     if (ASRS_02_01_P2A_Total_Error === 1)
-      await this.makeAlarm('진출_AMR_도킹부', '진출_AMR_도킹부');
+      await this.makeAlarm('ASRS_02_01_P2A_Total_Error', '진출_AMR_도킹부');
 
     if (SUPPLY_01_01_P2A_Total_Error === 1)
-      await this.makeAlarm('안착대1 종합이상', '안착대1 종합이상');
+      await this.makeAlarm('SUPPLY_01_01_P2A_Total_Error', '안착대1 종합이상');
     if (SUPPLY_01_02_P2A_Total_Error === 1)
-      await this.makeAlarm('안착대2 종합이상', '안착대2 종합이상');
+      await this.makeAlarm('SUPPLY_01_02_P2A_Total_Error', '안착대2 종합이상');
     if (SUPPLY_01_03_P2A_Total_Error === 1)
-      await this.makeAlarm('안착대3 종합이상', '안착대3 종합이상');
+      await this.makeAlarm('SUPPLY_01_03_P2A_Total_Error', '안착대3 종합이상');
     if (SUPPLY_01_04_P2A_Total_Error === 1)
-      await this.makeAlarm('안착대4 종합이상', '안착대4 종합이상');
+      await this.makeAlarm('SUPPLY_01_04_P2A_Total_Error', '안착대4 종합이상');
 
     if (RETURN_02_01_P2A_Total_Error === 1)
-      await this.makeAlarm('반송포트1 종합이상', '반송포트1 종합이상');
+      await this.makeAlarm(
+        'RETURN_02_01_P2A_Total_Error',
+        '반송포트1 종합이상',
+      );
     if (RETURN_02_02_P2A_Total_Error === 1)
-      await this.makeAlarm('반송포트2 종합이상', '반송포트2 종합이상');
+      await this.makeAlarm(
+        'RETURN_02_02_P2A_Total_Error',
+        '반송포트2 종합이상',
+      );
     if (RETURN_03_01_P2A_Total_Error === 1)
       await this.makeAlarm(
-        '반송대기장포트1 종합이상',
+        'RETURN_03_01_P2A_Total_Error',
         '반송대기장포트1 종합이상',
       );
   }
@@ -511,5 +568,17 @@ export class AsrsService {
       count: 1,
       alarmMessage: alarmMessage,
     });
+  }
+
+  async getPreviousAlarmState(equipmentName: string) {
+    const [findResult] = await this.alarmRepository.find({
+      where: {
+        equipmentName: equipmentName,
+      },
+      order: orderByUtil(null),
+      take: 1,
+    });
+
+    return findResult;
   }
 }

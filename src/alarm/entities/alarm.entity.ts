@@ -48,6 +48,13 @@ export class Alarm {
   @Column({ type: 'text', nullable: true })
   alarmMessage: string;
 
+  @ApiProperty({
+    example: false,
+    description: '에러처리 완료여부',
+  })
+  @Column({ type: 'boolean', nullable: true, default: false })
+  done: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
