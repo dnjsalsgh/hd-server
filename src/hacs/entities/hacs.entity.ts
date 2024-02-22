@@ -175,6 +175,13 @@ export class Hacs {
   public JobId: number;
 
   @ApiProperty({
+    example: 1,
+    description: '수행중인 string',
+  })
+  @Column({ name: 'MISSIONNM', nullable: true })
+  public JobNm: string;
+
+  @ApiProperty({
     example: 50,
     description: '미션 진척율',
   })

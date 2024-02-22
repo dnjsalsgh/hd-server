@@ -206,16 +206,16 @@ export class AmrRawDto {
   //   description: '수행중인 미션 그룹번호',
   // })
   // public GroupNo: number;
-  // @ApiProperty({
-  //   example: 1,
-  //   description: '수행중인 미션번호',
-  // })
-  // public MissionNo: number;
-  // @ApiProperty({
-  //   example: 1,
-  //   description: '수행중인 미션번호',
-  // })
-  // public Missionld: number;
+  @ApiProperty({
+    example: 1,
+    description: '수행중인 미션번호',
+  })
+  public MissionNo: number;
+  @ApiProperty({
+    example: 1,
+    description: '수행중인 미션번호',
+  })
+  public Missionld: number;
   @ApiProperty({
     example: 1,
     description: '수행중인 작업번호',

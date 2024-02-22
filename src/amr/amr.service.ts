@@ -85,6 +85,8 @@ export class AmrService {
         // lastBatteryLevel: amrData.LastBatteryLevel,
         simulation: true,
         // distinguish: amrData?.distinguish, // 인입용 인출용 구분
+        MissionNo: amrData?.JobNm,
+        Missionld: amrData?.JobId,
       };
 
       // amr의 에러code가 오면 그 에러 코드로 알람 발생

@@ -33,6 +33,18 @@ export class Amr {
   @Column({ nullable: true, default: false }) // 이전 배터리 충전량과 비교해서 충전여부 판단하기 때문에 처음에 생기면 무조건 false
   charging: boolean;
 
+  @ApiProperty({
+    example: 1,
+    description: '수행중인 미션번호',
+  })
+  public MissionNo: string;
+
+  @ApiProperty({
+    example: 1,
+    description: '수행중인 미션번호',
+  })
+  public Missionld: number;
+
   // @ApiProperty({
   //   example: 1,
   //   description: '공정 코드',
