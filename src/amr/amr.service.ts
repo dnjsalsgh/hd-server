@@ -90,17 +90,21 @@ export class AmrService {
       };
 
       // amr의 에러code가 오면 그 에러 코드로 알람 발생
-      const previousAlarmBody = await this.alarmService.getPreviousAlarmState(
+      const previousAmrBody = await this.alarmService.getPreviousAlarmState(
         amrData?.AMRNM,
       );
-      if (previousAlarmBody) {
-        await this.alarmService.changeAlarm(previousAlarmBody);
-      } else if (amrBody.errorCode !== null && amrBody.errorCode !== '') {
+      if (
+        previousAmrBody &&
+        amrBody.errorCode !== null &&
+        amrBody.errorCode == previousAmrBody.alarmMessage
+      ) {
+        await this.alarmService.changeAlarm(previousAmrBody);
+      } else if (amrBody.errorCode !== null) {
         await this.alarmService.create({
           equipmentName: amrData?.AMRNM,
           stopTime: new Date(),
           count: 1,
-          alarmMessage: amrData?.ErrorInfo || amrBody.errorCode,
+          alarmMessage: amrBody.errorCode,
         });
       }
       console.log('설비알람 체킹 in amr');
