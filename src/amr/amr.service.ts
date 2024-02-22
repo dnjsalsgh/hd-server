@@ -93,9 +93,9 @@ export class AmrService {
       const previousAmrBody = await this.alarmService.getPreviousAlarmState(
         amrData?.AMRNM,
       );
-      if (previousAmrBody) {
+      if (previousAmrBody && amrBody.errorCode !== null) {
         await this.alarmService.changeAlarm(previousAmrBody);
-      } else if (amrBody.errorCode !== null || amrBody.errorCode !== '') {
+      } else if (amrBody.errorCode !== null) {
         await this.alarmService.create({
           equipmentName: amrData?.AMRNM,
           stopTime: new Date(),
