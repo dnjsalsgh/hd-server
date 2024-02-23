@@ -23,11 +23,8 @@ import { Hacs } from '../hacs/entities/hacs.entity';
 import { LoggerService } from '../lib/logger/logger.service';
 import dayjs from 'dayjs';
 import { AlarmService } from '../alarm/alarm.service';
-<<<<<<< HEAD
-import { log } from 'console';
-=======
 import { amrErrorData } from '../worker/amrErrorData';
->>>>>>> 46521006270094a5da0e6b7427c5fc85b8c6fff0
+
 
 @Injectable()
 export class AmrService {

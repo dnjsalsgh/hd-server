@@ -208,8 +208,8 @@ export class AsrsService {
         if (asrsHistory && asrsHistory.inOutType === 'in') {
           await this.processInOut(
             unitNumber,
-            body[awbNo],
-            body[separateNumber],
+            (asrsHistory.Awb as Awb).barcode,
+            (asrsHistory.Awb as Awb).separateNumber,
             'out',
           );
         }
