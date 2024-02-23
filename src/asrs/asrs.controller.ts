@@ -35,6 +35,7 @@ export class AsrsController {
   private messageQueue = [];
   private readonly processInterval = 1500; // 처리 간격을 1500ms (1.5초)로 설정
   private processing = false;
+
   constructor(
     private readonly asrsService: AsrsService,
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
@@ -142,9 +143,9 @@ export class AsrsController {
 
         // 메시지 처리 로직
         await this.asrsService.checkAwb(data);
-        console.log(
-          'asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드 동작함',
-        );
+        // console.log(
+        //   'asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드 동작함',
+        // );
 
         // 3초 딜레이
         await this.delay(3000);
@@ -155,15 +156,16 @@ export class AsrsController {
 
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
       await this.asrsService.checkAsrsChange(data);
-      console.log('asrs 체킹');
+      // console.log('asrs 체킹');
       await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
-      console.log('skidPlatform 체킹');
+      // console.log('skidPlatform 체킹');
       await this.asrsService.makeAlarmFromPlc(data);
-      console.log('설비알람 체킹 in hyundai/asrs1/eqData');
+      // console.log('설비알람 체킹 in hyundai/asrs1/eqData');
       // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
     }
   }
 }
+
 // 메시지를 큐에 추가
 // this.messageQueue.push(data);
 //

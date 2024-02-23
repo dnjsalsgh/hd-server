@@ -202,6 +202,18 @@ export class AsrsService {
 
       // 빈 바코드 있을 때 다음걸로 넘어가기
       if (body[awbNo] === '') {
+        // 이전의 상태가 in이고
+        // 현재 빈 바코드 있을 때 out 처리
+        const asrsHistory = await this.getAsrsIn(unitNumber);
+        if (asrsHistory && asrsHistory.inOutType === 'in') {
+          await this.processInOut(
+            unitNumber,
+            body[awbNo],
+            body[separateNumber],
+            'out',
+          );
+        }
+
         continue;
       }
 
@@ -280,13 +292,7 @@ export class AsrsService {
     inOutType: 'in' | 'out',
   ) {
     try {
-      const asrsState = await this.asrsHistoryRepository
-        .createQueryBuilder('ah')
-        .leftJoinAndSelect('ah.Asrs', 'Asrs')
-        .leftJoinAndSelect('ah.Awb', 'Awb')
-        .where('Asrs.id = :asrsId', { asrsId: asrsId })
-        .orderBy('ah.createdAt', 'DESC')
-        .getOne();
+      const asrsState = await this.getAsrsIn(asrsId);
 
       // 창고에서 나갈 때 다른 화물이 들어오면 막기 처리
       if (
@@ -326,6 +332,17 @@ export class AsrsService {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  private async getAsrsIn(asrsId: number) {
+    const asrsState = await this.asrsHistoryRepository
+      .createQueryBuilder('ah')
+      .leftJoinAndSelect('ah.Asrs', 'Asrs')
+      .leftJoinAndSelect('ah.Awb', 'Awb')
+      .where('Asrs.id = :asrsId', { asrsId: asrsId })
+      .orderBy('ah.createdAt', 'DESC')
+      .getOne();
+    return asrsState;
   }
 
   // redis를 편하게 쓰기 위해 쓰는 함수

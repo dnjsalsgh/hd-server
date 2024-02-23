@@ -23,7 +23,11 @@ import { Hacs } from '../hacs/entities/hacs.entity';
 import { LoggerService } from '../lib/logger/logger.service';
 import dayjs from 'dayjs';
 import { AlarmService } from '../alarm/alarm.service';
+<<<<<<< HEAD
 import { log } from 'console';
+=======
+import { amrErrorData } from '../worker/amrErrorData';
+>>>>>>> 46521006270094a5da0e6b7427c5fc85b8c6fff0
 
 @Injectable()
 export class AmrService {
@@ -95,14 +99,18 @@ export class AmrService {
         amrData?.AMRNM,
       );
       
-      if (previousAmrBody && amrData?.ErrorCode !== null) {
+      if (
+        previousAmrBody &&
+        amrBody.errorCode !== null &&
+        amrBody.errorCode == previousAmrBody.alarmMessage
+      ) {
         await this.alarmService.changeAlarm(previousAmrBody);
       } else if (amrData?.ErrorCode !== null) {
         await this.alarmService.create({
           equipmentName: amrData?.AMRNM,
           stopTime: new Date(),
           count: 1,
-          alarmMessage: amrData?.ErrorInfo || amrBody.errorCode,
+          alarmMessage: amrErrorData[amrBody.errorCode],
         });
       }
 

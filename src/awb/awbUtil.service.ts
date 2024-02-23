@@ -5,7 +5,7 @@ import { CreateAwbDto } from './dto/create-awb.dto';
 import { Awb } from './entities/awb.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
-import { DataSource, In, Repository, TypeORMError } from 'typeorm';
+import { Between, DataSource, In, Repository, TypeORMError } from 'typeorm';
 import { FileService } from '../file/file.service';
 import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
@@ -15,6 +15,7 @@ import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entit
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { RedisService } from '../redis/redis.service';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class AwbUtilService {
@@ -177,8 +178,11 @@ export class AwbUtilService {
   }
 
   async findSchedule(code: string): Promise<AircraftSchedule> {
+    const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
+    const todayEnd = dayjs().endOf('day').add(9, 'hour').toDate();
+
     const [aircraftSchedule] = await this.aircraftScheduleRepository.find({
-      where: { code: code },
+      where: { code: code, createdAt: Between(todayStart, todayEnd) },
       order: orderByUtil(null),
       take: 1,
     });
