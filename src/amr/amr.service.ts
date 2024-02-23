@@ -23,6 +23,7 @@ import { Hacs } from '../hacs/entities/hacs.entity';
 import { LoggerService } from '../lib/logger/logger.service';
 import dayjs from 'dayjs';
 import { AlarmService } from '../alarm/alarm.service';
+import { amrErrorData } from '../worker/amrErrorData';
 
 @Injectable()
 export class AmrService {
@@ -104,7 +105,7 @@ export class AmrService {
           equipmentName: amrData?.AMRNM,
           stopTime: new Date(),
           count: 1,
-          alarmMessage: amrBody.errorCode,
+          alarmMessage: amrErrorData[amrBody.errorCode],
         });
       }
       console.log('설비알람 체킹 in amr');
