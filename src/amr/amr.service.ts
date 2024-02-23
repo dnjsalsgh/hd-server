@@ -23,6 +23,7 @@ import { Hacs } from '../hacs/entities/hacs.entity';
 import { LoggerService } from '../lib/logger/logger.service';
 import dayjs from 'dayjs';
 import { AlarmService } from '../alarm/alarm.service';
+import { log } from 'console';
 
 @Injectable()
 export class AmrService {
@@ -93,9 +94,10 @@ export class AmrService {
       const previousAmrBody = await this.alarmService.getPreviousAlarmState(
         amrData?.AMRNM,
       );
-      if (previousAmrBody && amrBody.errorCode !== null) {
+      
+      if (previousAmrBody && amrData?.ErrorCode !== null) {
         await this.alarmService.changeAlarm(previousAmrBody);
-      } else if (amrBody.errorCode !== null) {
+      } else if (amrData?.ErrorCode !== null) {
         await this.alarmService.create({
           equipmentName: amrData?.AMRNM,
           stopTime: new Date(),
@@ -103,7 +105,6 @@ export class AmrService {
           alarmMessage: amrData?.ErrorInfo || amrBody.errorCode,
         });
       }
-      console.log('설비알람 체킹 in amr');
 
       const amrChargerBody: CreateAmrChargerDto = {
         name: amrData.Amrld.toString(),
