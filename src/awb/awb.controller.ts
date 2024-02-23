@@ -316,7 +316,7 @@ export class AwbController {
     if (!this.invmsProcessing) {
       this.invmsProcessing = true; // 처리 시작 표시
 
-      console.log('vms eqData 실행 스케줄러 동작');
+      // console.log('vms eqData 실행 스케줄러 동작');
       // 메시지 처리 로직
       await this.awbService.createAwbByPlcMqtt(data);
 
@@ -343,7 +343,7 @@ export class AwbController {
           });
         }
       }
-      console.log('설비알람 체킹 in hyundai/vms1/eqData');
+      // console.log('설비알람 체킹 in hyundai/vms1/eqData');
 
       // 3초 딜레이
       await this.delay(3000);

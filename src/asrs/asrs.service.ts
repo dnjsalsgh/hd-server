@@ -205,8 +205,8 @@ export class AsrsService {
         continue;
       }
 
-      console.log('awbNo = ', awbNo);
-      console.log('separateNumber = ', separateNumber);
+      // console.log('awbNo = ', awbNo);
+      // console.log('separateNumber = ', separateNumber);
       if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
         await this.processInOut(
           unitNumber,
