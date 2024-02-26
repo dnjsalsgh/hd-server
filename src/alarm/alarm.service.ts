@@ -86,6 +86,21 @@ export class AlarmService {
     }
   }
 
+  async makeAlarm(equipmentName: string, alarmMessage: string) {
+    await this.create({
+      equipmentName: equipmentName,
+      stopTime: new Date(),
+      count: 1,
+      alarmMessage: alarmMessage,
+    });
+  }
+
+  async changeAlarmIsDone(alarm: Alarm, done: boolean) {
+    await this.alarmRepository.update(alarm.id, {
+      done: done,
+    });
+  }
+
   async getPreviousAlarmState(equipmentName: string) {
     // 오늘 날짜의 시작과 끝을 구하고, KST로 변환합니다 (UTC+9).
     const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
