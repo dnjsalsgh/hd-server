@@ -94,21 +94,20 @@ export class AmrService {
       const previousAmrBody = await this.alarmService.getPreviousAlarmState(
         amrData?.AMRNM,
       );
-      if (
-        previousAmrBody &&
-        amrBody.errorCode !== null &&
-        amrBody.errorCode == previousAmrBody.alarmMessage
-      ) {
-        await this.alarmService.changeAlarm(previousAmrBody);
-      } else if (amrBody.errorCode !== null) {
+
+      if (previousAmrBody && amrData?.ErrorCode !== null) {
+        await this.alarmService.changeAlarm(
+          previousAmrBody,
+          amrErrorData[amrData?.ErrorCode] !== previousAmrBody.alarmMessage,
+        );
+      } else if (amrData?.ErrorCode !== null) {
         await this.alarmService.create({
           equipmentName: amrData?.AMRNM,
           stopTime: new Date(),
           count: 1,
-          alarmMessage: amrErrorData[amrBody.errorCode],
+          alarmMessage: amrErrorData[amrData?.ErrorCode],
         });
       }
-      // console.log('설비알람 체킹 in amr');
 
       const amrChargerBody: CreateAmrChargerDto = {
         name: amrData.Amrld.toString(),
