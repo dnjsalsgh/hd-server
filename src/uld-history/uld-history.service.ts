@@ -54,7 +54,7 @@ export class UldHistoryService {
       if (savedHistory && createUldHistoryDto.Awb) {
         await this.injectScc(createUldHistoryDto);
         // uld 안에 들어갈 때 state inuld로 변경
-        await this.awbRepository.update((createUldHistoryDto.Awb as Awb).id, {
+        await this.awbRepository.update(createUldHistoryDto.Awb as number, {
           state: 'inuld',
         });
       }
