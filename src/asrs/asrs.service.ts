@@ -524,6 +524,7 @@ export class AsrsService {
         );
       }
     }
+
     if (CONV_01_02_P2A_Total_Error === 1) {
       if (previousCONV_01_02_P2A_Total_Error) {
         await this.changeAlarm(
@@ -584,8 +585,8 @@ export class AsrsService {
         );
       } else {
         await this.makeAlarm(
-          'CONV_02_01_P2A_Total_Error',
-          '연결컨베이어(VMS진출후)',
+          'CONV_02_02_P2A_Total_Error',
+          '버퍼디버팅 컨베이어(진출)',
         );
       }
     }
