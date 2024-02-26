@@ -96,16 +96,12 @@ export class AmrService {
         amrData?.AMRNM,
       );
       
-      if (
-        previousAmrBody && amrErrorData[amrData?.ErrorCode] === previousAmrBody.alarmMessage
-      ) {
-        continue;
-      }else if(
+      if(
         previousAmrBody &&
         amrData?.ErrorCode !== null &&
         amrErrorData[amrData?.ErrorCode] === previousAmrBody.alarmMessage
         ){
-        await this.alarmService.changeAlarm(previousAmrBody);
+        await this.alarmService.changeAlarm(previousAmrBody, true);
       } 
       else if (amrData?.ErrorCode !== null) {
         await this.alarmService.create({
