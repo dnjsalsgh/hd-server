@@ -448,290 +448,68 @@ export class AsrsService {
   // plc에서 들어온 데이터 중 에러 코드만 가지고 alarm 테이블에 저장하기
   // TODO: 리팩토링 하기
   async makeAlarmFromPlc(body: CreateAsrsPlcDto) {
-    const CONV_01_01_P2A_Total_Error = body['CONV_01_01_P2A_Total_Error'];
-    const CONV_01_02_P2A_Total_Error = body['CONV_01_02_P2A_Total_Error'];
-    const CONV_01_03_P2A_Total_Error = body['CONV_01_03_P2A_Total_Error'];
-    const CONV_01_04_P2A_Total_Error = body['CONV_01_04_P2A_Total_Error'];
-    const CONV_02_01_P2A_Total_Error = body['CONV_02_01_P2A_Total_Error'];
-    const CONV_02_02_P2A_Total_Error = body['CONV_02_02_P2A_Total_Error'];
-    const CONV_02_03_P2A_Total_Error = body['CONV_02_03_P2A_Total_Error'];
-    const ASRS_01_01_P2A_Total_Error = body['ASRS_01_01_P2A_Total_Error'];
-    const Stacker_Total_Error = body['Stacker_Total_Error'];
-    const ASRS_02_01_P2A_Total_Error = body['ASRS_02_01_P2A_Total_Error'];
-    const SUPPLY_01_01_P2A_Total_Error = body['SUPPLY_01_01_P2A_Total_Error'];
-    const SUPPLY_01_02_P2A_Total_Error = body['SUPPLY_01_02_P2A_Total_Error'];
-    const SUPPLY_01_03_P2A_Total_Error = body['SUPPLY_01_03_P2A_Total_Error'];
-    const SUPPLY_01_04_P2A_Total_Error = body['SUPPLY_01_04_P2A_Total_Error'];
-    const RETURN_02_01_P2A_Total_Error = body['RETURN_02_01_P2A_Total_Error'];
-    const RETURN_02_02_P2A_Total_Error = body['RETURN_02_02_P2A_Total_Error'];
-    const RETURN_03_01_P2A_Total_Error = body['RETURN_03_01_P2A_Total_Error'];
-
-    const previousCONV_01_01_P2A_Total_Error = await this.getPreviousAlarmState(
+    const facilityArray = [
       'CONV_01_01_P2A_Total_Error',
-    );
-    const previousCONV_01_02_P2A_Total_Error = await this.getPreviousAlarmState(
       'CONV_01_02_P2A_Total_Error',
-    );
-    const previousCONV_01_03_P2A_Total_Error = await this.getPreviousAlarmState(
       'CONV_01_03_P2A_Total_Error',
-    );
-    const previousCONV_01_04_P2A_Total_Error = await this.getPreviousAlarmState(
       'CONV_01_04_P2A_Total_Error',
-    );
-    const previousCONV_02_01_P2A_Total_Error = await this.getPreviousAlarmState(
       'CONV_02_01_P2A_Total_Error',
-    );
-    const previousCONV_02_02_P2A_Total_Error = await this.getPreviousAlarmState(
       'CONV_02_02_P2A_Total_Error',
-    );
-    const previousCONV_02_03_P2A_Total_Error = await this.getPreviousAlarmState(
       'CONV_02_03_P2A_Total_Error',
-    );
-    const previousASRS_01_01_P2A_Total_Error = await this.getPreviousAlarmState(
       'ASRS_01_01_P2A_Total_Error',
-    );
-    const previousStacker_Total_Error = await this.getPreviousAlarmState(
       'Stacker_Total_Error',
-    );
-    const previousASRS_02_01_P2A_Total_Error = await this.getPreviousAlarmState(
       'ASRS_02_01_P2A_Total_Error',
-    );
-    const previousSUPPLY_01_01_P2A_Total_Error =
-      await this.getPreviousAlarmState('SUPPLY_01_01_P2A_Total_Error');
-    const previousSUPPLY_01_02_P2A_Total_Error =
-      await this.getPreviousAlarmState('SUPPLY_01_02_P2A_Total_Error');
-    const previousSUPPLY_01_03_P2A_Total_Error =
-      await this.getPreviousAlarmState('SUPPLY_01_03_P2A_Total_Error');
-    const previousSUPPLY_01_04_P2A_Total_Error =
-      await this.getPreviousAlarmState('SUPPLY_01_04_P2A_Total_Error');
-    const previousRETURN_02_01_P2A_Total_Error =
-      await this.getPreviousAlarmState('RETURN_02_01_P2A_Total_Error');
-    const previousRETURN_02_02_P2A_Total_Error =
-      await this.getPreviousAlarmState('RETURN_02_02_P2A_Total_Error');
-    const previousRETURN_03_01_P2A_Total_Error =
-      await this.getPreviousAlarmState('RETURN_03_01_P2A_Total_Error');
+      'SUPPLY_01_01_P2A_Total_Error',
+      'SUPPLY_01_02_P2A_Total_Error',
+      'SUPPLY_01_03_P2A_Total_Error',
+      'SUPPLY_01_04_P2A_Total_Error',
+      'RETURN_02_01_P2A_Total_Error',
+      'RETURN_02_02_P2A_Total_Error',
+      'RETURN_03_01_P2A_Total_Error',
+    ];
 
-    if (CONV_01_01_P2A_Total_Error === 1) {
-      if (previousCONV_01_01_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousCONV_01_01_P2A_Total_Error,
-          previousCONV_01_01_P2A_Total_Error !== CONV_01_01_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'CONV_01_01_P2A_Total_Error',
-          '진입 컨베이어_AMR 도킹',
-        );
-      }
-    }
+    const messageArray = [
+      '진입 컨베이어_AMR 도킹',
+      '버퍼디버팅 컨베이어(진입)',
+      '로딩 컨베이어',
+      '연결컨베이어(VMS진입전)',
+      '연결컨베이어(VMS진출후)',
+      '버퍼디버팅 컨베이어(진출)',
+      '진출 컨베이어_AMR도킹',
+      '진입_AMR_도킹부',
+      '스태커 크레인 종합이상',
+      '진출_AMR_도킹부',
+      '안착대1 종합이상',
+      '안착대2 종합이상',
+      '안착대3 종합이상',
+      '안착대4 종합이상',
+      '반송포트1 종합이상',
+      '반송포트2 종합이상',
+      '반송대기장포트1 종합이상',
+    ];
 
-    if (CONV_01_02_P2A_Total_Error === 1) {
-      if (previousCONV_01_02_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousCONV_01_02_P2A_Total_Error,
-          previousCONV_01_02_P2A_Total_Error !== CONV_01_02_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'CONV_01_02_P2A_Total_Error',
-          '버퍼디버팅 컨베이어(진입)',
-        );
-      }
-    }
-    if (CONV_01_03_P2A_Total_Error === 1) {
-      if (previousCONV_01_03_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousCONV_01_03_P2A_Total_Error,
-          previousCONV_01_03_P2A_Total_Error !== CONV_01_03_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm('CONV_01_03_P2A_Total_Error', '로딩 컨베이어');
-      }
-    }
+    for (let i = 0; i < facilityArray.length; i++) {
+      const facility = facilityArray[i];
+      const totalError = body[facility];
+      const previousTotalError = await this.getPreviousAlarmState(facility);
 
-    if (CONV_01_04_P2A_Total_Error === 1) {
-      if (previousCONV_01_04_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousCONV_01_04_P2A_Total_Error,
-          previousCONV_01_04_P2A_Total_Error !== CONV_01_04_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'CONV_01_04_P2A_Total_Error',
-          '연결컨베이어(VMS진입전)',
-        );
-      }
-    }
+      const message = messageArray[i];
 
-    if (CONV_02_01_P2A_Total_Error === 1) {
-      if (previousCONV_02_01_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousCONV_02_01_P2A_Total_Error,
-          previousCONV_02_01_P2A_Total_Error !== CONV_02_01_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'CONV_02_01_P2A_Total_Error',
-          '연결컨베이어(VMS진출후)',
-        );
-      }
-    }
-
-    if (CONV_02_02_P2A_Total_Error === 1) {
-      if (previousCONV_02_02_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousCONV_02_02_P2A_Total_Error,
-          previousCONV_02_02_P2A_Total_Error !== CONV_02_02_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'CONV_02_02_P2A_Total_Error',
-          '버퍼디버팅 컨베이어(진출)',
-        );
-      }
-    }
-
-    if (CONV_02_03_P2A_Total_Error === 1) {
-      if (previousCONV_02_03_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousCONV_02_03_P2A_Total_Error,
-          previousCONV_02_03_P2A_Total_Error !== CONV_02_03_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'CONV_02_03_P2A_Total_Error',
-          '진출 컨베이어_AMR도킹',
-        );
-      }
-    }
-
-    if (ASRS_01_01_P2A_Total_Error === 1) {
-      if (previousASRS_01_01_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousASRS_01_01_P2A_Total_Error,
-          previousASRS_01_01_P2A_Total_Error !== ASRS_01_01_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm('ASRS_01_01_P2A_Total_Error', '진입_AMR_도킹부');
-      }
-    }
-
-    if (Stacker_Total_Error === 1) {
-      if (previousStacker_Total_Error) {
-        await this.changeAlarm(
-          previousStacker_Total_Error,
-          previousStacker_Total_Error !== Stacker_Total_Error,
-        );
-      } else {
-        await this.makeAlarm('Stacker_Total_Error', '스태커 크레인 종합이상');
-      }
-    }
-
-    if (ASRS_02_01_P2A_Total_Error === 1) {
-      if (previousASRS_02_01_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousASRS_02_01_P2A_Total_Error,
-          previousASRS_02_01_P2A_Total_Error !== ASRS_02_01_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm('ASRS_02_01_P2A_Total_Error', '진출_AMR_도킹부');
-      }
-    }
-
-    if (SUPPLY_01_01_P2A_Total_Error === 1) {
-      if (previousSUPPLY_01_01_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousSUPPLY_01_01_P2A_Total_Error,
-          previousSUPPLY_01_01_P2A_Total_Error !== SUPPLY_01_01_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'SUPPLY_01_01_P2A_Total_Error',
-          '안착대1 종합이상',
-        );
-      }
-    }
-
-    if (SUPPLY_01_02_P2A_Total_Error === 1) {
-      if (previousSUPPLY_01_02_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousSUPPLY_01_02_P2A_Total_Error,
-          previousSUPPLY_01_02_P2A_Total_Error !== SUPPLY_01_02_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'SUPPLY_01_02_P2A_Total_Error',
-          '안착대2 종합이상',
-        );
-      }
-    }
-    if (SUPPLY_01_03_P2A_Total_Error === 1) {
-      if (previousSUPPLY_01_03_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousSUPPLY_01_03_P2A_Total_Error,
-          previousSUPPLY_01_03_P2A_Total_Error !== SUPPLY_01_03_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'SUPPLY_01_03_P2A_Total_Error',
-          '안착대3 종합이상',
-        );
-      }
-    }
-
-    if (SUPPLY_01_04_P2A_Total_Error === 1) {
-      if (previousSUPPLY_01_04_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousSUPPLY_01_04_P2A_Total_Error,
-          previousSUPPLY_01_04_P2A_Total_Error !== SUPPLY_01_04_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'SUPPLY_01_04_P2A_Total_Error',
-          '안착대4 종합이상',
-        );
-      }
-    }
-
-    if (RETURN_02_01_P2A_Total_Error === 1) {
-      if (previousRETURN_02_01_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousRETURN_02_01_P2A_Total_Error,
-          previousRETURN_02_01_P2A_Total_Error !== RETURN_02_01_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'RETURN_02_01_P2A_Total_Error',
-          '반송포트1 종합이상',
-        );
-      }
-    }
-
-    if (RETURN_02_02_P2A_Total_Error === 1) {
-      if (previousRETURN_02_02_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousRETURN_02_02_P2A_Total_Error,
-          previousRETURN_02_02_P2A_Total_Error !== RETURN_02_02_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'RETURN_02_02_P2A_Total_Error',
-          '반송포트2 종합이상',
-        );
-      }
-    }
-
-    if (RETURN_03_01_P2A_Total_Error === 1) {
-      if (previousRETURN_03_01_P2A_Total_Error) {
-        await this.changeAlarm(
-          previousRETURN_03_01_P2A_Total_Error,
-          previousRETURN_03_01_P2A_Total_Error !== RETURN_03_01_P2A_Total_Error,
-        );
-      } else {
-        await this.makeAlarm(
-          'RETURN_03_01_P2A_Total_Error',
-          '반송대기장포트1 종합이상',
-        );
+      if (
+        previousTotalError &&
+        totalError === 0 &&
+        previousTotalError.done === false
+      ) {
+        await this.changeAlarmIsDone(previousTotalError, true);
+      } else if (
+        previousTotalError &&
+        totalError === 1 &&
+        previousTotalError.done
+      ) {
+        await this.changeAlarm(previousTotalError, true);
+        await this.changeAlarmIsDone(previousTotalError, false);
+      } else if (totalError === 1) {
+        await this.makeAlarm(facility, message);
       }
     }
   }
@@ -748,6 +526,12 @@ export class AsrsService {
   async changeAlarm(alarm: Alarm, check: boolean) {
     await this.alarmRepository.update(alarm.id, {
       count: check ? alarm.count + 1 : alarm.count,
+    });
+  }
+
+  async changeAlarmIsDone(alarm: Alarm, done: boolean) {
+    await this.alarmRepository.update(alarm.id, {
+      done: done,
     });
   }
 
