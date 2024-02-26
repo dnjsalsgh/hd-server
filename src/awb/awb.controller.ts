@@ -337,7 +337,7 @@ export class AwbController {
           );
         } else {
           await this.alarmService.create({
-            equipmentName: 'VMS 계측기 에러',
+            equipmentName: 'VMS_08_01_P2A_Total_Error',
             stopTime: new Date(),
             count: 1,
             alarmMessage: 'VMS 계측기 에러',
