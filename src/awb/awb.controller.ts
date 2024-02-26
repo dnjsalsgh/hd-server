@@ -340,7 +340,7 @@ export class AwbController {
           true,
         );
       } else if (
-        VMS_08_01_P2A_Total_Error &&
+        previousVMS_08_01_P2A_Total_Error &&
         VMS_08_01_P2A_Total_Error === 1 &&
         previousVMS_08_01_P2A_Total_Error.done
       ) {
