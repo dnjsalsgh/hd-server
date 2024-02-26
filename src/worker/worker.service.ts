@@ -24,12 +24,12 @@ export class WorkerService {
 
   @Interval(600)
   // 0.6 초마다 mssql 에서 amr 데이터를 가져옴
-  InitialScheduler() {
+  async InitialScheduler() {
     //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
     if (this.configService.get<string>('SCHEDULE') !== 'true') {
       return;
     }
-    this.amrService.createAmrByHacs();
+    await this.amrService.createAmrByHacs();
     console.log('amr 데이터 수집 스케줄러 동작');
   }
 
