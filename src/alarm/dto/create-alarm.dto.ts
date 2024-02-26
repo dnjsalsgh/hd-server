@@ -7,4 +7,5 @@ export class CreateAlarmDto extends PickType(Alarm, [
   'stopTime',
   'count',
   'alarmMessage',
+  'done',
 ]) {}

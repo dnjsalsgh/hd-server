@@ -25,7 +25,6 @@ import dayjs from 'dayjs';
 import { AlarmService } from '../alarm/alarm.service';
 import { amrErrorData } from '../worker/amrErrorData';
 
-
 @Injectable()
 export class AmrService {
   constructor(
@@ -95,14 +94,13 @@ export class AmrService {
       const previousAmrBody = await this.alarmService.getPreviousAlarmState(
         amrData?.AMRNM,
       );
-      
       if (
         previousAmrBody &&
         amrBody.errorCode !== null &&
         amrBody.errorCode == previousAmrBody.alarmMessage
       ) {
         await this.alarmService.changeAlarm(previousAmrBody);
-      } else if (amrData?.ErrorCode !== null) {
+      } else if (amrBody.errorCode !== null) {
         await this.alarmService.create({
           equipmentName: amrData?.AMRNM,
           stopTime: new Date(),
@@ -110,6 +108,7 @@ export class AmrService {
           alarmMessage: amrErrorData[amrBody.errorCode],
         });
       }
+      // console.log('설비알람 체킹 in amr');
 
       const amrChargerBody: CreateAmrChargerDto = {
         name: amrData.Amrld.toString(),

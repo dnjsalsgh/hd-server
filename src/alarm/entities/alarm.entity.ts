@@ -53,7 +53,7 @@ export class Alarm {
     description: '에러처리 완료여부',
   })
   @Column({ type: 'boolean', nullable: true, default: false })
-  done: boolean;
+  done?: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
