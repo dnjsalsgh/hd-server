@@ -446,6 +446,7 @@ export class AsrsService {
   }
 
   // plc에서 들어온 데이터 중 에러 코드만 가지고 alarm 테이블에 저장하기
+  // TODO: 리팩토링 하기
   async makeAlarmFromPlc(body: CreateAsrsPlcDto) {
     const CONV_01_01_P2A_Total_Error = body['CONV_01_01_P2A_Total_Error'];
     const CONV_01_02_P2A_Total_Error = body['CONV_01_02_P2A_Total_Error'];
