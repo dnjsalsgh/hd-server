@@ -79,9 +79,11 @@ export class AlarmService {
   }
 
   async changeAlarm(alarm: Alarm, check: boolean) {
-    await this.alarmRepository.update(alarm.id, {
-      count: check ? alarm.count + 1 : alarm.count,
-    });
+    if (check) {
+      await this.alarmRepository.update(alarm.id, {
+        count: alarm.count + 1,
+      });
+    }
   }
 
   async getPreviousAlarmState(equipmentName: string) {

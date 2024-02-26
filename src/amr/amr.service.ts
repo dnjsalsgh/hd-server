@@ -95,7 +95,11 @@ export class AmrService {
         amrData?.AMRNM,
       );
 
-      if (previousAmrBody && amrData?.ErrorCode !== null) {
+      if (
+        previousAmrBody &&
+        amrData?.ErrorCode !== null &&
+        amrErrorData[amrData?.ErrorCode] === previousAmrBody.alarmMessage
+      ) {
         await this.alarmService.changeAlarm(
           previousAmrBody,
           amrErrorData[amrData?.ErrorCode] !== previousAmrBody.alarmMessage,
