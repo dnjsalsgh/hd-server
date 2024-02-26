@@ -512,7 +512,10 @@ export class AsrsService {
 
     if (CONV_01_01_P2A_Total_Error === 1) {
       if (previousCONV_01_01_P2A_Total_Error) {
-        await this.changeAlarm(previousCONV_01_01_P2A_Total_Error);
+        await this.changeAlarm(
+          previousCONV_01_01_P2A_Total_Error,
+          previousCONV_01_01_P2A_Total_Error !== CONV_01_01_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'CONV_01_01_P2A_Total_Error',
@@ -522,7 +525,10 @@ export class AsrsService {
     }
     if (CONV_01_02_P2A_Total_Error === 1) {
       if (previousCONV_01_02_P2A_Total_Error) {
-        await this.changeAlarm(previousCONV_01_02_P2A_Total_Error);
+        await this.changeAlarm(
+          previousCONV_01_02_P2A_Total_Error,
+          previousCONV_01_02_P2A_Total_Error !== CONV_01_02_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'CONV_01_02_P2A_Total_Error',
@@ -532,7 +538,10 @@ export class AsrsService {
     }
     if (CONV_01_03_P2A_Total_Error === 1) {
       if (previousCONV_01_03_P2A_Total_Error) {
-        await this.changeAlarm(previousCONV_01_03_P2A_Total_Error);
+        await this.changeAlarm(
+          previousCONV_01_03_P2A_Total_Error,
+          previousCONV_01_03_P2A_Total_Error !== CONV_01_03_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm('CONV_01_03_P2A_Total_Error', '로딩 컨베이어');
       }
@@ -540,7 +549,10 @@ export class AsrsService {
 
     if (CONV_01_04_P2A_Total_Error === 1) {
       if (previousCONV_01_04_P2A_Total_Error) {
-        await this.changeAlarm(previousCONV_01_04_P2A_Total_Error);
+        await this.changeAlarm(
+          previousCONV_01_04_P2A_Total_Error,
+          previousCONV_01_04_P2A_Total_Error !== CONV_01_04_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'CONV_01_04_P2A_Total_Error',
@@ -551,7 +563,10 @@ export class AsrsService {
 
     if (CONV_02_01_P2A_Total_Error === 1) {
       if (previousCONV_02_01_P2A_Total_Error) {
-        await this.changeAlarm(previousCONV_02_01_P2A_Total_Error);
+        await this.changeAlarm(
+          previousCONV_02_01_P2A_Total_Error,
+          previousCONV_02_01_P2A_Total_Error !== CONV_02_01_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'CONV_02_01_P2A_Total_Error',
@@ -562,7 +577,10 @@ export class AsrsService {
 
     if (CONV_02_02_P2A_Total_Error === 1) {
       if (previousCONV_02_02_P2A_Total_Error) {
-        await this.changeAlarm(previousCONV_02_02_P2A_Total_Error);
+        await this.changeAlarm(
+          previousCONV_02_02_P2A_Total_Error,
+          previousCONV_02_02_P2A_Total_Error !== CONV_02_02_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'CONV_02_01_P2A_Total_Error',
@@ -573,7 +591,10 @@ export class AsrsService {
 
     if (CONV_02_03_P2A_Total_Error === 1) {
       if (previousCONV_02_03_P2A_Total_Error) {
-        await this.changeAlarm(previousCONV_02_03_P2A_Total_Error);
+        await this.changeAlarm(
+          previousCONV_02_03_P2A_Total_Error,
+          previousCONV_02_03_P2A_Total_Error !== CONV_02_03_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'CONV_02_03_P2A_Total_Error',
@@ -584,7 +605,10 @@ export class AsrsService {
 
     if (ASRS_01_01_P2A_Total_Error === 1) {
       if (previousASRS_01_01_P2A_Total_Error) {
-        await this.changeAlarm(previousASRS_01_01_P2A_Total_Error);
+        await this.changeAlarm(
+          previousASRS_01_01_P2A_Total_Error,
+          previousASRS_01_01_P2A_Total_Error !== ASRS_01_01_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm('ASRS_01_01_P2A_Total_Error', '진입_AMR_도킹부');
       }
@@ -592,7 +616,10 @@ export class AsrsService {
 
     if (Stacker_Total_Error === 1) {
       if (previousStacker_Total_Error) {
-        await this.changeAlarm(previousStacker_Total_Error);
+        await this.changeAlarm(
+          previousStacker_Total_Error,
+          previousStacker_Total_Error !== Stacker_Total_Error,
+        );
       } else {
         await this.makeAlarm('Stacker_Total_Error', '스태커 크레인 종합이상');
       }
@@ -600,7 +627,10 @@ export class AsrsService {
 
     if (ASRS_02_01_P2A_Total_Error === 1) {
       if (previousASRS_02_01_P2A_Total_Error) {
-        await this.changeAlarm(previousASRS_02_01_P2A_Total_Error);
+        await this.changeAlarm(
+          previousASRS_02_01_P2A_Total_Error,
+          previousASRS_02_01_P2A_Total_Error !== ASRS_02_01_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm('ASRS_02_01_P2A_Total_Error', '진출_AMR_도킹부');
       }
@@ -608,7 +638,10 @@ export class AsrsService {
 
     if (SUPPLY_01_01_P2A_Total_Error === 1) {
       if (previousSUPPLY_01_01_P2A_Total_Error) {
-        await this.changeAlarm(previousSUPPLY_01_01_P2A_Total_Error);
+        await this.changeAlarm(
+          previousSUPPLY_01_01_P2A_Total_Error,
+          previousSUPPLY_01_01_P2A_Total_Error !== SUPPLY_01_01_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'SUPPLY_01_01_P2A_Total_Error',
@@ -619,7 +652,10 @@ export class AsrsService {
 
     if (SUPPLY_01_02_P2A_Total_Error === 1) {
       if (previousSUPPLY_01_02_P2A_Total_Error) {
-        await this.changeAlarm(previousSUPPLY_01_02_P2A_Total_Error);
+        await this.changeAlarm(
+          previousSUPPLY_01_02_P2A_Total_Error,
+          previousSUPPLY_01_02_P2A_Total_Error !== SUPPLY_01_02_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'SUPPLY_01_02_P2A_Total_Error',
@@ -629,7 +665,10 @@ export class AsrsService {
     }
     if (SUPPLY_01_03_P2A_Total_Error === 1) {
       if (previousSUPPLY_01_03_P2A_Total_Error) {
-        await this.changeAlarm(previousSUPPLY_01_03_P2A_Total_Error);
+        await this.changeAlarm(
+          previousSUPPLY_01_03_P2A_Total_Error,
+          previousSUPPLY_01_03_P2A_Total_Error !== SUPPLY_01_03_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'SUPPLY_01_03_P2A_Total_Error',
@@ -640,7 +679,10 @@ export class AsrsService {
 
     if (SUPPLY_01_04_P2A_Total_Error === 1) {
       if (previousSUPPLY_01_04_P2A_Total_Error) {
-        await this.changeAlarm(previousSUPPLY_01_04_P2A_Total_Error);
+        await this.changeAlarm(
+          previousSUPPLY_01_04_P2A_Total_Error,
+          previousSUPPLY_01_04_P2A_Total_Error !== SUPPLY_01_04_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'SUPPLY_01_04_P2A_Total_Error',
@@ -649,20 +691,12 @@ export class AsrsService {
       }
     }
 
-    if (SUPPLY_01_04_P2A_Total_Error === 1) {
-      if (previousSUPPLY_01_04_P2A_Total_Error) {
-        await this.changeAlarm(previousSUPPLY_01_04_P2A_Total_Error);
-      } else {
-        await this.makeAlarm(
-          'SUPPLY_01_04_P2A_Total_Error',
-          '안착대1 종합이상',
-        );
-      }
-    }
-
     if (RETURN_02_01_P2A_Total_Error === 1) {
       if (previousRETURN_02_01_P2A_Total_Error) {
-        await this.changeAlarm(previousRETURN_02_01_P2A_Total_Error);
+        await this.changeAlarm(
+          previousRETURN_02_01_P2A_Total_Error,
+          previousRETURN_02_01_P2A_Total_Error !== RETURN_02_01_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'RETURN_02_01_P2A_Total_Error',
@@ -673,7 +707,10 @@ export class AsrsService {
 
     if (RETURN_02_02_P2A_Total_Error === 1) {
       if (previousRETURN_02_02_P2A_Total_Error) {
-        await this.changeAlarm(previousRETURN_02_02_P2A_Total_Error);
+        await this.changeAlarm(
+          previousRETURN_02_02_P2A_Total_Error,
+          previousRETURN_02_02_P2A_Total_Error !== RETURN_02_02_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'RETURN_02_02_P2A_Total_Error',
@@ -684,7 +721,10 @@ export class AsrsService {
 
     if (RETURN_03_01_P2A_Total_Error === 1) {
       if (previousRETURN_03_01_P2A_Total_Error) {
-        await this.changeAlarm(previousRETURN_03_01_P2A_Total_Error);
+        await this.changeAlarm(
+          previousRETURN_03_01_P2A_Total_Error,
+          previousRETURN_03_01_P2A_Total_Error !== RETURN_03_01_P2A_Total_Error,
+        );
       } else {
         await this.makeAlarm(
           'RETURN_03_01_P2A_Total_Error',
@@ -703,8 +743,10 @@ export class AsrsService {
     });
   }
 
-  async changeAlarm(alarm: Alarm) {
-    await this.alarmRepository.update(alarm.id, { count: alarm.count + 1 });
+  async changeAlarm(alarm: Alarm, check: boolean) {
+    await this.alarmRepository.update(alarm.id, {
+      count: check ? alarm.count + 1 : alarm.count,
+    });
   }
 
   async getPreviousAlarmState(equipmentName: string) {
