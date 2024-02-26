@@ -333,6 +333,7 @@ export class AwbController {
         if (previousVMS_08_01_P2A_Total_Error) {
           await this.alarmService.changeAlarm(
             previousVMS_08_01_P2A_Total_Error,
+            previousVMS_08_01_P2A_Total_Error !== VMS_08_01_P2A_Total_Error,
           );
         } else {
           await this.alarmService.create({
