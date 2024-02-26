@@ -312,6 +312,8 @@ export class SimulatorResultService {
       .send('hyundai/ps/input', packageSimulatorCallRequestObject)
       .pipe()
       .subscribe();
+    this.client.send('hyundai/ps/request', apiRequest).pipe().subscribe();
+
     const psResult = await getUserSelect(packageSimulatorCallRequestObject); // ps 콜
     this.client.send('hyundai/ps/result', psResult).pipe(take(1)).subscribe();
 
