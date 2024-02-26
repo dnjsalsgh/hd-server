@@ -247,6 +247,20 @@ export class SimulatorResultService {
   ) {
     const queryRunner = queryRunnerManager.queryRunner;
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
+    // 사용자가 넣는 화물
+    const inputAWB = {
+      id: apiRequest.id || 0,
+      palletRackId: apiRequest.palletRackId,
+      name: apiRequest.barcode,
+      separateNumber: apiRequest.separateNumber,
+      width: apiRequest.width,
+      length: apiRequest.length,
+      depth: apiRequest.depth,
+      waterVolume: apiRequest.waterVolume,
+      weight: apiRequest.weight,
+      destination: apiRequest.destination,
+      SCCs: apiRequest.SCCs,
+    };
 
     // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
     const asrsStateArray = await this.asrsHistoryService.nowState();
@@ -278,21 +292,6 @@ export class SimulatorResultService {
     // uld의 현재 상황 묶음
     const currentAWBsInULD = [];
     this.setCurrentAwbInUld(uldStateArray, currentAWBsInULD);
-
-    // 사용자가 넣는 화물
-    const inputAWB = {
-      id: apiRequest.id || 0,
-      palletRackId: apiRequest.palletRackId,
-      name: apiRequest.barcode,
-      separateNumber: apiRequest.separateNumber,
-      width: apiRequest.width,
-      length: apiRequest.length,
-      depth: apiRequest.depth,
-      waterVolume: apiRequest.waterVolume,
-      weight: apiRequest.weight,
-      destination: apiRequest.destination,
-      SCCs: apiRequest.SCCs,
-    };
 
     if (!inputAWB && !inputAWB.name) {
       throw new NotFoundException(
