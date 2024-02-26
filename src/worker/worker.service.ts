@@ -30,7 +30,7 @@ export class WorkerService {
       return;
     }
     await this.amrService.createAmrByHacs();
-    console.log('amr 데이터 수집 스케줄러 동작');
+    // console.log('amr 데이터 수집 스케줄러 동작');
   }
 
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
@@ -47,7 +47,7 @@ export class WorkerService {
     if (this.configService.get<string>('LOCAL_SCHEDULE') !== 'true') {
       return;
     }
-    console.log('누락 3d파일 체크 스케줄러 동작함');
+    // console.log('누락 3d파일 체크 스케줄러 동작함');
     // 화물 100개 limit 걸기
     const missingAwbs = await this.awbService.getAwbNotCombineModelPath(10);
 
@@ -73,7 +73,7 @@ export class WorkerService {
     if (this.configService.get<string>('VMS_VOLUME') !== 'true') {
       return;
     }
-    console.log('누락 체적 vms 체크 스케줄러 동작함');
+    // console.log('누락 체적 vms 체크 스케줄러 동작함');
     // width 화물이 없다는 것 = 체적이 없다는 것
     const missingAwbs = await this.awbService.getAwbNotVolumeAwb();
 
