@@ -98,8 +98,8 @@ export class AmrService {
       
       if (
         previousAmrBody &&
-        amrBody.errorCode !== null &&
-        amrBody.errorCode == previousAmrBody.alarmMessage
+        amrData?.ErrorCode !== null &&
+        amrErrorData[amrData?.ErrorCode] == previousAmrBody.alarmMessage
       ) {
         await this.alarmService.changeAlarm(previousAmrBody);
       } else if (amrData?.ErrorCode !== null) {
@@ -107,7 +107,7 @@ export class AmrService {
           equipmentName: amrData?.AMRNM,
           stopTime: new Date(),
           count: 1,
-          alarmMessage: amrErrorData[amrBody.errorCode],
+          alarmMessage: amrErrorData[amrData?.ErrorCode],
         });
       }
 
