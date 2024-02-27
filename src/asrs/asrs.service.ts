@@ -508,7 +508,7 @@ export class AsrsService {
       ) {
         await this.changeAlarm(previousTotalError, true);
         await this.changeAlarmIsDone(previousTotalError, false);
-      } else if (totalError === 1) {
+      } else if (!previousTotalError && totalError === 1) {
         await this.makeAlarm(facility, message);
       }
     }
