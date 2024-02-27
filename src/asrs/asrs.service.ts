@@ -215,7 +215,7 @@ export class AsrsService {
       if (
         body[awbNo] === '' &&
         body[separateNumber] === 0 &&
-        body[onOffTag] === 0
+        onOffSignal === 0
       ) {
         // 이전의 상태가 in이고
         // 현재 빈 바코드 있을 때 out 처리
