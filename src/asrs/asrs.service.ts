@@ -237,14 +237,14 @@ export class AsrsService {
       // console.log('awbNo = ', awbNo);
       // console.log('separateNumber = ', separateNumber);
 
-      // if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
-      //   await this.processInOut(
-      //     unitNumber,
-      //     body[awbNo],
-      //     body[separateNumber],
-      //     variableInOut,
-      //   );
-      // }
+      if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
+        await this.processInOut(
+          unitNumber,
+          body[awbNo],
+          body[separateNumber],
+          variableInOut,
+        );
+      }
     }
   }
 
