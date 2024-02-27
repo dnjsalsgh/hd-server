@@ -94,7 +94,6 @@ export class AmrService {
       const previousAmrBody = await this.alarmService.getPreviousAlarmState(
         amrData?.AMRNM,
       );
-      console.log(amrErrorData[amrData?.ErrorCode], previousAmrBody);
       if (
         previousAmrBody &&
         amrErrorData[amrData?.ErrorCode] !== null &&
