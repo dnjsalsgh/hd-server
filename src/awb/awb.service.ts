@@ -980,9 +980,10 @@ export class AwbService {
     // console.log(currentBarcode, currentSeparateNumber);
     try {
       if (!currentBarcode || !currentSeparateNumber) {
-        throw new NotFoundException(
-          'VMS_08_01_P2A_Bill_No, VMS_08_01_P2A_SEPARATION_NO 데이터가 없습니다.',
-        );
+        // throw new NotFoundException(
+        //   'VMS_08_01_P2A_Bill_No, VMS_08_01_P2A_SEPARATION_NO 데이터가 없습니다.',
+        // );
+        return;
       }
 
       // 다르다면 로직 시작

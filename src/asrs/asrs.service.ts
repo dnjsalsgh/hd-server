@@ -211,6 +211,7 @@ export class AsrsService {
       //     body[separateNumber] === 0 &&
       //     body[onOffTag] === 0,
       // );
+
       // 빈 바코드 있을 때 다음걸로 넘어가기
       if (
         body[awbNo] === '' &&
