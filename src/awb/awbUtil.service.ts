@@ -73,7 +73,7 @@ export class AwbUtilService {
       allAwbReceive: vmsAwbResult?.ALL_PART_RECEIVED === 'Y',
       receivedUser: vmsAwbHistory?.IN_USER_ID,
       receivedDate: vmsAwbHistory?.IN_DATE,
-      waterVolume: vmsAwbHistory?.RESULT_WATER_VOLUME,
+      waterVolume: vmsAwbHistory?.RESULT_WATER_VOLUME / 1000000,
       squareVolume: vmsAwbHistory?.RESULT_CUBIC_VOLUME,
       modelPath: null,
       path: null,
