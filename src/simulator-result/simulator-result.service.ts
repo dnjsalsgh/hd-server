@@ -277,7 +277,7 @@ export class SimulatorResultService {
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
     if (Awbs.length <= 0)
-      throw new HttpException(`자동창고 정보가 비어있습니다.`, 407);
+      throw new HttpException(`자동창고 정보가 비어있습니다.`, 408);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
