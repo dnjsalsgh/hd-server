@@ -108,7 +108,7 @@ export class AlarmService {
 
     const [findResult] = await this.alarmRepository.find({
       where: {
-        createdAt: Between(todayStart, todayEnd),
+        // createdAt: Between(todayStart, todayEnd),
         equipmentName: equipmentName,
       },
       order: orderByUtil(null),
