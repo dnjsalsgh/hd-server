@@ -276,6 +276,8 @@ export class SimulatorResultService {
     // 현재 ASRS의 정보들
     const Awbs = [];
     this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
+    if (Awbs.length <= 0)
+      throw new HttpException(`자동창고 정보를 찾아오지 못했습니다.`, 400);
 
     // ps에 보낼 Uld정보를 모아두는
     const Ulds = [];
