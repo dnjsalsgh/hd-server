@@ -94,17 +94,18 @@ export class AmrService {
       const previousAmrBody = await this.alarmService.getPreviousAlarmState(
         amrData?.AMRNM,
       );
-        console.log(amrErrorData[amrData?.ErrorCode], previousAmrBody);
+      console.log(amrErrorData[amrData?.ErrorCode], previousAmrBody);
       if (
         previousAmrBody &&
         amrErrorData[amrData?.ErrorCode] !== null &&
         amrErrorData[amrData?.ErrorCode] === previousAmrBody.alarmMessage
       ) {
-        await this.alarmService.changeAlarm(
-          previousAmrBody,
-          true,
-        );
-      } else if (!previousAmrBody && amrData?.ErrorCode !== null && amrErrorData[amrData?.ErrorCode] !== previousAmrBody.alarmMessage) {
+        await this.alarmService.changeAlarm(previousAmrBody, true);
+      } else if (
+        !previousAmrBody &&
+        amrData?.ErrorCode !== null &&
+        amrErrorData[amrData?.ErrorCode] !== previousAmrBody.alarmMessage
+      ) {
         await this.alarmService.create({
           equipmentName: amrData?.AMRNM,
           stopTime: new Date(),

@@ -352,7 +352,10 @@ export class AwbController {
           previousVMS_08_01_P2A_Total_Error,
           false,
         );
-      } else if (VMS_08_01_P2A_Total_Error === 1) {
+      } else if (
+        !previousVMS_08_01_P2A_Total_Error &&
+        VMS_08_01_P2A_Total_Error === 1
+      ) {
         await this.alarmService.makeAlarm(
           'VMS_08_01_P2A_Total_Error',
           'VMS 계측기 에러',
