@@ -556,11 +556,11 @@ export class AsrsService {
   async getPreviousAlarmState(equipmentName: string) {
     // 오늘 날짜의 시작과 끝을 구하고, KST로 변환합니다 (UTC+9).
     const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
-    const todayEnd = dayjs().endOf('day').add(9, 'hour').toDate();
+    const todayEnd = dayjs().endOf('day').add(18, 'hour').toDate();
 
     const [findResult] = await this.alarmRepository.find({
       where: {
-        // createdAt: Between(todayStart, todayEnd),
+        createdAt: Between(todayStart, todayEnd),
         equipmentName: equipmentName,
       },
       order: orderByUtil(null),
