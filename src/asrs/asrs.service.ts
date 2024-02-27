@@ -200,11 +200,27 @@ export class AsrsService {
       const separateNumber = this.getTag('SEPARATION_NO', unitKey);
       const variableInOut = onOffSignal ? 'in' : 'out';
 
+      // console.log(
+      //   unitKey,
+      //   body[awbNo],
+      //   body[separateNumber],
+      //   body[onOffTag],
+      //   'true니',
+      //   body[awbNo] === '',
+      //   body[awbNo] === '' &&
+      //     body[separateNumber] === 0 &&
+      //     body[onOffTag] === 0,
+      // );
       // 빈 바코드 있을 때 다음걸로 넘어가기
-      if (body[awbNo] === '') {
+      if (
+        body[awbNo] === '' &&
+        body[separateNumber] === 0 &&
+        body[onOffTag] === 0
+      ) {
         // 이전의 상태가 in이고
         // 현재 빈 바코드 있을 때 out 처리
         const asrsHistory = await this.getAsrsIn(unitNumber);
+        // console.log((asrsHistory.Asrs as Asrs).id);
         if (asrsHistory && asrsHistory.inOutType === 'in') {
           await this.processInOut(
             unitNumber,
@@ -219,14 +235,15 @@ export class AsrsService {
 
       // console.log('awbNo = ', awbNo);
       // console.log('separateNumber = ', separateNumber);
-      if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
-        await this.processInOut(
-          unitNumber,
-          body[awbNo],
-          body[separateNumber],
-          variableInOut,
-        );
-      }
+
+      // if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
+      //   await this.processInOut(
+      //     unitNumber,
+      //     body[awbNo],
+      //     body[separateNumber],
+      //     variableInOut,
+      //   );
+      // }
     }
   }
 
@@ -334,15 +351,15 @@ export class AsrsService {
     }
   }
 
-  private async getAsrsIn(asrsId: number) {
+  public async getAsrsIn(asrsId: number) {
     const asrsState = await this.asrsHistoryRepository
       .createQueryBuilder('ah')
       .leftJoinAndSelect('ah.Asrs', 'Asrs')
       .leftJoinAndSelect('ah.Awb', 'Awb')
       .where('Asrs.id = :asrsId', { asrsId: asrsId })
       .orderBy('ah.createdAt', 'DESC')
-      .getOne();
-    return asrsState;
+      .getMany();
+    return asrsState[0];
   }
 
   // redis를 편하게 쓰기 위해 쓰는 함수
