@@ -977,7 +977,7 @@ export class AwbService {
     // 현재 들어오는 데이터 확인하기
     const currentBarcode = data['VMS_08_01_P2A_Bill_No'];
     const currentSeparateNumber = data['VMS_08_01_P2A_SEPARATION_NO'];
-    console.log(currentBarcode, currentSeparateNumber);
+    // console.log(currentBarcode, currentSeparateNumber);
     try {
       if (!currentBarcode || !currentSeparateNumber) {
         throw new NotFoundException(
@@ -995,6 +995,7 @@ export class AwbService {
         );
 
       if (!vmsAwbHistoryData) {
+        return;
         throw new NotFoundException(
           `vmsAwbHistory 테이블에 데이터가 없습니다. in awb.service${currentBarcode}, ${currentSeparateNumber}`,
         );
