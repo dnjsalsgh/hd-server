@@ -102,7 +102,8 @@ export class AmrService {
         await this.alarmService.changeAlarm(previousAmrBody, true);
       } else if (
         !previousAmrBody &&
-        amrData?.ErrorCode !== null
+        amrData?.ErrorCode !== null &&
+        amrErrorData[amrData?.ErrorCode] !== undefined
         // amrErrorData[amrData?.ErrorCode] !== previousAmrBody.alarmMessage
       ) {
         await this.alarmService.create({
