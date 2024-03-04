@@ -24,6 +24,7 @@ import { LoggerService } from '../lib/logger/logger.service';
 import dayjs from 'dayjs';
 import { AlarmService } from '../alarm/alarm.service';
 import { amrErrorData } from '../worker/amrErrorData';
+import process from 'process';
 
 @Injectable()
 export class AmrService {
@@ -51,6 +52,10 @@ export class AmrService {
    * @param body
    */
   async createAmrByHacs() {
+    if (process.env.AMRLATENCY) {
+      console.log(`ACS DB로부터 데이터 수집 ${new Date().toISOString()}`);
+    }
+
     const amrDataList = await this.hacsRepository.find({
       // where: { Connected: 1 },
       order: { LogDT: 'DESC' },
@@ -59,6 +64,10 @@ export class AmrService {
 
     if (!amrDataList) {
       return;
+    }
+
+    if (process.env.AMRLATENCY) {
+      console.log(`ACS mqtt로 publish ${new Date().toISOString()}`);
     }
 
     // amr실시간 데이터 mqtt로 publish 하기 위함
@@ -117,6 +126,9 @@ export class AmrService {
 
       try {
         // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
+        if (process.env.AMRLATENCY) {
+          console.log(`AMR TABLE에 데이터 저장 ${new Date().toISOString()}`);
+        }
         const amrResult = await this.amrRepository.upsert(amrBody, ['name']);
 
         const amrChargerResult = await this.amrChargerRepository.upsert(
@@ -184,6 +196,7 @@ export class AmrService {
         stopTime: new Date(),
         count: 1,
         alarmMessage: amrErrorData[amrData?.ErrorCode],
+        done: false,
       });
     }
   }
