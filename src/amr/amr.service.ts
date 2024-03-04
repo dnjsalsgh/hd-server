@@ -91,28 +91,7 @@ export class AmrService {
       };
 
       // amr의 에러code가 오면 그 에러 코드로 알람 발생
-      const previousAmrBody = await this.alarmService.getPreviousAlarmState(
-        amrData?.AMRNM,
-      );
-      if (
-        previousAmrBody &&
-        amrErrorData[amrData?.ErrorCode] !== null &&
-        amrErrorData[amrData?.ErrorCode] === previousAmrBody.alarmMessage
-      ) {
-        await this.alarmService.changeAlarm(previousAmrBody, true);
-      } else if (
-        !previousAmrBody &&
-        amrData?.ErrorCode !== null &&
-        amrErrorData[amrData?.ErrorCode] !== undefined
-        // amrErrorData[amrData?.ErrorCode] !== previousAmrBody.alarmMessage
-      ) {
-        await this.alarmService.create({
-          equipmentName: amrData?.AMRNM,
-          stopTime: new Date(),
-          count: 1,
-          alarmMessage: amrErrorData[amrData?.ErrorCode],
-        });
-      }
+      await this.makeAmrAlarm(amrData);
 
       const amrChargerBody: CreateAmrChargerDto = {
         name: amrData.Amrld.toString(),
@@ -177,6 +156,35 @@ export class AmrService {
       } finally {
         // await queryRunner.release();
       }
+    }
+  }
+
+  private async makeAmrAlarm(amrData: Hacs) {
+    if (!amrErrorData[amrData?.ErrorCode]) {
+      return;
+    }
+
+    const previousAmrBody = await this.alarmService.getPreviousAlarmState(
+      amrData?.AMRNM,
+      amrErrorData[amrData?.ErrorCode],
+    );
+
+    if (previousAmrBody) {
+      await this.alarmService.changeAlarm(previousAmrBody, true);
+    } else if (
+      !previousAmrBody
+      // &&
+      // amrData?.ErrorCode !== null &&
+      // amrErrorData[amrData?.ErrorCode] !== undefined &&
+      // previousAmrBody.alarmMessage !== amrErrorData[amrData?.ErrorCode]
+      // amrErrorData[amrData?.ErrorCode] !== previousAmrBody.alarmMessage
+    ) {
+      await this.alarmService.create({
+        equipmentName: amrData?.AMRNM,
+        stopTime: new Date(),
+        count: 1,
+        alarmMessage: amrErrorData[amrData?.ErrorCode],
+      });
     }
   }
 

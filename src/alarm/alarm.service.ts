@@ -101,15 +101,16 @@ export class AlarmService {
     });
   }
 
-  async getPreviousAlarmState(equipmentName: string) {
+  async getPreviousAlarmState(equipmentName: string, alarmMessage: string) {
     // 오늘 날짜의 시작과 끝을 구하고, KST로 변환합니다 (UTC+9).
-    const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
-    const todayEnd = dayjs().endOf('day').add(18, 'hour').toDate();
+    const todayStart = dayjs().startOf('day').toDate();
+    const todayEnd = dayjs().endOf('day').toDate();
 
     const [findResult] = await this.alarmRepository.find({
       where: {
         createdAt: Between(todayStart, todayEnd),
         equipmentName: equipmentName,
+        alarmMessage: alarmMessage,
       },
       order: orderByUtil(null),
       take: 1,
