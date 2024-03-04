@@ -16,6 +16,8 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { RedisService } from '../redis/redis.service';
 import dayjs from 'dayjs';
+import { nowTime } from '../lib/util/nowTime';
+import console from 'console';
 
 @Injectable()
 export class AwbUtilService {
@@ -241,6 +243,7 @@ export class AwbUtilService {
       fileContent,
       `${vms.AWB_NUMBER}_${vms.SEPARATION_NO}_${vms.FILE_NAME}`,
     );
+
     return fileResult;
   }
 

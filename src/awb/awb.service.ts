@@ -49,6 +49,7 @@ import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
 import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { ClientProxy } from '@nestjs/microservices';
+import { nowTime } from '../lib/util/nowTime';
 
 @Injectable()
 export class AwbService {
@@ -362,7 +363,7 @@ export class AwbService {
       );
 
       if (!awbDto) {
-        console.log(`awbDto 생성 실패 ${awbDto}`);
+        // console.log(`awbDto 생성 실패 ${awbDto}`);
         return;
       }
 
@@ -812,8 +813,8 @@ export class AwbService {
   // 체적이 없는 화물을 검색하는 메서드
   async getAwbNotVolumeAwb() {
     // 오늘 날짜의 시작과 끝을 구하고, KST로 변환합니다 (UTC+9).
-    const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
-    const todayEnd = dayjs().endOf('day').add(9, 'hour').toDate();
+    const todayStart = dayjs().startOf('day').toDate();
+    const todayEnd = dayjs().endOf('day').toDate();
 
     return await this.awbRepository.find({
       where: {
@@ -1022,7 +1023,7 @@ export class AwbService {
 
       // awb 생성되지 않았다면 null 반환
       if (!awb) {
-        console.log('vms에서 awb가 생성되지 않았습니다.');
+        // console.log('vms에서 awb가 생성되지 않았습니다.');
         return null;
       }
 
@@ -1031,7 +1032,7 @@ export class AwbService {
       await this.awbUtilService.settingRedis(awb.barcode, awb.separateNumber);
       // mqtt 메세지 보내기 로직 호출
       await this.sendSyncMqttMessage(awb);
-      console.log('vms 동기화 완료');
+      // console.log('vms 동기화 완료');
     } catch (error) {
       console.error('Error:', error);
     }
@@ -1101,7 +1102,7 @@ export class AwbService {
       // await this.sendSyncMqttMessage(awb);
       // }
 
-      console.log('누락 체크 로직에서 vms 데이터 생성');
+      // console.log('누락 체크 로직에서 vms 데이터 생성');
     } catch (error) {
       console.error('Error:', error);
     }
