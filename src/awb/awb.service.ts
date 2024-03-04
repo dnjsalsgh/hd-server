@@ -50,6 +50,7 @@ import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/creat
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { nowTime } from '../lib/util/nowTime';
+import process from 'process';
 
 @Injectable()
 export class AwbService {
@@ -983,13 +984,19 @@ export class AwbService {
       // 다르다면 로직 시작
       // history 값 가져오기
       // vms 체적 데이터 가져오기
-      console.log(`vwms db 데이터 요청 ${new Date().toISOString()}`);
+      if (process.env.LATENCY === 'true') {
+        console.log(`vwms db 데이터 요청 ${new Date().toISOString()}`);
+      }
+
       const vmsAwbHistoryData =
         await this.fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
           currentBarcode,
           currentSeparateNumber,
         );
-      console.log(`vwms db 데이터 수신 ${new Date().toISOString()}`);
+
+      if (process.env.LATENCY === 'true') {
+        console.log(`vwms db 데이터 수신 ${new Date().toISOString()}`);
+      }
 
       if (!vmsAwbHistoryData) {
         return;
