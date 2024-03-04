@@ -316,7 +316,7 @@ export class AwbController {
     if (!this.invmsProcessing) {
       this.invmsProcessing = true; // 처리 시작 표시
 
-      // console.log('vms eqData 실행 스케줄러 동작');
+      console.log(`vms mqtt 수신 ${new Date().toISOString()}`);
       // 메시지 처리 로직
       await this.awbService.createAwbByPlcMqtt(data);
 

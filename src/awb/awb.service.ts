@@ -983,11 +983,13 @@ export class AwbService {
       // 다르다면 로직 시작
       // history 값 가져오기
       // vms 체적 데이터 가져오기
+      console.log(`vwms db 데이터 요청 ${new Date().toISOString()}`);
       const vmsAwbHistoryData =
         await this.fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
           currentBarcode,
           currentSeparateNumber,
         );
+      console.log(`vwms db 데이터 수신 ${new Date().toISOString()}`);
 
       if (!vmsAwbHistoryData) {
         return;
@@ -1027,6 +1029,7 @@ export class AwbService {
         return null;
       }
 
+      console.log(`DT AWB TABLE 저장 ${new Date().toISOString()}`);
       // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
       // insert 되면 redis의 값 수정
       await this.awbUtilService.settingRedis(awb.barcode, awb.separateNumber);
