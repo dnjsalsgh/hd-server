@@ -984,7 +984,7 @@ export class AwbService {
       // 다르다면 로직 시작
       // history 값 가져오기
       // vms 체적 데이터 가져오기
-      if (process.env.LATENCY === 'true') {
+      if (process.env.VMSLATENCY === 'true') {
         console.log(`vwms db 데이터 요청 ${new Date().toISOString()}`);
       }
 
@@ -994,7 +994,7 @@ export class AwbService {
           currentSeparateNumber,
         );
 
-      if (process.env.LATENCY === 'true') {
+      if (process.env.VMSLATENCY === 'true') {
         console.log(`vwms db 데이터 수신 ${new Date().toISOString()}`);
       }
 
@@ -1035,8 +1035,9 @@ export class AwbService {
         // console.log('vms에서 awb가 생성되지 않았습니다.');
         return null;
       }
-
-      console.log(`DT AWB TABLE 저장 ${new Date().toISOString()}`);
+      if (process.env.VMSLATENCY === 'true') {
+        console.log(`DT AWB TABLE 저장 ${new Date().toISOString()}`);
+      }
       // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
       // insert 되면 redis의 값 수정
       await this.awbUtilService.settingRedis(awb.barcode, awb.separateNumber);

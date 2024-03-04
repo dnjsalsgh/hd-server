@@ -317,7 +317,7 @@ export class AwbController {
     if (!this.invmsProcessing) {
       this.invmsProcessing = true; // 처리 시작 표시
 
-      if (process.env.LATENCY === 'true') {
+      if (process.env.VMSLATENCY === 'true') {
         console.log(`vms mqtt 수신 ${new Date().toISOString()}`);
       }
       // 메시지 처리 로직
