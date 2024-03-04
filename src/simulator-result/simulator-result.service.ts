@@ -3,7 +3,6 @@ import {
   Inject,
   Injectable,
   NotFoundException,
-  UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SimulatorResult } from './entities/simulator-result.entity';
@@ -69,7 +68,7 @@ import {
   UldDeployCheckerRequest,
 } from './dto/uld-deploy-checker-input.dto';
 import { AwbUtilService } from '../awb/awbUtil.service';
-import { HttpExceptionFilter } from '../lib/filter/httpException.filter';
+import process from 'process';
 
 @Injectable()
 export class SimulatorResultService {
@@ -113,6 +112,9 @@ export class SimulatorResultService {
     apiRequest: PsApiRequest,
     queryRunnerManager: EntityManager,
   ) {
+    if (process.env.LATENCY === 'true') {
+      console.log(`ps call 수신 ${new Date().toISOString()}`);
+    }
     const queryRunner = queryRunnerManager.queryRunner;
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
 
@@ -140,7 +142,16 @@ export class SimulatorResultService {
       .send('hyundai/ps/input', packageSimulatorCallRequestObject)
       .pipe(take(1))
       .subscribe();
+
+    if (process.env.LATENCY === 'true') {
+      console.log(`ps 호출 ${new Date().toISOString()}`);
+    }
+
     const psResult = await getOrderDischarge(packageSimulatorCallRequestObject); // ps 콜
+
+    if (process.env.LATENCY === 'true') {
+      console.log(`불출서열 결과 수신 ${new Date().toISOString()}`);
+    }
 
     try {
       const bodyResult = psResult.result[0];
@@ -184,6 +195,9 @@ export class SimulatorResultService {
           };
         });
 
+        if (process.env.LATENCY === 'true') {
+          console.log(`불출서열 MQTT Message 발신 ${new Date().toISOString()}`);
+        }
         // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
         this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
 
@@ -245,6 +259,9 @@ export class SimulatorResultService {
     apiRequest: userSelectInput,
     queryRunnerManager: EntityManager,
   ) {
+    if (process.env.LATENCY === 'true') {
+      console.log(`ps call 수신 ${new Date().toISOString()}`);
+    }
     const queryRunner = queryRunnerManager.queryRunner;
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
     // 사용자가 넣는 화물
@@ -315,7 +332,15 @@ export class SimulatorResultService {
       .subscribe();
     this.client.send('hyundai/ps/request', apiRequest).pipe().subscribe();
 
+    if (process.env.LATENCY === 'true') {
+      console.log(`ps 호출 ${new Date().toISOString()}`);
+    }
+
     const psResult = await getUserSelect(packageSimulatorCallRequestObject); // ps 콜
+    if (process.env.LATENCY === 'true') {
+      console.log(`불출서열 결과 수신 ${new Date().toISOString()}`);
+    }
+
     this.client.send('hyundai/ps/result', psResult).pipe(take(1)).subscribe();
 
     // ps의 결과가 Failure로 올 때 예외 처리
@@ -362,6 +387,9 @@ export class SimulatorResultService {
           };
         });
 
+        if (process.env.LATENCY === 'true') {
+          console.log(`불출서열 MQTT Message 발신 ${new Date().toISOString()}`);
+        }
         // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
         this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
 
@@ -564,6 +592,9 @@ export class SimulatorResultService {
   // 패키지 시뮬레이터의 결과로 [안착대 추천도] 반환하는 곳
   async getAWBinPalletRack(apiRequest: userSelectInput) {
     try {
+      if (process.env.LATENCY === 'true') {
+        console.log(`ps call 수신 ${new Date().toISOString()}`);
+      }
       const mode = apiRequest.simulation || false; // 시뮬레이션, 커넥티드 분기
 
       // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
@@ -579,23 +610,23 @@ export class SimulatorResultService {
       // ps에 현재 자동창고, 안착대 상태 보내기 로직 start
       // ps에 보낼 Awb 정보들 모아두는 배열
       const Awbs = [];
-      console.time('asrs setting part');
+      // console.time('asrs setting part');
       this.setCurrentAwbsInAsrs(asrsStateArray, Awbs);
-      console.timeEnd('asrs setting part');
+      // console.timeEnd('asrs setting part');
 
       // ps에 보낼 Uld정보를 모아두는
       const Ulds = [];
-      console.time('uld setting part');
+      // console.time('uld setting part');
       await this.setUldStateByUldCode(apiRequest, Ulds);
-      console.timeEnd('uld setting part');
+      // console.timeEnd('uld setting part');
       if (Ulds.length <= 0)
         throw new HttpException(`Uld 정보를 찾아오지 못했습니다.`, 400);
 
       // 안착대 현재 상황 묶음
       const palletRack = [];
-      console.time('skidPlatform setting part');
+      // console.time('skidPlatform setting part');
       this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
-      console.timeEnd('skidPlatform setting part');
+      // console.timeEnd('skidPlatform setting part');
 
       // uld의 현재 상황 묶음
       const currentAWBsInULD = [];
@@ -609,7 +640,11 @@ export class SimulatorResultService {
         palletRack: palletRack,
       };
 
-      console.time('ps Call part');
+      // console.time('ps Call part');
+      if (process.env.LATENCY === 'true') {
+        console.log(`ps 호출 ${new Date().toISOString()}`);
+      }
+
       this.client
         .send('hyundai/ps/input', packageSimulatorCallRequestObject)
         .pipe(take(1))
@@ -617,9 +652,14 @@ export class SimulatorResultService {
       const psResult = await getAWBinPalletRack(
         packageSimulatorCallRequestObject,
       );
+      if (process.env.LATENCY === 'true') {
+        console.log(`추천도 결과 수신 ${new Date().toISOString()}`);
+      }
 
-      console.timeEnd('ps Call part');
-
+      // console.timeEnd('ps Call part');
+      if (process.env.LATENCY === 'true') {
+        console.log(`MQTT Message 발신 ${new Date().toISOString()}`);
+      }
       // 안착대 추천도 결과를 mqtt에 전송
       this.client
         .send('hyundai/ps/recommend', psResult)
@@ -636,6 +676,9 @@ export class SimulatorResultService {
 
   // uld, 안착대, 창고의 모든 정보를 가져와서 ps 결과를 반환하는 곳
   async psAll(apiRequest: PsAllRequest, queryRunnerManager: EntityManager) {
+    if (process.env.LATENCY === 'true') {
+      console.log(`ps call 수신 ${new Date().toISOString()}`);
+    }
     const queryRunner = queryRunnerManager.queryRunner;
     const mode = apiRequest.simulation; // 시뮬레이션, 커넥티드 분기
 
@@ -681,9 +724,15 @@ export class SimulatorResultService {
       .send('hyundai/ps/input', packageSimulatorCallRequestObject)
       .pipe(take(1))
       .subscribe();
+    if (process.env.LATENCY === 'true') {
+      console.log(`ps 호출 ${new Date().toISOString()}`);
+    }
     const psResult = await packageSimulatorCallAll(
       packageSimulatorCallRequestObject,
     );
+    if (process.env.LATENCY === 'true') {
+      console.log(`불출서열 결과 수신 ${new Date().toISOString()}`);
+    }
     this.client.send('hyundai/ps/result', psResult).pipe(take(1)).subscribe();
 
     try {
@@ -769,7 +818,9 @@ export class SimulatorResultService {
         /**
          * 시뮬레이션 결과,이력을 저장하기 위한 부분 end
          */
-
+        if (process.env.LATENCY === 'true') {
+          console.log(`불출서열 MQTT Message 발신 ${new Date().toISOString()}`);
+        }
         // 1-2. 패키징 시뮬레이터에서 도출된 최적 불출순서 mqtt publish(자동창고 불출을 위함)
         this.client.send(`hyundai/asrs1/outOrder`, asrsOutOrder).subscribe();
 
