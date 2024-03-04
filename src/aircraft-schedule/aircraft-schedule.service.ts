@@ -24,6 +24,7 @@ import {
 } from '../uld-type/entities/uld-type.entity';
 import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
+import { adjustDate } from '../lib/util/adjustDate';
 
 @Injectable()
 export class AircraftScheduleService {
@@ -130,9 +131,23 @@ export class AircraftScheduleService {
       // cache: 60000, // 1 minute caching
     });
 
-    this.client.send(`hyundai/aircraftSchedule/find`, result).subscribe();
+    // 날짜 조정 로직 적용
+    const updatedFindResult = result.map((item) => {
+      if (item.createdAt instanceof Date && item.updatedAt instanceof Date) {
+        return {
+          ...item,
+          createdAt: adjustDate(item.createdAt, 9), // createdAt에 +9시간
+          updatedAt: adjustDate(item.updatedAt, 9), // updatedAt에 +9시간
+        };
+      }
+      return item;
+    });
 
-    return result;
+    this.client
+      .send(`hyundai/aircraftSchedule/find`, updatedFindResult)
+      .subscribe();
+
+    return updatedFindResult;
   }
 
   async findOne(id: number) {
