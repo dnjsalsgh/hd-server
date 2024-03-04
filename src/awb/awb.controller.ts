@@ -328,6 +328,7 @@ export class AwbController {
       const previousVMS_08_01_P2A_Total_Error =
         await this.alarmService.getPreviousAlarmState(
           'VMS_08_01_P2A_Total_Error',
+          'VMS 계측기 에러',
         );
 
       if (
