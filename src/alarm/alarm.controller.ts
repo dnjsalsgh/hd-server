@@ -27,6 +27,11 @@ export class AlarmController {
     return reuslt;
   }
 
+  @Get('/test')
+  test() {
+    return this.alarmService.test();
+  }
+
   @ApiQuery({ name: 'createdAtFrom', required: false })
   @ApiQuery({ name: 'createdAtTo', required: false })
   @ApiQuery({ name: 'order', required: false })

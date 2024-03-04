@@ -15,6 +15,7 @@ import { orderByUtil } from '../lib/util/orderBy.util';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import dayjs from 'dayjs';
+import { adjustDate } from '../lib/util/adjustDate';
 
 @Injectable()
 export class AlarmService {
@@ -55,12 +56,24 @@ export class AlarmService {
       skip: query.offset,
     });
 
+    // 날짜 조정 로직 적용
+    const updatedFindResult = findResult.map((item) => {
+      if (item.createdAt instanceof Date && item.updatedAt instanceof Date) {
+        return {
+          ...item,
+          createdAt: adjustDate(item.createdAt, 9), // createdAt에 +9시간
+          updatedAt: adjustDate(item.updatedAt, 9), // updatedAt에 +9시간
+        };
+      }
+      return item;
+    });
+
     this.client
-      .send(`hyundai/alarm/find`, findResult)
+      .send(`hyundai/alarm/find`, updatedFindResult)
       .pipe(take(1))
       .subscribe();
 
-    return findResult;
+    return updatedFindResult;
   }
 
   async findOne(id: number) {
@@ -119,6 +132,25 @@ export class AlarmService {
       order: orderByUtil(null),
       take: 1,
     });
+    return findResult;
+  }
+
+  async test() {
+    const todayStart = dayjs().startOf('day').toDate();
+    const todayEnd = dayjs().endOf('day').toDate();
+    // const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
+    // const todayEnd = dayjs().endOf('day').add(9, 'hour').toDate();
+    console.log('todayStart = ', todayStart);
+    console.log('todayEnd = ', todayEnd);
+
+    const [findResult] = await this.alarmRepository.find({
+      where: {
+        createdAt: Between(todayStart, todayEnd),
+      },
+      order: orderByUtil(null),
+      take: 1,
+    });
+    console.log('findResult = ', findResult);
     return findResult;
   }
 }

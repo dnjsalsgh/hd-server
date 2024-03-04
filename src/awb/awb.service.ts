@@ -1,5 +1,4 @@
 import {
-  forwardRef,
   HttpException,
   Inject,
   Injectable,
@@ -17,14 +16,12 @@ import {
   ILike,
   In,
   IsNull,
-  Not,
   LessThanOrEqual,
   MoreThanOrEqual,
+  Not,
   QueryRunner,
   Repository,
   TypeORMError,
-  MoreThan,
-  LessThan,
 } from 'typeorm';
 import { Awb } from './entities/awb.entity';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
@@ -52,16 +49,12 @@ import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
 import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { ClientProxy } from '@nestjs/microservices';
-import { take } from 'rxjs';
-import { AlarmService } from '../alarm/alarm.service';
-import { Alarm } from '../alarm/entities/alarm.entity';
 
 @Injectable()
 export class AwbService {
   constructor(
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
     @InjectRepository(Vms3D, 'mssqlDB')
