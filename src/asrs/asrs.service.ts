@@ -200,18 +200,6 @@ export class AsrsService {
       const separateNumber = this.getTag('SEPARATION_NO', unitKey);
       const variableInOut = onOffSignal ? 'in' : 'out';
 
-      // console.log(
-      //   unitKey,
-      //   body[awbNo],
-      //   body[separateNumber],
-      //   body[onOffTag],
-      //   'true니',
-      //   body[awbNo] === '',
-      //   body[awbNo] === '' &&
-      //     body[separateNumber] === 0 &&
-      //     body[onOffTag] === 0,
-      // );
-
       // 빈 바코드 있을 때 다음걸로 넘어가기
       if (
         body[awbNo] === '' &&
@@ -538,6 +526,7 @@ export class AsrsService {
       stopTime: new Date(),
       count: 1,
       alarmMessage: alarmMessage,
+      done: false,
     });
   }
 
