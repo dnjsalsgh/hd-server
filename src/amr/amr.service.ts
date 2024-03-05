@@ -182,7 +182,7 @@ export class AmrService {
     );
 
     if (previousAmrBody) {
-      await this.alarmService.changeAlarm(previousAmrBody, true);
+      await this.alarmService.changeAlarm(previousAmrBody, false);
     } else if (
       !previousAmrBody
       // &&
