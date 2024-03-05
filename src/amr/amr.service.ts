@@ -52,7 +52,7 @@ export class AmrService {
    * @param body
    */
   async createAmrByHacs() {
-    if (process.env.AMRLATENCY) {
+    if (process.env.AMRLATENCY === 'true') {
       console.log(`ACS DB로부터 데이터 수집 ${new Date().toISOString()}`);
     }
 
