@@ -156,9 +156,13 @@ export class AsrsController {
     }
 
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
-      await this.asrsService.checkAsrsChange(data);
+      // await this.asrsService.checkAsrsChange(data);
+      this.asrsService.checkAsrsChange(data);
       // console.log('asrs 체킹');
-      await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+      
+      // await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+      this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+      
       // console.log('skidPlatform 체킹');
 
       if(!this.alarmProcessing){
