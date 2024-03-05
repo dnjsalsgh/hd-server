@@ -56,7 +56,7 @@ export class Hacs {
     example: 0.3,
     description: '현재속도(m/s)',
   })
-  @Column({ name: 'SPEED', nullable: true })
+  @Column({ name: 'SPEED',type: 'float', nullable: true })
   public Speed: number;
 
   @ApiProperty({
