@@ -539,6 +539,7 @@ export class AsrsService {
       stopTime: new Date(),
       count: 1,
       alarmMessage: alarmMessage,
+      done:false
     });
   }
 
