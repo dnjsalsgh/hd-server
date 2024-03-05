@@ -293,6 +293,7 @@ export class AsrsService {
       const inOutType = state === 'in' ? 'in' : 'out';
 
       if (!(awb && awb.id)) {
+        return;
         throw new TypeORMError('awb 정보를 찾지 못했습니다.');
       }
 
