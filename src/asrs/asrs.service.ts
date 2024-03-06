@@ -498,6 +498,12 @@ export class AsrsService {
     for (let i = 0; i < facilityArray.length; i++) {
       const facility = facilityArray[i];
       const totalError = body[facility];
+
+      // 알람 없다면 팅기기
+      if (totalError === 0) {
+        continue;
+      }
+
       const previousTotalError = await this.getPreviousAlarmState(facility);
 
       const message = messageArray[i];

@@ -328,6 +328,11 @@ export class AwbController {
        * awbService에 로직 생성하려고 하면 주입 모듈 꼬여서 안넣어둠
        */
       const VMS_08_01_P2A_Total_Error = data['VMS_08_01_P2A_Total_Error'];
+
+      if (VMS_08_01_P2A_Total_Error === 0) {
+        return;
+      }
+
       const previousVMS_08_01_P2A_Total_Error =
         await this.alarmService.getPreviousAlarmState(
           'VMS_08_01_P2A_Total_Error',
