@@ -66,7 +66,7 @@ export class AmrService {
       return;
     }
 
-    if (process.env.AMRLATENCY=== 'true') {
+    if (process.env.AMRLATENCY === 'true') {
       console.log(`ACS mqtt로 publish ${new Date().toISOString()}`);
     }
 
@@ -182,7 +182,7 @@ export class AmrService {
     );
 
     if (previousAmrBody) {
-      await this.alarmService.changeAlarm(previousAmrBody, false);
+      await this.alarmService.changeAlarm(previousAmrBody, true);
     } else if (
       !previousAmrBody
       // &&

@@ -36,13 +36,6 @@ export class WorkerService {
   }
 
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
-  // * 10 * * * *
-  // every 10minute between 8am and 7pm
-  // @Cron('* */10 8-19 * * *', {
-  // @Cron('*/3 * * * *', {
-  //   name: 'missingAWBModelingFileHandlingLogic',
-  //   timeZone: 'Asia/Seoul',
-  // })
   @Interval(6000) // 6초
   // 3d 모델 누락 스케줄러
   async missingAWBModelingFileHandlingLogic() {

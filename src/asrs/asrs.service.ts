@@ -281,6 +281,7 @@ export class AsrsService {
       const inOutType = state === 'in' ? 'in' : 'out';
 
       if (!(awb && awb.id)) {
+        return;
         throw new TypeORMError('awb 정보를 찾지 못했습니다.');
       }
 
@@ -501,22 +502,28 @@ export class AsrsService {
 
       const message = messageArray[i];
 
-      if (
-        previousTotalError &&
-        totalError === 0 &&
-        previousTotalError.done === false
-      ) {
-        await this.changeAlarmIsDone(previousTotalError, true);
-      } else if (
-        previousTotalError &&
-        totalError === 1 &&
-        previousTotalError.done
-      ) {
+      if (previousTotalError) {
         await this.changeAlarm(previousTotalError, true);
-        await this.changeAlarmIsDone(previousTotalError, false);
       } else if (!previousTotalError && totalError === 1) {
         await this.makeAlarm(facility, message);
       }
+
+      // if (
+      //   previousTotalError &&
+      //   totalError === 0 &&
+      //   previousTotalError.done === false
+      // ) {
+      //   await this.changeAlarmIsDone(previousTotalError, true);
+      // } else if (
+      //   previousTotalError &&
+      //   totalError === 1 &&
+      //   previousTotalError.done
+      // ) {
+      //   await this.changeAlarm(previousTotalError, true);
+      //   await this.changeAlarmIsDone(previousTotalError, false);
+      // } else if (!previousTotalError && totalError === 1) {
+      //   await this.makeAlarm(facility, message);
+      // }
     }
   }
 
@@ -531,9 +538,11 @@ export class AsrsService {
   }
 
   async changeAlarm(alarm: Alarm, check: boolean) {
-    await this.alarmRepository.update(alarm.id, {
-      count: check ? alarm.count + 1 : alarm.count,
-    });
+    if (check) {
+      await this.alarmRepository.update(alarm.id, {
+        count: alarm.count + 1,
+      });
+    }
   }
 
   async changeAlarmIsDone(alarm: Alarm, done: boolean) {
