@@ -334,37 +334,52 @@ export class AwbController {
           'VMS 계측기 에러',
         );
 
-      if (
-        previousVMS_08_01_P2A_Total_Error &&
-        VMS_08_01_P2A_Total_Error === 0 &&
-        previousVMS_08_01_P2A_Total_Error.done === false
-      ) {
+      if (previousVMS_08_01_P2A_Total_Error) {
         await this.alarmService.changeAlarmIsDone(
           previousVMS_08_01_P2A_Total_Error,
           true,
-        );
-      } else if (
-        previousVMS_08_01_P2A_Total_Error &&
-        VMS_08_01_P2A_Total_Error === 1 &&
-        previousVMS_08_01_P2A_Total_Error.done
-      ) {
-        await this.alarmService.changeAlarm(
-          previousVMS_08_01_P2A_Total_Error,
-          true,
-        );
-        await this.alarmService.changeAlarmIsDone(
-          previousVMS_08_01_P2A_Total_Error,
-          false,
         );
       } else if (
         !previousVMS_08_01_P2A_Total_Error &&
-        VMS_08_01_P2A_Total_Error === 1
+        VMS_08_01_P2A_Total_Error
       ) {
         await this.alarmService.makeAlarm(
           'VMS_08_01_P2A_Total_Error',
           'VMS 계측기 에러',
         );
       }
+
+      // if (
+      //   previousVMS_08_01_P2A_Total_Error &&
+      //   VMS_08_01_P2A_Total_Error === 0 &&
+      //   previousVMS_08_01_P2A_Total_Error.done === false
+      // ) {
+      //   await this.alarmService.changeAlarmIsDone(
+      //     previousVMS_08_01_P2A_Total_Error,
+      //     true,
+      //   );
+      // } else if (
+      //   previousVMS_08_01_P2A_Total_Error &&
+      //   VMS_08_01_P2A_Total_Error === 1 &&
+      //   previousVMS_08_01_P2A_Total_Error.done
+      // ) {
+      //   await this.alarmService.changeAlarm(
+      //     previousVMS_08_01_P2A_Total_Error,
+      //     true,
+      //   );
+      //   await this.alarmService.changeAlarmIsDone(
+      //     previousVMS_08_01_P2A_Total_Error,
+      //     false,
+      //   );
+      // } else if (
+      //   !previousVMS_08_01_P2A_Total_Error &&
+      //   VMS_08_01_P2A_Total_Error === 1
+      // ) {
+      //   await this.alarmService.makeAlarm(
+      //     'VMS_08_01_P2A_Total_Error',
+      //     'VMS 계측기 에러',
+      //   );
+      // }
 
       // console.log('설비알람 체킹 in hyundai/vms1/eqData');
 
