@@ -502,7 +502,7 @@ export class AsrsService {
 
       const message = messageArray[i];
 
-      if (previousTotalError) {
+      if (previousTotalError && totalError === 1) {
         await this.changeAlarm(previousTotalError, true);
       } else if (!previousTotalError && totalError === 1) {
         await this.makeAlarm(facility, message);
