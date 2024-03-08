@@ -47,6 +47,11 @@ export class AlarmController {
     return this.alarmService.update(+id, updateAlarmDto);
   }
 
+  @Delete('/all')
+  removeAll() {
+    return this.alarmService.removeAll();
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.alarmService.remove(+id);

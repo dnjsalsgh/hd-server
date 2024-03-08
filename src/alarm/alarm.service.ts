@@ -78,6 +78,10 @@ export class AlarmService {
     return this.alarmRepository.delete(id);
   }
 
+  removeAll() {
+    return this.alarmRepository.delete({});
+  }
+
   async changeAlarm(alarm: Alarm, check: boolean) {
     if (check) {
       await this.alarmRepository.update(alarm.id, {
