@@ -151,6 +151,7 @@ services:
       AMR_DATABASE_USER: ${AMR_DATABASE_USER}
       AMR_DATABASE_PASS: ${AMR_DATABASE_PASS}
       AMR_DATABASE_NAME: ${AMR_DATABASE_NAME}
+      PS_SERVER: 'http://10.220.128.100:5000'
       TZ: 'Asia/Seoul'
     ports:
       - '3003:3000'
