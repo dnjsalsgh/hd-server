@@ -36,6 +36,7 @@ export class AsrsController {
   private readonly processInterval = 1500; // 처리 간격을 1500ms (1.5초)로 설정
   private processing = false;
   private alarmProcessing = false;
+  private asrsSkidProcessing = false;
 
   constructor(
     private readonly asrsService: AsrsService,
@@ -156,24 +157,29 @@ export class AsrsController {
     }
 
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
-      // await this.asrsService.checkAsrsChange(data);
-      this.asrsService.checkAsrsChange(data);
-      // console.log('asrs 체킹');
+      if (!this.asrsSkidProcessing) {
+        this.asrsSkidProcessing = true;
+        // await this.asrsService.checkAsrsChange(data);
+        await this.asrsService.checkAsrsChange(data);
+        // console.log('asrs 체킹');
 
-      // await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
-      this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+        // await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
+        await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
 
-      // console.log('skidPlatform 체킹');
+        // console.log('skidPlatform 체킹');
 
-      // if(!this.alarmProcessing){
-      //   this.alarmProcessing = true;
-      this.asrsService.makeAlarmFromPlc(data);
-      // await this.delay(5);
-      // this.alarmProcessing = false;
-      // }
+        // if(!this.alarmProcessing){
+        //   this.alarmProcessing = true;
+        await this.asrsService.makeAlarmFromPlc(data);
+        // await this.delay(5);
+        // this.alarmProcessing = false;
+        // }
+        await this.delay(10000);
+        this.asrsSkidProcessing = false;
 
-      // console.log('설비알람 체킹 in hyundai/asrs1/eqData');
-      // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
+        // console.log('설비알람 체킹 in hyundai/asrs1/eqData');
+        // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
+      }
     }
   }
 }
