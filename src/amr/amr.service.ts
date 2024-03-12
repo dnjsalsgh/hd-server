@@ -129,36 +129,33 @@ export class AmrService {
         if (process.env.AMRLATENCY === 'true') {
           console.log(`AMR TABLE에 데이터 저장 ${new Date().toISOString()}`);
         }
-        const amrResult = await this.amrRepository.upsert(amrBody, ['name']);
-
-        const amrChargerResult = await this.amrChargerRepository.upsert(
-          amrChargerBody,
-          ['name'],
+        // const amrResult = await this.amrRepository.upsert(amrBody, ['name']);
+        const amrResult = await this.amrRepository.update(
+          { name: amrBody.name },
+          amrBody,
         );
 
+        // const amrChargerResult = await this.amrChargerRepository.upsert(
+        //   amrChargerBody,
+        //   ['name'],
+        // );
+
         // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
-        // const amrResult = await queryRunner.manager
-        //   .getRepository(Amr)
-        //   .upsert(amrBody, ['name']);
-        //
-        // const amrChargerResult = await queryRunner.manager
-        //   .getRepository(AmrCharger)
-        //   .upsert(amrChargerBody, ['name']);
 
         // Amr 생성, amr충전 생성 될 시에만 이력 저장
-        if (
-          amrResult.identifiers[0].id &&
-          amrChargerResult.identifiers[0].id &&
-          amrBody.charging
-        ) {
-          amrChargeHistoryBody.amr = amrResult.identifiers[0].id;
-          amrChargeHistoryBody.amrCharger = amrChargerResult.identifiers[0].id;
-
-          await this.amrChargeHistoryRepository.save(amrChargeHistoryBody);
-          // await queryRunner.manager
-          //   .getRepository(AmrChargeHistory)
-          //   .save(amrChargeHistoryBody);
-        }
+        // if (
+        //   amrResult.identifiers[0].id &&
+        //   amrChargerResult.identifiers[0].id &&
+        //   amrBody.charging
+        // ) {
+        //   amrChargeHistoryBody.amr = amrResult.identifiers[0].id;
+        //   amrChargeHistoryBody.amrCharger = amrChargerResult.identifiers[0].id;
+        //
+        //   await this.amrChargeHistoryRepository.save(amrChargeHistoryBody);
+        //   // await queryRunner.manager
+        //   //   .getRepository(AmrChargeHistory)
+        //   //   .save(amrChargeHistoryBody);
+        // }
 
         // await queryRunner.commitTransaction();
       } catch (error) {
