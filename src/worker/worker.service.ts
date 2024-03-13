@@ -31,7 +31,19 @@ export class WorkerService {
     if (this.configService.get<string>('SCHEDULE') !== 'true') {
       return;
     }
-    await this.amrService.createAmrByHacs();
+    // await this.amrService.createAmrByHacs();
+    // console.log('amr 데이터 수집 스케줄러 동작');
+  }
+
+  @Interval(20000)
+  // 20 초마다 mssql 에서 amr 알람 데이터
+  async amrAlarmCheck() {
+    //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
+    if (this.configService.get<string>('SCHEDULE') !== 'true') {
+      return;
+    }
+    console.log('amr 알람 로직 동작');
+    await this.amrService.makeAmrAlarm();
     // console.log('amr 데이터 수집 스케줄러 동작');
   }
 
