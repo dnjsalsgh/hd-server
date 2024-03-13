@@ -35,8 +35,8 @@ export class WorkerService {
     // console.log('amr 데이터 수집 스케줄러 동작');
   }
 
-  @Interval(20000)
-  // 20 초마다 mssql 에서 amr 알람 데이터
+  @Interval(10000)
+  // 10 초마다 mssql 에서 amr 알람 데이터
   async amrAlarmCheck() {
     //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
     if (this.configService.get<string>('SCHEDULE') !== 'true') {
