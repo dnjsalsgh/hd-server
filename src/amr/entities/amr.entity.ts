@@ -37,12 +37,16 @@ export class Amr {
     example: 1,
     description: '수행중인 미션번호',
   })
-  public MissionNo: string;
+  // [24-03-14] 이거 원래 없었음
+  // @Column({ nullable: true })
+  MissionNo: string;
 
   @ApiProperty({
     example: 1,
     description: '수행중인 미션번호',
   })
+  // [24-03-14] 이거 원래 없었음
+  // @Column({ nullable: true })
   public Missionld: number;
 
   // @ApiProperty({

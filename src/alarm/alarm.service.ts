@@ -103,6 +103,21 @@ export class AlarmService {
     }
   }
 
+  async changeAlarmByAmrNm(
+    equipmentName: string,
+    count: number,
+    check: boolean,
+  ) {
+    if (check) {
+      await this.alarmRepository.update(
+        { equipmentName: equipmentName },
+        {
+          count: count + 1,
+        },
+      );
+    }
+  }
+
   async makeAlarm(equipmentName: string, alarmMessage: string) {
     await this.create({
       equipmentName: equipmentName,

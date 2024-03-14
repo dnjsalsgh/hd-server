@@ -40,4 +40,11 @@ export class RedisService {
   async removeElement(key: string, count: number, value: string) {
     return await this.redis.lRem(key, count, value);
   }
+
+  async setHash(key: string, field: string, value: any): Promise<void> {
+    await this.redis.hSet(key, field, value);
+  }
+  async getHash(key: string, field: string): Promise<string | null> {
+    return await this.redis.hGet(key, field);
+  }
 }

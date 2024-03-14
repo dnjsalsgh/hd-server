@@ -25,6 +25,7 @@ import dayjs from 'dayjs';
 import { AlarmService } from '../alarm/alarm.service';
 import { amrErrorData } from '../worker/amrErrorData';
 import process from 'process';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class AmrService {
@@ -40,6 +41,7 @@ export class AmrService {
     private readonly hacsRepository: Repository<Hacs>,
     private readonly loggerService: LoggerService,
     private readonly alarmService: AlarmService,
+    private redisService: RedisService,
   ) {}
 
   create(createAmrDto: CreateAmrDto) {
@@ -76,6 +78,9 @@ export class AmrService {
       .pipe(take(1))
       .subscribe();
 
+    // amr의 에러code가 오면 그 에러 코드로 알람 발생
+    await this.makeAmrAlarm(amrDataList);
+
     // amr 5대 데이터 전부 이력 관리를 위한 for문
     for (const amrData of amrDataList) {
       const amrBody: CreateAmrDto = {
@@ -98,9 +103,6 @@ export class AmrService {
         MissionNo: amrData?.JobNm,
         Missionld: amrData?.JobId,
       };
-
-      // amr의 에러code가 오면 그 에러 코드로 알람 발생
-      // await this.makeAmrAlarm(amrData);
 
       const amrChargerBody: CreateAmrChargerDto = {
         name: amrData.Amrld.toString(),
@@ -168,25 +170,60 @@ export class AmrService {
     }
   }
 
-  public async makeAmrAlarm() {
-    const amrDataList = await this.hacsRepository.find({
-      // where: { Connected: 1 },
-      order: { LogDT: 'DESC' },
-      take: 5, // 최소한만 가져오려고 함(6 개)
-    });
+  public async makeAmrAlarm(amrDataList: Hacs[]) {
+    // const amrDataList = await this.hacsRepository.find({
+    //   // where: { Connected: 1 },
+    //   order: { LogDT: 'DESC' },
+    //   take: 5, // 최소한만 가져오려고 함(6 개)
+    // });
     for (const acs of amrDataList) {
       if (!amrErrorData[acs?.ErrorCode]) {
         return;
       }
 
-      const previousAmrBody = await this.alarmService.getPreviousAlarmState(
-        acs?.AMRNM,
-        amrErrorData[acs?.ErrorCode],
+      // 전원 off면 에러처리 안함
+      if (acs?.ErrorCode === 3) {
+        return;
+      }
+
+      const errorCodeNumber = acs?.ErrorCode;
+      const previousAmrErrorCode = await this.redisService.getHash(
+        `${acs.AMRNM}`,
+        'errorCodeNumber',
+      );
+      const previousAmrCount = await this.redisService.getHash(
+        `${acs.AMRNM}`,
+        'count',
       );
 
-      if (previousAmrBody) {
-        await this.alarmService.changeAlarm(previousAmrBody, true);
-      } else if (!previousAmrBody) {
+      // 처음 알람이 발생하면 들어가면
+      if (!previousAmrErrorCode) {
+        await this.redisService.setHash(
+          `${acs.AMRNM}`,
+          'errorCodeNumber',
+          acs?.ErrorCode,
+        );
+        await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
+      }
+
+      // const previousAmrBody = await this.alarmService.getPreviousAlarmState(
+      //   acs?.AMRNM,
+      //   amrErrorData[acs?.ErrorCode],
+      // );
+
+      if (+previousAmrErrorCode === errorCodeNumber) {
+        await this.alarmService.changeAlarmByAmrNm(
+          acs.AMRNM,
+          Number(previousAmrCount) + 1,
+          true,
+        );
+        await this.redisService.setHash(
+          `${acs.AMRNM}`,
+          'count',
+          Number(previousAmrCount) + 1,
+        );
+      } else if (+previousAmrErrorCode !== errorCodeNumber) {
+        // 이전의 알람과 현재의 알람이 다르다면 create
         await this.alarmService.create({
           equipmentName: acs?.AMRNM,
           stopTime: new Date(),
@@ -194,10 +231,15 @@ export class AmrService {
           alarmMessage: amrErrorData[acs?.ErrorCode],
           done: false,
         });
+        await this.redisService.setHash(
+          `${acs.AMRNM}`,
+          'errorCodeNumber',
+          acs?.ErrorCode,
+        );
+        await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
       }
     }
   }
-
   findAll(
     name?: string,
     charging?: boolean,

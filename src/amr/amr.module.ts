@@ -10,6 +10,8 @@ import { Hacs } from '../hacs/entities/hacs.entity';
 import { LoggerService } from '../lib/logger/logger.service';
 import { AlarmService } from '../alarm/alarm.service';
 import { Alarm } from '../alarm/entities/alarm.entity';
+import { RedisService } from '../redis/redis.service';
+import { redisCustomProvider } from '../redis/redisCustomProvider';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { Alarm } from '../alarm/entities/alarm.entity';
       useValue: 'AmrService', // 원하는 값을 useValue로 지정합니다.
     },
     AlarmService,
+    RedisService,
+    ...redisCustomProvider,
   ],
 })
 export class AmrModule {}

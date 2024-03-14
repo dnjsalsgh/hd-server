@@ -174,7 +174,7 @@ export class AsrsController {
         // await this.delay(5);
         // this.alarmProcessing = false;
         // }
-        await this.delay(10000);
+        await this.delay(1000);
         this.asrsSkidProcessing = false;
 
         // console.log('설비알람 체킹 in hyundai/asrs1/eqData');
