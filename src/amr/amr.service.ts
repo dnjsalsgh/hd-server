@@ -215,6 +215,7 @@ export class AmrService {
     //   amrErrorData[acs?.ErrorCode],
     // );
 
+    // 이전 에러와 동일한 에러가 들어올 때
     if (+previousAmrErrorCode === errorCodeNumber) {
       await this.alarmService.changeAlarmByAlarmId(
         Number(previousAlarmId),
@@ -227,8 +228,9 @@ export class AmrService {
         'count',
         Number(previousAmrCount) + 1,
       );
-    } else if (+previousAmrErrorCode !== errorCodeNumber) {
-      // 이전의 알람과 현재의 알람이 다르다면 create
+    }
+    // 이전의 알람과 현재의 알람이 다르다면 create
+    else if (+previousAmrErrorCode !== errorCodeNumber) {
       const alarm = await this.alarmService.create({
         equipmentName: acs?.AMRNM,
         stopTime: new Date(),

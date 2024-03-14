@@ -3,12 +3,14 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
+@Index(['id', 'createdAt'], { unique: true })
 export class Alarm {
   @PrimaryGeneratedColumn()
   id: number;
