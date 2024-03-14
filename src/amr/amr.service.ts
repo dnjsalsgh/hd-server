@@ -363,4 +363,53 @@ export class AmrService {
       // take: limitNumber,
     });
   }
+
+  // public async makeAmrAlarm() {
+  //   const amrDataList = await this.hacsRepository.find({
+  //     // where: { Connected: 1 },
+  //     order: { LogDT: 'DESC' },
+  //     take: 5, // 최소한만 가져오려고 함(6 개)
+  //   });
+  //   for (const acs of amrDataList) {
+  //     if (!amrErrorData[acs?.ErrorCode]) {
+  //       return;
+  //     }
+  //
+  //     const previousAmrBody = await this.alarmService.getPreviousAlarmState(
+  //       amrData?.AMRNM,
+  //       amrErrorData[amrData?.ErrorCode],
+  //     );
+  //     const previousAmrBody = await this.alarmService.getPreviousAlarmState(
+  //       acs?.AMRNM,
+  //       amrErrorData[acs?.ErrorCode],
+  //     );
+  //
+  //     if (previousAmrBody) {
+  //       await this.alarmService.changeAlarm(previousAmrBody, true);
+  //     } else if (
+  //       !previousAmrBody
+  //       // &&
+  //       // amrData?.ErrorCode !== null &&
+  //       // amrErrorData[amrData?.ErrorCode] !== undefined &&
+  //       // previousAmrBody.alarmMessage !== amrErrorData[amrData?.ErrorCode]
+  //       // amrErrorData[amrData?.ErrorCode] !== previousAmrBody.alarmMessage
+  //     ) {
+  //       await this.alarmService.create({
+  //         equipmentName: amrData?.AMRNM,
+  //         stopTime: new Date(),
+  //         count: 1,
+  //         alarmMessage: amrErrorData[amrData?.ErrorCode],
+  //         done: false,
+  //       });
+  //       if (previousAmrBody) {
+  //         await this.alarmService.changeAlarm(previousAmrBody, true);
+  //       } else if (!previousAmrBody) {
+  //         await this.alarmService.create({
+  //           equipmentName: acs?.AMRNM,
+  //           stopTime: new Date(),
+  //           count: 1,
+  //           alarmMessage: amrErrorData[acs?.ErrorCode],
+  //           done: false,
+  //         });
+  //       }
 }
