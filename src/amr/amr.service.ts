@@ -78,9 +78,6 @@ export class AmrService {
       .pipe(take(1))
       .subscribe();
 
-    // amr의 에러code가 오면 그 에러 코드로 알람 발생
-    await this.makeAmrAlarm(amrDataList);
-
     // amr 5대 데이터 전부 이력 관리를 위한 for문
     for (const amrData of amrDataList) {
       const amrBody: CreateAmrDto = {
@@ -100,27 +97,30 @@ export class AmrService {
         // lastBatteryLevel: amrData.LastBatteryLevel,
         simulation: true,
         // distinguish: amrData?.distinguish, // 인입용 인출용 구분
-        MissionNo: amrData?.JobNm,
-        Missionld: amrData?.JobId,
+        // MissionNo: amrData?.JobNm,
+        // Missionld: amrData?.JobId,
       };
 
-      const amrChargerBody: CreateAmrChargerDto = {
-        name: amrData.Amrld.toString(),
-        working: amrData?.CurState === 'Charge',
-        // x: amrData?.ChargeX, // 유니티에서 보여지는 amr의 x좌표
-        // y: amrData?.ChargeY, // 유니티에서 보여지는 amr의 y좌표
-        // z: amrData?.ChargeZ, // 유니티에서 보여지는 amr의 z좌표
-      };
+      // amr의 에러code가 오면 그 에러 코드로 알람 발생
+      await this.makeAmrAlarm(amrData);
 
-      const amrChargeHistoryBody: CreateAmrChargeHistoryDto = {
-        chargeStart: amrData?.StartTime || new Date(),
-        chargeEnd: amrData?.EndTime || new Date(),
-        soc: amrData.SOC?.toString(),
-        soh: amrData.SOH?.toString(),
-        // 밑쪽 로직에서 값 주입되어서 기본값 null
-        amr: null,
-        amrCharger: null,
-      };
+      // const amrChargerBody: CreateAmrChargerDto = {
+      //   name: amrData.Amrld.toString(),
+      //   working: amrData?.CurState === 'Charge',
+      // x: amrData?.ChargeX, // 유니티에서 보여지는 amr의 x좌표
+      // y: amrData?.ChargeY, // 유니티에서 보여지는 amr의 y좌표
+      // z: amrData?.ChargeZ, // 유니티에서 보여지는 amr의 z좌표
+      // };
+
+      // const amrChargeHistoryBody: CreateAmrChargeHistoryDto = {
+      //   chargeStart: amrData?.StartTime || new Date(),
+      //   chargeEnd: amrData?.EndTime || new Date(),
+      //   soc: amrData.SOC?.toString(),
+      //   soh: amrData.SOH?.toString(),
+      //   // 밑쪽 로직에서 값 주입되어서 기본값 null
+      //   amr: null,
+      //   amrCharger: null,
+      // };
 
       // const queryRunner = await this.dataSource.createQueryRunner();
       // await queryRunner.connect();
@@ -170,75 +170,83 @@ export class AmrService {
     }
   }
 
-  public async makeAmrAlarm(amrDataList: Hacs[]) {
+  public async makeAmrAlarm(acs: Hacs) {
     // const amrDataList = await this.hacsRepository.find({
     //   // where: { Connected: 1 },
     //   order: { LogDT: 'DESC' },
     //   take: 5, // 최소한만 가져오려고 함(6 개)
     // });
-    for (const acs of amrDataList) {
-      if (!amrErrorData[acs?.ErrorCode]) {
-        return;
-      }
+    // for (const acs of amrDataList) {
+    if (!amrErrorData[acs?.ErrorCode]) {
+      return;
+    }
 
-      // 전원 off면 에러처리 안함
-      if (acs?.ErrorCode === 3) {
-        return;
-      }
+    // 전원 off면 에러처리 안함
+    if (acs?.ErrorCode === 3) {
+      return;
+    }
 
-      const errorCodeNumber = acs?.ErrorCode;
-      const previousAmrErrorCode = await this.redisService.getHash(
+    const errorCodeNumber = acs?.ErrorCode;
+    const previousAmrErrorCode = await this.redisService.getHash(
+      `${acs.AMRNM}`,
+      'errorCodeNumber',
+    );
+    const previousAmrCount = await this.redisService.getHash(
+      `${acs.AMRNM}`,
+      'count',
+    );
+    const previousAlarmId = await this.redisService.getHash(
+      `${acs.AMRNM}`,
+      'alarmId',
+    );
+
+    // 처음 알람이 발생하면 들어가면 알람 정보 redis에 세팅하기
+    if (!previousAmrErrorCode) {
+      await this.redisService.setHash(
         `${acs.AMRNM}`,
         'errorCodeNumber',
+        acs?.ErrorCode,
       );
-      const previousAmrCount = await this.redisService.getHash(
+      await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
+    }
+
+    // const previousAmrBody = await this.alarmService.getPreviousAlarmState(
+    //   acs?.AMRNM,
+    //   amrErrorData[acs?.ErrorCode],
+    // );
+
+    if (+previousAmrErrorCode === errorCodeNumber) {
+      await this.alarmService.changeAlarmByAlarmId(
+        Number(previousAlarmId),
+        Number(previousAmrCount) + 1,
+        true,
+      );
+      // 이전 count + 1 해주기
+      await this.redisService.setHash(
         `${acs.AMRNM}`,
         'count',
+        Number(previousAmrCount) + 1,
       );
+    } else if (+previousAmrErrorCode !== errorCodeNumber) {
+      // 이전의 알람과 현재의 알람이 다르다면 create
+      const alarm = await this.alarmService.create({
+        equipmentName: acs?.AMRNM,
+        stopTime: new Date(),
+        count: 1,
+        alarmMessage: amrErrorData[acs?.ErrorCode],
+        done: false,
+      });
 
-      // 처음 알람이 발생하면 들어가면
-      if (!previousAmrErrorCode) {
-        await this.redisService.setHash(
-          `${acs.AMRNM}`,
-          'errorCodeNumber',
-          acs?.ErrorCode,
-        );
-        await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
-      }
-
-      // const previousAmrBody = await this.alarmService.getPreviousAlarmState(
-      //   acs?.AMRNM,
-      //   amrErrorData[acs?.ErrorCode],
-      // );
-
-      if (+previousAmrErrorCode === errorCodeNumber) {
-        await this.alarmService.changeAlarmByAmrNm(
-          acs.AMRNM,
-          Number(previousAmrCount) + 1,
-          true,
-        );
-        await this.redisService.setHash(
-          `${acs.AMRNM}`,
-          'count',
-          Number(previousAmrCount) + 1,
-        );
-      } else if (+previousAmrErrorCode !== errorCodeNumber) {
-        // 이전의 알람과 현재의 알람이 다르다면 create
-        await this.alarmService.create({
-          equipmentName: acs?.AMRNM,
-          stopTime: new Date(),
-          count: 1,
-          alarmMessage: amrErrorData[acs?.ErrorCode],
-          done: false,
-        });
-        await this.redisService.setHash(
-          `${acs.AMRNM}`,
-          'errorCodeNumber',
-          acs?.ErrorCode,
-        );
-        await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
-      }
+      // 처음 만들 때 알람 정보를 redis에 세팅하기
+      await this.redisService.setHash(
+        `${acs.AMRNM}`,
+        'errorCodeNumber',
+        acs?.ErrorCode,
+      );
+      await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
+      await this.redisService.setHash(`${acs.AMRNM}`, 'alarmId', alarm.id);
     }
+    // }
   }
   findAll(
     name?: string,
@@ -333,6 +341,10 @@ export class AmrService {
 
   remove(id: number) {
     return this.amrRepository.delete(id);
+  }
+
+  removeRedis(amrNumber: string) {
+    return this.redisService.deleteAllFieldsInHash(amrNumber);
   }
 
   // 체적이 없는 화물을 검색하는 메서드

@@ -123,6 +123,15 @@ export class AmrController {
     return this.amrService.update(+id, updateAmrDto);
   }
 
+  @Delete('/redis-reset')
+  removeRedis() {
+    const amrName = ['R_001', 'R_002', 'R_003', 'R_004', 'R_005'];
+    for (const amr of amrName) {
+      this.amrService.removeRedis(amr);
+    }
+    return this.amrService.removeRedis('R_001');
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.amrService.remove(+id);

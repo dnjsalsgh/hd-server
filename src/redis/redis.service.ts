@@ -47,4 +47,8 @@ export class RedisService {
   async getHash(key: string, field: string): Promise<string | null> {
     return await this.redis.hGet(key, field);
   }
+
+  async deleteAllFieldsInHash(key: string): Promise<void> {
+    await this.redis.del(key);
+  }
 }

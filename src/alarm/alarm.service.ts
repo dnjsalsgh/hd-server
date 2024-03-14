@@ -103,14 +103,13 @@ export class AlarmService {
     }
   }
 
-  async changeAlarmByAmrNm(
-    equipmentName: string,
-    count: number,
-    check: boolean,
-  ) {
+  async changeAlarmByAlarmId(alarmId: number, count: number, check: boolean) {
     if (check) {
+      const todayStart = dayjs().startOf('day').toDate();
+      const todayEnd = dayjs().endOf('day').toDate();
+
       await this.alarmRepository.update(
-        { equipmentName: equipmentName },
+        { id: alarmId, createdAt: Between(todayStart, todayEnd) },
         {
           count: count + 1,
         },

@@ -21,8 +21,8 @@ export class CreateAmrDto extends PickType(Amr, [
   'simulation',
   'logDT',
   // 'distinguish',
-  'Missionld',
-  'MissionNo',
+  // 'Missionld',
+  // 'MissionNo',
 ]) {
   // @ApiProperty({
   //   example: '충전기이름',
