@@ -42,7 +42,7 @@ export class WorkerService {
     if (this.configService.get<string>('SCHEDULE') !== 'true') {
       return;
     }
-    console.log('amr 알람 로직 동작');
+    // console.log('amr 알람 로직 동작');
     // await this.amrService.makeAmrAlarm();
     // console.log('amr 데이터 수집 스케줄러 동작');
   }
