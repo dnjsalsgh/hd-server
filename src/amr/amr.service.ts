@@ -206,7 +206,6 @@ export class AmrService {
       'createdAt',
     );
 
-    console.log('previousAlarmCreatedAt = ', previousAlarmCreatedAt);
     // 처음 알람이 발생하면 들어가면 알람 정보 redis에 세팅하기
     if (!previousAmrErrorCode) {
       await this.redisService.setHash(
@@ -222,11 +221,6 @@ export class AmrService {
     //   acs?.AMRNM,
     //   amrErrorData[acs?.ErrorCode],
     // );
-
-    console.log(
-      'isOneDayDifference(previousAlarmCreatedAt, new Date().toISOString()) = ',
-      isOneDayDifference(previousAlarmCreatedAt, new Date().toISOString()),
-    );
 
     // 이전의 알람과 현재의 알람이 다르다면 create
     if (
