@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": false,
+        "amount": 90
+    },
+    "auditLog": "latency\\debug\\.feea0c24ccd016d77c60c0d876d16300fa7e09bf-audit.json",
+    "files": [
+        {
+            "date": 1711083056055,
+            "name": "latency\\debug\\2024-03-22.debug.log",
+            "hash": "d67ca2e6b76c450b5029e0590f4d0e295282bb6b225c044db60099793b1424d8"
+        },
+        {
+            "date": 1710830243241,
+            "name": "latency\\debug\\2024-03-19.debug.log",
+            "hash": "b4a5a312cda85bb264994aae53c133bfadc31d679c1465f05524335df52bed57"
+        }
+    ],
+    "hashType": "sha256"
+}
