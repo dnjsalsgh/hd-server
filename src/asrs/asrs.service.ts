@@ -31,6 +31,8 @@ import { AwbService } from '../awb/awb.service';
 import { AlarmService } from '../alarm/alarm.service';
 import { Alarm } from '../alarm/entities/alarm.entity';
 import dayjs from 'dayjs';
+import process from 'process';
+import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class AsrsService {
@@ -316,6 +318,11 @@ export class AsrsService {
         Asrs: asrsId,
         Awb: awbId,
       };
+      if (process.env.LATENCY === 'true') {
+        winstonLogger.debug(
+          `asrsHistory 저장 ${new Date().toISOString()}/${new Date().getTime()}`,
+        );
+      }
 
       const asrsHistoryFromIf = await this.asrsHistoryRepository.save(
         asrsHistoryBody,

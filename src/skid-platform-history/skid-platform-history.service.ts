@@ -30,6 +30,8 @@ import {
 } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { RedisService } from '../redis/redis.service';
 import { orderByUtil } from '../lib/util/orderBy.util';
+import process from 'process';
+import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class SkidPlatformHistoryService {
@@ -477,6 +479,11 @@ export class SkidPlatformHistoryService {
         count: awb.piece, // plc에서 들어오는 정보로 변경해야 할 지 고민
         totalCount: awb.awbTotalPiece,
       };
+      if (process.env.LATENCY === 'true') {
+        winstonLogger.debug(
+          `skidPlatformHistory 저장 ${new Date().toISOString()}/${new Date().getTime()}`,
+        );
+      }
 
       const skidPlatformHistoryFormIf =
         await this.skidPlatformHistoryRepository.save(asrsHistoryBody);

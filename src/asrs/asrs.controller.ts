@@ -28,6 +28,8 @@ import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { ConfigService } from '@nestjs/config';
 import { AwbService } from '../awb/awb.service';
+import process from 'process';
+import { winstonLogger } from '../lib/logger/winston.util';
 
 @Controller('asrs')
 @ApiTags('[자동창고]Asrs')
@@ -160,6 +162,11 @@ export class AsrsController {
       // if (!this.asrsSkidProcessing) {
       //   this.asrsSkidProcessing = true;
       // await this.asrsService.checkAsrsChange(data);
+      if (process.env.LATENCY === 'true') {
+        winstonLogger.debug(
+          `asrs,skid mqtt 수신 ${new Date().toISOString()}/${new Date().getTime()}`,
+        );
+      }
       await this.asrsService.checkAsrsChange(data);
       // console.log('asrs 체킹');
 
