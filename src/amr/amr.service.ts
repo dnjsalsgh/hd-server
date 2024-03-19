@@ -194,7 +194,8 @@ export class AmrService {
     const isBetweenElevenPMAndSevenAM =
       dayjs(now).isAfter(elevenPM) && dayjs(now).isBefore(sevenAM);
 
-    // 전원 off면 에러처리 안함
+    // 오후 11시 부터 오전 7시까지 amr의 알람 생성을 금지함
+    // [폐기] 전원 off면 에러처리 안함
     if (
       isBetweenElevenPMAndSevenAM
       // && acs?.ErrorCode === 3
