@@ -392,7 +392,7 @@ export class AwbController {
       // console.log('설비알람 체킹 in hyundai/vms1/eqData');
 
       // 3초 딜레이
-      await this.delay(3000);
+      await this.delay(1000);
 
       this.invmsProcessing = false; // 처리 완료 표시
     }
