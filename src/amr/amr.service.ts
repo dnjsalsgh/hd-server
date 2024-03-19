@@ -172,19 +172,33 @@ export class AmrService {
   }
 
   public async makeAmrAlarm(acs: Hacs) {
-    const now = new Date().toISOString();
     // const amrDataList = await this.hacsRepository.find({
     //   // where: { Connected: 1 },
     //   order: { LogDT: 'DESC' },
     //   take: 5, // 최소한만 가져오려고 함(6 개)
     // });
     // for (const acs of amrDataList) {
+
     if (!amrErrorData[acs?.ErrorCode]) {
       return;
     }
 
+    const now = new Date().toISOString();
+    // 오후 11시 설정
+    const elevenPM = dayjs(now).hour(23).minute(0).second(0);
+
+    // 아침 7시 설정
+    const sevenAM = dayjs(now).add(1, 'day').hour(7).minute(0).second(0);
+
+    // 현재 시간이 오후 11시부터 다음 날 아침 7시 사이인지 확인
+    const isBetweenElevenPMAndSevenAM =
+      dayjs(now).isAfter(elevenPM) && dayjs(now).isBefore(sevenAM);
+
     // 전원 off면 에러처리 안함
-    if (acs?.ErrorCode === 3) {
+    if (
+      isBetweenElevenPMAndSevenAM
+      // && acs?.ErrorCode === 3
+    ) {
       return;
     }
 

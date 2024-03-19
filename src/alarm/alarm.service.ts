@@ -109,7 +109,10 @@ export class AlarmService {
       const todayEnd = dayjs().endOf('day').toDate();
 
       await this.alarmRepository.update(
-        { id: alarmId, createdAt: Between(todayStart, todayEnd) },
+        {
+          id: alarmId,
+          // , createdAt: Between(todayStart, todayEnd)
+        },
         {
           count: count + 1,
         },
