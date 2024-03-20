@@ -74,10 +74,10 @@ export class AmrService {
     }
 
     // amr실시간 데이터 mqtt로 publish 하기 위함
-    // this.client
-    //   .send(`hyundai/amr/realData`, amrDataList)
-    //   .pipe(take(1))
-    //   .subscribe();
+    this.client
+      .send(`hyundai/amr/realData`, amrDataList)
+      .pipe(take(1))
+      .subscribe();
 
     // amr 5대 데이터 전부 이력 관리를 위한 for문
     for (const amrData of amrDataList) {

@@ -25,7 +25,7 @@ async function bootstrap() {
   });
 
   // 스케줄러 프로세스 생성
-  const sheduler = await NestFactory.create(WorkerModule);
+  // const sheduler = await NestFactory.create(WorkerModule);
 
   app.useGlobalPipes(new ValidationPipe()); // class validator 처리
   app.useGlobalFilters(new HttpExceptionFilter()); // Http 에러 처리
@@ -68,7 +68,7 @@ async function bootstrap() {
     },
   );
   await mqttApp.listen();
-  await sheduler.init(); // 스케줄러 프로세스 적용
+  // await sheduler.init(); // 스케줄러 프로세스 적용
 }
 
 bootstrap();
