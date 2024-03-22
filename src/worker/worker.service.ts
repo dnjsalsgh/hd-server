@@ -72,7 +72,7 @@ export class WorkerService {
         // 누락 로직 돌고 있으니 모델링 누락 스케줄러 동작안해도됨
         if (process.env.LATENCY === 'true') {
           winstonLogger.debug(
-            `모델업로드${new Date().toISOString()}/${new Date().getTime()}`,
+            `모델업로드 ${new Date().toISOString()}/${new Date().getTime()}`,
           );
         }
         await this.awbService.preventMissingData(missingVms, missingVms2d);
