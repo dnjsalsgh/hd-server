@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Cron, Interval } from '@nestjs/schedule';
+import { Injectable, UseInterceptors } from '@nestjs/common';
+import { Interval } from '@nestjs/schedule';
 import { AmrService } from '../amr/amr.service';
 import { LoggerService } from '../lib/logger/logger.service';
 import { AwbService } from '../awb/awb.service';
@@ -9,8 +9,8 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { Repository } from 'typeorm';
-import { nowTime } from '../lib/util/nowTime';
 import process from 'process';
+import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 
 @Injectable()
 export class WorkerService {

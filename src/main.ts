@@ -12,6 +12,7 @@ import path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { winstonLogger } from './lib/logger/winston.util';
 import * as dotenv from 'dotenv';
+import { MqttModule } from './mqtt.module';
 
 declare const module: any;
 
@@ -53,8 +54,6 @@ async function bootstrap() {
 
   // cors 설정
   app.enableCors();
-  await app.listen(port);
-
   // nest app 먼저 구동하고 mqtt 연결(mqtt 연결 안됬을 시 nest 구동 불가를 막기 위함)
   const mqttApp = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
@@ -68,6 +67,8 @@ async function bootstrap() {
     },
   );
   await mqttApp.listen();
+  await app.listen(port);
+
   // await sheduler.init(); // 스케줄러 프로세스 적용
 }
 

@@ -6,16 +6,17 @@ import { Amr } from './entities/amr.entity';
 import {
   Between,
   DataSource,
+  EntityManager,
   FindOperator,
   LessThanOrEqual,
   MoreThanOrEqual,
+  QueryRunner,
   Repository,
+  Transaction,
   TypeORMError,
 } from 'typeorm';
 import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-history.entity';
-import { CreateAmrChargerDto } from '../amr-charger/dto/create-amr-charger.dto';
-import { CreateAmrChargeHistoryDto } from '../amr-charge-history/dto/create-amr-charge-history.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { orderByUtil } from '../lib/util/orderBy.util';
@@ -27,6 +28,9 @@ import { amrErrorData } from '../worker/amrErrorData';
 import process from 'process';
 import { RedisService } from '../redis/redis.service';
 import { isOneDayDifference } from '../lib/util/isOneDayDifference';
+import { Alarm } from '../alarm/entities/alarm.entity';
+import { CreateAmrChargerDto } from '../amr-charger/dto/create-amr-charger.dto';
+import { CreateAmrChargeHistoryDto } from '../amr-charge-history/dto/create-amr-charge-history.dto';
 
 @Injectable()
 export class AmrService {
@@ -62,7 +66,7 @@ export class AmrService {
     const amrDataList = await this.hacsRepository.find({
       // where: { Connected: 1 },
       order: { LogDT: 'DESC' },
-      take: 5, // 최소한만 가져오려고 함(6 개)
+      take: 5, // 최소한만 가져오려고 함(5 개)
     });
 
     if (!amrDataList) {
@@ -79,203 +83,187 @@ export class AmrService {
       .pipe(take(1))
       .subscribe();
 
-    // amr 5대 데이터 전부 이력 관리를 위한 for문
-    for (const amrData of amrDataList) {
-      const amrBody: CreateAmrDto = {
-        name: amrData?.Amrld?.toString() || '', // 로봇 번호
-        logDT: amrData?.LogDT || new Date().toISOString(), // 데이터 업데이트 일자
-        charging: amrData?.CurState === 'Charge', // 마지막 amr의 배터리량과 현재 배터리량의 비교로 [충전중] 판단
-        // prcsCD: amrData.PrcsCD,
-        // ACSMode: amrData.ACSMode === 1,
-        mode: amrData?.Mode,
-        // errorLevel: amrData.ErrorLevel,
-        errorCode: amrData?.ErrorCode?.toString() || '',
-        soc: amrData?.SOC,
-        travelDist: amrData?.TravelDist, // 누적이동거리(m)
-        oprTime: amrData?.OprTime, // 누적운행시간(M)
-        stopTime: amrData?.StopTime, // 누적정지시간(M)
-        startBatteryLevel: amrData?.StartBatteryLevel, // 충전을 시작할 때만 입력하기
-        // lastBatteryLevel: amrData.LastBatteryLevel,
-        simulation: true,
-        // distinguish: amrData?.distinguish, // 인입용 인출용 구분
-        // MissionNo: amrData?.JobNm,
-        // Missionld: amrData?.JobId,
-      };
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-      // amr의 에러code가 오면 그 에러 코드로 알람 발생
-      await this.makeAmrAlarm(amrData);
+    try {
+      // amr 5대 데이터 전부 이력 관리를 위한 for문
+      for (const amrData of amrDataList) {
+        const amrBody: CreateAmrDto = {
+          name: amrData?.Amrld?.toString() || '', // 로봇 번호
+          logDT: amrData?.LogDT || new Date().toISOString(), // 데이터 업데이트 일자
+          charging: amrData?.CurState === 'Charge',
+          mode: amrData?.Mode,
+          errorCode: amrData?.ErrorCode?.toString() || '',
+          soc: amrData?.SOC,
+          travelDist: amrData?.TravelDist, // 누적이동거리(m)
+          oprTime: amrData?.OprTime, // 누적운행시간(M)
+          stopTime: amrData?.StopTime, // 누적정지시간(M)
+          startBatteryLevel: amrData?.StartBatteryLevel, // 충전을 시작할 때만 입력하기
+          simulation: true,
+        };
 
-      // const amrChargerBody: CreateAmrChargerDto = {
-      //   name: amrData.Amrld.toString(),
-      //   working: amrData?.CurState === 'Charge',
-      // x: amrData?.ChargeX, // 유니티에서 보여지는 amr의 x좌표
-      // y: amrData?.ChargeY, // 유니티에서 보여지는 amr의 y좌표
-      // z: amrData?.ChargeZ, // 유니티에서 보여지는 amr의 z좌표
-      // };
+        const amrResult = await this.amrRepository.upsert(amrBody, ['name']);
 
-      // const amrChargeHistoryBody: CreateAmrChargeHistoryDto = {
-      //   chargeStart: amrData?.StartTime || new Date(),
-      //   chargeEnd: amrData?.EndTime || new Date(),
-      //   soc: amrData.SOC?.toString(),
-      //   soh: amrData.SOH?.toString(),
-      //   // 밑쪽 로직에서 값 주입되어서 기본값 null
-      //   amr: null,
-      //   amrCharger: null,
-      // };
+        const amrChargerBody: CreateAmrChargerDto = {
+          name: amrData.Amrld.toString(),
+          working: amrData?.CurState === 'Charge',
+        };
 
-      // const queryRunner = await this.dataSource.createQueryRunner();
-      // await queryRunner.connect();
-      // await queryRunner.startTransaction();
+        const amrChargeHistoryBody: CreateAmrChargeHistoryDto = {
+          chargeStart: amrData?.StartTime || new Date(),
+          chargeEnd: amrData?.EndTime || new Date(),
+          soc: amrData.SOC?.toString(),
+          soh: amrData.SOH?.toString(),
+          amr: null,
+          amrCharger: null,
+        };
 
-      try {
-        // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
-        if (process.env.AMRLATENCY === 'true') {
-          console.log(`AMR TABLE에 데이터 저장 ${new Date().toISOString()}`);
-        }
-        // const amrResult = await this.amrRepository.upsert(amrBody, ['name']);
-        const amrResult = await this.amrRepository.update(
-          { name: amrBody.name },
-          amrBody,
+        const amrChargerResult = await this.amrChargerRepository.upsert(
+          amrChargerBody,
+          ['name'],
         );
 
-        // const amrChargerResult = await this.amrChargerRepository.upsert(
-        //   amrChargerBody,
-        //   ['name'],
-        // );
-
         // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
-
         // Amr 생성, amr충전 생성 될 시에만 이력 저장
-        // if (
-        //   amrResult.identifiers[0].id &&
-        //   amrChargerResult.identifiers[0].id &&
-        //   amrBody.charging
-        // ) {
-        //   amrChargeHistoryBody.amr = amrResult.identifiers[0].id;
-        //   amrChargeHistoryBody.amrCharger = amrChargerResult.identifiers[0].id;
-        //
-        //   await this.amrChargeHistoryRepository.save(amrChargeHistoryBody);
-        //   // await queryRunner.manager
-        //   //   .getRepository(AmrChargeHistory)
-        //   //   .save(amrChargeHistoryBody);
-        // }
+        if (
+          amrResult.identifiers[0].id &&
+          amrChargerResult.identifiers[0].id &&
+          amrBody.charging
+        ) {
+          amrChargeHistoryBody.amr = amrResult.identifiers[0].id;
+          amrChargeHistoryBody.amrCharger = amrChargerResult.identifiers[0].id;
 
-        // await queryRunner.commitTransaction();
-      } catch (error) {
-        // await queryRunner.rollbackTransaction();
-        // await queryRunner.release();
-        throw new TypeORMError(`rollback Working - ${error}`);
-      } finally {
-        // await queryRunner.release();
+          await this.amrChargeHistoryRepository.save(amrChargeHistoryBody);
+        }
+      }
+
+      // amr의 에러code가 오면 그 에러 코드로 알람 발생
+      await this.makeAmrAlarm(amrDataList, queryRunner);
+
+      // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
+      if (process.env.AMRLATENCY === 'true') {
+        console.log(`AMR TABLE에 데이터 저장 ${new Date().toISOString()}`);
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      throw new TypeORMError(`rollback Working - ${error}`);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  public async makeAmrAlarm(acsList: Hacs[], queryRunner: QueryRunner) {
+    for (const acs of acsList) {
+      if (!amrErrorData[acs?.ErrorCode]) {
+        return;
+      }
+
+      const now = new Date().toISOString();
+      // 오후 11시 설정
+      const elevenPM = dayjs(now).hour(23).minute(0).second(0);
+
+      // 아침 7시 설정
+      const sevenAM = dayjs(now).add(1, 'day').hour(7).minute(0).second(0);
+
+      // 현재 시간이 오후 11시부터 다음 날 아침 7시 사이인지 확인
+      const isBetweenElevenPMAndSevenAM =
+        dayjs(now).isAfter(elevenPM) && dayjs(now).isBefore(sevenAM);
+
+      // 오후 11시 부터 오전 7시까지 amr의 알람 생성을 금지함
+      // [폐기] 전원 off면 에러처리 안함
+      if (
+        isBetweenElevenPMAndSevenAM
+        // && acs?.ErrorCode === 3
+      ) {
+        return;
+      }
+
+      const errorCodeNumber = acs?.ErrorCode;
+      const previousAmrErrorCode = await this.redisService.getHash(
+        `${acs.AMRNM}`,
+        'errorCodeNumber',
+      );
+      const previousAmrCount = await this.redisService.getHash(
+        `${acs.AMRNM}`,
+        'count',
+      );
+      const previousAlarmId = await this.redisService.getHash(
+        `${acs.AMRNM}`,
+        'alarmId',
+      );
+      const previousAlarmCreatedAt = await this.redisService.getHash(
+        `${acs.AMRNM}`,
+        'createdAt',
+      );
+
+      // 처음 알람이 발생하면 들어가면 알람 정보 redis에 세팅하기
+      if (!previousAmrErrorCode) {
+        await this.redisService.setHash(
+          `${acs.AMRNM}`,
+          'errorCodeNumber',
+          acs?.ErrorCode,
+        );
+        await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
+        await this.redisService.setHash(`${acs.AMRNM}`, 'createdAt', now);
+      }
+
+      // const previousAmrBody = await this.alarmService.getPreviousAlarmState(
+      //   acs?.AMRNM,
+      //   amrErrorData[acs?.ErrorCode],
+      // );
+
+      // 이전의 알람과 현재의 알람이 다르다면 create
+      if (
+        +previousAmrErrorCode !== errorCodeNumber ||
+        isOneDayDifference(previousAlarmCreatedAt, new Date().toISOString())
+      ) {
+        const alarm = await queryRunner.manager.getRepository(Alarm).save({
+          equipmentName: acs?.AMRNM,
+          stopTime: new Date(),
+          count: 1,
+          alarmMessage: amrErrorData[acs?.ErrorCode],
+          done: false,
+        });
+        this.client
+          .send(`hyundai/alarm/insert`, alarm.id)
+          .pipe(take(1))
+          .subscribe();
+
+        // 처음 만들 때 알람 정보를 redis에 세팅하기
+        await this.redisService.setHash(
+          `${acs.AMRNM}`,
+          'errorCodeNumber',
+          acs?.ErrorCode,
+        );
+        await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
+        await this.redisService.setHash(`${acs.AMRNM}`, 'alarmId', alarm.id);
+        await this.redisService.setHash(`${acs.AMRNM}`, 'createdAt', now);
+      }
+      // 이전 에러와 동일한 에러가 들어올 때
+      else if (+previousAmrErrorCode === errorCodeNumber) {
+        await queryRunner.manager.getRepository(Alarm).update(
+          {
+            id: Number(previousAlarmId),
+          },
+          {
+            count: Number(previousAmrCount) + 1,
+          },
+        );
+        // 이전 count + 1 해주기
+        await this.redisService.setHash(
+          `${acs.AMRNM}`,
+          'count',
+          Number(previousAmrCount) + 1,
+        );
       }
     }
   }
 
-  public async makeAmrAlarm(acs: Hacs) {
-    // const amrDataList = await this.hacsRepository.find({
-    //   // where: { Connected: 1 },
-    //   order: { LogDT: 'DESC' },
-    //   take: 5, // 최소한만 가져오려고 함(6 개)
-    // });
-    // for (const acs of amrDataList) {
-
-    if (!amrErrorData[acs?.ErrorCode]) {
-      return;
-    }
-
-    const now = new Date().toISOString();
-    // 오후 11시 설정
-    const elevenPM = dayjs(now).hour(23).minute(0).second(0);
-
-    // 아침 7시 설정
-    const sevenAM = dayjs(now).add(1, 'day').hour(7).minute(0).second(0);
-
-    // 현재 시간이 오후 11시부터 다음 날 아침 7시 사이인지 확인
-    const isBetweenElevenPMAndSevenAM =
-      dayjs(now).isAfter(elevenPM) && dayjs(now).isBefore(sevenAM);
-
-    // 오후 11시 부터 오전 7시까지 amr의 알람 생성을 금지함
-    // [폐기] 전원 off면 에러처리 안함
-    if (
-      isBetweenElevenPMAndSevenAM
-      // && acs?.ErrorCode === 3
-    ) {
-      return;
-    }
-
-    const errorCodeNumber = acs?.ErrorCode;
-    const previousAmrErrorCode = await this.redisService.getHash(
-      `${acs.AMRNM}`,
-      'errorCodeNumber',
-    );
-    const previousAmrCount = await this.redisService.getHash(
-      `${acs.AMRNM}`,
-      'count',
-    );
-    const previousAlarmId = await this.redisService.getHash(
-      `${acs.AMRNM}`,
-      'alarmId',
-    );
-    const previousAlarmCreatedAt = await this.redisService.getHash(
-      `${acs.AMRNM}`,
-      'createdAt',
-    );
-
-    // 처음 알람이 발생하면 들어가면 알람 정보 redis에 세팅하기
-    if (!previousAmrErrorCode) {
-      await this.redisService.setHash(
-        `${acs.AMRNM}`,
-        'errorCodeNumber',
-        acs?.ErrorCode,
-      );
-      await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
-      await this.redisService.setHash(`${acs.AMRNM}`, 'createdAt', now);
-    }
-
-    // const previousAmrBody = await this.alarmService.getPreviousAlarmState(
-    //   acs?.AMRNM,
-    //   amrErrorData[acs?.ErrorCode],
-    // );
-
-    // 이전의 알람과 현재의 알람이 다르다면 create
-    if (
-      +previousAmrErrorCode !== errorCodeNumber ||
-      isOneDayDifference(previousAlarmCreatedAt, new Date().toISOString())
-    ) {
-      const alarm = await this.alarmService.create({
-        equipmentName: acs?.AMRNM,
-        stopTime: new Date(),
-        count: 1,
-        alarmMessage: amrErrorData[acs?.ErrorCode],
-        done: false,
-      });
-
-      // 처음 만들 때 알람 정보를 redis에 세팅하기
-      await this.redisService.setHash(
-        `${acs.AMRNM}`,
-        'errorCodeNumber',
-        acs?.ErrorCode,
-      );
-      await this.redisService.setHash(`${acs.AMRNM}`, 'count', 1);
-      await this.redisService.setHash(`${acs.AMRNM}`, 'alarmId', alarm.id);
-      await this.redisService.setHash(`${acs.AMRNM}`, 'createdAt', now);
-    }
-    // 이전 에러와 동일한 에러가 들어올 때
-    else if (+previousAmrErrorCode === errorCodeNumber) {
-      await this.alarmService.changeAlarmByAlarmId(
-        Number(previousAlarmId),
-        Number(previousAmrCount) + 1,
-        true,
-      );
-      // 이전 count + 1 해주기
-      await this.redisService.setHash(
-        `${acs.AMRNM}`,
-        'count',
-        Number(previousAmrCount) + 1,
-      );
-    }
-    // }
-  }
   findAll(
     name?: string,
     charging?: boolean,

@@ -48,6 +48,8 @@ import { RedisModule } from './redis/redis.module';
 import { Vms2dModule } from './vms2d/vms2d.module';
 import { BasicModule } from './basic/basic.module';
 import { VmsAwbResultModule } from './vms-awb-result/vms-awb-result.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import process from 'process';
 
 @Module({
   imports: [
