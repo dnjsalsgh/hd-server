@@ -22,6 +22,24 @@ const dailyOption = (level: string) => {
   };
 };
 
+const latencyOption = (level: string) => {
+  return {
+    level,
+    datePattern: 'YYYY-MM-DD',
+    dirname: `./latency/${level}`,
+    filename: `%DATE%.${level}.log`,
+    maxFiles: 90,
+    zippedArchive: true,
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      utilities.format.nestLike(process.env.NODE_ENV, {
+        colors: false,
+        prettyPrint: true,
+      }),
+    ),
+  };
+};
+
 export const winstonLogger = WinstonModule.createLogger({
   transports: [
     new winston.transports.Console({
@@ -37,5 +55,6 @@ export const winstonLogger = WinstonModule.createLogger({
     new winston.transports.DailyRotateFile(dailyOption('http')),
     new winston.transports.DailyRotateFile(dailyOption('warn')),
     new winston.transports.DailyRotateFile(dailyOption('error')),
+    new winston.transports.DailyRotateFile(latencyOption('debug')),
   ],
 });

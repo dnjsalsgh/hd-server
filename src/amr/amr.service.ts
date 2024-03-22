@@ -18,7 +18,7 @@ import {
 import { AmrCharger } from '../amr-charger/entities/amr-charger.entity';
 import { AmrChargeHistory } from '../amr-charge-history/entities/amr-charge-history.entity';
 import { ClientProxy } from '@nestjs/microservices';
-import { take } from 'rxjs';
+import { pairwise, take } from 'rxjs';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { LoggerService } from '../lib/logger/logger.service';
@@ -31,6 +31,7 @@ import { isOneDayDifference } from '../lib/util/isOneDayDifference';
 import { Alarm } from '../alarm/entities/alarm.entity';
 import { CreateAmrChargerDto } from '../amr-charger/dto/create-amr-charger.dto';
 import { CreateAmrChargeHistoryDto } from '../amr-charge-history/dto/create-amr-charge-history.dto';
+import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class AmrService {
@@ -60,7 +61,9 @@ export class AmrService {
    */
   async createAmrByHacs() {
     if (process.env.AMRLATENCY === 'true') {
-      console.log(`ACS DB로부터 데이터 수집 ${new Date().toISOString()}`);
+      winstonLogger.debug(
+        `ACS DB로부터 데이터 수집 ${new Date().toISOString()}/${new Date().getTime()}`,
+      );
     }
 
     const amrDataList = await this.hacsRepository.find({
@@ -74,7 +77,9 @@ export class AmrService {
     }
 
     if (process.env.AMRLATENCY === 'true') {
-      console.log(`ACS mqtt로 publish ${new Date().toISOString()}`);
+      winstonLogger.debug(
+        `ACS mqtt로 publish ${new Date().toISOString()}/${new Date().getTime()}`,
+      );
     }
 
     // amr실시간 데이터 mqtt로 publish 하기 위함
@@ -144,7 +149,9 @@ export class AmrService {
 
       // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
       if (process.env.AMRLATENCY === 'true') {
-        console.log(`AMR TABLE에 데이터 저장 ${new Date().toISOString()}`);
+        winstonLogger.debug(
+          `AMR TABLE에 데이터 저장 ${new Date().toISOString()}/${new Date().getTime()}`,
+        );
       }
 
       await queryRunner.commitTransaction();
