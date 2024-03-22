@@ -120,23 +120,23 @@ export class AmrService {
           amrCharger: null,
         };
 
-        const amrChargerResult = await this.amrChargerRepository.upsert(
-          amrChargerBody,
-          ['name'],
-        );
+        // const amrChargerResult = await this.amrChargerRepository.upsert(
+        //   amrChargerBody,
+        //   ['name'],
+        // );
 
         // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
         // Amr 생성, amr충전 생성 될 시에만 이력 저장
-        if (
-          amrResult.identifiers[0].id &&
-          amrChargerResult.identifiers[0].id &&
-          amrBody.charging
-        ) {
-          amrChargeHistoryBody.amr = amrResult.identifiers[0].id;
-          amrChargeHistoryBody.amrCharger = amrChargerResult.identifiers[0].id;
-
-          await this.amrChargeHistoryRepository.save(amrChargeHistoryBody);
-        }
+        // if (
+        //   amrResult.identifiers[0].id &&
+        //   amrChargerResult.identifiers[0].id &&
+        //   amrBody.charging
+        // ) {
+        //   amrChargeHistoryBody.amr = amrResult.identifiers[0].id;
+        //   amrChargeHistoryBody.amrCharger = amrChargerResult.identifiers[0].id;
+        //
+        //   await this.amrChargeHistoryRepository.save(amrChargeHistoryBody);
+        // }
       }
 
       // amr의 에러code가 오면 그 에러 코드로 알람 발생

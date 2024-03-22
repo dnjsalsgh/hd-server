@@ -6,13 +6,11 @@ import { TypeOrmExceptionFilter } from './lib/filter/typeOrmException.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as process from 'process';
-import { WorkerModule } from './worker/worker.module';
 import { AppModule } from './app.module';
 import path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { winstonLogger } from './lib/logger/winston.util';
 import * as dotenv from 'dotenv';
-import { MqttModule } from './mqtt.module';
 
 declare const module: any;
 
@@ -55,18 +53,28 @@ async function bootstrap() {
   // cors 설정
   app.enableCors();
   // nest app 먼저 구동하고 mqtt 연결(mqtt 연결 안됬을 시 nest 구동 불가를 막기 위함)
-  const mqttApp = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.MQTT,
-      options: {
-        url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
-        // keepalive: 30000,
-        reconnectPeriod: 3000,
-      },
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.MQTT,
+    options: {
+      url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
+      // keepalive: 30000,
+      reconnectPeriod: 3000,
     },
-  );
-  await mqttApp.listen();
+  });
+  // const mqttApp = await NestFactory.createMicroservice<MicroserviceOptions>(
+  //   AppModule,
+  //   {
+  //     transport: Transport.MQTT,
+  //     preview: true,
+  //     options: {
+  //       url: `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`,
+  //       // keepalive: 30000,
+  //       reconnectPeriod: 3000,
+  //     },
+  //   },
+  // );
+  // await mqttApp.listen();
+  await app.startAllMicroservices();
   await app.listen(port);
 
   // await sheduler.init(); // 스케줄러 프로세스 적용
