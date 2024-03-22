@@ -45,6 +45,7 @@ import { AwbUtilService } from './awbUtil.service';
 import console from 'console';
 import { AlarmService } from '../alarm/alarm.service';
 import process from 'process';
+import { winstonLogger } from '../lib/logger/winston.util';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
@@ -318,7 +319,9 @@ export class AwbController {
       this.invmsProcessing = true; // 처리 시작 표시
 
       if (process.env.VMSLATENCY === 'true') {
-        console.log(`vms mqtt 수신 ${new Date().toISOString()}`);
+        winstonLogger.debug(
+          `vms mqtt 수신 ${new Date().toISOString()}/${new Date().getTime()}`,
+        );
       }
       // 메시지 처리 로직
       await this.awbService.createAwbByPlcMqtt(data);

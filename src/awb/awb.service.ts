@@ -51,6 +51,7 @@ import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platfo
 import { ClientProxy } from '@nestjs/microservices';
 import { nowTime } from '../lib/util/nowTime';
 import process from 'process';
+import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class AwbService {
@@ -985,7 +986,9 @@ export class AwbService {
       // history 값 가져오기
       // vms 체적 데이터 가져오기
       if (process.env.VMSLATENCY === 'true') {
-        console.log(`vwms db 데이터 요청 ${new Date().toISOString()}`);
+        winstonLogger.debug(
+          `vwms db 데이터 요청 ${new Date().toISOString()}/${new Date().getTime()}`,
+        );
       }
 
       const vmsAwbHistoryData =
@@ -995,7 +998,9 @@ export class AwbService {
         );
 
       if (process.env.VMSLATENCY === 'true') {
-        console.log(`vwms db 데이터 수신 ${new Date().toISOString()}`);
+        winstonLogger.debug(
+          `vwms db 데이터 수신 ${new Date().toISOString()}/${new Date().getTime()}`,
+        );
       }
 
       if (!vmsAwbHistoryData) {
@@ -1036,7 +1041,9 @@ export class AwbService {
         return null;
       }
       if (process.env.VMSLATENCY === 'true') {
-        console.log(`DT AWB TABLE 저장 ${new Date().toISOString()}`);
+        winstonLogger.debug(
+          `DT AWB TABLE 저장 ${new Date().toISOString()}/${new Date().getTime()}`,
+        );
       }
       // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
       // insert 되면 redis의 값 수정

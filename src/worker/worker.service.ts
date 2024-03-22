@@ -11,6 +11,7 @@ import { Hacs } from '../hacs/entities/hacs.entity';
 import { Repository } from 'typeorm';
 import process from 'process';
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
+import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class WorkerService {
@@ -70,7 +71,9 @@ export class WorkerService {
       if (missingVms || missingVms2d) {
         // 누락 로직 돌고 있으니 모델링 누락 스케줄러 동작안해도됨
         if (process.env.LATENCY === 'true') {
-          console.log(`모델업로드 ${new Date().toISOString()}`);
+          winstonLogger.debug(
+            `모델업로드${new Date().toISOString()}/${new Date().getTime()}`,
+          );
         }
         await this.awbService.preventMissingData(missingVms, missingVms2d);
       }
