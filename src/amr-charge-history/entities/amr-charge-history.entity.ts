@@ -7,12 +7,14 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   Relation,
+  Unique,
 } from 'typeorm';
 import { Amr } from '../../amr/entities/amr.entity';
 import { AmrCharger } from '../../amr-charger/entities/amr-charger.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
+@Unique(['amr', 'amrCharger'])
 export class AmrChargeHistory {
   @PrimaryGeneratedColumn()
   id: number;
