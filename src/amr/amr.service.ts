@@ -139,7 +139,7 @@ export class AmrService {
         // ) {
         //   amrChargeHistoryBody.amr = amrResult.identifiers[0].id;
         //   amrChargeHistoryBody.amrCharger = amrChargerResult.identifiers[0].id;
-        //
+        //   await this.amrChargeHistoryRepository.save(amrChargeHistoryBody)
         //   await this.amrChargeHistoryRepository.upsert(amrChargeHistoryBody, [
         //     'amr',
         //     'amrCharger',
