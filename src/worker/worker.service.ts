@@ -33,17 +33,17 @@ export class WorkerService {
     // console.log('amr 데이터 수집 스케줄러 동작');
   }
 
-  @Interval(10000)
+  // @Interval(10000)
   // 10 초마다 mssql 에서 amr 알람 데이터
-  async amrAlarmCheck() {
-    //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
-    if (this.configService.get<string>('SCHEDULE') !== 'true') {
-      return;
-    }
-    // console.log('amr 알람 로직 동작');
-    // await this.amrService.makeAmrAlarm();
-    // console.log('amr 데이터 수집 스케줄러 동작');
-  }
+  // async amrAlarmCheck() {
+  //주석 해제 하면 mssql에서 amr 정보 가져오는 스케줄러 동작
+  // if (this.configService.get<string>('SCHEDULE') !== 'true') {
+  //   return;
+  // }
+  // console.log('amr 알람 로직 동작');
+  // await this.amrService.makeAmrAlarm();
+  // console.log('amr 데이터 수집 스케줄러 동작');
+  // }
 
   // awb의 누락된 모델링 파일을 다시 조립하기 위한 스케줄링
   @Interval(6000) // 6초
