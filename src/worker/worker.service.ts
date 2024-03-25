@@ -1,17 +1,14 @@
-import { Injectable, UseInterceptors } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { AmrService } from '../amr/amr.service';
 import { LoggerService } from '../lib/logger/logger.service';
 import { AwbService } from '../awb/awb.service';
-import console from 'console';
 import { FileService } from '../file/file.service';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hacs } from '../hacs/entities/hacs.entity';
 import { Repository } from 'typeorm';
 import process from 'process';
-import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
-import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class WorkerService {

@@ -1239,7 +1239,7 @@ export class SimulatorResultService {
       // 화물의 체적이 null이 들어오는 경우를 방지함
       if (!targetAwb.width) {
         throw new HttpException(
-          `403 체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+          `403 체적데이터가 없는 화물이 있습니다.${AsrsInfo.name}번 barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
           403,
         );
       }
@@ -1295,7 +1295,7 @@ export class SimulatorResultService {
       // 화물의 체적이 null이 들어오는 경우를 방지함
       if (!targetSkidPlatform.width) {
         throw new HttpException(
-          `403 체적데이터가 없는 화물이 있습니다. barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+          `403 체적데이터가 없는 화물이 있습니다. ${SkidPlatformInfo.name}번 barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
           403,
         );
       }
