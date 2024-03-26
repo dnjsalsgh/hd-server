@@ -315,8 +315,8 @@ export class AwbController {
     }
 
     // 1초 딜레이로 부하 줄이기
-    if (!this.invmsProcessing) {
-      this.invmsProcessing = true; // 처리 시작 표시
+    // if (!this.invmsProcessing) {
+    //   this.invmsProcessing = true; // 처리 시작 표시
 
       if (process.env.VMSLATENCY === 'true') {
         winstonLogger.debug(
@@ -358,10 +358,10 @@ export class AwbController {
       }
 
       // 3초 딜레이
-      // await this.delay(1000);e
+    //   await this.delay(600);
 
-      this.invmsProcessing = false; // 처리 완료 표시
-    }
+    //   this.invmsProcessing = false; // 처리 완료 표시
+    // }
 
     // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
