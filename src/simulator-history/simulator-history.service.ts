@@ -61,6 +61,8 @@ export class SimulatorHistoryService {
         Awb: query.Awb ? Equal(+query.Awb) : undefined,
         createdAt: findDate,
       },
+      take: query.limit,
+      skip: query.offset,
     });
   }
 

@@ -116,6 +116,9 @@ export class AsrsOutOrderService {
           : undefined,
         createdAt: findDate,
       },
+      order: orderByUtil(query.order),
+      take: query.limit,
+      skip: query.offset,
     });
   }
 
