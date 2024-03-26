@@ -319,9 +319,9 @@ export class AwbController {
     //   this.invmsProcessing = true; // 처리 시작 표시
 
       if (process.env.VMSLATENCY === 'true') {
-        winstonLogger.debug(
-          `vms mqtt 수신 ${new Date().toISOString()}/${new Date().getTime()}`,
-        );
+        // winstonLogger.debug(
+        //   `vms mqtt 수신 ${new Date().toISOString()}/${new Date().getTime()}`,
+        // );
       }
       // 메시지 처리 로직
       await this.awbService.createAwbByPlcMqtt(data);
