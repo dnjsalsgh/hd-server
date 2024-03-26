@@ -358,7 +358,7 @@ export class AwbController {
       }
 
       // 3초 딜레이
-      await this.delay(1000);
+      // await this.delay(1000);e
 
       this.invmsProcessing = false; // 처리 완료 표시
     }
