@@ -1,6 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
-import { MessagePattern, Payload, ClientProxy } from '@nestjs/microservices';
-import { take } from 'rxjs';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller()
 export class MqttController {
