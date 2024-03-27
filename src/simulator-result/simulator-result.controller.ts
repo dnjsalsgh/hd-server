@@ -147,6 +147,15 @@ export class SimulatorResultController {
   }
 
   @ApiOperation({
+    summary: '창고, 안착대에 체적이 null인 값이 있는지 확인하기 위한 api',
+    description: '창고, 안착대 상황을 보고 빈값이 있으면 throw 에러 출력',
+  })
+  @Get('/empty')
+  isEmptyInAsrsAndSkid() {
+    return this.simulatorResultService.isEmpty();
+  }
+
+  @ApiOperation({
     summary: 'uld안에 화물이 들어갈 수 있는지 확인하는 api',
     description: 'uld안에 화물이 들어갈 수 있는지 확인',
   })

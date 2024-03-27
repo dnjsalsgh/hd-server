@@ -1093,6 +1093,26 @@ export class SimulatorResultService {
     return packageSimulatorCallRequestObject;
   }
 
+  // 현재 자동창고, 안착대 상황의 체적이 null인 값이 있다면 403에러 띄우기
+  async isEmpty() {
+    // 자동창고 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것
+    const asrsStateArray = await this.asrsHistoryService.nowState();
+    // 안착대의 최신 이력을 화물 기준으로 가져오기(패키지 시뮬레이터에 넘겨줄 것)
+    const skidPlatformStateArray =
+      await this.skidPlatformHistoryService.nowVirtualState(false, true);
+
+    // 현재 ASRS의 정보들
+    const Awbs = [];
+    this.setCurrentAwbsInAsrsExcludeNull(asrsStateArray, Awbs);
+    if (Awbs.length <= 0) throw new HttpException(`창고 이력이 없습니다.`, 400);
+
+    // 안착대 현재 상황 묶음
+    const palletRack = [];
+    this.setCurrentSkidPlatformExcludeNull(skidPlatformStateArray, palletRack);
+
+    return '체적이 전부 있습니다.';
+  }
+
   async findAll(query: SimulatorResult & BasicQueryParamDto) {
     // createdAt 기간검색 처리
     const { createdAtFrom, createdAtTo } = query;
@@ -1238,6 +1258,41 @@ export class SimulatorResultService {
 
       // 화물의 체적이 null이 들어오는 경우를 방지함
       if (!targetAwb.width) {
+        // throw new HttpException(
+        //   `403 체적데이터가 없는 화물이 있습니다.${AsrsInfo.name}번 barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+        //   403,
+        // );
+        continue;
+      }
+
+      Awbs.push(targetAwb);
+    }
+  }
+
+  // 현재 asrs이력을 보고 ps에넘길 객체로 변환을 위한 method
+  private setCurrentAwbsInAsrsExcludeNull(
+    asrsStateArray: AsrsHistory[],
+    Awbs: any[],
+  ) {
+    for (const asrsHistory of asrsStateArray) {
+      const AwbInfo = asrsHistory.Awb as Awb;
+      const AsrsInfo = asrsHistory.Asrs as Asrs;
+      const targetAwb = {
+        id: AwbInfo.id,
+        storageId: AsrsInfo.id,
+        name: AwbInfo.barcode,
+        separateNumber: AwbInfo.separateNumber.toString(),
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        destination: AwbInfo.destination,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+      };
+
+      // 화물의 체적이 null이 들어오는 경우를 방지함
+      if (!targetAwb.width) {
         throw new HttpException(
           `403 체적데이터가 없는 화물이 있습니다.${AsrsInfo.name}번 barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
           403,
@@ -1298,6 +1353,40 @@ export class SimulatorResultService {
           `403 체적데이터가 없는 화물이 있습니다. ${SkidPlatformInfo.name}번 barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
           403,
         );
+        // continue;
+      }
+      palletRack.push(targetSkidPlatform);
+    }
+  }
+
+  // 현재 안착대에 어떤 화물이 있는지 확인을 위한 method
+  private setCurrentSkidPlatformExcludeNull(
+    skidPlatformStateArray: SkidPlatformHistory[],
+    palletRack: any[],
+  ) {
+    for (const skidPlatformHistory of skidPlatformStateArray) {
+      const AwbInfo = skidPlatformHistory.Awb as Awb;
+      const SkidPlatformInfo = skidPlatformHistory.SkidPlatform as SkidPlatform;
+      const targetSkidPlatform = {
+        id: AwbInfo.id,
+        name: AwbInfo.barcode,
+        separateNumber: AwbInfo.separateNumber.toString(),
+        width: AwbInfo.width,
+        length: AwbInfo.length,
+        depth: AwbInfo.depth,
+        waterVolume: AwbInfo.waterVolume,
+        weight: AwbInfo.weight,
+        destination: AwbInfo.destination,
+        SCCs: AwbInfo.Scc?.map((v) => v.code),
+        palletRackId: SkidPlatformInfo.id, // pallet의 id를 ps에 넘겨주기 위함
+      };
+      // 화물의 체적이 null이 들어오는 경우를 방지함
+      if (!targetSkidPlatform.width) {
+        throw new HttpException(
+          `403 체적데이터가 없는 화물이 있습니다. ${SkidPlatformInfo.name}번 barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+          403,
+        );
+        // continue;
       }
       palletRack.push(targetSkidPlatform);
     }
