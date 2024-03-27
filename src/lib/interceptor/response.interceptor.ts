@@ -27,7 +27,6 @@ export class ResponseInterceptor implements NestInterceptor<ServerResponse> {
     const { url, method } = httpResponseObject.req;
     const statusCode = httpResponseObject.statusCode;
     const splitUrl = url.split('/')[1];
-
     let message = '';
 
     switch (method) {
@@ -47,8 +46,16 @@ export class ResponseInterceptor implements NestInterceptor<ServerResponse> {
     }
     return next.handle().pipe(
       map((data) => {
-        // const length = data?.length;
-        // data.unshift(length);
+        // [2024/03/27] 훈님 요청으로 isNull이 있다면 data와 같은 depth에서 보여주게 끔 변경
+        if ('isNull' in data) {
+          return {
+            statusCode: statusCode,
+            message: message,
+            data: data,
+            isNull: data.isNull,
+          };
+        }
+
         return {
           statusCode: statusCode,
           message: message,
