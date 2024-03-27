@@ -24,6 +24,6 @@ export class MqttController {
 
   @MessagePattern('American') //구독하는 주제2
   getUnique(@Payload() data) {
-    // console.log(data);
+    console.log(data);
   }
 }
