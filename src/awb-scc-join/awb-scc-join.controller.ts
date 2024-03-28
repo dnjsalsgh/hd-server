@@ -25,8 +25,6 @@ export class AwbSccJoinController {
     return this.awbSccJoinService.create(createAwbSccJoinDto);
   }
 
-  // @ApiQuery({ name: 'Scc', required: false, type: 'string' })
-  // @ApiQuery({ name: 'Awb', required: false, type: 'string' })
   @ApiQuery({ name: 'SccName', required: false, type: 'string' })
   @ApiQuery({ name: 'AwbName', required: false, type: 'string' })
   @ApiQuery({ name: 'SccName', required: false })
