@@ -15,7 +15,6 @@ import { CreateSkidPlatformAndAsrsPlcDto } from './dto/plc-data-intersection.dto
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { CreateSkidPlatformHistoryDto } from './dto/create-skid-platform-history.dto';
 import { UpdateSkidPlatformHistoryDto } from './dto/update-skid-platform-history.dto';
-import { CreateAsrsPlcDto } from '../asrs/dto/create-asrs-plc.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SkidPlatformHistory } from './entities/skid-platform-history.entity';
 import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
@@ -24,22 +23,15 @@ import {
   SkidPlatform,
   SkidPlatformAttribute,
 } from '../skid-platform/entities/skid-platform.entity';
-import {
-  AsrsOutOrder,
-  AsrsOutOrderAttribute,
-} from '../asrs-out-order/entities/asrs-out-order.entity';
+import { AsrsOutOrderAttribute } from '../asrs-out-order/entities/asrs-out-order.entity';
 import { RedisService } from '../redis/redis.service';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import process from 'process';
-import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class SkidPlatformHistoryService {
   constructor(
     @InjectRepository(SkidPlatformHistory)
     private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
-    @InjectRepository(AsrsOutOrder)
-    private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
     private dataSource: DataSource,
@@ -407,24 +399,6 @@ export class SkidPlatformHistoryService {
     return body[onOffTag];
   }
 
-  // in으로 상태 변경하는 메서드
-  shouldSetInSkidPlatform(
-    body: CreateSkidPlatformAndAsrsPlcDto,
-    onTag: string,
-    previousState: string | null,
-  ): boolean {
-    return body[onTag] && (previousState === 'out' || previousState === null);
-  }
-
-  // out으로 상태 변경하는 메서드
-  shouldSetOutSkidPlatform(
-    body: CreateAsrsPlcDto,
-    offTag: string,
-    previousState: string | null,
-  ): boolean {
-    return body[offTag] && previousState === 'in';
-  }
-
   // in인지 out 인지 return 하는 함수
   shouldSetInOutSkidPlatform(
     onOffSignal: boolean,
@@ -547,23 +521,6 @@ export class SkidPlatformHistoryService {
       return awbResult;
     } catch (e) {
       console.error(e);
-    }
-  }
-
-  /**
-   * plc로 들어온 데이터중 화물 누락된 화물 데이터 체크
-   */
-  async checkAwb() {
-    for (let unitNumber = 1; unitNumber <= 4; unitNumber++) {
-      const unitKey = this.formatUnitNumber(unitNumber);
-
-      const awbNo = `SUPPLY_01_${unitKey}_P2A_Bill_No`;
-      const separateNumber = `SUPPLY_01_${unitKey}_P2A_SEPARATION_NO`;
-
-      // this.awbService.createAwbByPlcMqttUsingAsrsAndSkidPlatform(
-      //   awbNo,
-      //   +separateNumber,
-      // );
     }
   }
 }

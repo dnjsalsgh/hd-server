@@ -1,18 +1,9 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { SkidPlatformHistory } from '../entities/skid-platform-history.entity';
-import { IsString } from 'class-validator';
 
 export class CreateSkidPlatformHistoryDto extends PickType(
   SkidPlatformHistory,
-  [
-    // 'AsrsOutOrder',
-    // 'Asrs',
-    // 'SkidPlatform',
-    // 'Awb',
-    'inOutType',
-    'count',
-    'totalCount',
-  ],
+  ['inOutType', 'count', 'totalCount'],
 ) {
   @ApiProperty({
     example: 1,
