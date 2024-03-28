@@ -134,7 +134,6 @@ import { VmsAwbResultModule } from './vms-awb-result/vms-awb-result.module';
     AwbReturnModule,
     WorkerModule,
     BasicModule,
-    // ...(process.env.IF_ACTIVE === 'true' ? [WorkerModule] : []),
   ],
   controllers: [AppController],
   providers: [AppService],

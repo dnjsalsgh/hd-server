@@ -273,7 +273,11 @@ export class SimulatorResultService {
 
     // 안착대 현재 상황 묶음
     const palletRack = [];
-    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+    this.setCurrentSkidPlatformExcludeNull(
+      skidPlatformStateArray,
+      palletRack,
+      isNull,
+    );
     if (palletRack.length <= 0)
       throw new HttpException(`파레트 정보를 찾아오지 못했습니다.`, 400);
 
@@ -432,7 +436,11 @@ export class SimulatorResultService {
 
     // 안착대 현재 상황 묶음
     const palletRack = [];
-    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+    this.setCurrentSkidPlatformExcludeNull(
+      skidPlatformStateArray,
+      palletRack,
+      isNull,
+    );
 
     const packageSimulatorCallRequestObject = {
       mode: false,
@@ -579,7 +587,11 @@ export class SimulatorResultService {
 
       // 안착대 현재 상황 묶음
       const palletRack = [];
-      this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+      this.setCurrentSkidPlatformExcludeNull(
+        skidPlatformStateArray,
+        palletRack,
+        isNull,
+      );
 
       // uld의 현재 상황 묶음
       const currentAWBsInULD = [];
@@ -645,7 +657,11 @@ export class SimulatorResultService {
 
     // 안착대 현재 상황 묶음
     const palletRack = [];
-    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+    this.setCurrentSkidPlatformExcludeNull(
+      skidPlatformStateArray,
+      palletRack,
+      isNull,
+    );
 
     // uld의 현재 상황 묶음
     const currentAWBsInULD = [];
@@ -803,7 +819,11 @@ export class SimulatorResultService {
 
     // 안착대 현재 상황 묶음
     const palletRack = [];
-    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+    this.setCurrentSkidPlatformExcludeNull(
+      skidPlatformStateArray,
+      palletRack,
+      isNull,
+    );
 
     // uld의 현재 상황 묶음
     const currentAWBsInULD = [];
@@ -985,7 +1005,11 @@ export class SimulatorResultService {
 
     // 안착대 현재 상황 묶음
     const palletRack = [];
-    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
+    this.setCurrentSkidPlatformExcludeNull(
+      skidPlatformStateArray,
+      palletRack,
+      isNull,
+    );
 
     const packageSimulatorCallRequestObject = {
       mode: false,
@@ -1010,7 +1034,7 @@ export class SimulatorResultService {
 
     // 안착대 현재 상황 묶음
     const palletRack = [];
-    this.setCurrentSkidPlatformExcludeNull(skidPlatformStateArray, palletRack);
+    this.setCurrentSkidPlatform(skidPlatformStateArray, palletRack);
 
     return '체적이 전부 있습니다.';
   }
@@ -1271,6 +1295,7 @@ export class SimulatorResultService {
   private setCurrentSkidPlatformExcludeNull(
     skidPlatformStateArray: SkidPlatformHistory[],
     palletRack: any[],
+    isNull: string[],
   ) {
     for (const skidPlatformHistory of skidPlatformStateArray) {
       const AwbInfo = skidPlatformHistory.Awb as Awb;
@@ -1290,11 +1315,13 @@ export class SimulatorResultService {
       };
       // 화물의 체적이 null이 들어오는 경우를 방지함
       if (!targetSkidPlatform.width) {
-        throw new HttpException(
-          `403 체적데이터가 없는 화물이 있습니다. ${SkidPlatformInfo.name}번 barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
-          403,
-        );
-        // continue;
+        // throw new HttpException(
+        //   `403 체적데이터가 없는 화물이 있습니다. ${SkidPlatformInfo.name}번 barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`,
+        //   403,
+        // );
+        isNull[0] = `403 체적데이터가 없는 화물이 있습니다.${SkidPlatformInfo.name}번 barcode = ${AwbInfo.barcode} separateNumber = ${AwbInfo.separateNumber}`;
+
+        continue;
       }
       palletRack.push(targetSkidPlatform);
     }
