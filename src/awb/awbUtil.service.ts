@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { CreateAwbDto } from './dto/create-awb.dto';
@@ -16,8 +16,6 @@ import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedul
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { RedisService } from '../redis/redis.service';
 import dayjs from 'dayjs';
-import { nowTime } from '../lib/util/nowTime';
-import console from 'console';
 
 @Injectable()
 export class AwbUtilService {
@@ -38,14 +36,6 @@ export class AwbUtilService {
     await this.redisService.set('separateNumber', separateNumber.toString());
   }
 
-  async getBarcode() {
-    return this.redisService.get('barcode');
-  }
-
-  async getSeparateNumber() {
-    return this.redisService.get('separateNumber');
-  }
-
   // vms db에서 넘어온 데이터들을 awb에 넣기 위해 가공하는 메서드
   async prepareAwbDto(
     vms: Vms3D,
@@ -57,12 +47,10 @@ export class AwbUtilService {
       ? await this.findSchedule(vmsAwbHistory.FLIGHT_NUMBER)
       : null;
 
-    // TODO: vms의 데이터로 awb에 정보를 넣을 일이 있다면 여기서 넣어야 함
+    // vms의 데이터로 awb에 정보를 넣을 일이 있다면 여기서 넣어야 함
     const awbDto: Partial<CreateAwbDto> = {
       barcode: vmsAwbHistory.AWB_NUMBER,
       separateNumber: vmsAwbHistory.SEPARATION_NO,
-      // width: vmsAwbHistory.RESULT_WIDTH,
-      // length: vmsAwbHistory.RESULT_LENGTH,
       width: vmsAwbHistory.RESULT_LENGTH,
       length: vmsAwbHistory.RESULT_WIDTH,
       depth: vmsAwbHistory.RESULT_HEIGHT,
@@ -84,17 +72,6 @@ export class AwbUtilService {
       source: vmsAwbResult?.DEPARTURE_CTY_CD, // 출발 공항 코드
       parent: 0, // 처음 vms에서 생성되었으니 부모 0
     };
-
-    // console.log('awbDto가 생성됨 = ', awbDto);
-
-    // VWMS_AWB_HISTORY에서 체적 정보가 없을 때 반환 하는 로직
-    // 100개를 긁어와서 누락된 화물 체크
-    // [24.01.23] 100개를 긁어와서 팅기는게 아니라 다음 화물을 위해 null값 반환
-    // if (!awbDto.width) {
-    //   console.log(`awbDto.width 없어서 실패`);
-    //   return null;
-    // throw new NotFoundException('체적 정보가 없습니다.');
-    // }
 
     // vms의 3D 파일을 저장함
     if (vms && vms.FILE_PATH) {
@@ -221,11 +198,6 @@ export class AwbUtilService {
       Scc: item.id,
     }));
     return queryRunner.manager.getRepository(AwbSccJoin).save(joinParam);
-  }
-
-  // mqtt 메시지를 보내는 캡슐화하는 위한 메서드
-  async sendMqttMessage(existingAwb: any) {
-    return this.mqttService.sendMqttMessage(`hyundai/vms1/create`, existingAwb);
   }
 
   // 에러를 반환하는데 쉽게 만들 메서드
