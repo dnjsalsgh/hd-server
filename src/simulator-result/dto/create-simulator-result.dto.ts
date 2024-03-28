@@ -1,6 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { SimulatorResult } from '../entities/simulator-result.entity';
-import { Column } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
 
 export class CreateSimulatorResultDto extends PickType(SimulatorResult, [
