@@ -1,25 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { AmrService } from '../amr/amr.service';
-import { LoggerService } from '../lib/logger/logger.service';
 import { AwbService } from '../awb/awb.service';
-import { FileService } from '../file/file.service';
 import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Hacs } from '../hacs/entities/hacs.entity';
-import { Repository } from 'typeorm';
-import process from 'process';
 
 @Injectable()
 export class WorkerService {
   constructor(
     private readonly amrService: AmrService,
-    private readonly loggerService: LoggerService,
     private readonly awbService: AwbService,
-    private readonly fileService: FileService,
     private readonly configService: ConfigService,
-    @InjectRepository(Hacs, 'amrDB') // amr에서 화물 정보를 긁어오기 위함
-    private readonly hacsRepository: Repository<Hacs>,
   ) {}
 
   // 0.6 초마다 mssql 에서 amr 데이터를 가져옴
