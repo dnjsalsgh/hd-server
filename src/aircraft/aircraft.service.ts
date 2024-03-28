@@ -12,7 +12,6 @@ import {
   Repository,
 } from 'typeorm';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
-import { AircraftScheduleAttributes } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 
 @Injectable()
 export class AircraftService {
@@ -37,12 +36,8 @@ export class AircraftService {
       findDate = LessThanOrEqual(createdAtTo);
     }
     const result = await this.aircraftRepository.find({
-      select: {
-        // AircraftSchedules: AircraftScheduleAttributes,
-      },
-      relations: {
-        // AircraftSchedules: true,
-      },
+      select: {},
+      relations: {},
       where: {
         name: query.name ? ILike(`%${query.name}%`) : undefined,
         code: query.code ? ILike(`%${query.code}%`) : undefined,
