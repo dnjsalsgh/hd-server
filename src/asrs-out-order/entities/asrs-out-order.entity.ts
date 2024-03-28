@@ -7,7 +7,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   Relation,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Awb } from '../../awb/entities/awb.entity';
@@ -18,7 +17,6 @@ import { SkidPlatformHistory } from '../../skid-platform-history/entities/skid-p
 import { Uld } from '../../uld/entities/uld.entity';
 
 @Entity()
-// @Unique(['Asrs', 'Awb']) // 어떤 안착대로 가는지 모르기 때문에 skidplatform 유니크 제거
 export class AsrsOutOrder {
   @PrimaryGeneratedColumn()
   id: number;

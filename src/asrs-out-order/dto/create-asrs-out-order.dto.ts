@@ -4,7 +4,6 @@ import { AsrsOutOrder } from '../entities/asrs-out-order.entity';
 export class CreateAsrsOutOrderDto extends PickType(AsrsOutOrder, [
   'order',
   'Asrs',
-  // 'SkidPlatform',
   'Awb',
   'Uld',
 ]) {

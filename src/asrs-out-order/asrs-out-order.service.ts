@@ -19,20 +19,15 @@ import { ClientProxy } from '@nestjs/microservices';
 import { take } from 'rxjs';
 import { UldAttribute } from '../uld/entities/uld.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
 import { AsrsHistoryService } from '../asrs-history/asrs-history.service';
-import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 
 @Injectable()
 export class AsrsOutOrderService {
   constructor(
     @InjectRepository(AsrsOutOrder)
     private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
-    @InjectRepository(SkidPlatformHistory)
-    private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,
     private asrsHistoryService: AsrsHistoryService,
-    private skidPlatformHistoryService: SkidPlatformHistoryService,
   ) {}
 
   async create(
