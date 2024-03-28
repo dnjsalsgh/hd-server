@@ -25,17 +25,6 @@ export class Vms2dService {
   }
 
   async findAll(query: Vms2d & BasicQueryParamDto) {
-    // createdAt 기간검색 처리
-    const { createdAtFrom, createdAtTo } = query;
-    let findDate: FindOperator<Date>;
-    if (createdAtFrom && createdAtTo) {
-      findDate = Between(createdAtFrom, createdAtTo);
-    } else if (createdAtFrom) {
-      findDate = MoreThanOrEqual(createdAtFrom);
-    } else if (createdAtTo) {
-      findDate = LessThanOrEqual(createdAtTo);
-    }
-
     return await this.vms2dRepository.find({
       where: {
         AWB_NUMBER: query.AWB_NUMBER
@@ -48,10 +37,5 @@ export class Vms2dService {
     });
   }
 
-  async findOne(id: number) {
-    // const result = await this.vms2dRepository.findOne({
-    //   where: { id: id },
-    // });
-    // return result;
-  }
+  async findOne(id: number) {}
 }

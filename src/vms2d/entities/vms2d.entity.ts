@@ -57,14 +57,6 @@ export class Vms2d {
   @Column({ name: 'FILE_PATH', type: 'nvarchar', length: 1024, nullable: true })
   FILE_PATH: string;
 
-  // @Column({
-  //   name: 'FILE_EXTENSION',
-  //   type: 'nvarchar',
-  //   length: 1024,
-  //   nullable: true,
-  // })
-  // FILE_EXTENSION: string;
-
   @Column({
     name: 'FILE_SIZE',
     type: 'int',
