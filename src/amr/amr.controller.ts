@@ -88,28 +88,12 @@ export class AmrController {
     return this.amrService.findAll(
       name,
       charging,
-      prcsCD,
-      ACSMode,
       mode,
-      errorLevel,
       errorCode,
-      startTimeFrom,
-      startTimeTo,
-      endTimeFrom,
-      endTimeTo,
       travelDist,
       oprTime,
       stopTime,
       startBatteryLevel,
-      lastBatteryLevel,
-      simulation,
-      logDT,
-      distinguish,
-      createdAtFrom,
-      createdAtTo,
-      order,
-      limit,
-      offset,
     );
   }
 
