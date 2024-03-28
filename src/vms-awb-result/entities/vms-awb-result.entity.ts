@@ -27,17 +27,6 @@ export class VmsAwbResult {
   })
   AWB_NUMBER: string;
 
-  // @ApiProperty({
-  //   example: 0,
-  //   description: '화물 분리 번호',
-  // })
-  // @Column({
-  //   name: 'SEPARATION_NO',
-  //   type: 'int',
-  //   nullable: true,
-  // })
-  // SEPARATION_NO: number;
-
   @ApiProperty({
     example: 0,
     description: '출발 공항 코드',

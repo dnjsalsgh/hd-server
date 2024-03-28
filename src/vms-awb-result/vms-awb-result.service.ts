@@ -1,14 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateVmsAwbResultDto } from './dto/create-vms-awb-result.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Between,
-  FindOperator,
-  ILike,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-  Repository,
-} from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { VmsAwbResult } from './entities/vms-awb-result.entity';
@@ -37,10 +30,5 @@ export class VmsAwbResultService {
     });
   }
 
-  async findOne(id: number) {
-    // const result = await this.vmsAwbResultRepository.findOne({
-    //   where: { id: id },
-    // });
-    // return result;
-  }
+  async findOne(id: number) {}
 }
