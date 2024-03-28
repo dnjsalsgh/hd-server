@@ -5,7 +5,6 @@ import { HttpException } from '@nestjs/common';
 import { userSelectOutput } from '../../simulator-result/dto/user-select-output';
 import { awbInPalletRackResult } from '../../simulator-result/dto/get-Awb-in-palletPack.dto';
 import { PsAllResponse } from '../../simulator-result/dto/ps-all-output.dto';
-import { PrepareBreakDownAwbInputDto } from '../../awb/dto/prepare-break-down-awb-input.dto';
 import { PrepareBreakDownAwbOutputDto } from '../../awb/dto/prepare-break-down-awb-output.dto';
 
 export const checkPsServer = async (): Promise<PsApiResponse> => {
