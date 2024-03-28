@@ -159,34 +159,12 @@ export class AsrsController {
     }
 
     if (data && this.configService.get<string>('IF_ACTIVE') === 'true') {
-      // if (!this.asrsSkidProcessing) {
-      //   this.asrsSkidProcessing = true;
-      // await this.asrsService.checkAsrsChange(data);
-      if (process.env.LATENCY === 'true') {
-        winstonLogger.debug(
-          `asrs,skid mqtt 수신 ${new Date().toISOString()}/${new Date().getTime()}`,
-        );
-      }
       await this.asrsService.checkAsrsChange(data);
-      // console.log('asrs 체킹');
 
-      // await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
       await this.skidPlatformHistoryService.checkSkidPlatformChange(data);
 
-      // console.log('skidPlatform 체킹');
-
-      // if(!this.alarmProcessing){
-      //   this.alarmProcessing = true;
       await this.asrsService.makeAlarmFromPlc(data);
-      // await this.delay(5);
-      // this.alarmProcessing = false;
-      // }
-      // await this.delay(1000);
-      // this.asrsSkidProcessing = false;
-
-      // console.log('설비알람 체킹 in hyundai/asrs1/eqData');
       // asrs, skidPlatform의 누락된 awb를 가져오기 위한 메서드
-      // }
     }
   }
 }

@@ -314,50 +314,41 @@ export class AwbController {
       return;
     }
 
-    // 1초 딜레이로 부하 줄이기
-    // if (!this.invmsProcessing) {
-    //   this.invmsProcessing = true; // 처리 시작 표시
+    // 메시지 처리 로직
+    await this.awbService.createAwbByPlcMqtt(data);
 
-      if (process.env.VMSLATENCY === 'true') {
-        // winstonLogger.debug(
-        //   `vms mqtt 수신 ${new Date().toISOString()}/${new Date().getTime()}`,
-        // );
-      }
-      // 메시지 처리 로직
-      await this.awbService.createAwbByPlcMqtt(data);
+    /**
+     * vms에서 오는 알람 처리를 위한 로직
+     * awbService에 로직 생성하려고 하면 주입 모듈 꼬여서 안넣어둠
+     */
+    const VMS_08_01_P2A_Total_Error = data['VMS_08_01_P2A_Total_Error'];
 
-      /**
-       * vms에서 오는 알람 처리를 위한 로직
-       * awbService에 로직 생성하려고 하면 주입 모듈 꼬여서 안넣어둠
-       */
-      const VMS_08_01_P2A_Total_Error = data['VMS_08_01_P2A_Total_Error'];
+    if (VMS_08_01_P2A_Total_Error === 0) {
+      return;
+    }
 
-      if (VMS_08_01_P2A_Total_Error === 0) {
-        return;
-      }
+    const previousVMS_08_01_P2A_Total_Error =
+      await this.alarmService.getPreviousAlarmState(
+        'VMS_08_01_P2A_Total_Error',
+        'VMS 계측기 에러',
+      );
 
-      const previousVMS_08_01_P2A_Total_Error =
-        await this.alarmService.getPreviousAlarmState(
-          'VMS_08_01_P2A_Total_Error',
-          'VMS 계측기 에러',
-        );
+    if (previousVMS_08_01_P2A_Total_Error && VMS_08_01_P2A_Total_Error) {
+      await this.alarmService.changeAlarm(
+        previousVMS_08_01_P2A_Total_Error,
+        true,
+      );
+    } else if (
+      !previousVMS_08_01_P2A_Total_Error &&
+      VMS_08_01_P2A_Total_Error
+    ) {
+      await this.alarmService.makeAlarm(
+        'VMS_08_01_P2A_Total_Error',
+        'VMS 계측기 에러',
+      );
+    }
 
-      if (previousVMS_08_01_P2A_Total_Error && VMS_08_01_P2A_Total_Error) {
-        await this.alarmService.changeAlarm(
-          previousVMS_08_01_P2A_Total_Error,
-          true,
-        );
-      } else if (
-        !previousVMS_08_01_P2A_Total_Error &&
-        VMS_08_01_P2A_Total_Error
-      ) {
-        await this.alarmService.makeAlarm(
-          'VMS_08_01_P2A_Total_Error',
-          'VMS 계측기 에러',
-        );
-      }
-
-      // 3초 딜레이
+    // 3초 딜레이
     //   await this.delay(600);
 
     //   this.invmsProcessing = false; // 처리 완료 표시

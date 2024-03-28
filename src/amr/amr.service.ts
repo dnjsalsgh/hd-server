@@ -60,12 +60,6 @@ export class AmrService {
    * @param body
    */
   async createAmrByHacs() {
-    if (process.env.AMRLATENCY === 'true') {
-      winstonLogger.debug(
-        `ACS DB로부터 데이터 수집 ${new Date().toISOString()}/${new Date().getTime()}`,
-      );
-    }
-
     const amrDataList = await this.hacsRepository.find({
       // where: { Connected: 1 },
       order: { LogDT: 'DESC' },
@@ -74,12 +68,6 @@ export class AmrService {
 
     if (!amrDataList) {
       return;
-    }
-
-    if (process.env.AMRLATENCY === 'true') {
-      winstonLogger.debug(
-        `ACS mqtt로 publish ${new Date().toISOString()}/${new Date().getTime()}`,
-      );
     }
 
     // amr실시간 데이터 mqtt로 publish 하기 위함
@@ -149,13 +137,6 @@ export class AmrService {
 
       // amr의 에러code가 오면 그 에러 코드로 알람 발생
       await this.makeAmrAlarm(amrDataList, queryRunner);
-
-      // 로봇의 상태 데이터를 업데이트 하기 위해 시간 데이터들 중 name이 같으면 update를 침
-      if (process.env.AMRLATENCY === 'true') {
-        winstonLogger.debug(
-          `AMR TABLE에 데이터 저장 ${new Date().toISOString()}/${new Date().getTime()}`,
-        );
-      }
 
       await queryRunner.commitTransaction();
     } catch (error) {

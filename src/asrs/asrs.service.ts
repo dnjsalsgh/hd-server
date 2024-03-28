@@ -318,11 +318,6 @@ export class AsrsService {
         Asrs: asrsId,
         Awb: awbId,
       };
-      if (process.env.LATENCY === 'true') {
-        winstonLogger.debug(
-          `asrsHistory 저장 ${new Date().toISOString()}/${new Date().getTime()}`,
-        );
-      }
 
       const asrsHistoryFromIf = await this.asrsHistoryRepository.save(
         asrsHistoryBody,
