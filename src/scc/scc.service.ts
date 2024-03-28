@@ -14,15 +14,12 @@ import {
 import { Scc } from './entities/scc.entity';
 import { BasicQueryParamDto } from '../lib/dto/basicQueryParam.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { Basic } from '../basic/entities/basic.entity';
 
 @Injectable()
 export class SccService {
   constructor(
     @InjectRepository(Scc)
     private readonly sccRepository: Repository<Scc>,
-    @InjectRepository(Basic)
-    private readonly basicRepository: Repository<Basic>,
   ) {}
 
   async create(createSccDto: CreateSccDto) {

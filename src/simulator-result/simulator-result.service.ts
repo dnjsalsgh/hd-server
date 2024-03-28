@@ -32,7 +32,6 @@ import { Awb, AwbAttribute } from '../awb/entities/awb.entity';
 import { AsrsHistory } from '../asrs-history/entities/asrs-history.entity';
 import { SkidPlatformHistory } from '../skid-platform-history/entities/skid-platform-history.entity';
 import { AsrsOutOrder } from '../asrs-out-order/entities/asrs-out-order.entity';
-import { BuildUpOrder } from '../build-up-order/entities/build-up-order.entity';
 import { CreateAsrsOutOrderDto } from '../asrs-out-order/dto/create-asrs-out-order.dto';
 import { CreateBuildUpOrderDto } from '../build-up-order/dto/create-build-up-order.dto';
 import { ClientProxy } from '@nestjs/microservices';
@@ -68,28 +67,12 @@ import {
   UldDeployCheckerRequest,
 } from './dto/uld-deploy-checker-input.dto';
 import { AwbUtilService } from '../awb/awbUtil.service';
-import process from 'process';
-import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class SimulatorResultService {
   constructor(
     @InjectRepository(SimulatorResult)
     private readonly simulatorResultRepository: Repository<SimulatorResult>,
-    @InjectRepository(AsrsHistory)
-    private readonly asrsHistoryRepository: Repository<AsrsHistory>,
-    @InjectRepository(SkidPlatformHistory)
-    private readonly skidPlatformHistoryRepository: Repository<SkidPlatformHistory>,
-    @InjectRepository(AsrsOutOrder)
-    private readonly asrsOutOrderRepository: Repository<AsrsOutOrder>,
-    @InjectRepository(BuildUpOrder)
-    private readonly buildUpOrderRepository: Repository<BuildUpOrder>,
-    @InjectRepository(Awb)
-    private readonly awbRepository: Repository<Awb>,
-    @InjectRepository(Asrs)
-    private readonly asrsRepository: Repository<Asrs>,
-    @InjectRepository(SkidPlatform)
-    private readonly skidPlatformRepository: Repository<SkidPlatform>,
     @InjectRepository(Uld)
     private readonly uldRepository: Repository<Uld>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,

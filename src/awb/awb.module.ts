@@ -30,7 +30,6 @@ import { Alarm } from '../alarm/entities/alarm.entity';
     TypeOrmModule.forFeature([
       Awb,
       Scc,
-      Basic,
       AwbSccJoin,
       AsrsOutOrder,
       AircraftSchedule,

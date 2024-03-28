@@ -39,7 +39,6 @@ import { Alarm } from '../alarm/entities/alarm.entity';
       AsrsOutOrder,
       Awb,
       Scc,
-      Basic,
       AwbSccJoin,
       AircraftSchedule,
       Alarm,

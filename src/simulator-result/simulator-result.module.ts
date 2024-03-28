@@ -28,7 +28,6 @@ import { Scc } from '../scc/entities/scc.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { FileService } from '../file/file.service';
 import { SccService } from '../scc/scc.service';
-import { Basic } from '../basic/entities/basic.entity';
 
 @Module({
   imports: [
@@ -52,7 +51,6 @@ import { Basic } from '../basic/entities/basic.entity';
       SkidPlatform,
       Scc,
       AircraftSchedule,
-      Basic,
     ]),
     // mqtt 모듈설정
     MqttModule,
