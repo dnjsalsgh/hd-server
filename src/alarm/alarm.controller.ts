@@ -22,14 +22,7 @@ export class AlarmController {
 
   @Post()
   create(@Body() createAlarmDto: CreateAlarmDto) {
-    const reuslt = this.alarmService.create(createAlarmDto);
-
-    return reuslt;
-  }
-
-  @Get('/test')
-  test() {
-    return this.alarmService.test();
+    return this.alarmService.create(createAlarmDto);
   }
 
   @ApiQuery({ name: 'createdAtFrom', required: false })

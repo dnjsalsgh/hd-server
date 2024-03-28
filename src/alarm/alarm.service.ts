@@ -77,10 +77,9 @@ export class AlarmService {
   }
 
   async findOne(id: number) {
-    const result = await this.alarmRepository.findOne({
+    return await this.alarmRepository.findOne({
       where: { id: id },
     });
-    return result;
   }
 
   update(id: number, updateAlarmDto: UpdateAlarmDto) {
@@ -103,23 +102,6 @@ export class AlarmService {
     }
   }
 
-  async changeAlarmByAlarmId(alarmId: number, count: number, check: boolean) {
-    if (check) {
-      const todayStart = dayjs().startOf('day').toDate();
-      const todayEnd = dayjs().endOf('day').toDate();
-
-      await this.alarmRepository.update(
-        {
-          id: alarmId,
-          // , createdAt: Between(todayStart, todayEnd)
-        },
-        {
-          count: count + 1,
-        },
-      );
-    }
-  }
-
   async makeAlarm(equipmentName: string, alarmMessage: string) {
     await this.create({
       equipmentName: equipmentName,
@@ -127,12 +109,6 @@ export class AlarmService {
       count: 1,
       alarmMessage: alarmMessage,
       done: false,
-    });
-  }
-
-  async changeAlarmIsDone(alarm: Alarm, done: boolean) {
-    await this.alarmRepository.update(alarm.id, {
-      done: done,
     });
   }
 
@@ -150,25 +126,6 @@ export class AlarmService {
       order: orderByUtil(null),
       take: 1,
     });
-    return findResult;
-  }
-
-  async test() {
-    const todayStart = dayjs().startOf('day').toDate();
-    const todayEnd = dayjs().endOf('day').toDate();
-    // const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
-    // const todayEnd = dayjs().endOf('day').add(9, 'hour').toDate();
-    console.log('todayStart = ', todayStart);
-    console.log('todayEnd = ', todayEnd);
-
-    const [findResult] = await this.alarmRepository.find({
-      where: {
-        createdAt: Between(todayStart, todayEnd),
-      },
-      order: orderByUtil(null),
-      take: 1,
-    });
-    console.log('findResult = ', findResult);
     return findResult;
   }
 }
