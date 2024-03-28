@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
   Param,
   ParseIntPipe,
   Post,
@@ -22,7 +21,7 @@ import {
 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
-import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { TransactionInterceptor } from '../lib/interceptor/transaction.interfacepter';
 import { TransactionManager } from '../lib/decorator/transaction.decorator';
 import { EntityManager, TypeORMError } from 'typeorm';
@@ -38,42 +37,18 @@ import { Vms3D } from '../vms/entities/vms.entity';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
-import { FileService } from '../file/file.service';
 import { AwbService } from './awb.service';
 import { ParseIdListPipe } from '../lib/pipe/parseIdList.pipe';
-import { AwbUtilService } from './awbUtil.service';
-import console from 'console';
 import { AlarmService } from '../alarm/alarm.service';
-import process from 'process';
-import { winstonLogger } from '../lib/logger/winston.util';
 
 @Controller('awb')
 @ApiTags('[화물,vms]Awb')
 export class AwbController {
-  private messageQueue = [];
-  private readonly processInterval = 500; // 처리 간격을 500ms (0.5초)로 설정
-  private invmsProcessing = false;
-
   constructor(
     private readonly awbService: AwbService,
-    private readonly awbUtilService: AwbUtilService,
-    private readonly fileService: FileService,
     private readonly configService: ConfigService,
     private readonly alarmService: AlarmService,
-    @Inject('MQTT_SERVICE') private client: ClientProxy,
-  ) {
-    // setInterval(() => this.processMessage(), this.processInterval);
-  }
-
-  // 0.5초마다 큐에서 메시지를 꺼내 처리
-  // private async processMessage() {
-  // if (this.messageQueue.length > 0 && !this.processing) {
-  //   this.processing = true; // 처리 중 플래그 설정
-  //   const message = this.messageQueue.shift();
-  //   await this.awbService.createAwbByPlcMqtt(message);
-  //   this.processing = false; // 처리 완료 후 플래그 해제
-  // }
-  // }
+  ) {}
 
   @ApiOperation({ summary: 'vms 입력데이터 저장하기(scc와 함께)' })
   @UseInterceptors(TransactionInterceptor)
@@ -94,15 +69,6 @@ export class AwbController {
     @TransactionManager() queryRunnerManager: EntityManager,
   ) {
     return this.awbService.createList(createAwbDto, queryRunnerManager);
-  }
-
-  @ApiOperation({
-    summary:
-      'vms 입력데이터 저장하기, 디모아, nas에 모델링 파일 들어왔다고 가정',
-  })
-  @Post('/integrate')
-  createIntegrate(@Body() createAwbDto: CreateAwbDto) {
-    return this.awbService.createIntegrate(createAwbDto);
   }
 
   @ApiOperation({
@@ -302,11 +268,6 @@ export class AwbController {
     return this.awbService.remove(+id);
   }
 
-  // 3초 딜레이를 위한 Promise 기반의 delay 함수
-  private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   // VMS 설비데이터 데이터를 추적하는 mqtt
   @MessagePattern('hyundai/vms1/eqData') //구독하는 주제
   async createByPlcMatt(@Payload() data) {
@@ -347,14 +308,6 @@ export class AwbController {
         'VMS 계측기 에러',
       );
     }
-
-    // 3초 딜레이
-    //   await this.delay(600);
-
-    //   this.invmsProcessing = false; // 처리 완료 표시
-    // }
-
-    // this.client.send(`hyundai/vms1/eqData2`, data).pipe(take(1)).subscribe();
   }
 
   // 3d 모델링 파일 트리거를 받아서 하는것이 아닌 mqtt로 직접 awb 정보를 받는다. 바로 위에 메서드로 대체
@@ -424,102 +377,4 @@ export class AwbController {
     //   console.error('Error:', error);
     // }
   }
-
-  private async fetchAwbData() {
-    return await this.awbService.getAwbByVms(1);
-  }
-
-  private async fetchAwb2dData() {
-    return await this.awbService.getAwbByVms2d(1);
-  }
-
-  // vms3D에서 이름으로 찾아오는 메서드
-  private async fetchAwbDataByBarcode(vmsAwbHistoryData: VmsAwbHistory) {
-    return await this.awbService.getAwbByVmsByName(
-      vmsAwbHistoryData.AWB_NUMBER,
-      vmsAwbHistoryData.SEPARATION_NO,
-    );
-  }
-
-  // vms2에서 이름으로 찾아오는 메서드
-  private async fetchAwb2dDataByBarcode(vmsAwbHistoryData: VmsAwbHistory) {
-    return await this.awbService.getAwbByVms2dByName(
-      vmsAwbHistoryData.AWB_NUMBER,
-      vmsAwbHistoryData.SEPARATION_NO,
-    );
-  }
-
-  private async fetchVmsAwbResultData(vms: Vms3D) {
-    const AWB_NUMBER = vms.AWB_NUMBER;
-    return await this.awbService.getVmsByAwbNumber(AWB_NUMBER);
-  }
-
-  private async fetchVmsAwbHistoryData(vms: Vms3D) {
-    const AWB_NUMBER = vms.AWB_NUMBER;
-    return await this.awbService.getLastAwbByAwbNumber(AWB_NUMBER);
-  }
-
-  // 최신 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
-  private async fetchVmsAwbResultDataLimit1(barcode: string) {
-    return await this.awbService.getLastVmsAwbResult(barcode);
-  }
-
-  // VWMS_AWB_HISTORY 테이블에 있는 정보 100개 가져오기
-  private async fetchVmsAwbHistoryDataLimit100() {
-    // return await this.awbService.getLastVmsAwbHistory();
-    return await this.awbService.get100VmsAwbHistory();
-  }
-
-  // VWMS_AWB_HISTORY 테이블에 있는 정보 barcode, separateNumber로 정보 가져오기
-  private async fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
-    barcode: string,
-    separateNumber: number,
-  ) {
-    return await this.awbService.getVmsAwbHistoryByBarcodeAndSeparateNumber(
-      barcode,
-      separateNumber,
-    );
-  }
-
-  private async createAwbDataInMssql(
-    vms: Vms3D,
-    vms2d: Vms2d,
-    vmsAwbResult: VmsAwbResult,
-    vmsAwbHistory: VmsAwbHistory,
-  ) {
-    // vms db에서 값이 들어오지 않았을 때 예외처리
-    // if (!vms) this.errorMessageHandling(vms, 'vms');
-    // if (!vms2d) this.errorMessageHandling(vms2d, 'vms2d');
-
-    // TODO 개발용으로 vmsAwbResult 테이블 없으니 이렇게 함 주석 해제할 것
-    // if (!vmsAwbResult) this.errorMessageHandling(vmsAwbResult, 'vmsAwbResult');
-    if (!vmsAwbHistory)
-      this.errorMessageHandling(vmsAwbHistory, 'vmsAwbHistory');
-
-    const awb = await this.awbService.createWithMssql(
-      vms,
-      vms2d,
-      vmsAwbResult,
-      vmsAwbHistory,
-    );
-    return awb;
-  }
-
-  private errorMessageHandling(target: any, tableName: string) {
-    throw new TypeORMError(
-      `${tableName} 테이블에 정보가 정확하지 않습니다. ${target}: ${target}`,
-    );
-  }
-
-  private async sendModelingCompleteSignal() {
-    await this.awbService.sendModelingCompleteMqttMessage();
-  }
 }
-
-// 메시지를 큐에 추가
-// this.messageQueue.push(data);
-
-// 메시지 큐의 길이가 10을 초과하면 가장 오래된 메시지부터 제거(메모리 관리 문제)
-// while (this.messageQueue.length > 10) {
-//   this.messageQueue.shift(); // 배열의 첫 번째 요소를 제거
-// }

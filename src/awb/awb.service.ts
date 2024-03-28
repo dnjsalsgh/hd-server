@@ -49,9 +49,7 @@ import { breakDownAwb } from './dto/prepare-break-down-awb-output.dto';
 import { CreateSkidPlatformHistoryDto } from '../skid-platform-history/dto/create-skid-platform-history.dto';
 import { SkidPlatformHistoryService } from '../skid-platform-history/skid-platform-history.service';
 import { ClientProxy } from '@nestjs/microservices';
-import { nowTime } from '../lib/util/nowTime';
 import process from 'process';
-import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class AwbService {
@@ -72,7 +70,6 @@ export class AwbService {
     private dataSource: DataSource,
     private readonly fileService: FileService,
     private readonly mqttService: MqttService,
-    private readonly sccService: SccService,
     private readonly awbUtilService: AwbUtilService,
     private readonly skidPlatformHistoryService: SkidPlatformHistoryService,
   ) {}
@@ -83,8 +80,6 @@ export class AwbService {
     const queryRunner = queryRunnerManager.queryRunner;
 
     try {
-      // 2. awb를 입력하기
-
       // 초기 입력 시 피스수 = 전체피스수
       if (!awbDto.awbTotalPiece) awbDto.awbTotalPiece = awbDto.piece;
 
@@ -198,94 +193,6 @@ export class AwbService {
       );
 
       return joinResult;
-    } catch (error) {
-      throw new TypeORMError(`rollback Working - ${error}`);
-    }
-  }
-
-  // vms에 데이터를 넣고 awb 테이블에 데이터를 넣는 메서드(디모아측 insert를 대신 테스트 하기 위한용도)
-  async createIntegrate(createAwbDto: CreateAwbDto) {
-    const { scc, ...awbDto } = createAwbDto;
-    const randomeString = uuidv4().split('-')[0];
-    const randomAwbPiece = Math.floor(Math.random() * 1000) + 1;
-    const createDate = dayjs().format('YYYYMMDDHHmmss');
-
-    try {
-      // 서버 내부적으로 body 데이터 기반으로 태스트용 디모아DB에 VMS 생성
-      const createVmsDto: CreateVmsDto = {
-        VWMS_ID: randomeString,
-        AWB_NUMBER: awbDto.barcode,
-        SEPARATION_NO: awbDto.separateNumber,
-        MEASUREMENT_COUNT: 0,
-        FILE_NAME: awbDto.barcode,
-        FILE_PATH: process.env.NAS_PATH,
-        // FILE_EXTENSION: 'fbx',
-        FILE_SIZE: 0,
-        RESULT_TYPE: 'C',
-        WATER_VOLUME: awbDto.waterVolume,
-        CUBIC_VOLUME: awbDto.squareVolume,
-        WIDTH: awbDto.width,
-        LENGTH: awbDto.length,
-        HEIGHT: awbDto.depth,
-        WEIGHT: awbDto.weight,
-        CREATE_USER_ID: randomeString,
-        CREATE_DATE: createDate,
-      };
-      const insertVmsResult = this.vmsRepository.save(createVmsDto);
-
-      const createVms2Dto: CreateVms2dDto = {
-        VWMS_ID: randomeString,
-        AWB_NUMBER: awbDto.barcode,
-        SEPARATION_NO: awbDto.separateNumber,
-        FILE_NAME: awbDto.barcode,
-        FILE_PATH: process.env.NAS_PATH_2D,
-        // FILE_EXTENSION: 'png',
-        FILE_SIZE: 0,
-        CALIBRATION_ID: randomeString,
-        CREATE_USER_ID: randomeString,
-        CREATE_DATE: createDate,
-      };
-      const insertVms2dResult = this.vms2dRepository.save(createVms2Dto);
-
-      // VWMV_AWB_RESULT 테이블 넣는 작업
-      const createVmsAwbResult: Partial<CreateVmsAwbResultDto> = {
-        VWMS_ID: randomeString,
-        AWB_NUMBER: awbDto.barcode,
-        SPCL_CGO_CD_INFO: scc ? scc.join(',') : null,
-        CGO_TOTAL_PC: randomAwbPiece,
-        // CGO_NDS: 'Y', nds 칼럼 넣기 옵션
-        ALL_PART_RECEIVED: 'Y',
-        RECEIVED_USER_ID: randomeString,
-        RECEIVED_DATE: createDate,
-      };
-      const insertVmsAwbResultResult =
-        this.vmsAwbResultRepository.save(createVmsAwbResult);
-
-      // VWMV_AWB_HISTORY 테이블 넣는 작업
-      const createVmsAwbHistory: Partial<CreateVmsAwbHistoryDto> = {
-        VWMS_ID: randomeString,
-        AWB_NUMBER: awbDto.barcode,
-        SEPARATION_NO: awbDto.separateNumber,
-        FLIGHT_NUMBER: randomeString,
-        CGO_PC: randomAwbPiece,
-        G_SKID_ON: 'Y',
-        OUT_USER_ID: randomeString,
-        OUT_DATE: createDate,
-      };
-      const insertVmsAwbHisotryResult =
-        this.vmsAwbHistoryRepository.save(createVmsAwbHistory);
-
-      const [vmsResult, vms2dResult, vmsAwbResult] = await Promise.allSettled([
-        insertVmsResult,
-        insertVms2dResult,
-        insertVmsAwbResultResult,
-        insertVmsAwbHisotryResult,
-      ]);
-
-      // 서버 내부적으로 mqtt 신호(/hyundai/vms1/createFile)을 발생,
-      // 서버 내부적으로 디모아DB에 담긴 vms 파일을 읽어오기
-      // 읽어온 vms 파일을 result 형태로 mqtt(hyundai/vms1/create)로 전송
-      this.mqttService.sendMqttMessage(`hyundai/vms1/createFile`, {});
     } catch (error) {
       throw new TypeORMError(`rollback Working - ${error}`);
     }
@@ -524,7 +431,6 @@ export class AwbService {
       skip: query.offset,
       relations: {
         Scc: true,
-        // AirCraftSchedules: true,
       },
     });
 
@@ -581,7 +487,6 @@ export class AwbService {
     const csvResult = this.fileService.jsonToCSV(csvData);
     await this.fileService.makeCsvFile(
       csvResult,
-      // `${new Date().toISOString()}.csv`,
       `${dayjs().format('YYYY-MM-DD HH-mm-ss')}.csv`,
     );
     return searchResult;
@@ -593,7 +498,6 @@ export class AwbService {
       where: [{ parent: id }],
       relations: {
         Scc: true,
-        // AirCraftSchedules: true,
       },
     });
   }
@@ -615,10 +519,6 @@ export class AwbService {
   ) {
     const searchResult = await this.awbRepository.find({
       where: { barcode: barcode, separateNumber: separateNUmber },
-      // relations: {
-      //   Scc: true,
-      //   AirCraftSchedule: true,
-      // },
     });
     return searchResult;
   }
@@ -630,7 +530,6 @@ export class AwbService {
   // awb의 상태를 변경하는 메서드
   updateState(id: number, state: string, updateAwbDto?: UpdateAwbDto) {
     if (state) updateAwbDto.state = state;
-    // this.awbRepository.update({ parent: id }, updateAwbDto);
     return this.awbRepository.update(id, updateAwbDto);
   }
 
@@ -774,26 +673,8 @@ export class AwbService {
   }
 
   // vms데이터를 받았다는 신호를 전송하는 메서드
-  async sendModelingCompleteMqttMessage() {
-    // awb실시간 데이터 mqtt로 publish 하기 위함
-    this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
-      fileRead: true,
-    });
-    // const awb = await this.getLastAwb();
-    // vwms_history 기준으로 최신 awb를 보내기 위함
-    const awb = await this.getLastAwbByReceivedDate();
-    this.mqttService.sendMqttMessage(`hyundai/vms1/awb`, awb);
-  }
-
-  // vms데이터를 받았다는 신호를 전송하는 메서드
   async sendSyncMqttMessage(awb: Awb) {
     // awb실시간 데이터 mqtt로 publish 하기 위함
-    // this.client.send(`hyundai/vms1/awb`, awb).subscribe();
-    // this.client
-    //   .send(`hyundai/vms1/readCompl`, {
-    //     fileRead: true,
-    //   })
-    //   .subscribe();
     this.mqttService.sendMqttMessage(`hyundai/vms1/readCompl`, {
       fileRead: true,
     });
@@ -829,29 +710,11 @@ export class AwbService {
     });
   }
 
-  // vms3D에서 개수만큼 꺼내오는 메서드
-  async getAwbByVms(takeNumber: number) {
-    const [result] = await this.vmsRepository.find({
-      order: orderByUtil('-CREATE_DATE'),
-      take: takeNumber,
-    });
-    return result;
-  }
-
   // vms3D에서 이름으로 찾아오는 메서드
   async getAwbByVmsByName(name: string, separateNumber: number) {
     const [result] = await this.vmsRepository.find({
       order: orderByUtil('-CREATE_DATE'),
       where: { AWB_NUMBER: name, SEPARATION_NO: separateNumber },
-    });
-    return result;
-  }
-
-  // vms2d에서 개수만큼 찾아오는 메서드
-  async getAwbByVms2d(takeNumber: number) {
-    const [result] = await this.vms2dRepository.find({
-      order: orderByUtil('-CREATE_DATE'),
-      take: takeNumber,
     });
     return result;
   }
@@ -865,49 +728,6 @@ export class AwbService {
     return result;
   }
 
-  // 최신 awb를 꺼내오는 매서드
-  async getLastAwb() {
-    const [awbResult] = await this.awbRepository.find({
-      order: orderByUtil(null),
-      take: 1,
-    });
-    return awbResult;
-  }
-
-  // 최신 awb를 꺼내오는 매서드
-  async getLastAwbByReceivedDate() {
-    const [awbResult] = await this.awbRepository.find({
-      where: {
-        receivedDate: Not(IsNull()),
-      },
-      order: orderByUtil('-receivedDate'),
-      take: 1,
-    });
-    return awbResult;
-  }
-
-  // awbNumber로 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
-  async getVmsByAwbNumber(name: string) {
-    const [result] = await this.vmsAwbResultRepository.find({
-      order: orderByUtil('-RECEIVED_DATE'),
-      where: { AWB_NUMBER: name },
-    });
-    return result;
-  }
-
-  // awbNumber로 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
-  async getLastAwbByAwbNumber(name: string) {
-    try {
-      const [result] = await this.vmsAwbHistoryRepository.find({
-        order: orderByUtil('-IN_DATE'),
-        where: { AWB_NUMBER: name },
-      });
-      return result;
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   // 최신 VWMS_AWB_RESULT 테이블에 있는 정보 가져오기
   async getLastVmsAwbResult(barcode: string) {
     const [result] = await this.vmsAwbResultRepository.find({
@@ -915,27 +735,6 @@ export class AwbService {
         AWB_NUMBER: Equal(barcode),
       },
       order: orderByUtil('-RECEIVED_DATE'),
-      take: 1,
-    });
-    return result;
-  }
-
-  // 최신 VWMS_AWB_HISTORY 테이블에 있는 정보 가져오기
-  async getLastVmsAwbHistory() {
-    const [result] = await this.vmsAwbHistoryRepository.find({
-      order: orderByUtil('-IN_DATE'),
-      take: 1,
-    });
-    return result;
-  }
-
-  // VWMS_AWB_HISTORY 테이블에 있는 정보 100 가져오기
-  async get100VmsAwbHistory() {
-    const result = await this.vmsAwbHistoryRepository.find({
-      where: {
-        RESULT_LENGTH: Not(IsNull()),
-      },
-      order: orderByUtil('-IN_DATE'),
       take: 1,
     });
     return result;
@@ -973,7 +772,6 @@ export class AwbService {
     // 현재 들어오는 데이터 확인하기
     const currentBarcode = data['VMS_08_01_P2A_Bill_No'];
     const currentSeparateNumber = data['VMS_08_01_P2A_SEPARATION_NO'];
-    // console.log(currentBarcode, currentSeparateNumber);
     try {
       if (!currentBarcode || !currentSeparateNumber) {
         // throw new NotFoundException(
@@ -982,10 +780,7 @@ export class AwbService {
         return;
       }
 
-      // 다르다면 로직 시작
-      // history 값 가져오기
       // vms 체적 데이터 가져오기
-
       const vmsAwbHistoryData =
         await this.fetchVmsAwbHistoryByBarcodeAndSeparateNumber(
           currentBarcode,
@@ -1035,7 +830,6 @@ export class AwbService {
       await this.awbUtilService.settingRedis(awb.barcode, awb.separateNumber);
       // mqtt 메세지 보내기 로직 호출
       await this.sendSyncMqttMessage(awb);
-      // console.log('vms 동기화 완료');
     } catch (error) {
       console.error('Error:', error);
     }
@@ -1050,11 +844,8 @@ export class AwbService {
     const currentBarcode = barcode;
     const currentSeparateNumber = separateNumber;
 
-    // console.log('currentBarcode = ', currentBarcode);
-    // console.log('currentSeparateNumber = ', currentSeparateNumber);
     if (!currentBarcode || !currentSeparateNumber) {
       // throw new NotFoundException('barcode, separateNumber 데이터가 없습니다.');
-      // console.log('barcode, separateNumber 데이터가 없습니다.');
       return null;
     }
 
@@ -1070,7 +861,6 @@ export class AwbService {
       if (!vmsAwbHistoryData) {
         // console.log('vmsAwbHistory 테이블에 데이터가 없습니다.');
         return null;
-        // throw new NotFoundException('vmsAwbHistory 테이블에 데이터가 없습니다.');
       }
 
       // bill_No으로 vmsAwbResult 테이블의 값 가져오기 위함(기존에는 최상단의 vms를 가져옴)
@@ -1097,15 +887,6 @@ export class AwbService {
         vmsAwbResult,
         vmsAwbHistoryData,
       );
-
-      // 화물이 입력이 되면 입력된 바코드, separateNumber 저장
-      // insert 되면 redis의 값 수정
-      // if (awb) {
-      // mqtt 메세지 보내기 로직 호출
-      // await this.sendSyncMqttMessage(awb);
-      // }
-
-      // console.log('누락 체크 로직에서 vms 데이터 생성');
     } catch (error) {
       console.error('Error:', error);
     }

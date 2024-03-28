@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AwbService } from './awb.service';
 import { AwbController } from './awb.controller';
 import { Awb } from './entities/awb.entity';
@@ -12,7 +12,6 @@ import { Vms3D } from '../vms/entities/vms.entity';
 import { MqttService } from '../mqtt.service';
 import { SccService } from '../scc/scc.service';
 import { Vms2d } from '../vms2d/entities/vms2d.entity';
-import { Basic } from '../basic/entities/basic.entity';
 import { AwbUtilService } from './awbUtil.service';
 import { VmsAwbResult } from '../vms-awb-result/entities/vms-awb-result.entity';
 import { VmsAwbHistory } from '../vms-awb-history/entities/vms-awb-history.entity';
