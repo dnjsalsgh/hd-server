@@ -25,11 +25,7 @@ export class SimulatorResultAwbJoinService {
     return await this.simulatorResultCargoJoinRepository.find();
   }
 
-  async findOne(id: number) {
-    // return await this.simulatorResultCargoJoinRepository.find({
-    //   where: { id: id },
-    // });
-  }
+  async findOne(id: number) {}
 
   update(
     id: number,
