@@ -14,7 +14,6 @@ import { RedisService } from '../redis/redis.service';
 import { redisCustomProvider } from '../redis/redisCustomProvider';
 import { AwbService } from '../awb/awb.service';
 import { Scc } from '../scc/entities/scc.entity';
-import { Basic } from '../basic/entities/basic.entity';
 import { AwbSccJoin } from '../awb-scc-join/entities/awb-scc-join.entity';
 import { AircraftSchedule } from '../aircraft-schedule/entities/aircraft-schedule.entity';
 import { Vms3D } from '../vms/entities/vms.entity';

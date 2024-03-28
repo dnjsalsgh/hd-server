@@ -31,8 +31,6 @@ import { AwbService } from '../awb/awb.service';
 import { AlarmService } from '../alarm/alarm.service';
 import { Alarm } from '../alarm/entities/alarm.entity';
 import dayjs from 'dayjs';
-import process from 'process';
-import { winstonLogger } from '../lib/logger/winston.util';
 
 @Injectable()
 export class AsrsService {
@@ -108,8 +106,7 @@ export class AsrsService {
   }
 
   async findOne(id: number) {
-    const result = await this.asrsRepository.findOne({ where: { id: id } });
-    return result;
+    return await this.asrsRepository.findOne({ where: { id: id } });
   }
 
   async update(id: number, updateAsrsDto: UpdateAsrsDto) {
@@ -198,9 +195,10 @@ export class AsrsService {
 
       const onOffTag = this.getTag('SKID_ON', unitKey);
       const onOffSignal = this.checkOnOff(body, onOffTag);
+      const variableInOut = onOffSignal ? 'in' : 'out';
+
       const awbNo = this.getTag('Bill_No', unitKey);
       const separateNumber = this.getTag('SEPARATION_NO', unitKey);
-      const variableInOut = onOffSignal ? 'in' : 'out';
 
       // 빈 바코드 있을 때 다음걸로 넘어가기
       if (
@@ -211,7 +209,6 @@ export class AsrsService {
         // 이전의 상태가 in이고
         // 현재 빈 바코드 있을 때 out 처리
         const asrsHistory = await this.getAsrsIn(unitNumber);
-        // console.log((asrsHistory.Asrs as Asrs).id);
         if (asrsHistory && asrsHistory.inOutType === 'in') {
           await this.processInOut(
             unitNumber,
@@ -220,12 +217,8 @@ export class AsrsService {
             'out',
           );
         }
-
         continue;
       }
-
-      // console.log('awbNo = ', awbNo);
-      // console.log('separateNumber = ', separateNumber);
 
       if (this.shouldSetInOUtAsrs(onOffSignal, previousState)) {
         await this.processInOut(
@@ -288,7 +281,6 @@ export class AsrsService {
       }
 
       await this.recordOperation(unitNumber, awb?.id, inOutType);
-      // await this.settingRedis(String(unitNumber), state);
     } catch (error) {
       console.error(error.message);
     }
@@ -385,13 +377,6 @@ export class AsrsService {
       .subscribe();
   }
 
-  async findAsrsByName(name: string) {
-    return await this.asrsRepository.findOne({
-      where: { name: name },
-      order: orderByUtil(null),
-    });
-  }
-
   // barcode와 separateNumber로 target awb를 찾기 위한 함수
   async findAwbByBarcode(billNo: string, separateNumber: number) {
     try {
@@ -455,7 +440,6 @@ export class AsrsService {
   }
 
   // plc에서 들어온 데이터 중 에러 코드만 가지고 alarm 테이블에 저장하기
-  // TODO: 리팩토링 하기
   async makeAlarmFromPlc(body: CreateAsrsPlcDto) {
     const facilityArray = [
       'CONV_01_01_P2A_Total_Error',
@@ -515,23 +499,6 @@ export class AsrsService {
       } else if (!previousTotalError && totalError === 1) {
         await this.makeAlarm(facility, message);
       }
-
-      // if (
-      //   previousTotalError &&
-      //   totalError === 0 &&
-      //   previousTotalError.done === false
-      // ) {
-      //   await this.changeAlarmIsDone(previousTotalError, true);
-      // } else if (
-      //   previousTotalError &&
-      //   totalError === 1 &&
-      //   previousTotalError.done
-      // ) {
-      //   await this.changeAlarm(previousTotalError, true);
-      //   await this.changeAlarmIsDone(previousTotalError, false);
-      // } else if (!previousTotalError && totalError === 1) {
-      //   await this.makeAlarm(facility, message);
-      // }
     }
   }
 
@@ -553,16 +520,8 @@ export class AsrsService {
     }
   }
 
-  async changeAlarmIsDone(alarm: Alarm, done: boolean) {
-    await this.alarmRepository.update(alarm.id, {
-      done: done,
-    });
-  }
-
   async getPreviousAlarmState(equipmentName: string) {
     // 오늘 날짜의 시작과 끝을 구하고, KST로 변환합니다 (UTC+9).
-    // const todayStart = dayjs().startOf('day').add(9, 'hour').toDate();
-    // const todayEnd = dayjs().endOf('day').add(18, 'hour').toDate();
     const todayStart = dayjs().startOf('day').toDate();
     const todayEnd = dayjs().endOf('day').toDate();
 
