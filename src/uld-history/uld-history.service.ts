@@ -19,7 +19,6 @@ import { ClientProxy } from '@nestjs/microservices';
 import { UldService } from '../uld/uld.service';
 import { UldSccInjectionDto } from '../uld/dto/uld-sccInjection.dto';
 import { orderByUtil } from '../lib/util/orderBy.util';
-import { log } from 'console';
 
 @Injectable()
 export class UldHistoryService {
@@ -82,10 +81,7 @@ export class UldHistoryService {
   }
 
   // uld에 scc를 주입하는 메서드
-  async injectScc(
-    createUldHistoryDto,
-    // , queryRunner
-  ) {
+  async injectScc(createUldHistoryDto) {
     const targetAwbId = +createUldHistoryDto.Awb;
     const targetUldId = +createUldHistoryDto.Uld;
 
