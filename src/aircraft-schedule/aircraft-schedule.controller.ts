@@ -29,19 +29,6 @@ export class AircraftScheduleController {
     return await this.aircraftScheduleService.create(createAircraftScheduleDto);
   }
 
-  @ApiOperation({
-    summary: '항공편 안에 화물 정보를 넣어서 입력하기 위한 api',
-    description: 'uld 없어도 됨',
-  })
-  @Post('/with/awbs')
-  async createWithAwbs(
-    @Body() createAircraftScheduleDto: CreateAircraftScheduleDto,
-  ) {
-    return await this.aircraftScheduleService.createWithAwbs(
-      createAircraftScheduleDto,
-    );
-  }
-
   @ApiQuery({ name: 'Aircraft', required: false, type: 'number' })
   @ApiQuery({ name: 'destination', required: false, type: 'string' })
   @ApiQuery({ name: 'departure', required: false, type: 'string' })

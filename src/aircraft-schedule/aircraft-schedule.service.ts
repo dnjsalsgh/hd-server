@@ -44,26 +44,6 @@ export class AircraftScheduleService {
     return insertResult;
   }
 
-  async createWithAwbs(createAircraftScheduleDto: CreateAircraftScheduleDto) {
-    const { Awbs, ...aircraftSchedule } = createAircraftScheduleDto;
-
-    const aircraftScheduleResult = await this.aircraftScheduleRepository.save(
-      createAircraftScheduleDto,
-    );
-
-    for (const awb of Awbs) {
-      awb.AirCraftSchedule = aircraftScheduleResult.id;
-      const awbsResult = this.awbRepository.save(awb);
-    }
-    const insertResult = await this.aircraftScheduleRepository.save(
-      createAircraftScheduleDto,
-    );
-    this.client
-      .send(`hyundai/aircraftSchedule/insert`, insertResult)
-      .subscribe();
-    return insertResult;
-  }
-
   async findAll(
     Aircraft: number,
     destination: string,
