@@ -307,6 +307,7 @@ export class SimulatorResultService {
 
     // ps의 결과가 Failure로 올 때 예외 처리
     if (psResult.inputState !== 'Success') {
+      psResult['isNull'] = isNull[0];
       return psResult;
     }
 
@@ -605,6 +606,7 @@ export class SimulatorResultService {
         .send('hyundai/ps/recommend', psResult)
         .pipe(take(1))
         .subscribe();
+      psResult['isNull'] = isNull[0];
       return psResult;
     } catch (e) {
       throw new HttpException(
@@ -671,7 +673,10 @@ export class SimulatorResultService {
     try {
       const bodyResult = psResult.result[0];
       // uld에 더이상 화물이 들어가지 못합니다.
-      if (bodyResult.isDone) return psResult;
+      if (bodyResult.isDone) {
+        psResult['isNull'] = isNull[0];
+        return psResult;
+      }
 
       // 1. 자동창고 작업지시를 만들기
       const asrsOutOrderParamArray: CreateAsrsOutOrderDto[] = [];
