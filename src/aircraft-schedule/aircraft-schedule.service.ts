@@ -17,11 +17,8 @@ import { AircraftAttribute } from '../aircraft/entities/aircraft.entity';
 import { orderByUtil } from '../lib/util/orderBy.util';
 import { Awb, AwbSimpleAttribute } from '../awb/entities/awb.entity';
 import { ClientProxy } from '@nestjs/microservices';
-import { Uld, UldAttribute } from '../uld/entities/uld.entity';
-import {
-  UldType,
-  UldTypeAttribute,
-} from '../uld-type/entities/uld-type.entity';
+import { UldAttribute } from '../uld/entities/uld.entity';
+import { UldTypeAttribute } from '../uld-type/entities/uld-type.entity';
 import { UldHistoryAttribute } from '../uld-history/entities/uld-history.entity';
 import { SccAttribute } from '../scc/entities/scc.entity';
 import { adjustDate } from '../lib/util/adjustDate';
@@ -31,10 +28,6 @@ export class AircraftScheduleService {
   constructor(
     @InjectRepository(Awb)
     private readonly awbRepository: Repository<Awb>,
-    @InjectRepository(Uld)
-    private readonly uldRepository: Repository<Uld>,
-    @InjectRepository(UldType)
-    private readonly UldTypeRepository: Repository<UldType>,
     @InjectRepository(AircraftSchedule)
     private readonly aircraftScheduleRepository: Repository<AircraftSchedule>,
     @Inject('MQTT_SERVICE') private client: ClientProxy,

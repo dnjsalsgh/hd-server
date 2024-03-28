@@ -13,8 +13,6 @@ import { AircraftScheduleService } from './aircraft-schedule.service';
 import { CreateAircraftScheduleDto } from './dto/create-aircraft-schedule.dto';
 import { UpdateAircraftScheduleDto } from './dto/update-aircraft-schedule.dto';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { UpdateAwbDto } from '../awb/dto/update-awb.dto';
-import { CreateAsrsDto } from '../asrs/dto/create-asrs.dto';
 
 @Controller('aircraft-schedule')
 @ApiTags('[항공기 스케줄]aircraft-schedule')
