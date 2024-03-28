@@ -1,7 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Uld } from '../entities/uld.entity';
 import { UldType } from '../../uld-type/entities/uld-type.entity';
-import { AircraftSchedule } from '../../aircraft-schedule/entities/aircraft-schedule.entity';
 
 export class CreateUldDto extends PickType(Uld, [
   'code',
