@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Asrs, AsrsAttribute } from '../asrs/entities/asrs.entity';
 import {
   Between,
-  DataSource,
   Equal,
   FindOperator,
   LessThanOrEqual,
@@ -22,25 +21,14 @@ export class AsrsHistoryService {
   constructor(
     @InjectRepository(AsrsHistory)
     private readonly asrsHistoryRepository: Repository<AsrsHistory>,
-    @InjectRepository(Asrs)
-    private readonly asrsRepository: Repository<Asrs>,
-    @InjectRepository(Awb)
-    private readonly awbRepository: Repository<Awb>,
-    private dataSource: DataSource,
   ) {}
 
   async create(createAsrsHistoryDto: CreateAsrsHistoryDto) {
-    const insertResult = await this.asrsHistoryRepository.save(
-      createAsrsHistoryDto,
-    );
-    return insertResult;
+    return await this.asrsHistoryRepository.save(createAsrsHistoryDto);
   }
 
   async createList(createAsrsHistoryDto: CreateAsrsHistoryDto[]) {
-    const insertResult = await this.asrsHistoryRepository.save(
-      createAsrsHistoryDto,
-    );
-    return insertResult;
+    return await this.asrsHistoryRepository.save(createAsrsHistoryDto);
   }
 
   /**
@@ -116,8 +104,7 @@ export class AsrsHistoryService {
   }
 
   async resetAsrsAll() {
-    const asrsResult = await this.asrsHistoryRepository.delete({});
-
+    await this.asrsHistoryRepository.delete({});
     return '창고가 비었습니다.';
   }
 

@@ -1,10 +1,7 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { AsrsHistory } from '../entities/asrs-history.entity';
-import { IsString } from 'class-validator';
 
 export class CreateAsrsHistoryDto extends PickType(AsrsHistory, [
-  // 'Asrs',
-  // 'Awb',
   'inOutType',
   'count',
 ]) {
