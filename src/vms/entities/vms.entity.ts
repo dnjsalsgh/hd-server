@@ -65,14 +65,6 @@ export class Vms3D {
   @Column({ name: 'FILE_PATH', type: 'nvarchar', length: 1024, nullable: true })
   FILE_PATH: string;
 
-  // @Column({
-  //   name: 'FILE_EXTENSION',
-  //   type: 'nvarchar',
-  //   length: 1024,
-  //   nullable: true,
-  // })
-  // FILE_EXTENSION: string;
-
   @Column({
     name: 'FILE_SIZE',
     type: 'int',
@@ -175,12 +167,4 @@ export class Vms3D {
     nullable: true,
   })
   CREATE_DATE: string;
-
-  // scc가 string으로 들어오는대신 ,로 구분되어진다고 가정
-  // @ApiProperty({
-  //   example: ['REG', 'GEN'],
-  //   description: 'scc들',
-  // })
-  // @Column({ type: 'varchar', length: 500, nullable: true })
-  // Sccs: string;
 }
