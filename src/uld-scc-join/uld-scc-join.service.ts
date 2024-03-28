@@ -22,12 +22,7 @@ export class UldSccJoinService {
     return await this.uldSccJoinRepository.find();
   }
 
-  async findOne(id: number) {
-    // const result = await this.uldSccJoinRepository.findOne({
-    //   where: { id: id },
-    // });
-    // return result;
-  }
+  async findOne(id: number) {}
 
   update(id: number, updateUldSccJoinDto: UpdateUldSccJoinDto) {
     return this.uldSccJoinRepository.update(id, updateUldSccJoinDto);
