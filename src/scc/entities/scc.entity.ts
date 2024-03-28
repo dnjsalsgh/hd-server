@@ -73,12 +73,6 @@ export class Scc {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  // @OneToMany(() => AwbSccJoin, (cargoSccJoin) => cargoSccJoin.Scc)
-  // awbSccJoin: AwbSccJoin[];
-
-  // @OneToMany(() => UldSccJoin, (uldSccJoin) => uldSccJoin.scc)
-  // uldSccJoin: UldSccJoin[];
-
   @ManyToMany(() => Uld, (uld) => uld.Scc)
   Uld: Uld[];
 
